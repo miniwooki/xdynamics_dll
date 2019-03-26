@@ -1,0 +1,398 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="소스 파일">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="헤더 파일">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="헤더 파일\xdynamics_object">
+      <UniqueIdentifier>{aaf54513-1a53-46fa-8985-165f9f66511e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\xdynamics_algebra">
+      <UniqueIdentifier>{ae9aab90-59ca-4b47-8107-00967d8513f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\xdynamics_simulation">
+      <UniqueIdentifier>{ff570af4-d2a9-4abc-8c9e-b254f4926527}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\xdynamics_manager">
+      <UniqueIdentifier>{2db2aa66-18af-4946-aff2-f9950e8b9751}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\xdynamics_manager">
+      <UniqueIdentifier>{191ed707-d109-4392-8d98-abc5bf6b5dbb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\xdynamics_simulation">
+      <UniqueIdentifier>{7a97ff13-dded-4a38-9684-12c34adf1e1f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\xdynamics_algebra">
+      <UniqueIdentifier>{0b7ce05c-6190-4b52-b49b-695754bb8c6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\xdynamics_object">
+      <UniqueIdentifier>{4fcdd42a-fcc8-4f94-a95e-c9a32ee0e60f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\xParallel">
+      <UniqueIdentifier>{c1b8f1eb-5f9e-443e-ae05-a05d13672896}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\xdynamics_parallel">
+      <UniqueIdentifier>{458f66e8-8c38-4491-b905-eecef12c2eb2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\xdynamics_object\contactPair">
+      <UniqueIdentifier>{d5979e32-b0e5-4d26-930d-10f14391d0fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\xdynamics_object\joint">
+      <UniqueIdentifier>{38f118df-48e9-4469-a619-74108a8b7477}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\xdynamics_object\shapeObject">
+      <UniqueIdentifier>{8952ef39-2547-4c36-bd4b-32bc67b264f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\xdynamics_object\joint">
+      <UniqueIdentifier>{360e46c7-5ef1-456d-83ed-b9cfabb0da7b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\xdynamics_object\shapeObject">
+      <UniqueIdentifier>{0904b987-e0a9-4d05-a70f-0938874f3bde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\xdynamics_object\contactPair">
+      <UniqueIdentifier>{f14fbc24-0689-4087-9f26-cf83193445c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\xdynamics_object\force">
+      <UniqueIdentifier>{37ca92ed-5cb9-4ce8-93c9-446cbd863df7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\xdynamics_object\force">
+      <UniqueIdentifier>{8b60814d-eba0-4255-9835-fa82a3e6629e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_manager\xModel.cpp">
+      <Filter>소스 파일\xdynamics_manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_manager\xMultiBodyModel.cpp">
+      <Filter>소스 파일\xdynamics_manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_simulation\xDynamicSimulator.cpp">
+      <Filter>소스 파일\xdynamics_simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_simulation\xMultiBodySimulation.cpp">
+      <Filter>소스 파일\xdynamics_simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_simulation\xSimulation.cpp">
+      <Filter>소스 파일\xdynamics_simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_algebra\xUtilityFunction.cpp">
+      <Filter>소스 파일\xdynamics_algebra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xPointMass.cpp">
+      <Filter>소스 파일\xdynamics_object</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_global.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_manager\xDynamicsManager.cpp">
+      <Filter>소스 파일\xdynamics_manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_simulation\xIntegratorHHT.cpp">
+      <Filter>소스 파일\xdynamics_simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xDynamicsError.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_algebra\xParabolaPredictor.cpp">
+      <Filter>소스 파일\xdynamics_algebra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_simulation\xIntegratorRK4.cpp">
+      <Filter>소스 파일\xdynamics_simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_manager\xResultManager.cpp">
+      <Filter>소스 파일\xdynamics_manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_manager\xDiscreteElementMethodModel.cpp">
+      <Filter>소스 파일\xdynamics_manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_manager\xParticleManager.cpp">
+      <Filter>소스 파일\xdynamics_manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xObejct.cpp">
+      <Filter>소스 파일\xdynamics_object</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_algebra\xAlgebraType.cpp">
+      <Filter>소스 파일\xdynamics_algebra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_algebra\xAlgebraMath.cpp">
+      <Filter>소스 파일\xdynamics_algebra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xXLSReader.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xObjectManager.cpp">
+      <Filter>소스 파일\xdynamics_manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_manager\xContactManager.cpp">
+      <Filter>소스 파일\xdynamics_manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_algebra\xGridCell.cpp">
+      <Filter>소스 파일\xdynamics_algebra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_simulation\xDiscreteElementMethodSimulation.cpp">
+      <Filter>소스 파일\xdynamics_simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_simulation\xIntegratorVV.cpp">
+      <Filter>소스 파일\xdynamics_simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_algebra\xNeiborhoodCell.cpp">
+      <Filter>소스 파일\xdynamics_algebra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xLog.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xParticlePlaneContact.cpp">
+      <Filter>소스 파일\xdynamics_object\contactPair</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xParticleParticleContact.cpp">
+      <Filter>소스 파일\xdynamics_object\contactPair</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xParticleCubeContact.cpp">
+      <Filter>소스 파일\xdynamics_object\contactPair</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xRevoluteConstraint.cpp">
+      <Filter>소스 파일\xdynamics_object\joint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xSphericalConstraint.cpp">
+      <Filter>소스 파일\xdynamics_object\joint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xTranslationConstraint.cpp">
+      <Filter>소스 파일\xdynamics_object\joint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xUniversalConstraint.cpp">
+      <Filter>소스 파일\xdynamics_object\joint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xDrivingConstraint.cpp">
+      <Filter>소스 파일\xdynamics_object\joint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xMeshObject.cpp">
+      <Filter>소스 파일\xdynamics_object\shapeObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xCubeObject.cpp">
+      <Filter>소스 파일\xdynamics_object\shapeObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xParticleObject.cpp">
+      <Filter>소스 파일\xdynamics_object\shapeObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xPlaneObject.cpp">
+      <Filter>소스 파일\xdynamics_object\shapeObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xParticleMeshObjectContact.cpp">
+      <Filter>소스 파일\xdynamics_object\contactPair</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xParticleMeshObjectsContact.cpp">
+      <Filter>소스 파일\xdynamics_object\contactPair</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xKinematicConstraint.cpp">
+      <Filter>소스 파일\xdynamics_object\joint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xForce.cpp">
+      <Filter>소스 파일\xdynamics_object\force</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xSpringDamperForce.cpp">
+      <Filter>소스 파일\xdynamics_object\force</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xContactPairList.cpp">
+      <Filter>소스 파일\xdynamics_object\contactPair</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xContact.cpp">
+      <Filter>소스 파일\xdynamics_object\contactPair</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xParticlePlanesContact.cpp">
+      <Filter>소스 파일\xdynamics_object\contactPair</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xViewExporter.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_simulation\xKinematicAnalysis.cpp">
+      <Filter>소스 파일\xdynamics_simulation</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\xdynamics_decl.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_object\xPointMass.h">
+      <Filter>헤더 파일\xdynamics_object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_algebra\xUtilityFunctions.h">
+      <Filter>헤더 파일\xdynamics_algebra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_simulation\xDynamicsSimulator.h">
+      <Filter>헤더 파일\xdynamics_simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_simulation\xMultiBodySimulation.h">
+      <Filter>헤더 파일\xdynamics_simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_simulation\xSimulation.h">
+      <Filter>헤더 파일\xdynamics_simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_manager\xModel.h">
+      <Filter>헤더 파일\xdynamics_manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_manager\xMultiBodyModel.h">
+      <Filter>헤더 파일\xdynamics_manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_global.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xDynamicsError.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_manager\xDynamicsManager.h">
+      <Filter>헤더 파일\xdynamics_manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_simulation\xIntegratorHHT.h">
+      <Filter>헤더 파일\xdynamics_simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_algebra\xParaboalPredictor.h">
+      <Filter>헤더 파일\xdynamics_algebra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_manager\xResultStorage.h">
+      <Filter>헤더 파일\xdynamics_manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_simulation\xIntegratorRK4.h">
+      <Filter>헤더 파일\xdynamics_simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_manager\xResultManager.h">
+      <Filter>헤더 파일\xdynamics_manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_manager\XDiscreteElementMethodModel.h">
+      <Filter>헤더 파일\xdynamics_manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_manager\xParticleMananger.h">
+      <Filter>헤더 파일\xdynamics_manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_object\xObject.h">
+      <Filter>헤더 파일\xdynamics_object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xTypes.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_algebra\xAlgebraType.h">
+      <Filter>헤더 파일\xdynamics_algebra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_algebra\xAlgebraMath.h">
+      <Filter>헤더 파일\xdynamics_algebra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xXLSReader.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_manager\xObjectManager.h">
+      <Filter>헤더 파일\xdynamics_manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_manager\xContactManager.h">
+      <Filter>헤더 파일\xdynamics_manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_algebra\xGridCell.h">
+      <Filter>헤더 파일\xdynamics_algebra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_simulation\xDiscreteElementMethodSimulation.h">
+      <Filter>헤더 파일\xdynamics_simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_simulation\xIngegratorVV.h">
+      <Filter>헤더 파일\xdynamics_simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_algebra\xNeiborhoodCell.h">
+      <Filter>헤더 파일\xdynamics_algebra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_parallel\xParallelDEM_decl.cuh">
+      <Filter>헤더 파일\xParallel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xLog.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_object\xParticleCubeContact.h">
+      <Filter>헤더 파일\xdynamics_object\contactPair</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_object\xParticleParticleContact.h">
+      <Filter>헤더 파일\xdynamics_object\contactPair</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_object\xParticlePlaneContact.h">
+      <Filter>헤더 파일\xdynamics_object\contactPair</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_object\xDrivingConstraint.h">
+      <Filter>헤더 파일\xdynamics_object\joint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_object\xRevoluteConstraint.h">
+      <Filter>헤더 파일\xdynamics_object\joint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_object\xSphericalConstraint.h">
+      <Filter>헤더 파일\xdynamics_object\joint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_object\xTranslationConstraint.h">
+      <Filter>헤더 파일\xdynamics_object\joint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_object\xUniversalConstraint.h">
+      <Filter>헤더 파일\xdynamics_object\joint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_object\xCubeObject.h">
+      <Filter>헤더 파일\xdynamics_object\shapeObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_object\xMeshObject.h">
+      <Filter>헤더 파일\xdynamics_object\shapeObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_object\xParticleObject.h">
+      <Filter>헤더 파일\xdynamics_object\shapeObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_object\xPlaneObject.h">
+      <Filter>헤더 파일\xdynamics_object\shapeObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_object\xParticleMeshObjectContact.h">
+      <Filter>헤더 파일\xdynamics_object\contactPair</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_object\xParticleMeshObjectsContact.h">
+      <Filter>헤더 파일\xdynamics_object\contactPair</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_object\xForce.h">
+      <Filter>헤더 파일\xdynamics_object\force</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_object\xKinematicConstraint.h">
+      <Filter>헤더 파일\xdynamics_object\joint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_object\xSpringDamperForce.h">
+      <Filter>헤더 파일\xdynamics_object\force</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_object\xContactPairList.h">
+      <Filter>헤더 파일\xdynamics_object\contactPair</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_object\xConatct.h">
+      <Filter>헤더 파일\xdynamics_object\contactPair</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_object\xParticlePlanesContact.h">
+      <Filter>헤더 파일\xdynamics_object\contactPair</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xViewExporter.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_simulation\xKinematicAnalysis.h">
+      <Filter>헤더 파일\xdynamics_simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_parallel\xParallelDEM_impl.cuh">
+      <Filter>헤더 파일\xParallel</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="..\..\source\xdynamics_parallel\xParallelDEM_def.cu">
+      <Filter>소스 파일\xdynamics_parallel</Filter>
+    </CudaCompile>
+  </ItemGroup>
+</Project>

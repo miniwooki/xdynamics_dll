@@ -4,6 +4,11 @@
 *.aab
 *.obj
 *.tlog
+*.sdf
+*.deps
+*.cache
+*.pdb
+*.idp
 
 
 # Files for the ART/Dalvik VM
