@@ -9,7 +9,7 @@
 *.cache
 *.pdb
 *.idp
-
+*.opensdf
 
 # Files for the ART/Dalvik VM
 *.dex
