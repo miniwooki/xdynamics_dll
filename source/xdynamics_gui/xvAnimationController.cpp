@@ -5,7 +5,7 @@ int xvAnimationController::play_mode = 0;
 unsigned int xvAnimationController::current_frame = 0;
 unsigned int xvAnimationController::buffer_count = 0;
 bool xvAnimationController::is_play = false;
-float *xvAnimationController::times = new float[1000];
+float *xvAnimationController::times = 0;// new float[1000];
 bool xvAnimationController::real_time = false;
 
 xvAnimationController::xvAnimationController()

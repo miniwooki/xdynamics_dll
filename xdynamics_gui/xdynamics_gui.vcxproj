@@ -114,9 +114,12 @@
     </QtRcc>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\source\xdynamics_gui\xAnimationTool.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xCommandWindow.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xGLWidget.cpp" />
+    <ClCompile Include="..\source\xdynamics_gui\xModelNavigator.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xvAnimationController.cpp" />
+    <ClCompile Include="..\source\xdynamics_gui\xvCube.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xvMarker.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xvObject.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xvParticle.cpp" />
@@ -129,6 +132,7 @@
     <QtMoc Include="xdynamics_gui.h" />
   </ItemGroup>
   <ItemGroup>
+    <QtUic Include="wcube.ui" />
     <QtUic Include="xdynamics_gui.ui" />
   </ItemGroup>
   <ItemGroup>
@@ -138,7 +142,11 @@
     <QtMoc Include="..\include\xdynamics_gui\xGLWidget.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GeneratedFiles\ui_wcube.h" />
+    <QtMoc Include="..\include\xdynamics_gui\xModelNavigator.h" />
+    <ClInclude Include="..\include\xdynamics_gui\xvCube.h" />
     <QtMoc Include="..\include\xdynamics_gui\xCommandWindow.h" />
+    <QtMoc Include="..\include\xdynamics_gui\xAnimationTool.h" />
     <ClInclude Include="..\include\xdynamics_gui\xvAnimationController.h" />
     <ClInclude Include="..\include\xdynamics_gui\xvGlew.h" />
     <ClInclude Include="..\include\xdynamics_gui\xvMarker.h" />

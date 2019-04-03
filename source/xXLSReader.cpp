@@ -130,13 +130,33 @@ xCubeParticleData xXLSReader::ReadCubeParticleData(std::string& _name, int r, in
 	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 3);
 	d.minr = sheet->readNum(r, c++);
 	d.maxr = sheet->readNum(r, c++);
+	int t_shape = (int)CUBE_SHAPE;
 // 	if (xve)
 // 	{
 // 		int t = VPARTICLE;
 // 		xve->Write((char*)&t, sizeof(int));
 // 		int ns = _name.size(); xve->Write((char*)&ns, sizeof(int));
 // 		xve->Write((char*)_name.c_str(), sizeof(char)*_name.size());
+// 		xve->Write((char*)t_shape, sizeof(int));
 // 		xve->Write((char*)&d, sizeof(xCubeParticleData));
+// 	}
+	return d;
+}
+
+xListParticleData xXLSReader::ReadListParticleData(std::string& _name, int r, int& c)
+{
+	xListParticleData d = { 0 };
+	unsigned int number = static_cast<int>(sheet->readNum(r, c++));
+	int t_shape = (int)NO_SHAPE_AND_LIST;
+	d.number = number;
+// 	if (xve)
+// 	{
+// 		int t = VPARTICLE;
+// 		xve->Write((char*)&t, sizeof(int));
+// 		int ns = _name.size(); xve->Write((char*)&ns, sizeof(int));
+// 		xve->Write((char*)_name.c_str(), sizeof(char)*_name.size());
+// 		xve->Write((char*)t_shape, sizeof(int));
+// 		xve->Write((char*)&d, sizeof(xListParticleData));
 // 	}
 	return d;
 }
@@ -270,22 +290,27 @@ void xXLSReader::ReadParticle(xParticleManager* xparticle, vector2i rc)
 			}
 			else if (form == NO_SHAPE_AND_LIST)
 			{
+				//xListParticleData d = ReadListParticleData(name, rc.x++, rc.y);
 				unsigned int number = static_cast<int>(sheet->readNum(rc.x, rc.y++));
 				std::wstring x;
-				x = sheet->readStr(rc.x, rc.y); 
-				uf::xsplit(x, ",", 2, &rc.x);
+				x = sheet->readStr(rc.x++, rc.y); 
+				vector2i _rc;
+				uf::xsplit(x, ",", 2, &_rc.x);
 				vector4d* d = new vector4d[number];
-				rc.x -= 1; rc.y -= 1;
+				_rc.x -= 1; _rc.y -= 1;
+				int start_column = _rc.y;
 				for (unsigned int i = 0; i < number; i++)
 				{
-					if (IsEmptyCell(rc.x, rc.y))
+					if (IsEmptyCell(_rc.x, _rc.y))
 						break;
-					d[i].x = sheet->readNum(rc.x, rc.y++);
-					d[i].y = sheet->readNum(rc.x, rc.y++);
-					d[i].z = sheet->readNum(rc.x, rc.y++);
-					d[i].w = sheet->readNum(rc.x++, rc.y);
+					d[i].x = sheet->readNum(_rc.x, _rc.y++);
+					d[i].y = sheet->readNum(_rc.x, _rc.y++);
+					d[i].z = sheet->readNum(_rc.x, _rc.y++);
+					d[i].w = sheet->readNum(_rc.x++, _rc.y);
+					_rc.y = start_column;
 				}
 				xparticle->CreateParticleFromList(name.c_str(), (xMaterialType)material, number, d);
+				delete[] d;
 			}
 		}
 	}

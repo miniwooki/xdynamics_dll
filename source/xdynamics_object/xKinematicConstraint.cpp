@@ -133,7 +133,7 @@ void xKinematicConstraint::SetupDataFromStructure(xPointMass* base, xPointMass* 
 	hj = cross(fj, gj);
 }
 
-void xKinematicConstraint::ExportResults(/*QString& path*/)
+void xKinematicConstraint::ExportResults(std::fstream& of)
 {
 	std::ofstream ofs;
 	QString _path = xModel::path + xModel::name + "/" + name + ".bkc";
@@ -152,6 +152,7 @@ void xKinematicConstraint::ExportResults(/*QString& path*/)
 	// 		<< "afx " << "afy " << "afz " << "amx " << "amy " << "amz "
 	ofs.close();
 	xLog::log("Exported : " + _path.toStdString());
+	of << _path.toStdString() << endl;
 	//std::wcout << L"Exported : " << _path.text() << std::endl;
 }
 

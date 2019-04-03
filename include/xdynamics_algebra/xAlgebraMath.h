@@ -175,6 +175,7 @@ XDYNAMICS_API vector3d ToAngularVelocity(const euler_parameters& e, const euler_
 XDYNAMICS_API vector3d ToGlobal(const euler_parameters& e, const vector3d& v3);
 XDYNAMICS_API matrix33d Transpose(const matrix33d& A);
 XDYNAMICS_API int LinearSolve(int n, int nrhs, xMatrixD& a, int lda, xVectorD& b, int ldb);
+XDYNAMICS_API void coordinatePartitioning(xSparseD& lhs, int* uID);
 
 // Conversion
 XDYNAMICS_API vector3d ToVector3D(vector3ui& v3);

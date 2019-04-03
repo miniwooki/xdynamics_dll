@@ -32,6 +32,7 @@ xModel::xModel()
 xModel::xModel(const QString _name)
 {
 	name = _name;
+	std::cout << _name.toStdString() << std::endl;
 	xUtilityFunctions::CreateDirectory(path.toStdWString().c_str());
 	if (!ground)
 	{

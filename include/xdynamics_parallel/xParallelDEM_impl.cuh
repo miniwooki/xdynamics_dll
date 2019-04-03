@@ -401,149 +401,149 @@ __device__ void DHSModel(
 	}
 }
 
-__global__ void check_no_collision_pair_kernel(double4* pos, uint2* pinfo, unsigned int* pother, unsigned int _np)
-{
-	unsigned int id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
-	unsigned int np = _np;
-	if (id >= np)
-		return;
-	uint2 pid = pinfo[id];
-	if (!pid.y)
-		return;
-	unsigned int sid = id * MAXIMUM_PAIR_NUMBER;
-	unsigned int count = 0;
-	double4 ipos = pos[pid.x];
-	unsigned int other = 0;
-	while (count < MAXIMUM_PAIR_NUMBER && other != 0xffffffff)
-	{
-		other = pother[sid + count];
-		double4 jpos = pos[other];
-		double3 rp = make_double3(jpos.x - ipos.x, jpos.y - ipos.y, jpos.z - ipos.z);
-		double dist = length(rp);
-		double cdist = (ipos.w + jpos.w) - dist;
-		if (cdist <= 0)
-		{
-			pother[sid + count] = 0xffffffff;
-			//data.y = 0xffffffff;
-			pid.y--;
-		}
-		count++;
-	}
-	pinfo[id] = pid;
-}
-
-__global__ void check_new_collision_pair_kernel(
-	double4* pos,  uint2 *pinfo, unsigned int* pdata,
-	unsigned int* sorted_index, unsigned int* cstart, unsigned int* cend, unsigned int _np)
-{
-	unsigned int id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
-	unsigned int np = _np;
-	if (id >= np)
-		return;
-	double4 ipos = pos[id];
-	double4 jpos = make_double4(0, 0, 0, 0);
-	int3 gridPos = calcGridPos(make_double3(ipos.x, ipos.y, ipos.z));
-
-	double ir = ipos.w; double jr = 0;
-	int3 neighbour_pos = make_int3(0, 0, 0);
-	uint grid_hash = 0;
-	unsigned int start_index = 0;
-	unsigned int end_index = 0;
-	uint2 pid = pinfo[id];
-	unsigned int sid = id * MAXIMUM_PAIR_NUMBER;
-	for (int z = -1; z <= 1; z++){
-		for (int y = -1; y <= 1; y++){
-			for (int x = -1; x <= 1; x++){
-				neighbour_pos = make_int3(gridPos.x + x, gridPos.y + y, gridPos.z + z);
-				grid_hash = calcGridHash(neighbour_pos);
-				start_index = cstart[grid_hash];
-				if (start_index != 0xffffffff){
-					end_index = cend[grid_hash];
-					for (unsigned int j = start_index; j < end_index; j++){
-						unsigned int k = sorted_index[j];
-						if (id == k || k >= np)
-							continue;
-						jpos = pos[k];
-						jr = jpos.w;
-						double3 rp = make_double3(jpos.x - ipos.x, jpos.y - ipos.y, jpos.z - ipos.z);
-						double dist = length(rp);
-						double cdist = (ir + jr) - dist;
-						if (cdist > 0){
-							pid.y++;
-							for (unsigned int i = sid; i < sid + MAXIMUM_PAIR_NUMBER; i++)
-							{
-								if (pdata[sid] != 0xffffffff)
-								{
-									pdata[sid] = k;
-									break;
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	pinfo[id] = pid;
-}
-
-__global__ void calculate_particle_collision_with_pair_kernel(
-	double4* pos, double3* vel, double3* omega,
-	double* mass, double2* tan, double3* force, double3* moment, 
-	uint2* pinfo, unsigned int* pother, device_contact_property* cp, unsigned int np)
-{
-	unsigned int id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
-	if (id >= np)
-		return;
-	uint2 pid = pinfo[id];
-	if (!pid.y)
-		return;
-	double im = mass[pid.x];
-	double jm = 0.0;
-	double4 ipos = pos[pid.x];
-	double3 ivel = vel[pid.x];
-	double3 iomega = omega[pid.x];
-	double4 jpos = make_double4(0.0, 0.0, 0.0, 0.0);
-	double3 jvel = make_double3(0.0, 0.0, 0.0);
-	double3 jomega = make_double3(0.0, 0.0, 0.0);
-	double3 Ft = make_double3(0, 0, 0);
-	double3 Fn = make_double3(0, 0, 0);// [id] * cte.gravity;
-	double3 M = make_double3(0, 0, 0);
-	double3 sumF = make_double3(0, 0, 0);
-	double3 sumM = make_double3(0, 0, 0);
-	unsigned int sid = id * MAXIMUM_PAIR_NUMBER;
-	for (unsigned int i = 0; i < MAXIMUM_PAIR_NUMBER; i++)
-	{
-		unsigned int other = pother[sid + i];
-		if (other == 0xffffffff)
-			continue;
-		jpos = pos[other];
-		jvel = vel[other];
-		jomega = omega[other];
-		jm = mass[other];
-		double2 ds = tan[sid + i];
-		double3 rp = make_double3(jpos.x - ipos.x, jpos.y - ipos.y, jpos.z - ipos.z);
-		double dist = length(rp);
-		double cdist = (ipos.w + jpos.w) - dist;
-		double rcon = ipos.w - 0.5 * cdist;
-		double3 unit = rp / dist;
-		double3 rv = jvel + cross(jomega, -jpos.w * unit) - (ivel + cross(iomega, ipos.w * unit));
-		device_force_constant c = getConstant(
-			1, ipos.w, jpos.w, im, jm, cp->Ei, cp->Ej,
-			cp->pri, cp->prj, cp->Gi, cp->Gj,
-			cp->rest, cp->fric, cp->rfric, cp->sratio);
-		DHSModel(
-			c, ipos.w, jpos.w, cp->Ei, cp->Ej, cp->pri, cp->prj,
-			cp->coh, rcon, cdist, iomega, ds.x, ds.y,
-			rv, unit, Ft, Fn, M);
-		break;
-
-		sumF += Fn + Ft;
-		sumM += M;
-	}
-	force[pid.x] += sumF;
-	moment[pid.x] += sumM;
-}
+//__global__ void check_no_collision_pair_kernel(double4* pos, uint2* pinfo, unsigned int* pother, unsigned int _np)
+//{
+//	unsigned int id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
+//	unsigned int np = _np;
+//	if (id >= np)
+//		return;
+//	uint2 pid = pinfo[id];
+//	if (!pid.y)
+//		return;
+//	unsigned int sid = id * MAXIMUM_PAIR_NUMBER;
+//	unsigned int count = 0;
+//	double4 ipos = pos[pid.x];
+//	unsigned int other = 0;
+//	while (count < MAXIMUM_PAIR_NUMBER && other != 0xffffffff)
+//	{
+//		other = pother[sid + count];
+//		double4 jpos = pos[other];
+//		double3 rp = make_double3(jpos.x - ipos.x, jpos.y - ipos.y, jpos.z - ipos.z);
+//		double dist = length(rp);
+//		double cdist = (ipos.w + jpos.w) - dist;
+//		if (cdist <= 0)
+//		{
+//			pother[sid + count] = 0xffffffff;
+//			//data.y = 0xffffffff;
+//			pid.y--;
+//		}
+//		count++;
+//	}
+//	pinfo[id] = pid;
+//}
+//
+//__global__ void check_new_collision_pair_kernel(
+//	double4* pos,  uint2 *pinfo, unsigned int* pdata,
+//	unsigned int* sorted_index, unsigned int* cstart, unsigned int* cend, unsigned int _np)
+//{
+//	unsigned int id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
+//	unsigned int np = _np;
+//	if (id >= np)
+//		return;
+//	double4 ipos = pos[id];
+//	double4 jpos = make_double4(0, 0, 0, 0);
+//	int3 gridPos = calcGridPos(make_double3(ipos.x, ipos.y, ipos.z));
+//
+//	double ir = ipos.w; double jr = 0;
+//	int3 neighbour_pos = make_int3(0, 0, 0);
+//	uint grid_hash = 0;
+//	unsigned int start_index = 0;
+//	unsigned int end_index = 0;
+//	uint2 pid = pinfo[id];
+//	unsigned int sid = id * MAXIMUM_PAIR_NUMBER;
+//	for (int z = -1; z <= 1; z++){
+//		for (int y = -1; y <= 1; y++){
+//			for (int x = -1; x <= 1; x++){
+//				neighbour_pos = make_int3(gridPos.x + x, gridPos.y + y, gridPos.z + z);
+//				grid_hash = calcGridHash(neighbour_pos);
+//				start_index = cstart[grid_hash];
+//				if (start_index != 0xffffffff){
+//					end_index = cend[grid_hash];
+//					for (unsigned int j = start_index; j < end_index; j++){
+//						unsigned int k = sorted_index[j];
+//						if (id == k || k >= np)
+//							continue;
+//						jpos = pos[k];
+//						jr = jpos.w;
+//						double3 rp = make_double3(jpos.x - ipos.x, jpos.y - ipos.y, jpos.z - ipos.z);
+//						double dist = length(rp);
+//						double cdist = (ir + jr) - dist;
+//						if (cdist > 0){
+//							pid.y++;
+//							for (unsigned int i = sid; i < sid + MAXIMUM_PAIR_NUMBER; i++)
+//							{
+//								if (pdata[sid] != 0xffffffff)
+//								{
+//									pdata[sid] = k;
+//									break;
+//								}
+//							}
+//						}
+//					}
+//				}
+//			}
+//		}
+//	}
+//	pinfo[id] = pid;
+//}
+//
+//__global__ void calculate_particle_collision_with_pair_kernel(
+//	double4* pos, double3* vel, double3* omega,
+//	double* mass, double2* tan, double3* force, double3* moment, 
+//	uint2* pinfo, unsigned int* pother, device_contact_property* cp, unsigned int np)
+//{
+//	unsigned int id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
+//	if (id >= np)
+//		return;
+//	uint2 pid = pinfo[id];
+//	if (!pid.y)
+//		return;
+//	double im = mass[pid.x];
+//	double jm = 0.0;
+//	double4 ipos = pos[pid.x];
+//	double3 ivel = vel[pid.x];
+//	double3 iomega = omega[pid.x];
+//	double4 jpos = make_double4(0.0, 0.0, 0.0, 0.0);
+//	double3 jvel = make_double3(0.0, 0.0, 0.0);
+//	double3 jomega = make_double3(0.0, 0.0, 0.0);
+//	double3 Ft = make_double3(0, 0, 0);
+//	double3 Fn = make_double3(0, 0, 0);// [id] * cte.gravity;
+//	double3 M = make_double3(0, 0, 0);
+//	double3 sumF = make_double3(0, 0, 0);
+//	double3 sumM = make_double3(0, 0, 0);
+//	unsigned int sid = id * MAXIMUM_PAIR_NUMBER;
+//	for (unsigned int i = 0; i < MAXIMUM_PAIR_NUMBER; i++)
+//	{
+//		unsigned int other = pother[sid + i];
+//		if (other == 0xffffffff)
+//			continue;
+//		jpos = pos[other];
+//		jvel = vel[other];
+//		jomega = omega[other];
+//		jm = mass[other];
+//		double2 ds = tan[sid + i];
+//		double3 rp = make_double3(jpos.x - ipos.x, jpos.y - ipos.y, jpos.z - ipos.z);
+//		double dist = length(rp);
+//		double cdist = (ipos.w + jpos.w) - dist;
+//		double rcon = ipos.w - 0.5 * cdist;
+//		double3 unit = rp / dist;
+//		double3 rv = jvel + cross(jomega, -jpos.w * unit) - (ivel + cross(iomega, ipos.w * unit));
+//		device_force_constant c = getConstant(
+//			1, ipos.w, jpos.w, im, jm, cp->Ei, cp->Ej,
+//			cp->pri, cp->prj, cp->Gi, cp->Gj,
+//			cp->rest, cp->fric, cp->rfric, cp->sratio);
+//		DHSModel(
+//			c, ipos.w, jpos.w, cp->Ei, cp->Ej, cp->pri, cp->prj,
+//			cp->coh, rcon, cdist, iomega, ds.x, ds.y,
+//			rv, unit, Ft, Fn, M);
+//		break;
+//
+//		sumF += Fn + Ft;
+//		sumM += M;
+//	}
+//	force[pid.x] += sumF;
+//	moment[pid.x] += sumM;
+//}
 
 /*__global__ void calculate_pair_count_kernel(
 	double4* pos, uint2* pidx, uint2* pdata,
@@ -598,26 +598,182 @@ __global__ void calculate_p2p_kernel(
 	unsigned int* sorted_index, unsigned int* cstart,
 	unsigned int* cend, device_contact_property* cp, unsigned int np)
 {
-	unsigned id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
+	//unsigned id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
 
+	//if (id >= np)
+	//	return;
+
+	//double4 ipos = pos[id];
+	//double4 jpos = make_double4(0, 0, 0, 0);
+	//double3 ivel = vel[id];
+	//double3 jvel = make_double3(0, 0, 0);
+	//double3 iomega = omega[id];
+	//double3 jomega = make_double3(0, 0, 0);
+	//int3 gridPos = calcGridPos(make_double3(ipos.x, ipos.y, ipos.z));
+
+	//double ir = ipos.w; double jr = 0;
+	//double im = mass[id]; double jm = 0;
+	//double3 Ft = make_double3(0, 0, 0);
+	//double3 Fn = make_double3(0, 0, 0);// [id] * cte.gravity;
+	//double3 M = make_double3(0, 0, 0);
+	//double3 sumF = make_double3(0, 0, 0);
+	//double3 sumM = make_double3(0, 0, 0);
+	//int3 neighbour_pos = make_int3(0, 0, 0);
+	//uint grid_hash = 0;
+	//unsigned int start_index = 0;
+	//unsigned int end_index = 0;
+	//for (int z = -1; z <= 1; z++){
+	//	for (int y = -1; y <= 1; y++){
+	//		for (int x = -1; x <= 1; x++){
+	//			neighbour_pos = make_int3(gridPos.x + x, gridPos.y + y, gridPos.z + z);
+	//			grid_hash = calcGridHash(neighbour_pos);
+	//			start_index = cstart[grid_hash];
+	//			if (start_index != 0xffffffff){
+	//				end_index = cend[grid_hash];
+	//				for (unsigned int j = start_index; j < end_index; j++){
+	//					unsigned int k = sorted_index[j];
+	//					if (id == k || k >= np)
+	//						continue;
+	//					jpos = pos[k]; jvel = vel[k]; jomega = omega[k];
+	//					jr = jpos.w; jm = mass[k];
+	//					double3 rp = make_double3(jpos.x - ipos.x, jpos.y - ipos.y, jpos.z - ipos.z);
+	//					double dist = length(rp);
+	//					double cdist = (ir + jr) - dist;
+	//					if (cdist > 0){
+	//						double rcon = ir - 0.5 * cdist;
+	//						double3 unit = rp / dist;
+	//						double3 rv = cte.rollingCondition ? jvel + cross(jomega, -jr * unit) - (ivel + cross(iomega, ir * unit)) : (jvel - ivel);
+	//						device_force_constant c = getConstant(
+	//							TCM, ir, jr, im, jm, cp->Ei, cp->Ej,
+	//							cp->pri, cp->prj, cp->Gi, cp->Gj,
+	//							cp->rest, cp->fric, cp->rfric, cp->sratio);
+	//					/*	switch (TCM)
+	//						{
+	//						case 0:
+	//							HMCModel(
+	//								c, ir, jr, cp->Ei, cp->Ej, cp->pri, cp->prj,
+	//								cp->coh, rcon, cdist, iomega,
+	//								rv, unit, Ft, Fn, M);
+	//							break;
+	//						case 1:
+	//							DHSModel(
+	//								c, ir, jr, cp->Ei, cp->Ej, cp->pri, cp->prj,
+	//								cp->coh, rcon, cdist, iomega,
+	//								rv, unit, Ft, Fn, M);
+	//							break;
+	//						}*/
+	//						sumF += Fn + Ft;
+	//						sumM += M;
+	//					}
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
+	//force[id] += sumF;
+	//moment[id] += sumM;
+}
+
+__device__ double particle_plane_contact_detection(
+	device_plane_info& pe, double3& xp, double3& wp, double3& u, double r)
+{
+	double a_l1 = pow(wp.x - pe.l1, 2.0);
+	double b_l2 = pow(wp.y - pe.l2, 2.0);
+	double sqa = wp.x * wp.x;
+	double sqb = wp.y * wp.y;
+	double sqc = wp.z * wp.z;
+	double sqr = r*r;
+
+	if (abs(wp.z) < r && (wp.x > 0 && wp.x < pe.l1) && (wp.y > 0 && wp.y < pe.l2)){
+		double3 dp = xp - pe.xw;
+		double3 uu = pe.uw / length(pe.uw);
+		int pp = -sign(dot(dp, pe.uw));// dp.dot(pe.UW()));
+		u = pp * uu;
+		double collid_dist = r - abs(dot(dp, u));// dp.dot(u));
+		return collid_dist;
+	}
+
+	if (wp.x < 0 && wp.y < 0 && (sqa + sqb + sqc) < sqr){
+		double3 Xsw = xp - pe.xw;
+		double h = length(Xsw);// .length();
+		u = Xsw / h;
+		return r - h;
+	}
+	else if (wp.x > pe.l1 && wp.y < 0 && (a_l1 + sqb + sqc) < sqr){
+		double3 Xsw = xp - pe.w2;
+		double h = length(Xsw);// .length();
+		u = Xsw / h;
+		return r - h;
+	}
+	else if (wp.x > pe.l1 && wp.y > pe.l2 && (a_l1 + b_l2 + sqc) < sqr){
+		double3 Xsw = xp - pe.w3;
+		double h = length(Xsw);// .length();
+		u = Xsw / h;
+		return r - h;
+	}
+	else if (wp.x < 0 && wp.y > pe.l2 && (sqa + b_l2 + sqc) < sqr){
+		double3 Xsw = xp - pe.w4;
+		double h = length(Xsw);// .length();
+		u = Xsw / h;
+		return r - h;
+	}
+	if ((wp.x > 0 && wp.x < pe.l1) && wp.y < 0 && (sqb + sqc) < sqr){
+		double3 Xsw = xp - pe.xw;
+		double3 wj_wi = pe.w2 - pe.xw;
+		double3 us = wj_wi / length(wj_wi);// .length();
+		double3 h_star = Xsw - (dot(Xsw, us)) * us;
+		double h = length(h_star);// .length();
+		u = -h_star / h;
+		return r - h;
+	}
+	else if ((wp.x > 0 && wp.x < pe.l1) && wp.y > pe.l2 && (b_l2 + sqc) < sqr){
+		double3 Xsw = xp - pe.w4;
+		double3 wj_wi = pe.w3 - pe.w4;
+		double3 us = wj_wi / length(wj_wi);// .length();
+		double3 h_star = Xsw - (dot(Xsw, us)) * us;
+		double h = length(h_star);// .length();
+		u = -h_star / h;
+		return r - h;
+
+	}
+	else if ((wp.x > 0 && wp.y < pe.l2) && wp.x < 0 && (sqr + sqc) < sqr){
+		double3 Xsw = xp - pe.xw;
+		double3 wj_wi = pe.w4 - pe.xw;
+		double3 us = wj_wi / length(wj_wi);// .length();
+		double3 h_star = Xsw - (dot(Xsw, us)) * us;
+		double h = length(h_star);// .length();
+		u = -h_star / h;
+		return r - h;
+	}
+	else if ((wp.x > 0 && wp.y < pe.l2) && wp.x > pe.l1 && (a_l1 + sqc) < sqr){
+		double3 Xsw = xp - pe.w2;
+		double3 wj_wi = pe.w3 - pe.w2;
+		double3 us = wj_wi / length(wj_wi);// .length();
+		double3 h_star = Xsw - (dot(Xsw, us)) * us;
+		double h = length(h_star);// .length();
+		u = -h_star / h;
+		return r - h;
+	}
+	return -1.0;
+}
+
+__global__ void calculate_particle_particle_contact_count(
+	double4* pos, pair_data* old_pppd, unsigned int *old_count, unsigned int *count,
+	unsigned int* sidx, unsigned int *sorted_index, unsigned int *cstart,
+	unsigned int* cend, unsigned int _np)
+{
+	unsigned int id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
+	unsigned int np = _np;
 	if (id >= np)
 		return;
-
+	unsigned int old_sid = 0;
+	if (id != 0)
+		old_sid = sidx[id-1];
+	unsigned int cnt = 0;
 	double4 ipos = pos[id];
 	double4 jpos = make_double4(0, 0, 0, 0);
-	double3 ivel = vel[id];
-	double3 jvel = make_double3(0, 0, 0);
-	double3 iomega = omega[id];
-	double3 jomega = make_double3(0, 0, 0);
 	int3 gridPos = calcGridPos(make_double3(ipos.x, ipos.y, ipos.z));
-
 	double ir = ipos.w; double jr = 0;
-	double im = mass[id]; double jm = 0;
-	double3 Ft = make_double3(0, 0, 0);
-	double3 Fn = make_double3(0, 0, 0);// [id] * cte.gravity;
-	double3 M = make_double3(0, 0, 0);
-	double3 sumF = make_double3(0, 0, 0);
-	double3 sumM = make_double3(0, 0, 0);
 	int3 neighbour_pos = make_int3(0, 0, 0);
 	uint grid_hash = 0;
 	unsigned int start_index = 0;
@@ -634,133 +790,30 @@ __global__ void calculate_p2p_kernel(
 						unsigned int k = sorted_index[j];
 						if (id == k || k >= np)
 							continue;
-						jpos = pos[k]; jvel = vel[k]; jomega = omega[k];
-						jr = jpos.w; jm = mass[k];
+						jpos = pos[k];
+						jr = jpos.w;
 						double3 rp = make_double3(jpos.x - ipos.x, jpos.y - ipos.y, jpos.z - ipos.z);
 						double dist = length(rp);
 						double cdist = (ir + jr) - dist;
-						if (cdist > 0){
-							double rcon = ir - 0.5 * cdist;
-							double3 unit = rp / dist;
-							double3 rv = cte.rollingCondition ? jvel + cross(jomega, -jr * unit) - (ivel + cross(iomega, ir * unit)) : (jvel - ivel);
-							device_force_constant c = getConstant(
-								TCM, ir, jr, im, jm, cp->Ei, cp->Ej,
-								cp->pri, cp->prj, cp->Gi, cp->Gj,
-								cp->rest, cp->fric, cp->rfric, cp->sratio);
-						/*	switch (TCM)
-							{
-							case 0:
-								HMCModel(
-									c, ir, jr, cp->Ei, cp->Ej, cp->pri, cp->prj,
-									cp->coh, rcon, cdist, iomega,
-									rv, unit, Ft, Fn, M);
-								break;
-							case 1:
-								DHSModel(
-									c, ir, jr, cp->Ei, cp->Ej, cp->pri, cp->prj,
-									cp->coh, rcon, cdist, iomega,
-									rv, unit, Ft, Fn, M);
-								break;
-							}*/
-							sumF += Fn + Ft;
-							sumM += M;
+						for (unsigned int j = 0; j < old_count[id]; j++)
+						{
+							pair_data *pdata = old_pppd + (old_sid + j);
+							if (cdist <= 0 && pdata->type == 1)
+								pdata->enable = false;
 						}
+						if (cdist > 0)
+							cnt++;
 					}
 				}
 			}
 		}
 	}
-	force[id] += sumF;
-	moment[id] += sumM;
-}
-
-__device__ double particle_plane_contact_detection(
-	device_plane_info *pe, double3& xp, double3& wp, double3& u, double r)
-{
-	double a_l1 = pow(wp.x - pe->l1, 2.0);
-	double b_l2 = pow(wp.y - pe->l2, 2.0);
-	double sqa = wp.x * wp.x;
-	double sqb = wp.y * wp.y;
-	double sqc = wp.z * wp.z;
-	double sqr = r*r;
-
-	if (abs(wp.z) < r && (wp.x > 0 && wp.x < pe->l1) && (wp.y > 0 && wp.y < pe->l2)){
-		double3 dp = xp - pe->xw;
-		double3 uu = pe->uw / length(pe->uw);
-		int pp = -sign(dot(dp, pe->uw));// dp.dot(pe->UW()));
-		u = pp * uu;
-		double collid_dist = r - abs(dot(dp, u));// dp.dot(u));
-		return collid_dist;
-	}
-
-	if (wp.x < 0 && wp.y < 0 && (sqa + sqb + sqc) < sqr){
-		double3 Xsw = xp - pe->xw;
-		double h = length(Xsw);// .length();
-		u = Xsw / h;
-		return r - h;
-	}
-	else if (wp.x > pe->l1 && wp.y < 0 && (a_l1 + sqb + sqc) < sqr){
-		double3 Xsw = xp - pe->w2;
-		double h = length(Xsw);// .length();
-		u = Xsw / h;
-		return r - h;
-	}
-	else if (wp.x > pe->l1 && wp.y > pe->l2 && (a_l1 + b_l2 + sqc) < sqr){
-		double3 Xsw = xp - pe->w3;
-		double h = length(Xsw);// .length();
-		u = Xsw / h;
-		return r - h;
-	}
-	else if (wp.x < 0 && wp.y > pe->l2 && (sqa + b_l2 + sqc) < sqr){
-		double3 Xsw = xp - pe->w4;
-		double h = length(Xsw);// .length();
-		u = Xsw / h;
-		return r - h;
-	}
-	if ((wp.x > 0 && wp.x < pe->l1) && wp.y < 0 && (sqb + sqc) < sqr){
-		double3 Xsw = xp - pe->xw;
-		double3 wj_wi = pe->w2 - pe->xw;
-		double3 us = wj_wi / length(wj_wi);// .length();
-		double3 h_star = Xsw - (dot(Xsw, us)) * us;
-		double h = length(h_star);// .length();
-		u = -h_star / h;
-		return r - h;
-	}
-	else if ((wp.x > 0 && wp.x < pe->l1) && wp.y > pe->l2 && (b_l2 + sqc) < sqr){
-		double3 Xsw = xp - pe->w4;
-		double3 wj_wi = pe->w3 - pe->w4;
-		double3 us = wj_wi / length(wj_wi);// .length();
-		double3 h_star = Xsw - (dot(Xsw, us)) * us;
-		double h = length(h_star);// .length();
-		u = -h_star / h;
-		return r - h;
-
-	}
-	else if ((wp.x > 0 && wp.y < pe->l2) && wp.x < 0 && (sqr + sqc) < sqr){
-		double3 Xsw = xp - pe->xw;
-		double3 wj_wi = pe->w4 - pe->xw;
-		double3 us = wj_wi / length(wj_wi);// .length();
-		double3 h_star = Xsw - (dot(Xsw, us)) * us;
-		double h = length(h_star);// .length();
-		u = -h_star / h;
-		return r - h;
-	}
-	else if ((wp.x > 0 && wp.y < pe->l2) && wp.x > pe->l1 && (a_l1 + sqc) < sqr){
-		double3 Xsw = xp - pe->w2;
-		double3 wj_wi = pe->w3 - pe->w2;
-		double3 us = wj_wi / length(wj_wi);// .length();
-		double3 h_star = Xsw - (dot(Xsw, us)) * us;
-		double h = length(h_star);// .length();
-		u = -h_star / h;
-		return r - h;
-	}
-
-
-	return -1.0;
+	//old_count[id] = count[id];
+	count[id] = cnt;
 }
 
 __global__ void calculate_particle_plane_contact_count(
-	device_plane_info *plane, particle_plane_pair_data* old_pppd, unsigned int *old_count, unsigned int *count,
+	device_plane_info *plane, pair_data* old_pppd, unsigned int *old_count, unsigned int *count,
 	unsigned int *sidx, double4* pos, unsigned int _nplanes, unsigned int _np)
 {
 	unsigned int id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
@@ -777,37 +830,38 @@ __global__ void calculate_particle_plane_contact_count(
 	double3 ipos3 = make_double3(ipos.x, ipos.y, ipos.z);
 	unsigned int old_sid = 0;
 	if(id != 0)
-		old_sid = sidx[id];
+		old_sid = sidx[id-1];
 	unsigned int cnt = 0;
-	for (unsigned int i = 0; i < _nplanes; i++)
+	for (unsigned int i = 0; i < nplanes; i++)
 	{
 		device_plane_info pl = plane[i];
 		double3 unit = make_double3(0, 0, 0);
 		double3 dp = make_double3(ipos.x, ipos.y, ipos.z) - pl.xw;
 		double3 wp = make_double3(dot(dp, pl.u1), dot(dp, pl.u2), dot(dp, pl.uw));
-		double cdist = particle_plane_contact_detection(plane, ipos3, wp, unit, ipos.w);
-		for (unsigned int j = 0; j < count[id]; j++)
+		double cdist = particle_plane_contact_detection(pl, ipos3, wp, unit, ipos.w);
+		for (unsigned int j = 0; j < old_count[id]; j++)
 		{
-			unsigned int _j = old_pppd[old_sid + j].j;
-			if (cdist <= 0)
-				old_pppd[old_sid + j].enable = false;
+			pair_data *pdata = old_pppd + (old_sid + j);
+			if (cdist <= 0 && pdata->type == 2)
+				pdata->enable = false;
 		}
 		if (cdist > 0)
 			cnt++;
 	}
-	old_count[id] = count[id];
-	count[id] = cnt;
+	//old_count[id] = count[id];
+	count[id] += cnt;
 }
 
-__global__ void copy_old_to_new_memory(
+__global__ void copy_old_to_new_pair(
 	unsigned int *old_count, unsigned int *new_count, unsigned int* old_sidx, unsigned int* new_sidx,
-	particle_plane_pair_data* old_pppd, particle_plane_pair_data* new_pppd, unsigned int _np)
+	pair_data* old_pppd, pair_data* new_pppd, unsigned int _np)
 {
 	unsigned int id = __mul24(blockIdx.x, blockDim.y) + threadIdx.x;
 	unsigned int np = _np;
 	if (id >= np)
 		return;
 	unsigned int oc = old_count[id];
+//	unsigned int nc = new_count[id];
 	//particle_plane_pair_data new_ppp[10] = { 0, };
 	unsigned int old_sid = 0;
 	unsigned int new_sid = 0;
@@ -826,26 +880,126 @@ __global__ void copy_old_to_new_memory(
 	}
 }
 
-__global__ void update_particle_plane_contact(
-	device_plane_info *plane, double4* pos, double3* vel, double3* omega, double* mass, double3* force, double3* moment, unsigned int *count, unsigned int *sidx,
-	particle_plane_pair_data *pppd, device_contact_property *cp, unsigned int _nplanes, unsigned int _np)
+__global__ void new_particle_particle_contact_kernel(
+	double4* pos, double3* vel, double3* omega,
+	double* mass, double3* force, double3* moment, pair_data *old_pairs, pair_data *pairs,
+	unsigned int* old_count, unsigned int* count, unsigned int* old_sidx, unsigned int* sidx, int2* type_count, device_contact_property* cp,
+	unsigned int* sorted_index, unsigned int* cstart, unsigned int* cend, unsigned int _np)
+{
+	unsigned int id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
+	unsigned int np = _np;
+	if (id >= np)
+		return;
+	double4 ipos = pos[id];
+	double4 jpos = make_double4(0, 0, 0, 0);
+	double3 ivel = vel[id];
+	double3 iomega = omega[id];
+	double3 jvel = make_double3(0.0, 0.0, 0.0);
+	double3 jomega = make_double3(0.0, 0.0, 0.0);
+	double3 sumF = make_double3(0.0, 0.0, 0.0);
+	double3 sumM = make_double3(0.0, 0.0, 0.0);
+	double3 Ft = make_double3(0, 0, 0);
+	double3 Fn = make_double3(0, 0, 0);// [id] * cte.gravity;
+	double3 M = make_double3(0, 0, 0);
+	int3 gridPos = calcGridPos(make_double3(ipos.x, ipos.y, ipos.z));
+	double ir = ipos.w; double jr = 0;
+	double im = mass[id]; double jm = 0.0;
+	int3 neighbour_pos = make_int3(0, 0, 0);
+	uint grid_hash = 0;
+	unsigned int start_index = 0;
+	unsigned int end_index = 0;
+	unsigned int old_sid = 0;
+	unsigned int sid = 0;
+	unsigned int old_cnt = old_count[id];
+//	unsigned int cnt = count[id];
+	pair_data pair;
+	int tcnt = 0;
+	if (id != 0)
+	{
+		sid = sidx[id - 1];
+		old_sid = old_sidx[id - 1];
+	}
+		
+	for (int z = -1; z <= 1; z++){
+		for (int y = -1; y <= 1; y++){
+			for (int x = -1; x <= 1; x++){
+				neighbour_pos = make_int3(gridPos.x + x, gridPos.y + y, gridPos.z + z);
+				grid_hash = calcGridHash(neighbour_pos);
+				start_index = cstart[grid_hash];
+				if (start_index != 0xffffffff){
+					end_index = cend[grid_hash];
+					for (unsigned int j = start_index; j < end_index; j++){
+						unsigned int k = sorted_index[j];
+						if (id == k || k >= np)
+							continue;
+						jpos = pos[k];
+						jr = jpos.w;
+						double3 rp = make_double3(jpos.x - ipos.x, jpos.y - ipos.y, jpos.z - ipos.z);
+						double dist = length(rp);
+						double cdist = (ir + jr) - dist;
+						if (cdist > 0)
+						{
+//							unsigned int pid = 0;
+							pair = { true, 1, id, k, 0.0, 0.0 };
+							for (unsigned int j = 0; j < old_cnt; j++)
+							{
+								pair_data* pd = old_pairs + (old_sid + j);
+								if (pd->enable && pd->j == k)
+								{
+									pair = *pd;
+									break;
+								}
+							}
+							jvel = vel[k];
+							jomega = omega[k];
+							jm = mass[k];
+							//double2 ds = make_double2(pair.ds, pair.dots);
+							double rcon = ipos.w - 0.5 * cdist;
+							double3 unit = rp / dist;
+							double3 rv = jvel + cross(jomega, -jpos.w * unit) - (ivel + cross(iomega, ipos.w * unit));
+							device_force_constant c = getConstant(
+								1, ipos.w, jpos.w, im, jm, cp->Ei, cp->Ej,
+								cp->pri, cp->prj, cp->Gi, cp->Gj,
+								cp->rest, cp->fric, cp->rfric, cp->sratio);
+							DHSModel(
+								c, ipos.w, jpos.w, cp->Ei, cp->Ej, cp->pri, cp->prj,
+								cp->coh, rcon, cdist, iomega, pair.ds, pair.dots,
+								rv, unit, Ft, Fn, M);
+							sumF += Fn + Ft;
+							sumM += M;
+							pairs[sid + tcnt++] = pair;
+						}
+					}
+				}
+			}
+		}
+	}
+	force[id] += sumF;
+	moment[id] += sumM;
+	type_count[id].x = tcnt;
+}
+
+__global__ void new_particle_plane_contact(
+	device_plane_info *plane, double4* pos, double3* vel, 
+	double3* omega, double* mass, double3* force, 
+	double3* moment, unsigned int* old_count, unsigned int *count, 
+	unsigned int* old_sidx, unsigned int *sidx, int2 *type_count,
+	pair_data *old_pairs, pair_data *pairs, device_contact_property *cp, 
+	unsigned int _nplanes, unsigned int _np)
 {
 	unsigned int id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
 	unsigned int np = _np;
 	unsigned int nplanes = _nplanes;
 	if (id >= np)
 		return;
-	unsigned int sid = 0;
+	unsigned int old_sid = 0;
+	unsigned int sid = type_count[id].x;
 	if (id != 0)
-		sid = sidx[id];
-	/*for (unsigned int i = 0; i < count[id]; i++)
 	{
-		particle_plane_pair_data pp = pppd[sid + i];
-		unsigned int p = pp.i;
-		unsigned int pl = pp.j;
-		double4 ipos = pos[p];
-		double3 ipos3 = make_double3(ipos.x, ipos.y, ipos.z);
-	}*/
+		old_sid = old_sidx[id - 1];
+		sid = sidx[id - 1] + type_count[id].x;
+	}
+		
 	double4 ipos = pos[id];
 	double3 ivel = vel[id];
 	double3 iomega = omega[id];
@@ -854,32 +1008,32 @@ __global__ void update_particle_plane_contact(
 	double3 Ft = make_double3(0, 0, 0);
 	double3 M = make_double3(0, 0, 0);
 	double3 ipos3 = make_double3(ipos.x, ipos.y, ipos.z);
-	unsigned int cnt = count[id];
-	particle_plane_pair_data ppp;
+	unsigned int old_cnt = old_count[id];
+//	unsigned int cnt = count[id];
+	pair_data ppp;
 	unsigned int cur_cnt = 0;
-	for (unsigned int i = 0; i < _nplanes; i++)
+	for (unsigned int i = 0; i < nplanes; i++)
 	{
-		bool is_new = true;
-		ppp = { false, id, i, 0.0, 0.0 };
-		for (unsigned int j = 0; j < cnt; j++)
+		ppp = { false, 0, id, i + np, 0.0, 0.0 };
+		for (unsigned int j = 0; j < old_cnt; j++)
 		{
-			particle_plane_pair_data ppp_j = pppd[sid + j];
-			if (ppp_j.enable && ppp_j.j == i)
+			pair_data* pair = old_pairs + old_sid + j;
+			if (pair->enable && pair->j == i + np)
 			{
-				ppp = pppd[sid + j];
-				is_new = false;
+				ppp = *pair;// pairs[sid + j]
 				break;
 			}
 		}
 		
-		device_plane_info pl = plane[ppp.j];
+		device_plane_info pl = plane[ppp.j - np];
 		double3 unit = make_double3(0, 0, 0);
 		double3 dp = make_double3(ipos.x, ipos.y, ipos.z) - pl.xw;
 		double3 wp = make_double3(dot(dp, pl.u1), dot(dp, pl.u2), dot(dp, pl.uw));
-		double cdist = particle_plane_contact_detection(plane, ipos3, wp, unit, ipos.w);
+		double cdist = particle_plane_contact_detection(pl, ipos3, wp, unit, ipos.w);
 		if (cdist > 0)
 		{
 			ppp.enable = true;
+			ppp.type = 2;
 			double rcon = ipos.w - 0.5 * cdist;
 			double3 dv = -(ivel + cross(iomega, ipos.w * unit));
 			device_force_constant c = getConstant(
@@ -891,9 +1045,10 @@ __global__ void update_particle_plane_contact(
 				iomega, ppp.ds, ppp.dots, dv, unit, Ft, Fn, M);
 			force[id] += Fn + Ft;// m_force + shear_force;
 			moment[id] += M;
-			pppd[sid + cur_cnt++] = ppp;
+			pairs[sid + cur_cnt++] = ppp;
 		}
 	}
+	type_count[id].y = cur_cnt;
 }
 
 template <int TCM>
@@ -1051,53 +1206,53 @@ __global__ void cylinder_hertzian_contact_force_kernel(
 	double3* force, double3* moment, device_contact_property *cp,
 	double* mass, double3* mpos, double3* mf, double3* mm, unsigned int np)
 {
-	unsigned id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
+	//unsigned id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
 
-	if (id >= np)
-		return;
+	//if (id >= np)
+	//	return;
 
-	*mf = make_double3(0.0, 0.0, 0.0);
-	*mm = make_double3(0.0, 0.0, 0.0);
-	double cdist = 0.0;
-	double im = mass[id];
-	double4 ipos = make_double4(pos[id].x, pos[id].y, pos[id].z, pos[id].w);
-	double3 ivel = make_double3(vel[id].x, vel[id].y, vel[id].z);
-	double3 iomega = make_double3(omega[id].x, omega[id].y, omega[id].z);
-	double3 unit = make_double3(0.0, 0.0, 0.0);
-	double3 cpt = make_double3(0.0, 0.0, 0.0);
-	double3 mp = make_double3(mpos->x, mpos->y, mpos->z);
-	cdist = particle_cylinder_contact_detection(cy, ipos, unit, cpt, id);
-	double3 si = cpt - mp;
-	double3 cy2cp = cpt - cy->origin;
-	double3 Ft = make_double3(0.0, 0.0, 0.0);
-	double3 Fn = make_double3(0.0, 0.0, 0.0);
-	double3 M = make_double3(0.0, 0.0, 0.0);
-	/*if (cdist > 0)
-	{
-		double rcon = ipos.w - 0.5 * cdist;
-		double3 dv = cy->vel + cross(cy->omega, cy2cp) - (ivel + cross(iomega, ipos.w * unit));
-		device_force_constant c = getConstant(
-			TCM, ipos.w, 0, im, 0, cp->Ei, cp->Ej,
-			cp->pri, cp->prj, cp->Gi, cp->Gj,
-			cp->rest, cp->fric, cp->rfric, cp->sratio);
-		switch (TCM)
-		{
-		case 0: HMCModel(
-			c, 0, 0, 0, 0, 0, 0, 0, rcon, cdist, iomega,
-			dv, unit, Ft, Fn, M);
-			break;
-		case 1:
-			DHSModel(
-				c, 0, 0, 0, 0, 0, 0, 0, rcon, cdist, iomega,
-				dv, unit, Ft, Fn, M);
-			break;
-		}
-	}*/
-	double3 sum_f = Fn + Ft;
-	force[id] += make_double3(sum_f.x, sum_f.y, sum_f.z);
-	moment[id] += make_double3(M.x, M.y, M.z);
-	mf[id] = -(Fn);
-	mm[id] = cross(si, -Fn);
+	//*mf = make_double3(0.0, 0.0, 0.0);
+	//*mm = make_double3(0.0, 0.0, 0.0);
+	//double cdist = 0.0;
+	//double im = mass[id];
+	//double4 ipos = make_double4(pos[id].x, pos[id].y, pos[id].z, pos[id].w);
+	//double3 ivel = make_double3(vel[id].x, vel[id].y, vel[id].z);
+	//double3 iomega = make_double3(omega[id].x, omega[id].y, omega[id].z);
+	//double3 unit = make_double3(0.0, 0.0, 0.0);
+	//double3 cpt = make_double3(0.0, 0.0, 0.0);
+	//double3 mp = make_double3(mpos->x, mpos->y, mpos->z);
+	//cdist = particle_cylinder_contact_detection(cy, ipos, unit, cpt, id);
+	//double3 si = cpt - mp;
+	//double3 cy2cp = cpt - cy->origin;
+	//double3 Ft = make_double3(0.0, 0.0, 0.0);
+	//double3 Fn = make_double3(0.0, 0.0, 0.0);
+	//double3 M = make_double3(0.0, 0.0, 0.0);
+	///*if (cdist > 0)
+	//{
+	//	double rcon = ipos.w - 0.5 * cdist;
+	//	double3 dv = cy->vel + cross(cy->omega, cy2cp) - (ivel + cross(iomega, ipos.w * unit));
+	//	device_force_constant c = getConstant(
+	//		TCM, ipos.w, 0, im, 0, cp->Ei, cp->Ej,
+	//		cp->pri, cp->prj, cp->Gi, cp->Gj,
+	//		cp->rest, cp->fric, cp->rfric, cp->sratio);
+	//	switch (TCM)
+	//	{
+	//	case 0: HMCModel(
+	//		c, 0, 0, 0, 0, 0, 0, 0, rcon, cdist, iomega,
+	//		dv, unit, Ft, Fn, M);
+	//		break;
+	//	case 1:
+	//		DHSModel(
+	//			c, 0, 0, 0, 0, 0, 0, 0, rcon, cdist, iomega,
+	//			dv, unit, Ft, Fn, M);
+	//		break;
+	//	}
+	//}*/
+	//double3 sum_f = Fn + Ft;
+	//force[id] += make_double3(sum_f.x, sum_f.y, sum_f.z);
+	//moment[id] += make_double3(M.x, M.y, M.z);
+	//mf[id] = -(Fn);
+	//mm[id] = cross(si, -Fn);
 }
 
 template <typename T, unsigned int blockSize>
@@ -1254,97 +1409,97 @@ __global__ void particle_polygonObject_collision_kernel(
 	double* mass, unsigned int* sorted_index, unsigned int* cstart, unsigned int* cend,
 	device_contact_property *cp, unsigned int np)
 {
-	unsigned id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
-	//unsigned int np = _np;
-	if (id >= cte.np)
-		return;
+	//unsigned id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
+	////unsigned int np = _np;
+	//if (id >= cte.np)
+	//	return;
 
-	double cdist = 0.0;
-	double im = mass[id];
-	double3 ipos = make_double3(pos[id].x, pos[id].y, pos[id].z);
-	double3 ivel = make_double3(vel[id].x, vel[id].y, vel[id].z);
-	double3 iomega = make_double3(omega[id].x, omega[id].y, omega[id].z);
-	double3 unit = make_double3(0.0, 0.0, 0.0);
-	int3 gridPos = calcGridPos(make_double3(ipos.x, ipos.y, ipos.z));
-	//double3 cpt = make_double3(0.0, 0.0, 0.0);
-	//double3 mp = make_double3(mpos->x, mpos->y, mpos->z);
-	double ir = pos[id].w;
-	double3 M = make_double3(0, 0, 0);
-	int3 neighbour_pos = make_int3(0, 0, 0);
-	uint grid_hash = 0;
-	double3 Fn = make_double3(0, 0, 0);
-	double3 Ft = make_double3(0, 0, 0);
-	double3 sum_force = make_double3(0, 0, 0);
-	double3 sum_moment = make_double3(0, 0, 0);
-	unsigned int start_index = 0;
-	unsigned int end_index = 0;
-	for (int z = -1; z <= 1; z++){
-		for (int y = -1; y <= 1; y++){
-			for (int x = -1; x <= 1; x++){
-				neighbour_pos = make_int3(gridPos.x + x, gridPos.y + y, gridPos.z + z);
-				grid_hash = calcGridHash(neighbour_pos);
-				start_index = cstart[grid_hash];
-				if (start_index != 0xffffffff){
-					end_index = cend[grid_hash];
-					for (unsigned int j = start_index; j < end_index; j++){
-						unsigned int k = sorted_index[j];
-						if (k >= cte.np)
-						{
-							k -= cte.np;
-							//printf("%d", k);
-							double3 distVec;
-							double dist;
-							unsigned int pidx = dpi[k].id;
-							device_contact_property cmp = cp[pidx];
-							device_mesh_mass_info pmi = dpmi[pidx];
-							double3 cpt = closestPtPointTriangle(dpi[k], ipos, ir);
-							double3 po2cp = cpt - pmi.origin;
-							//double3 si = cpt - pmi.origin;
-							distVec = ipos - cpt;
-							dist = length(distVec);
-							cdist = ir - dist;
-							Fn = make_double3(0.0, 0.0, 0.0);
-							if (cdist > 0)
-							{
-								double3 qp = dpi[k].Q - dpi[k].P;
-								double3 rp = dpi[k].R - dpi[k].P;
-								double rcon = ir - 0.5 * cdist;
-								unit = -cross(qp, rp);// -dpi[k].N;
-								unit = unit / length(unit);
-								double3 dv = cte.rollingCondition ? pmi.vel + cross(pmi.omega, po2cp) - (ivel + cross(iomega, ir * unit)) : pmi.vel - ivel;
-								device_force_constant c = getConstant(
-									TCM, ir, 0, im, 0, cmp.Ei, cmp.Ej,
-									cmp.pri, cmp.prj, cmp.Gi, cmp.Gj,
-									cmp.rest, cmp.fric, cmp.rfric, cmp.sratio);
-							/*	switch (TCM)
-								{
-								case 0:
-									HMCModel(
-										c, 0, 0, 0, 0, 0, 0, 0, rcon, cdist, iomega,
-										dv, unit, Ft, Fn, M);
-									break;
-								case 1:
-									DHSModel(
-										c, 0, 0, 0, 0, 0, 0, 0, rcon, cdist, iomega,
-										dv, unit, Ft, Fn, M);
-									break;
-								}*/
-								//double3 sum_f = Fn;
-								sum_force += Fn + Ft;
-								sum_moment += M;
-								//force[id] += Fn + Ft;
-								//moment[id] += make_double3(M.x, M.y, M.z);
-								dpmi[pidx].force += -(Fn + Ft);// +make_double3(1.0, 5.0, 9.0);
-								dpmi[pidx].moment += -cross(po2cp, Fn + Ft);
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	force[id] += sum_force;
-	moment[id] += sum_moment;
+	//double cdist = 0.0;
+	//double im = mass[id];
+	//double3 ipos = make_double3(pos[id].x, pos[id].y, pos[id].z);
+	//double3 ivel = make_double3(vel[id].x, vel[id].y, vel[id].z);
+	//double3 iomega = make_double3(omega[id].x, omega[id].y, omega[id].z);
+	//double3 unit = make_double3(0.0, 0.0, 0.0);
+	//int3 gridPos = calcGridPos(make_double3(ipos.x, ipos.y, ipos.z));
+	////double3 cpt = make_double3(0.0, 0.0, 0.0);
+	////double3 mp = make_double3(mpos->x, mpos->y, mpos->z);
+	//double ir = pos[id].w;
+	//double3 M = make_double3(0, 0, 0);
+	//int3 neighbour_pos = make_int3(0, 0, 0);
+	//uint grid_hash = 0;
+	//double3 Fn = make_double3(0, 0, 0);
+	//double3 Ft = make_double3(0, 0, 0);
+	//double3 sum_force = make_double3(0, 0, 0);
+	//double3 sum_moment = make_double3(0, 0, 0);
+	//unsigned int start_index = 0;
+	//unsigned int end_index = 0;
+	//for (int z = -1; z <= 1; z++){
+	//	for (int y = -1; y <= 1; y++){
+	//		for (int x = -1; x <= 1; x++){
+	//			neighbour_pos = make_int3(gridPos.x + x, gridPos.y + y, gridPos.z + z);
+	//			grid_hash = calcGridHash(neighbour_pos);
+	//			start_index = cstart[grid_hash];
+	//			if (start_index != 0xffffffff){
+	//				end_index = cend[grid_hash];
+	//				for (unsigned int j = start_index; j < end_index; j++){
+	//					unsigned int k = sorted_index[j];
+	//					if (k >= cte.np)
+	//					{
+	//						k -= cte.np;
+	//						//printf("%d", k);
+	//						double3 distVec;
+	//						double dist;
+	//						unsigned int pidx = dpi[k].id;
+	//						device_contact_property cmp = cp[pidx];
+	//						device_mesh_mass_info pmi = dpmi[pidx];
+	//						double3 cpt = closestPtPointTriangle(dpi[k], ipos, ir);
+	//						double3 po2cp = cpt - pmi.origin;
+	//						//double3 si = cpt - pmi.origin;
+	//						distVec = ipos - cpt;
+	//						dist = length(distVec);
+	//						cdist = ir - dist;
+	//						Fn = make_double3(0.0, 0.0, 0.0);
+	//						if (cdist > 0)
+	//						{
+	//							double3 qp = dpi[k].Q - dpi[k].P;
+	//							double3 rp = dpi[k].R - dpi[k].P;
+	//							double rcon = ir - 0.5 * cdist;
+	//							unit = -cross(qp, rp);// -dpi[k].N;
+	//							unit = unit / length(unit);
+	//							double3 dv = cte.rollingCondition ? pmi.vel + cross(pmi.omega, po2cp) - (ivel + cross(iomega, ir * unit)) : pmi.vel - ivel;
+	//							device_force_constant c = getConstant(
+	//								TCM, ir, 0, im, 0, cmp.Ei, cmp.Ej,
+	//								cmp.pri, cmp.prj, cmp.Gi, cmp.Gj,
+	//								cmp.rest, cmp.fric, cmp.rfric, cmp.sratio);
+	//						/*	switch (TCM)
+	//							{
+	//							case 0:
+	//								HMCModel(
+	//									c, 0, 0, 0, 0, 0, 0, 0, rcon, cdist, iomega,
+	//									dv, unit, Ft, Fn, M);
+	//								break;
+	//							case 1:
+	//								DHSModel(
+	//									c, 0, 0, 0, 0, 0, 0, 0, rcon, cdist, iomega,
+	//									dv, unit, Ft, Fn, M);
+	//								break;
+	//							}*/
+	//							//double3 sum_f = Fn;
+	//							sum_force += Fn + Ft;
+	//							sum_moment += M;
+	//							//force[id] += Fn + Ft;
+	//							//moment[id] += make_double3(M.x, M.y, M.z);
+	//							dpmi[pidx].force += -(Fn + Ft);// +make_double3(1.0, 5.0, 9.0);
+	//							dpmi[pidx].moment += -cross(po2cp, Fn + Ft);
+	//						}
+	//					}
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
+	//force[id] += sum_force;
+	//moment[id] += sum_moment;
 }
 
 __device__ double3 toGlobal(double3& v, double4& ep)

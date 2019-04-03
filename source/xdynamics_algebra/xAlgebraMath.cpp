@@ -10,6 +10,77 @@ int LinearSolve(int n, int nrhs, xMatrixD& a, int lda, xVectorD& b, int ldb)
 	return info;
 }
 
+void coordinatePartitioning(xSparseD& lhs, int* uID)
+{
+		//std::cout << m;
+	xMatrixD m;
+	m.alloc(lhs.rows(), lhs.cols());
+	for (unsigned int i = 0; i < lhs.NNZ(); i++)
+	{
+		m(lhs.ridx[i], lhs.cidx[i]) = lhs.value[i];
+	}
+	int *v = new int[lhs.cols()];
+	for (unsigned int i = 0; i < lhs.cols(); i++) v[i] = i;
+	int index = 0;
+	double base = 0;
+	double lamda = 0;
+	double lower = 0;
+	bool check = false;
+	int ndof = lhs.cols() - lhs.rows();
+	for (unsigned int i = 0; i < m.rows(); i++)
+	{
+		index = i;
+		base = abs(m(i, index));
+		check = 0;
+		check = false;
+		for (unsigned j(i + 1); j < m.cols(); j++)
+		{
+			double c = abs(m(i, j));
+			if (base < c)
+			{
+				index = j;
+				base = abs(m(i, j));
+				check = true;
+			}
+		}
+		if (check) m.columnSwap(i, index, v);
+		lamda = 1.0 / m(i, i);
+		for (unsigned int j = i; j < m.cols(); j++)
+		{
+			m(i, j) *= lamda;
+		}
+		for (unsigned j(i + 1); j < m.rows(); j++)
+		{
+			lamda = m(j, i) / m(i, i);
+			for (unsigned k(i); k < m.cols(); k++)
+				m(j, k) = m(j, k) - lamda * m(i, k);
+		}
+	}
+	// separation
+	index = 0;
+	for (unsigned int i = m.rows(); i < m.cols(); i++)
+		uID[index++] = v[i];
+
+	// sort
+	int buf2, buf1, id = 0;
+
+	for (int i = 0; i < ndof - 1; i++)
+	{
+		buf1 = uID[i];
+		id = i;
+		for (int j = i + 1; j < ndof; j++)
+		{
+			if (buf1 > uID[j])
+			{
+				buf1 = uID[j];
+				id = j;
+			}
+		}
+		buf2 = uID[i];
+		uID[i] = uID[id];
+		uID[id] = buf2;
+	}
+}
 vector3d ToVector3D(vector3ui& v3)
 {
 	return

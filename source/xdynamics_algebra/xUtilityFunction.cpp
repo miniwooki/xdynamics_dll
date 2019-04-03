@@ -395,3 +395,36 @@ vector3d xUtilityFunctions::CenterOfTriangle(vector3d& P, vector3d& Q, vector3d&
 
 	return M1 + t * D1;
 }
+
+
+std::string xUtilityFunctions::xstring(QString v)
+{
+	return v.toStdString();
+}
+
+void xUtilityFunctions::DeleteFilesInDirectory(std::string path)
+{
+	QString qpath = QString::fromStdString(path);
+	QDir dir = QDir(qpath);
+	dir.setNameFilters(QStringList() << "*.*");
+	dir.setFilter(QDir::Files);
+	foreach(QString dirFile, dir.entryList())
+	{
+		dir.remove(dirFile);
+	}
+}
+
+void xUtilityFunctions::DeleteFileByEXT(std::string path, std::string ext)
+{
+	// QString dDir = model::path + model::name;
+	QString qpath = QString::fromStdString(path);
+	QString qext = QString::fromStdString(ext);
+	QDir dir = QDir(qpath);
+	QStringList delFileList;
+	delFileList = dir.entryList(QStringList("*." + qext), QDir::Files | QDir::NoSymLinks);
+	//qDebug() << "The number of *.bin file : " << delFileList.length();
+	for (int i = 0; i < delFileList.length(); i++){
+		QString deleteFilePath = qpath + "/" + delFileList[i];
+		QFile::remove(deleteFilePath);
+	}
+}

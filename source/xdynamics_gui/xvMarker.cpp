@@ -2,13 +2,14 @@
 //#include "model.h"
 #include "qgl.h"
 
-float xvMarker::scale = 1.0;
+//float xvMarker::scale = 1.0;
 
 xvMarker::xvMarker()
 	: xvObject()
 	, attachObject("")
 	, markerScaleFlag(true)
 	, isAttachMass(true)
+	, scale(1.0)
 {
 
 }
@@ -18,6 +19,7 @@ xvMarker::xvMarker(QString& n, bool mcf)
 	, attachObject("")
 	, markerScaleFlag(mcf)
 	, isAttachMass(true)
+	, scale(1.0)
 {
 
 }
@@ -80,7 +82,7 @@ void xvMarker::draw(GLenum eMode)
 	}
 }
 
-bool xvMarker::define(float x, float y, float z)
+bool xvMarker::define(float x, float y, float z, bool isdefine_text)
 {
 	pos.x = x; pos.y = y; pos.z = z;
 	float icon_scale = 0.08;

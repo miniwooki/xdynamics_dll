@@ -49,9 +49,11 @@ public:
 	~xGLWidget();
 
 	static xGLWidget* GLObject();
+	bool Upload_DEM_Results(QStringList& sl);
 
 	//	void setModeler(modeler* _md) { md = _md; }
 // 	void makeCube(cube* c);
+	void createCubeGeometry(QString& _name, xCubeObjectData& d);
 	void createPlaneGeometry(QString& _name, xPlaneObjectData& d);
 	xvParticle* createParticles();
 // 	void makeLine();
@@ -190,7 +192,7 @@ private:
 	xvObject* selectedObject;
 
 signals:
-	void mySignal();
+	void changedAnimationFrame();
 	//void propertySignal(QString, context_object_type);
 	//void contextSignal(QString, context_menu);
 };

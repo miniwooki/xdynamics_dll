@@ -3,6 +3,7 @@
 
 #include "xdynamics_object/xConatct.h"
 
+// class xParticleObject;
 class xPlaneObject;
 
 class XDYNAMICS_API xParticlePlaneContact : public xContact

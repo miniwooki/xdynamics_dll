@@ -46,6 +46,7 @@ xContact::xContact(const xContact& xc)
 		checkCudaErrors(cudaMalloc((void**)&dcp, sizeof(device_contact_property)));
 		checkCudaErrors(cudaMemcpy(dcp, xc.DeviceContactProperty(), sizeof(device_contact_property), cudaMemcpyDeviceToDevice));
 	}
+
 }
 
 xContact::~xContact()

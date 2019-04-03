@@ -10,12 +10,12 @@ class xCommandWindow : public QDockWidget
 	Q_OBJECT
 
 public:
-	enum tWriting{ CMD_INFO = 0, CMD_DEBUG, CMD_ERROR, CMD_QUESTION };
+	enum mode{ CMD_INFO = 0, CMD_DEBUG, CMD_ERROR, CMD_QUESTION };
 	xCommandWindow();
 	xCommandWindow(QWidget* parent);
 	~xCommandWindow();
 
-	void write(tWriting tw, QString c);
+	void write(mode tw, QString c);
 	void printLine();
 	//void addChild(tRoot, QString& _nm);
 

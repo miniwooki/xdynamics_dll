@@ -4,9 +4,10 @@
 #include "xdynamics_simulation/xIngegratorVV.h"
 #include "xdynamics_simulation/xKinematicAnalysis.h"
 #include "xdynamics_global.h"
-//#include "xModel.h"
 #include <QtCore/QTime>
 #include <QtCore/QDate>
+
+typedef xUtilityFunctions xuf;
 
 xDynamicsSimulator::xDynamicsSimulator()
 	: xSimulation()
@@ -102,6 +103,9 @@ bool xDynamicsSimulator::xInitialize(double _dt, unsigned int _st, double _et, x
 				xLog::log("The initialization of discrete element method model was succeeded.");
 		}
 	}
+// 	xuf::DeleteFileByEXT(xuf::xstring(xModel::path) + xuf::xstring(xModel::name), "bin");
+// 	xuf::DeleteFileByEXT(xuf::xstring(xModel::path) + xuf::xstring(xModel::name), "bpm");
+// 	xuf::DeleteFileByEXT(xuf::xstring(xModel::path) + xuf::xstring(xModel::name), "bkc");
 	savePartData(0, 0);
 	return true;
 }
@@ -110,13 +114,32 @@ bool xDynamicsSimulator::savePartData(double ct, unsigned int pt)
 {
 	if (xmbd)
 		xmbd->SaveStepResult(pt, ct);
+	if (xdem)
+		xdem->SaveStepResult(pt, ct);
 	return true;
 }
 
 void xDynamicsSimulator::exportPartData()
 {
+// 	QFile qf(xModel::path + xModel::name + "/result_list.rlt");
+// 	qf.open(QIODevice::WriteOnly);
+// 	QTextStream qts(&qf);
+ 	std::fstream of;
+ 	of.open((xModel::path + xModel::name + "/result_list.rlt").toStdString(), std::ios::out);
+	
 	if (xmbd)
-		xmbd->ExportResults();
+	{
+		of << "MBD" << endl;
+		xmbd->ExportResults(of);
+	}
+	
+	if (xdem)
+	{
+		of << "DEM" << endl;
+		xdem->ExportResults(of);
+	}
+		
+	of.close();
 }
 
 bool xDynamicsSimulator::xRunSimulation()
@@ -132,9 +155,11 @@ bool xDynamicsSimulator::xRunSimulation()
 // 	bool isUpdated = false;
  	xSimulation::setCurrentTime(ct);
  	double total_time = 0.0;
-	xLog::log("=========  =======    ==========    ======   ========   =============  ====================n");
-	xLog::log("PART       SimTime    TotalSteps    Steps    Time/Sec   TotalTime/Sec  Finish time        \n");
-	xLog::log("=========  =======    ==========    ======   ========   =============  ====================n");
+	double elapsed_time = 0.0;
+	double previous_time = 0.0;
+	xLog::log("=========  =======    ==========    ======   ========   =============  ====================");
+	xLog::log("PART       SimTime    TotalSteps    Steps    Time/Sec   TotalTime/Sec  Finish time         ");
+	xLog::log("=========  =======    ==========    ======   ========   =============  ====================");
 	//xTime tme;
 	QTime tme;
 	QTime startTime = tme.currentTime();
@@ -155,19 +180,20 @@ bool xDynamicsSimulator::xRunSimulation()
 				return false;
 		if (!((cstep) % xSimulation::st))
 		{
-			double elapsed_time = tme.elapsed() * 0.001;
-			total_time += elapsed_time;
+			previous_time = elapsed_time;
+			elapsed_time = tme.elapsed() * 0.001;
+			total_time += elapsed_time - previous_time;
 			part++;
 			if (savePartData(ct, part))
 			{
-				sprintf_s(buf, "Part%04d   %4.5f %10d      %5d      %4.5f     %4.5f    %ws", part, ctime, cstep, eachStep, elapsed_time, total_time, xUtilityFunctions::GetDateTimeFormat("%d-%m-%y %H:%M:%S", 0).c_str());
+				sprintf_s(buf, "Part%04d   %4.5f %10d      %5d      %4.5f     %4.5f    %ws", part, ctime, cstep, eachStep, elapsed_time - previous_time, total_time, xUtilityFunctions::GetDateTimeFormat("%d-%m-%y %H:%M:%S", 0).c_str());
 				xLog::log(buf);
 			}
 			eachStep = 0;
 		}
 	}
 	//tme.stop();
-	double elapsed_time = tme.elapsed() * 0.001;
+	elapsed_time = tme.elapsed() * 0.001;
 	total_time += elapsed_time;
 	xLog::log("=========  =======    ==========    ======   ========   =============  ====================\n");
 	exportPartData();

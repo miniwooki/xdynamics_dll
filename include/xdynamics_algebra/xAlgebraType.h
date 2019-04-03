@@ -40,6 +40,11 @@ public:
 	void plus(unsigned int sr, unsigned int sc, matrix34d& m3x4, bool ist = false);
 	void plus(unsigned int sr, unsigned int sc, matrix43d& m4x3, bool ist = false);
 
+	void columnSwap(unsigned int i, unsigned int j, int* idx);
+
+	unsigned int rows();
+	unsigned int cols();
+
 private:
 	unsigned int nrow;
 	unsigned int ncol;
@@ -72,13 +77,16 @@ class XDYNAMICS_API xSparseD
 {
 public:
 	xSparseD();
-	xSparseD(unsigned int _size);
+	//xSparseD(unsigned int _size);
+	xSparseD(unsigned int _nr, unsigned int _nc);
 	~xSparseD();
 
 	double& operator()(const unsigned int r, const unsigned int c);
 	void zeros();
 	unsigned int NNZ();
-	void alloc(unsigned int _size);
+	unsigned int rows();
+	unsigned int cols();
+	void alloc(unsigned int _nr, unsigned int _nc);
 	void insert(unsigned int sr, unsigned int sc, matrix34d& m3x4);
 	void insert(unsigned int sr, unsigned int sc, vector4d& v4);
 	void insert(unsigned int sr, unsigned int sc, vector3d& v3, vector4d& v4);
@@ -88,6 +96,8 @@ public:
 	double *value;
 
 private:
+	unsigned int nr;
+	unsigned int nc;
 	unsigned int nnz;
 	unsigned int size;
 };

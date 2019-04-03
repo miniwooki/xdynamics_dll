@@ -32,10 +32,12 @@ public:
 		unsigned int np);
 	virtual void cudaMemoryAlloc(unsigned int np);
 
-private:
-	unsigned int *d_pair_idx;
-	unsigned int *d_pair_other;
-	double* d_tan;
+	void deviceContactCount(double* pos, unsigned int *sorted_id, unsigned int *cstart, unsigned int *cend, unsigned int np);
+
+//private:
+// 	unsigned int *d_pair_idx;
+// 	unsigned int *d_pair_other;
+// 	double* d_tan;
 };
 
 #endif

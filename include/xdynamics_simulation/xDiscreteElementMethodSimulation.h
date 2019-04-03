@@ -20,12 +20,14 @@ public:
 	/*bool initialize_f(contactManager* _cm);*/
 	virtual int OneStepSimulation(double ct, unsigned int cstep) = 0;
 	/*bool oneStepAnalysis_f(double ct, unsigned int cstep);*/
-	QString saveResult(double *vp, double* vv, double ct, unsigned int pt);
+	QString SaveStepResult(unsigned int pt, double ct);
+	void ExportResults(std::fstream& of);
 	//QString saveResult_f(float *vp, float* vv, double ct, unsigned int pt);
 	//void setIntegratorType(dem_integrator_type itype) { itor_type = itype; }
 	//void saveFinalResult(QFile& qf);
 	//void saveFinalResult_f(QFile& qf);
 	//void setStartingData(startingModel* stm);
+
 
 protected:
 	//void applyMassForce();
@@ -35,6 +37,7 @@ protected:
 	void allocationMemory();
 	//dem_integrator_type itor_type;
 	bool isInitilize;		// initialize 
+	bool isSaveMemory;
 	unsigned int np;
 	unsigned int per_np;
 	unsigned int nPolySphere;
@@ -61,6 +64,8 @@ protected:
 	double *daacc;
 	double *dforce;
 	double *dmoment;
+
+	QList<QString> partList;
 };
 
 #endif

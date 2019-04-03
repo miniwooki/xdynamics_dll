@@ -1,6 +1,7 @@
 #include "xdynamics_object/xParticleCubeContact.h"
 #include "xdynamics_object/xParticlePlaneContact.h"
 #include "xdynamics_object/xCubeObject.h"
+#include "xdynamics_object/xParticleObject.h"
 
 xParticleCubeContact::xParticleCubeContact()
 	: xContact()
@@ -11,13 +12,23 @@ xParticleCubeContact::xParticleCubeContact()
 
 }
 
-xParticleCubeContact::xParticleCubeContact(std::string _name)
+xParticleCubeContact::xParticleCubeContact(std::string _name, xObject* o1, xObject *o2)
 	: xContact(_name, PARTICLE_CUBE)
 	, cu(NULL)
 	, p(NULL)
 	, dpi(NULL)
 {
-
+	if (o1->Shape() == CUBE_SHAPE)
+	{
+		cu = dynamic_cast<xCubeObject*>(o1);
+		p = dynamic_cast<xParticleObject*>(o2);
+	}
+	else
+	{
+		cu = dynamic_cast<xCubeObject*>(o2);
+		p = dynamic_cast<xParticleObject*>(o1);
+	}
+	//cu = o1->Shape() == CUBE_SHAPE ? dynamic_cast<xCubeObject*>(o1) : dynamic_cast<xParticleObject*>(o1);
 }
 
 xParticleCubeContact::~xParticleCubeContact()

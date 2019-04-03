@@ -12,13 +12,12 @@ xParticlePlanesContact::xParticlePlanesContact()
 	, hpi(NULL)
 	, dpi(NULL)
 	, nplanes(0)
-	, ncontact(0)
 	, xmps(NULL)
 	, hcmp(NULL)
-	, d_pair_count(NULL)
-	, d_old_pair_start(NULL)
-	, d_pair_start(NULL)
-	, d_pppd(NULL)
+// 	, d_pair_count(NULL)
+// 	, d_old_pair_start(NULL)
+// 	, d_pair_start(NULL)
+// 	, d_pppd(NULL)
 {
 
 }
@@ -29,11 +28,11 @@ xParticlePlanesContact::~xParticlePlanesContact()
 	if (xmps) delete[] xmps; xmps = NULL;
 	if (hpi) delete[] hpi; hpi = NULL;
 	if (dpi) checkCudaErrors(cudaFree(dpi)); dpi = NULL;
-	if (d_pair_count) checkCudaErrors(cudaFree(d_pair_count)); d_pair_count = NULL;
-	if (d_old_pair_start) checkCudaErrors(cudaFree(d_old_pair_start)); d_old_pair_start = NULL;
-	if (d_pair_start) checkCudaErrors(cudaFree(d_pair_start)); d_pair_start = NULL;
-	if (d_pppd) checkCudaErrors(cudaFree(d_pppd)); d_pppd = NULL;
-	qDeleteAll(pair_ip);
+// 	if (d_pair_count) checkCudaErrors(cudaFree(d_pair_count)); d_pair_count = NULL;
+// 	if (d_old_pair_start) checkCudaErrors(cudaFree(d_old_pair_start)); d_old_pair_start = NULL;
+// 	if (d_pair_start) checkCudaErrors(cudaFree(d_pair_start)); d_pair_start = NULL;
+// 	if (d_pppd) checkCudaErrors(cudaFree(d_pppd)); d_pppd = NULL;
+	//qDeleteAll(pair_ip);
 }
 
 void xParticlePlanesContact::define(unsigned int id, xParticlePlaneContact* d)
@@ -88,6 +87,16 @@ void xParticlePlanesContact::allocHostMemory(unsigned int n)
 	if(!hpi) hpi = new host_plane_info[nplanes];
 	if(!hcmp) hcmp = new xContactMaterialParameters[nplanes];
 	if(!xmps) xmps = new xMaterialPair[nplanes];
+}
+
+device_plane_info* xParticlePlanesContact::devicePlaneInfo()
+{
+	return dpi;
+}
+
+unsigned int xParticlePlanesContact::NumPlanes()
+{
+	return nplanes;
 }
 
 double xParticlePlanesContact::particle_plane_contact_detection(host_plane_info* _pe, vector3d& u, vector3d& xp, vector3d& wp, double r)
@@ -243,38 +252,40 @@ void xParticlePlanesContact::cudaMemoryAlloc(unsigned int np)
 	}
 	checkCudaErrors(cudaMalloc((void**)&dpi, sizeof(device_plane_info) * nplanes));
 	checkCudaErrors(cudaMalloc((void**)&dcp, sizeof(device_contact_property) * nplanes));
-	checkCudaErrors(cudaMalloc((void**)&d_pair_count, sizeof(unsigned int) * np));
-	checkCudaErrors(cudaMalloc((void**)&d_old_pair_count, sizeof(unsigned int) * np));
-	checkCudaErrors(cudaMalloc((void**)&d_pair_start, sizeof(unsigned int) * np));
-	checkCudaErrors(cudaMalloc((void**)&d_old_pair_start, sizeof(unsigned int) * np));
+// 	checkCudaErrors(cudaMalloc((void**)&d_pair_count, sizeof(unsigned int) * np));
+// 	checkCudaErrors(cudaMalloc((void**)&d_old_pair_count, sizeof(unsigned int) * np));
+// 	checkCudaErrors(cudaMalloc((void**)&d_pair_start, sizeof(unsigned int) * np));
+// 	checkCudaErrors(cudaMalloc((void**)&d_old_pair_start, sizeof(unsigned int) * np));
 	checkCudaErrors(cudaMemcpy(dpi, hpi, sizeof(device_plane_info) * nplanes, cudaMemcpyHostToDevice));
 	checkCudaErrors(cudaMemcpy(dcp, _hcp, sizeof(device_contact_property) * nplanes, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMemset(d_pair_count, 0, sizeof(unsigned int) * np));
-	checkCudaErrors(cudaMemset(d_old_pair_count, 0, sizeof(unsigned int) * np));
-	checkCudaErrors(cudaMemset(d_pair_start, 0, sizeof(unsigned int) * np));
-	checkCudaErrors(cudaMemset(d_old_pair_start, 0, sizeof(unsigned int) * np));
+// 	checkCudaErrors(cudaMemset(d_pair_count, 0, sizeof(unsigned int) * np));
+// 	checkCudaErrors(cudaMemset(d_old_pair_count, 0, sizeof(unsigned int) * np));
+// 	checkCudaErrors(cudaMemset(d_pair_start, 0, sizeof(unsigned int) * np));
+// 	checkCudaErrors(cudaMemset(d_old_pair_start, 0, sizeof(unsigned int) * np));
+	delete[] _hcp;
 }
 
 void xParticlePlanesContact::cuda_collision(double *pos, double *vel, double *omega, double *mass, double *force, double *moment, unsigned int *sorted_id, unsigned int *cell_start, unsigned int *cell_end, unsigned int np)
 {
-	unsigned int nc = cu_calculate_particle_plane_contact_count(dpi, d_pppd, d_old_pair_count, d_pair_count, d_pair_start, pos, nplanes, np);
-	if (nc)
-		bool pause = true;
-// 	thrust::constant_iterator<unsigned int> first(10);
-//  	unsigned int ncount = thrust::reduce(d_pair_count, d_pair_count + np);
- 	checkCudaErrors(cudaMemcpy(d_old_pair_start, d_pair_start, sizeof(unsigned int) * np, cudaMemcpyDeviceToDevice));
-// 	thrust::inclusive_scan(d_pair_count, d_pair_count + ncount, d_pair_start);
-	particle_plane_pair_data* d_old_pppd;
-	checkCudaErrors(cudaMalloc((void**)&d_old_pppd, sizeof(particle_plane_pair_data) * ncontact));
-	checkCudaErrors(cudaMemcpy(d_old_pppd, d_pppd, sizeof(particle_plane_pair_data) * ncontact, cudaMemcpyDeviceToDevice));
-	if (d_pppd)
-		checkCudaErrors(cudaFree(d_pppd));
-	checkCudaErrors(cudaMalloc((void**)&d_pppd, sizeof(particle_plane_pair_data) * nc));
-	checkCudaErrors(cudaMemset(d_pppd, 0, sizeof(particle_plane_pair_data) * nc));
-	checkCudaErrors(cudaMemcpy(d_old_pair_start, d_pair_start, sizeof(unsigned int) * np, cudaMemcpyDeviceToDevice));
- 	cu_copy_old_to_new_memory(d_old_pair_count, d_pair_count, d_old_pair_start, d_pair_start, d_old_pppd, d_pppd, nc, np);
-	checkCudaErrors(cudaFree(d_old_pppd));
-	cu_update_particle_plane_contact(dpi, pos, vel, omega, mass, force, moment, d_pair_count, d_pair_start, d_pppd, dcp, nplanes, np);
-	ncontact = nc;
+// 	unsigned int nc = cu_calculate_particle_plane_contact_count(
+// 		dpi, d_pppd, d_old_pair_count, d_pair_count, d_pair_start, pos, nplanes, np);
+// 	if (nc)
+// 		bool pause = true;
+// // 	thrust::constant_iterator<unsigned int> first(10);
+// //  	unsigned int ncount = thrust::reduce(d_pair_count, d_pair_count + np);
+//  	checkCudaErrors(cudaMemcpy(d_old_pair_start, d_pair_start, sizeof(unsigned int) * np, cudaMemcpyDeviceToDevice));
+// // 	thrust::inclusive_scan(d_pair_count, d_pair_count + ncount, d_pair_start);
+// 	particle_plane_pair_data* d_old_pppd;
+// 	checkCudaErrors(cudaMalloc((void**)&d_old_pppd, sizeof(particle_plane_pair_data) * ncontact));
+// 	checkCudaErrors(cudaMemcpy(d_old_pppd, d_pppd, sizeof(particle_plane_pair_data) * ncontact, cudaMemcpyDeviceToDevice));
+// 	if (d_pppd)
+// 		checkCudaErrors(cudaFree(d_pppd));
+// 	checkCudaErrors(cudaMalloc((void**)&d_pppd, sizeof(particle_plane_pair_data) * nc));
+// 	checkCudaErrors(cudaMemset(d_pppd, 0, sizeof(particle_plane_pair_data) * nc));
+// 	checkCudaErrors(cudaMemcpy(d_old_pair_start, d_pair_start, sizeof(unsigned int) * np, cudaMemcpyDeviceToDevice));
+//  	cu_copy_old_to_new_memory(d_old_pair_count, d_pair_count, d_old_pair_start, d_pair_start, d_old_pppd, d_pppd, nc, np);
+// 	checkCudaErrors(cudaFree(d_old_pppd));
+// 	cu_update_particle_plane_contact(dpi, pos, vel, omega, mass, force, moment, d_pair_count, d_pair_start, d_pppd, dcp, nplanes, np);
+// 	ncontact = nc;
 }
 

@@ -29,7 +29,7 @@ public:
 	xvObject(Type tp, QString _name);
 	virtual ~xvObject();
 
-// 	Type ViewObjectType() { return type; }
+ 	Type ObjectType() { return type; }
 // // 	void setInitialPosition( ip) { pos0 = ip; }
 // // 	void setInitialAngle(VEC3D ia) { ang0 = ia; }
 // //	void setCurrentPosition(VEC3D cp) { cpos = cp; }
@@ -48,7 +48,7 @@ public:
 	void setAngle(float x, float y, float z);
 	void setPosition(float x, float y, float z);
 // 	void setDisplay(bool _dis) { display = _dis; }
-// 	QColor color() { return clr; }
+ 	QColor Color() { return clr; }
 // 	void setColor(color_type ct);
 // 	static void msgBox(QString ch, QMessageBox::Icon ic);
 // 	void copyCoordinate(GLuint _coord);

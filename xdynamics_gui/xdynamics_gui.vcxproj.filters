@@ -28,6 +28,9 @@
       <Extensions>moc;h;cpp</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
+    <Filter Include="Header Files\widget">
+      <UniqueIdentifier>{a77cb45e-c3f5-412d-9223-3a269c37fe1c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -60,6 +63,15 @@
     <ClCompile Include="..\source\xdynamics_gui\xvPlane.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xAnimationTool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xvCube.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xModelNavigator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="xdynamics_gui.h">
@@ -71,9 +83,18 @@
     <QtMoc Include="..\include\xdynamics_gui\xCommandWindow.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="..\include\xdynamics_gui\xAnimationTool.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="..\include\xdynamics_gui\xModelNavigator.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="xdynamics_gui.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="wcube.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
@@ -106,6 +127,12 @@
     </ClInclude>
     <ClInclude Include="..\include\xdynamics_gui\xvPlane.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xdynamics_gui\xvCube.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_wcube.h">
+      <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

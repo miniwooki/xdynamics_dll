@@ -68,7 +68,23 @@ private:
 		unsigned int *cell_end,
 		unsigned int np);
 
-	
+	unsigned int deviceContactCount(
+		double *pos, double *vel,
+		double *omega, double *mass,
+		double *force, double *moment,
+		unsigned int *sorted_id,
+		unsigned int *cell_start,
+		unsigned int *cell_end,
+		unsigned int np);
+
+	unsigned int ncontact;
+	int *d_type_count;
+	unsigned int *d_old_pair_count;
+	unsigned int *d_pair_count;
+	unsigned int *d_old_pair_start;
+	unsigned int *d_pair_start;
+	pair_data* d_pppd;
+
 	QMap<QString, xContact*> cots;
 	QMap<QString, xParticleMeshObjectContact*> cpmesh;
 	xContactPairList* xcpl;

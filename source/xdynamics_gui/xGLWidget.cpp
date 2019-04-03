@@ -9,6 +9,7 @@
 #include "xvMath.h"
 #include "xvGlew.h"
 #include "xvPlane.h"
+#include "xvCube.h"
 // #include "cube.h"
 // #include "vcube.h"
 // #include "plane.h"
@@ -122,6 +123,33 @@ xGLWidget::~xGLWidget()
 xGLWidget* xGLWidget::GLObject()
 {
 	return ogl;
+}
+
+bool xGLWidget::Upload_DEM_Results(QStringList& sl)
+{
+	if (vp)
+	{
+		unsigned int i = 0;
+		vp->setBufferMemories(sl.size());
+		xvAnimationController::allocTimeMemory(sl.size());
+		xvAnimationController::setTotalFrame(sl.size()-1);
+		foreach(QString s, sl)
+		{
+			if (!vp->UploadParticleFromFile(i++, s))
+			{
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+void xGLWidget::createCubeGeometry(QString& _name, xCubeObjectData& d)
+{
+	xvCube *vc = new xvCube(_name);
+	vc->makeCubeGeometry(d);
+	v_objs[_name] = vc;
+	v_wobjs[vc->ID()] = (void*)vc;
 }
 
 void xGLWidget::createPlaneGeometry(QString& _name, xPlaneObjectData& d)
@@ -339,10 +367,11 @@ void xGLWidget::initializeGL()
 	ref_marker.setName("ref_marker");
 	//ref_marker.setAttchedMass(false);
 	//ref_marker.setMarkerScaleFlag(false);
-	ref_marker.define(-0.85, -0.85, 0.0);
+	ref_marker.define(-0.85, -0.85, 0.0, true);
 
-	ground_marker = new xvMarker(QString("ground_marker"), false);
+	ground_marker = new xvMarker(QString("ground_marker"), true);
 	ground_marker->define(0.0, 0.0, 0.0);
+	ground_marker->setMarkerScale(0.5);
 	//ground_marker->setAttchedMass(false);
 	v_wobjs[ground_marker->ID()] = (void*)ground_marker;
 
@@ -371,10 +400,10 @@ void xGLWidget::drawReferenceCoordinate()
 
 void xGLWidget::drawGroundCoordinate(GLenum eMode)
 {
-	double ang[3] = { DEG2RAD * xRot / 16, DEG2RAD * yRot / 16, DEG2RAD * zRot / 16 };
-	renderText(0.13, 0.0, 0.0, QString("X"), QColor(255, 0, 0));
-	renderText(0.0, 0.13, 0.0, QString("Y"), QColor(0, 255, 0));
-	renderText(0.0, 0.0, 0.13, QString("Z"), QColor(0, 0, 255));
+// 	double ang[3] = { DEG2RAD * xRot / 16, DEG2RAD * yRot / 16, DEG2RAD * zRot / 16 };
+// 	renderText(0.13, 0.0, 0.0, QString("X"), QColor(255, 0, 0));
+// 	renderText(0.0, 0.13, 0.0, QString("Y"), QColor(0, 255, 0));
+// 	renderText(0.0, 0.0, 0.13, QString("Z"), QColor(0, 0, 255));
 	ground_marker->draw(eMode);
 }
 
@@ -466,6 +495,12 @@ void xGLWidget::drawObject(GLenum eMode)
 	//qDebug() << xRot << " " << yRot << " " << zRot;
 	drawGroundCoordinate(eMode);
 	QMapIterator<QString, xvObject*> obj(v_objs);
+
+	if (vp)
+	{
+		vp->draw(GL_RENDER, wHeight, protype, abs(trans_z));
+	}
+
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	while (obj.hasNext()){
@@ -622,22 +657,13 @@ void xGLWidget::paintGL()
 	drawReferenceCoordinate();
 	resizeGL(wWidth, wHeight);
 
+	
+
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	drawObject(GL_RENDER);
-
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-// 	if (vp)
-// 	{
-// 		model::isSinglePrecision ?
-// 			vp->draw_f(GL_RENDER, wHeight, protype, abs(trans_z)) :
-// 			vp->draw(GL_RENDER, wHeight, protype, abs(trans_z));
-// 
-// 	}
-
-
 	if (xvAnimationController::Play()){
 		xvAnimationController::update_frame();
-		emit mySignal();
+		emit changedAnimationFrame();
 	}
 
 	glEnable(GL_COLOR_MATERIAL);

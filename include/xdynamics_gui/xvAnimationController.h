@@ -26,12 +26,14 @@ public:
 	static void setPlayMode(int m) { play_mode = m; }
 	static int getFrame() { return (int)current_frame; }
 	static void upBufferCount() { buffer_count++; }
-	static void addTimes(unsigned int i, float time) { times[i] = time; }
-	static float getTimes() { return times[current_frame]; }
+	static void allocTimeMemory(unsigned int sz) { times = new float[sz]; }
+	static void addTime(unsigned int i, float time) { times[i] = time; }
+	static float getTime() { return times[current_frame]; }
 	static float& getTimes(unsigned int i) { return times[i]; }
 	static void setTotalFrame(unsigned int tf) { buffer_count = tf; }
 	static void setRealTimeParameter(bool rt) { real_time = rt; }
 	static bool getRealTimeParameter() { return real_time; }
+	static int currentPlayMode() { return play_mode; }
 
 private:
 	static int play_mode;

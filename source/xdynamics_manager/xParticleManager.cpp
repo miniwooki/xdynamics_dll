@@ -4,6 +4,8 @@
 
 xParticleManager::xParticleManager()
 	: np(0)
+	, r_pos(NULL)
+	, r_vel(NULL)
 // 	, is_realtime_creating(false)
 // 	, one_by_one(false)
 {
@@ -12,13 +14,24 @@ xParticleManager::xParticleManager()
 
 xParticleManager::~xParticleManager()
 {
-	//qDeleteAll(xpcos);
+	if (r_pos) delete[] r_pos; r_pos = NULL;
+	if (r_vel) delete[] r_vel; r_vel = NULL;
 }
 
 
 unsigned int xParticleManager::NumParticle()
 {
 	return np;
+}
+
+double* xParticleManager::GetPositionResultPointer(unsigned int pt)
+{
+	return r_pos + (np * 4 * pt);
+}
+
+double* xParticleManager::GetVelocityResultPointer(unsigned int pt)
+{
+	return r_vel + (np * 3 * pt);
 }
 
 // void xParticleManager::setRealTimeCreating(bool b)
@@ -223,4 +236,15 @@ void xParticleManager::ExportParticleDataForView(std::string path)
 		of.write((char*)_pos, sizeof(double) * _np * 4);
 	}
 	of.close();
+}
+
+void xParticleManager::AllocParticleResultMemory(unsigned int npart, unsigned int np)
+{
+	if (r_pos) delete[] r_pos; r_pos = NULL;
+	if (r_vel) delete[] r_vel; r_vel = NULL;
+	unsigned int n = npart * np;
+	r_pos = new double[n * 4];
+	r_vel = new double[n * 3];
+	memset(r_pos, 0, sizeof(double) * n * 4);
+	memset(r_vel, 0, sizeof(double) * n * 3);
 }

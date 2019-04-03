@@ -13,6 +13,7 @@ public:
 	~xDiscreteElementMethodModel();
 
 	xParticleManager* XParticleManager();
+
 private:
 	QString name;
 	xParticleManager *xpmgr;

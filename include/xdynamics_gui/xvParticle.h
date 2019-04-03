@@ -31,11 +31,13 @@ public:
 	bool defineFromViewFile(QString path);
 
 	void setParticlePosition(double* p, unsigned int n);
-	
+	bool UploadParticleFromFile(unsigned int i, QString path);
 	void openResultFromFile(unsigned int idx);
 
 	void upParticleScale(double v) { pscale += v; }
 	void downParticleScale(double v) { pscale -= v; }
+	void setBufferMemories(unsigned int sz);
+	QMap<QString, particleGroupData>& ParticleGroupData() { return pgds; }
 
 private:
 	bool _define();
@@ -49,6 +51,9 @@ private:
 
 	unsigned int np;
 	float *buffer;
+	float *buffers;
+	float *vbuffers;
+	float *color_buffers;
 	float *color_buffer;
 	float *pos;
 	float *color;

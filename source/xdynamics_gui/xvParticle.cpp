@@ -24,6 +24,9 @@ xvParticle::xvParticle()
 	, pos(NULL)
 	, color(NULL)
 	, buffer(NULL)
+	, buffers(NULL)
+	, vbuffers(NULL)
+	, color_buffers(NULL)
 	, color_buffer(NULL)
 	, pscale(0)
 	, isDefine(false)
@@ -37,6 +40,9 @@ xvParticle::~xvParticle()
 {
 	if (pos) delete[] pos; pos = NULL;
 	if (color) delete[] color; color = NULL;
+	if (buffers) delete[] buffers; buffers = NULL;
+	if (vbuffers) delete[] vbuffers; vbuffers = NULL;
+	if (color_buffers) delete[] color_buffers; color_buffers = NULL;
 	if (m_posVBO){
 		glDeleteBuffers(1, &m_posVBO);
 		m_posVBO = 0;
@@ -55,14 +61,16 @@ void xvParticle::draw(GLenum eModem, int wHeight, int protype, double z)
 	if (xvAnimationController::Play())
 	{
 		unsigned int idx = xvAnimationController::getFrame();
-		//buffer = model::rs->getPartPosition(idx);
-		//color_buffer = model::rs->getPartColor(idx);
+		buffer = buffers + idx * np * 4;
+		color_buffer = color_buffers + idx * np * 4;// model::rs->getPartColor(idx);
 	}
 	else
 	{
 		unsigned int idx = xvAnimationController::getFrame();
 		if (idx)
 		{
+			buffer = buffers + idx * np * 4;
+			color_buffer = color_buffers + idx * np * 4;
 			//buffer = model::rs->getPartPosition(idx);
 			//color_buffer = model::rs->getPartColor(idx);
 		}
@@ -113,15 +121,15 @@ void xvParticle::_drawPoints()
 	if (m_posVBO)
 	{
 		glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_posVBO);
-		glVertexPointer(4, GL_DOUBLE, 0, 0);
+		glVertexPointer(4, GL_FLOAT, 0, 0);
 		glEnableClientState(GL_VERTEX_ARRAY);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat)*np * 4, buffer);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * np * 4, buffer);
 		if (m_colorVBO)
 		{
 			glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_colorVBO);
-			glColorPointer(4, GL_DOUBLE, 0, 0);
+			glColorPointer(4, GL_FLOAT, 0, 0);
 			glEnableClientState(GL_COLOR_ARRAY);
-			glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat)*np * 4, color_buffer);
+			glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * np * 4, color_buffer);
 		}
 
 		glDrawArrays(GL_POINTS, 0, np);
@@ -185,6 +193,9 @@ bool xvParticle::defineFromViewFile(QString path)
 	qf.open(QIODevice::ReadOnly);
 	int ns = 0;
 	QString name;
+	unsigned int _np = 0;
+	qf.read((char*)&_np, sizeof(unsigned int));
+	double* d_pos = NULL;
 	while (!qf.atEnd())
 	{
 		qf.read((char*)&ns, sizeof(int));
@@ -198,15 +209,72 @@ bool xvParticle::defineFromViewFile(QString path)
 		qf.read((char*)&(pgds[name].min_rad), sizeof(double));
 		qf.read((char*)&(pgds[name].max_rad), sizeof(double));
 		resizePositionMemory(np, np + pgds[name].np);
+		d_pos = new double[pgds[name].np * 4];
+		qf.read((char*)d_pos, sizeof(double) * pgds[name].np * 4);
+		for (unsigned int i = 0; i < pgds[name].np; i++)
+		{
+			pos[(np + i) * 4 + 0] = (float)d_pos[i * 4 + 0];
+			pos[(np + i) * 4 + 1] = (float)d_pos[i * 4 + 1];
+			pos[(np + i) * 4 + 2] = (float)d_pos[i * 4 + 2];
+			pos[(np + i) * 4 + 3] = (float)d_pos[i * 4 + 3];
+		}
 		np += pgds[name].np;
+		delete[] d_pos;
+		delete[] _name;
 	}
 	color = new float[np * 4];
+	return _define();
 }
 
 void xvParticle::setParticlePosition(double* p, unsigned int n)
 {
 // 	if (pos && p)
 // 		memcpy(pos, p, sizeof(double) * n * 4);
+}
+
+bool xvParticle::UploadParticleFromFile(unsigned int i, QString path)
+{
+	double ct = 0.0;
+	unsigned int inp = 0;
+	unsigned int sid = 0;
+	unsigned int vid = 0;
+	QFile qf(path);
+	qf.open(QIODevice::ReadOnly);
+	qf.read((char*)&ct, sizeof(double));
+	qf.read((char*)&inp, sizeof(unsigned int));
+	if (np != inp)
+	{
+		return false;
+	}
+	sid = inp * i * 4;
+	vid = inp * i * 3;
+	double *_pos = new double[inp * 4];
+	double *_vel = new double[inp * 3];
+	qf.read((char*)_pos, sizeof(double) * inp * 4);
+	qf.read((char*)_vel, sizeof(double) * inp * 3);
+	qf.close();
+	xvAnimationController::addTime(i, ct);
+	for (unsigned int j = 0; j < inp; j++)
+	{
+		unsigned int s = j * 4;
+		unsigned int v = j * 3;
+		buffers[s + sid + 0] = static_cast<float>(_pos[s + 0]);
+		buffers[s + sid + 1] = static_cast<float>(_pos[s + 1]);
+		buffers[s + sid + 2] = static_cast<float>(_pos[s + 2]);
+		buffers[s + sid + 3] = static_cast<float>(_pos[s + 3]);
+
+		vbuffers[v + vid + 0] = static_cast<float>(_vel[v + 0]);
+		vbuffers[v + vid + 1] = static_cast<float>(_vel[v + 1]);
+		vbuffers[v + vid + 2] = static_cast<float>(_vel[v + 2]);
+
+		color_buffers[s + sid + 0] = 0.0f;
+		color_buffers[s + sid + 1] = 0.0f;
+		color_buffers[s + sid + 2] = 1.0f;
+		color_buffers[s + sid + 3] = 1.0f;
+	}
+	delete[] _pos;
+	delete[] _vel;
+	return true;
 }
 
 void xvParticle::resizePositionMemory(unsigned int n0, unsigned int n1)
@@ -356,6 +424,17 @@ void xvParticle::openResultFromFile(unsigned int idx)
 	// // 	color[203878 * 4 + 1] = 1.0f;
 	// // 	color[203878 * 4 + 2] = 1.0f;
 	// 	pf.close();
+}
+
+void xvParticle::setBufferMemories(unsigned int sz)
+{
+	if (buffers)
+		delete[] buffers;
+	buffers = new float[sz * np * 4];
+	vbuffers = new float[sz * np * 3];
+	if (color_buffers)
+		delete[] color_buffers;
+	color_buffers = new float[sz * np * 4];
 }
 
 // void xvParticle::changeParticles(VEC4D_PTR _pos)

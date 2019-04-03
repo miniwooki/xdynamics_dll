@@ -1,5 +1,7 @@
 #include "xdynamics_simulation/xDiscreteElementMethodSimulation.h"
 #include "xdynamics_algebra/xGridCell.h"
+//#include <QtCore/QFile>
+#include <fstream>
 #include <cuda_runtime.h>
 #include <helper_cuda.h>
 
@@ -8,6 +10,7 @@ xDiscreteElementMethodSimulation::xDiscreteElementMethodSimulation()
 	, xdem(NULL)
 	, dtor(NULL)
 	, xcm(NULL)
+	, isSaveMemory(false)
 {
 
 }
@@ -62,7 +65,7 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 	for (unsigned int i = 0; i < np; i++)
 	{
 		double r = pos[i * 4 + 3];
-		vel[0] = 1.0;
+		//vel[0] = 1.0;
 		force[i * 3 + 0] = mass[i] * xModel::gravity.x;
 		force[i * 3 + 1] = mass[i] * xModel::gravity.y;
 		force[i * 3 + 2] = mass[i] * xModel::gravity.z;
@@ -148,6 +151,8 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 	}
 	if (per_np)
 		np = 0;
+	if (isSaveMemory)
+		xdem->XParticleManager()->AllocParticleResultMemory(xSimulation::npart, np);
 	//dynamic_cast<neighborhood_cell*>(dtor)->reorderElements(pos, (double*)cm->HostSphereData(), np, nPolySphere);
 	return xDynamicsError::xdynamicsSuccess;
 }
@@ -157,9 +162,56 @@ bool xDiscreteElementMethodSimulation::Initialized()
 	return isInitilize;
 }
 
-QString xDiscreteElementMethodSimulation::saveResult(double *vp, double* vv, double ct, unsigned int pt)
+QString xDiscreteElementMethodSimulation::SaveStepResult(unsigned int pt, double ct)
 {
-	return "";
+	double *rp = NULL;
+	double *rv = NULL;
+	if (isSaveMemory)
+	{
+		rp = xdem->XParticleManager()->GetPositionResultPointer(pt);
+		rv = xdem->XParticleManager()->GetVelocityResultPointer(pt);
+		if (xSimulation::Gpu())
+		{
+			checkCudaErrors(cudaMemcpy(rp, dpos, sizeof(double) * np * 4, cudaMemcpyDeviceToHost));
+			checkCudaErrors(cudaMemcpy(rv, dvel, sizeof(double) * np * 3, cudaMemcpyDeviceToHost));
+		}
+		else
+		{
+			memcpy(rp, dpos, sizeof(double) * np * 4);
+			memcpy(rv, dvel, sizeof(double) * np * 3);
+		}
+	}
+	if (xSimulation::Gpu())
+	{
+		checkCudaErrors(cudaMemcpy(pos, dpos, sizeof(double) * np * 4, cudaMemcpyDeviceToHost));
+		checkCudaErrors(cudaMemcpy(vel, dvel, sizeof(double) * np * 3, cudaMemcpyDeviceToHost));
+	}
+	//char pname[256] = { 0, };
+ 	QString fname = xModel::path + xModel::name;
+	QString part_name;
+	part_name.sprintf("part%04d", pt);
+	fname.sprintf("%s/part%04d.bin", fname.toUtf8().data(), pt);
+	std::fstream qf(fname.toStdString());
+	qf.open(fname.toStdString(), std::ios::binary | std::ios::out);
+	if (qf.is_open())
+	{
+		qf.write((char*)&ct, sizeof(double));
+		qf.write((char*)&np, sizeof(unsigned int));
+		qf.write((char*)pos, sizeof(double) * np * 4);
+		qf.write((char*)vel, sizeof(double) * np * 3);
+	}
+	qf.close();
+	/*qf.open(QIODevice::WriteOnly);*/
+	partList.push_back(fname);
+	return fname;
+}
+
+void xDiscreteElementMethodSimulation::ExportResults(std::fstream& of)
+{
+	foreach(QString s, partList)
+	{
+		of << s.toStdString() << endl;
+	}
 }
 
 // vector4d xDiscreteElementMethodSimulation::GlobalSphereInertiaForce(const euler_parameters& ev, const double j, const euler_parameters& ep)

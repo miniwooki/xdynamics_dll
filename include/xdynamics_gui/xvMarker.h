@@ -16,11 +16,11 @@ public:
 	virtual void draw(GLenum eMode);
 
 	//void setMarkerScale
-	bool define(float x, float y, float z);
+	bool define(float x, float y, float z, bool isdefine_text = false);
 	//void setAttchedMass(bool b) { isAttachMass = b; }
 	//void setAttachObject(QString o) { attachObject = o; }
 	//void setMarkerScaleFlag(bool b) { markerScaleFlag = b; }
-	static void setMarkerScale(float sc) { scale = sc; }
+	void setMarkerScale(float sc) { scale = sc; }
 	//bool makeCubeGeometry(QTextStream& in);
 	//bool makeCubeGeometry(QString& _name, geometry_use _tr, material_type _tm, VEC3F& _mp, VEC3F& _sz);
 
@@ -28,7 +28,7 @@ private:
 	bool isAttachMass;
 	QString attachObject;
 	bool markerScaleFlag;
-	static float scale;
+	float scale;
 	unsigned int glList;
 	//static float icon_scale;
 	//unsigned int glHiList;

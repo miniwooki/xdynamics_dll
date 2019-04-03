@@ -3,6 +3,7 @@
 
 //#include "xdynamics_decl.h"
 #include "xdynamics_object/xObject.h"
+#include <QtCore/QTextStream>
 
 class XDYNAMICS_API xPointMass : public xObject
 {
@@ -79,7 +80,7 @@ public:
 
 	void AllocResultMomory(unsigned int _s);
 	void SaveStepResult(unsigned int part, double time, xVectorD& q, xVectorD& qd, xVectorD& qdd);
-	void ExportResults(/*QString& path*/);
+	void ExportResults(std::fstream& of);
 	void SetDataFromStructure(int id, xPointMassData& d);
 	void ImportInitialData();
 	void ExportInitialData();

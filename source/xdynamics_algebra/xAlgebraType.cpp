@@ -135,6 +135,30 @@ void xMatrixD::plus(unsigned int sr, unsigned int sc, matrix43d& m4x3, bool ist 
 			ist ? data[c * nrow + r] += *(ptr + cnt++) : data[r * nrow + c] += *(ptr + cnt++);
 }
 
+void xMatrixD::columnSwap(unsigned int i, unsigned int j, int* idx)
+{
+	int idxbuf = 0;
+	double valbuf = 0;
+	for (unsigned k(0); k < nrow; k++){
+		valbuf = data[i*nrow + k];
+		data[i*nrow + k] = data[j*nrow + k];
+		data[j*nrow + k] = valbuf;
+	}
+	idxbuf = idx[i];
+	idx[i] = idx[j];
+	idx[j] = idxbuf;
+}
+
+unsigned int xMatrixD::rows()
+{
+	return nrow;
+}
+
+unsigned int xMatrixD::cols()
+{
+	return ncol;
+}
+
 xVectorD::xVectorD()
 	: size(0)
 	, data(NULL)
@@ -225,12 +249,31 @@ xSparseD::xSparseD()
 
 }
 
-xSparseD::xSparseD(unsigned int _size)
-	: ridx(NULL)
+// xSparseD::xSparseD(unsigned int _size)
+// 	: nr(0)
+// 	, nc(0)
+// 	, ridx(NULL)
+// 	, cidx(NULL)
+// 	, value(NULL)
+// 	, nnz(0)
+// 	, size(_size)
+// {
+// 	ridx = new unsigned int[size];
+// 	cidx = new unsigned int[size];
+// 	value = new double[size];
+// 	memset(ridx, 0, sizeof(unsigned int) * size);
+// 	memset(cidx, 0, sizeof(unsigned int) * size);
+// 	memset(value, 0, sizeof(double) * size);
+// }
+
+xSparseD::xSparseD(unsigned int _nr, unsigned int _nc)
+	: nr(_nr)
+	, nc(_nc)
+	, ridx(NULL)
 	, cidx(NULL)
 	, value(NULL)
 	, nnz(0)
-	, size(_size)
+	, size(_nr * _nc)
 {
 	ridx = new unsigned int[size];
 	cidx = new unsigned int[size];
@@ -265,9 +308,21 @@ unsigned int xSparseD::NNZ()
 	return nnz;
 }
 
-void xSparseD::alloc(unsigned int _size)
+unsigned int xSparseD::rows()
 {
-	size = _size;
+	return nr;
+}
+
+unsigned int xSparseD::cols()
+{
+	return nc;
+}
+
+void xSparseD::alloc(unsigned int _nr, unsigned int _nc)
+{
+	nr = _nr;
+	nc = _nc;
+	size = _nr * _nc;
 	ridx = new unsigned int[size];
 	cidx = new unsigned int[size];
 	value = new double[size];

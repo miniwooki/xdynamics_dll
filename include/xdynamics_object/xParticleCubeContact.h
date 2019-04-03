@@ -3,13 +3,14 @@
 
 #include "xdynamics_object/xConatct.h"
 
+class xParticleObject;
 class xCubeObject;
 
 class XDYNAMICS_API xParticleCubeContact : public xContact
 {
 public:
 	xParticleCubeContact();
-	xParticleCubeContact(std::string _name);
+	xParticleCubeContact(std::string _name, xObject* o1, xObject *o2);
 	virtual ~xParticleCubeContact();
 
 	xCubeObject* CubeObject();
@@ -27,7 +28,7 @@ public:
 	virtual void cudaMemoryAlloc(unsigned int np);
 
 private:
-	xObject* p;
+	xParticleObject* p;
 	xCubeObject* cu;
 	device_plane_info *dpi;
 };

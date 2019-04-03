@@ -48,17 +48,19 @@ public:
 		double *mass, double *force, double *moment,
 		unsigned int *sorted_id, unsigned int *cell_start, unsigned int *cell_end, unsigned int np);
 	//void setZeroCollisionForce();
+	device_plane_info* devicePlaneInfo();
+	unsigned int NumPlanes();
 
 private:
+	
 	//vector3d particle_polygon_contact_detection(host_mesh_info& dpi, vector3d& p, double r/*, polygonContactType& _pct*/);
 	double particle_plane_contact_detection(host_plane_info* _pe, vector3d& u, vector3d& xp, vector3d& wp, double r);
 	unsigned int nplanes;
-	unsigned int ncontact;
-	unsigned int *d_old_pair_count;
-	unsigned int *d_pair_count;
-	unsigned int *d_old_pair_start;
-	unsigned int *d_pair_start;
-	particle_plane_pair_data* d_pppd;
+// 	unsigned int *d_old_pair_count;
+// 	unsigned int *d_pair_count;
+// 	unsigned int *d_old_pair_start;
+// 	unsigned int *d_pair_start;
+	/*particle_plane_pair_data* d_pppd;*/
 	xContactMaterialParameters* hcmp;
 	xMaterialPair* xmps;
 	host_plane_info* hpi;

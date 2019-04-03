@@ -39,17 +39,17 @@ void xMultiBodySimulation::SaveStepResult(unsigned int part, double ct)
 	}
 }
 
-void xMultiBodySimulation::ExportResults()
+void xMultiBodySimulation::ExportResults(std::fstream& of)
 {
 	foreach(xPointMass* xpm, xmbd->Masses())
 	{
-		xpm->ExportResults();
+		xpm->ExportResults(of);
 		xpm->ExportInitialData();
 	}
 	unsigned int sr = 0;
 	foreach(xKinematicConstraint* xkc, xmbd->Joints())
 	{
-		xkc->ExportResults();
+		xkc->ExportResults(of);
 		sr += xkc->NumConst();
 	}
 }
@@ -126,14 +126,14 @@ int xMultiBodySimulation::Initialize(xMultiBodyModel* _xmbd)
 	{
 		tdim = sdim;
 		lhs.alloc(sdim, sdim);// new_matrix(tdim, tdim);
-		cjaco.alloc(sdim * sdim);
+		cjaco.alloc(sdim, sdim);
 		rhs.alloc(sdim);// = new double[tdim];
 	}
 	else
 	{
 		tdim = mdim + sdim;
 		lhs.alloc(tdim, tdim);// new_matrix(tdim, tdim);
-		cjaco.alloc(sdim * mdim);
+		cjaco.alloc(sdim, mdim);
 		rhs.alloc(tdim);// = new double[tdim];
 	}
 	return xDynamicsError::xdynamicsSuccess;
@@ -316,7 +316,7 @@ void xMultiBodySimulation::ConstructConstraintGamma(xVectorD& v, int sr /*= 0.0*
 	foreach(xPointMass* xpm, xmbd->Masses())
 	{
 		unsigned int id = xpm->xpmIndex() * xModel::OneDOF();
-		euler_parameters e = xpm->EulerParameters();// new_euler_parameters(qd(id + 3), qd(id + 4), qd(id + 5), qd(id + 6));
+		euler_parameters e = xpm->DEulerParameters();// new_euler_parameters(qd(id + 3), qd(id + 4), qd(id + 5), qd(id + 6));
 		v(sr++) = mul * 2.0 * dot(e, e);
 	}
 }

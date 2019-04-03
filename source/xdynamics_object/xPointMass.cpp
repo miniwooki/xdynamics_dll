@@ -322,7 +322,7 @@ void xPointMass::SaveStepResult(unsigned int part, double time, xVectorD& q, xVe
 	nr_part++;
 }
 
-void xPointMass::ExportResults(/*QString& path*/)
+void xPointMass::ExportResults(std::fstream& of)
 {
 	std::ofstream ofs;
 	QString _path = xModel::path + xModel::name + "/" + name + ".bpm";
@@ -337,6 +337,7 @@ void xPointMass::ExportResults(/*QString& path*/)
 
 	ofs.close();
 	xLog::log("Exported : " + _path.toStdString());
+	of << _path.toStdString() << endl;
 	//std::wcout << "Exported : " << _path.text() << std::endl;
 }
 

@@ -3,9 +3,9 @@
 
 xParticleParticleContact::xParticleParticleContact()
 	: xContact()
-	, d_pair_idx(NULL)
-	, d_pair_other(NULL)
-	, d_tan(NULL)
+// 	, d_pair_idx(NULL)
+// 	, d_pair_other(NULL)
+// 	, d_tan(NULL)
 {
 
 }
@@ -18,9 +18,9 @@ xParticleParticleContact::xParticleParticleContact(std::string _name)
 
 xParticleParticleContact::~xParticleParticleContact()
 {
-	if (d_pair_idx) checkCudaErrors(cudaFree(d_pair_idx)); d_pair_idx = NULL;
-	if (d_pair_other) checkCudaErrors(cudaFree(d_pair_other)); d_pair_other = NULL;
-	if (d_tan) checkCudaErrors(cudaFree(d_tan)); d_tan = NULL;
+// 	if (d_pair_idx) checkCudaErrors(cudaFree(d_pair_idx)); d_pair_idx = NULL;
+// 	if (d_pair_other) checkCudaErrors(cudaFree(d_pair_other)); d_pair_other = NULL;
+// 	if (d_tan) checkCudaErrors(cudaFree(d_tan)); d_tan = NULL;
 }
 
 void xParticleParticleContact::cudaMemoryAlloc(unsigned int np)
@@ -28,13 +28,18 @@ void xParticleParticleContact::cudaMemoryAlloc(unsigned int np)
 	xContact::cudaMemoryAlloc(np);
 	if (xSimulation::Gpu())
 	{
-		checkCudaErrors(cudaMalloc((void**)&d_pair_idx, sizeof(unsigned int) * np * 2));
-		checkCudaErrors(cudaMalloc((void**)&d_pair_other, sizeof(unsigned int) * np * MAXIMUM_PAIR_NUMBER));
-		checkCudaErrors(cudaMalloc((void**)&d_tan, sizeof(double) * np * MAXIMUM_PAIR_NUMBER));
-		checkCudaErrors(cudaMemset(d_pair_idx, 0, sizeof(unsigned int) * np * 2));
-		checkCudaErrors(cudaMemset(d_pair_other, 0, sizeof(unsigned int) * np * MAXIMUM_PAIR_NUMBER));
-		checkCudaErrors(cudaMemset(d_tan, 0, sizeof(unsigned int) * np * MAXIMUM_PAIR_NUMBER));
+// 		checkCudaErrors(cudaMalloc((void**)&d_pair_idx, sizeof(unsigned int) * np * 2));
+// 		checkCudaErrors(cudaMalloc((void**)&d_pair_other, sizeof(unsigned int) * np * MAXIMUM_PAIR_NUMBER));
+// 		checkCudaErrors(cudaMalloc((void**)&d_tan, sizeof(double) * np * MAXIMUM_PAIR_NUMBER));
+// 		checkCudaErrors(cudaMemset(d_pair_idx, 0, sizeof(unsigned int) * np * 2));
+// 		checkCudaErrors(cudaMemset(d_pair_other, 0, sizeof(unsigned int) * np * MAXIMUM_PAIR_NUMBER));
+// 		checkCudaErrors(cudaMemset(d_tan, 0, sizeof(unsigned int) * np * MAXIMUM_PAIR_NUMBER));
 	}
+}
+
+void xParticleParticleContact::deviceContactCount(double* pos, unsigned int *sorted_id, unsigned int *cstart, unsigned int *cend, unsigned int np)
+{
+
 }
 
 // void xParticleParticleContact::cppCollision(
@@ -127,8 +132,8 @@ void xParticleParticleContact::cuda_collision(
 	unsigned int *sorted_id, unsigned int *cell_start,
 	unsigned int *cell_end, unsigned int np)
 {
-	cu_check_no_collision_pair(pos, d_pair_idx, d_pair_other, np);
-	cu_check_new_collision_pair(pos, d_pair_idx, d_pair_other, sorted_id, cell_start, cell_end, np);
-	cu_calculate_particle_collision_with_pair(pos, vel , omega, mass, d_tan, force, moment, d_pair_idx, d_pair_other, dcp, np);
-	//cu_calculate_p2p(1, pos, vel, omega, force, moment, mass, sorted_id, cell_start, cell_end, dcp, np);
+// 	cu_check_no_collision_pair(pos, d_pair_idx, d_pair_other, np);
+// 	cu_check_new_collision_pair(pos, d_pair_idx, d_pair_other, sorted_id, cell_start, cell_end, np);
+// 	cu_calculate_particle_collision_with_pair(pos, vel , omega, mass, d_tan, force, moment, d_pair_idx, d_pair_other, dcp, np);
+// 	//cu_calculate_p2p(1, pos, vel, omega, force, moment, mass, sorted_id, cell_start, cell_end, dcp, np);
 }

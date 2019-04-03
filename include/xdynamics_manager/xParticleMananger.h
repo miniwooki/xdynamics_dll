@@ -20,9 +20,10 @@ public:
 	void ExportParticleDataForView(std::string path);
 // 	void setRealTimeCreating(bool b);
 // 	bool OneByOneCreating();
-// 
+	double* GetPositionResultPointer(unsigned int pt);
+	double* GetVelocityResultPointer(unsigned int pt);
 // 	unsigned int RealTimeCreating();
-
+	void AllocParticleResultMemory(unsigned int npart, unsigned int np);
 	static unsigned int GetNumCubeParticles(double dx, double dy, double dz, double min_radius, double max_radius);
 	static unsigned int GetNumPlaneParticles(double dx, unsigned int ny, double dy, double min_radius, double max_radius);
 	static unsigned int GetNumCircleParticles(double d, unsigned int ny, double min_radius, double max_radius);
@@ -38,8 +39,9 @@ private:
 	//unsigned int per_np;
 	//double per_time;
 	QMap<QString, xParticleObject*> xpcos;
+
+	double *r_pos;
+	double *r_vel;
 };
-
-
 
 #endif

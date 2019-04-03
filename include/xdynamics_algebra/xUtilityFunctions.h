@@ -12,6 +12,7 @@ inline const QString toWideCharToQString(const wchar_t* wc) { return QString::fr
 class XDYNAMICS_API xUtilityFunctions
 {
 public:
+	static std::string xstring(QString v);
 	static std::string xstring(int v);
 	static std::string xstring(unsigned int v);
 	static std::string xstring(double v);
@@ -30,6 +31,8 @@ public:
 	//static void Split2WString(const wchar_t* s, const wchar_t* c, int& n, QString* ws);
 	static double AngleCorrection(double d, double th);
 	static void DirectoryFileList(const wchar_t* _path);
+	static void DeleteFileByEXT(std::string path, std::string s);
+	static void DeleteFilesInDirectory(std::string path);
 	static bool ExistFile(const wchar_t* n);
 	static QString FileExtension(const wchar_t* f);
 	static QString GetFileName(const wchar_t* p);
@@ -37,7 +40,5 @@ public:
 	static double SignedVolumeOfTriangle(vector3d& v1, vector3d& v2, vector3d& v3);
 	static vector3d CenterOfTriangle(vector3d& P, vector3d& Q, vector3d& R);
 };
-
-
 
 #endif

@@ -200,6 +200,7 @@ xDynamicsManager::solverType xDynamicsManager::OpenModelXLS(const wchar_t* n)
 		std::map<xXlsInputDataType, vector2i>::iterator et = xx.end();
 		std::string model_name = xModel::name.toStdString();
 		std::string full_path = xModel::path.toStdString() + model_name + "/" + model_name;
+		xUtilityFunctions::DeleteFilesInDirectory(xUtilityFunctions::xstring(xModel::path) + model_name);
 		xViewExporter xve;
 		xve.Open(full_path + ".vmd");
 		xls.setViewExporter(&xve);
