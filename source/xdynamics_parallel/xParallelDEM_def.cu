@@ -199,7 +199,7 @@ void cu_cylinder_hertzian_contact_force(
 }
 
 void cu_particle_meshObject_collision(
-	const int tcm, device_mesh_info* dpi, double* dsph, device_mesh_mass_info* dpmi,
+	const int tcm, device_triangle_info* dpi, double* dsph, device_mesh_mass_info* dpmi,
 	double* pos, double* vel, double* omega,
 	double* force, double* moment, double* mass,
 	unsigned int* sorted_index, unsigned int* cstart, unsigned int* cend, device_contact_property *cp,
@@ -241,7 +241,7 @@ double3 reductionD3(double3* in, unsigned int np)
 
 void cu_update_meshObjectData(
 	device_mesh_mass_info *dpmi, double* vList,
-	double* sphere, device_mesh_info* dpi, unsigned int ntriangle)
+	double* sphere, device_triangle_info* dpi, unsigned int ntriangle)
 {
 	computeGridSize(ntriangle, 512, numBlocks, numThreads);
 	updatePolygonObjectData_kernel << <numBlocks, numThreads >> >(dpmi, vList, (double4 *)sphere, dpi, ntriangle);
@@ -313,7 +313,30 @@ void cu_calculate_particle_particle_contact_count(
 		np);
 }
 
-unsigned int cu_calculate_particle_plane_contact_count(
+void cu_calculate_particle_triangle_contact_count(
+	device_triangle_info *dpi, double* pos, pair_data* pairs,
+	unsigned int* old_pair_count,
+	unsigned int* pair_count,
+	unsigned int* pair_start,
+	unsigned int* sorted_id,
+	unsigned int* cell_start,
+	unsigned int* cell_end, unsigned int np)
+{
+	computeGridSize(np, 512, numBlocks, numThreads);
+	calculate_particle_triangle_contact_count << <numBlocks, numThreads >> >(
+		dpi,
+		(double4*)pos,
+		pairs,
+		old_pair_count,
+		pair_count,
+		pair_start,
+		sorted_id,
+		cell_start,
+		cell_end,
+		np);
+}
+
+void cu_calculate_particle_plane_contact_count(
 	device_plane_info *plane, pair_data* pairs,
 	unsigned int* old_pair_count, unsigned int *count,
 	unsigned int *sidx, double* pos, unsigned int nplanes, unsigned int np)
@@ -328,9 +351,14 @@ unsigned int cu_calculate_particle_plane_contact_count(
 		(double4 *)pos,
 		nplanes,
 		np);
-	unsigned int nc = thrust::reduce(thrust::device_ptr<unsigned int>(count), thrust::device_ptr<unsigned int> (count + np));
+}
+
+unsigned int cu_sumation_contact_count(unsigned int* count, unsigned int np)
+{
+	unsigned int nc = thrust::reduce(thrust::device_ptr<unsigned int>(count), thrust::device_ptr<unsigned int>(count + np));
 	return nc;
 }
+
 void cu_copy_old_to_new_pair(
 	unsigned int *old_count, unsigned int *new_count,
 	unsigned int* old_sidx, unsigned int* new_sidx,
@@ -403,6 +431,35 @@ void cu_new_particle_plane_contact(
 		old_pairs, pairs,
 		cp,
 		nplanes,
+		np);
+}
+
+void cu_new_particle_polygon_object_contact(
+	device_triangle_info* dpi, device_mesh_mass_info* dpmi,
+	pair_data *old_pairs, pair_data *pairs,
+	unsigned int* old_count, unsigned int* count,
+	unsigned int* old_sidx, unsigned int* sidx, int* type_count,
+	double *pos, double *vel, double *omega, double *force, double *moment,
+	double* mass, unsigned int* sorted_index, unsigned int* cstart, unsigned int* cend,
+	device_contact_property *cp, unsigned int np)
+{
+	computeGridSize(np, 512, numBlocks, numThreads);
+	new_particle_polygon_object_conatct_kernel << < numBlocks, numThreads >> >(
+		dpi, dpmi,
+		old_pairs, pairs,
+		old_count, count,
+		old_sidx, sidx,
+		(int2 *)type_count,
+		(double4 *)pos,
+		(double3 *)vel,
+		(double3 *)omega,
+		(double3 *)force,
+		(double3 *)moment,
+		mass,
+		sorted_index,
+		cstart,
+		cend,
+		cp,
 		np);
 }
 //void cu_calculate_contact_pair_count(

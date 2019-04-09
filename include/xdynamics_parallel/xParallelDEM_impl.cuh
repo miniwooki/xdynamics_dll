@@ -392,7 +392,9 @@ __device__ void DHSModel(
 		_ds = ds;
 		dots = s_dot;
 		//double ds = mag_e * cte.dt;
-		Ft = min(c.ks * ds + c.vs * (dot(dv, sh)), c.mu * length(Fn)) * sh;
+		double ft0 = c.ks * ds + c.vs * (dot(dv, sh));
+		double ft1 = c.mu * length(Fn);
+		Ft = min(ft0, ft1) * sh;
 		M = cross(ir * unit, Ft);
 		/*if (length(iomega)){
 		double3 on = iomega / length(iomega);
@@ -757,6 +759,78 @@ __device__ double particle_plane_contact_detection(
 	return -1.0;
 }
 
+__device__ double3 closestPtPointTriangle(
+	device_triangle_info& dpi,
+	double3& p,
+	double pr,
+	int& ct)
+{
+	double3 a = dpi.P;
+	double3 b = dpi.Q;
+	double3 c = dpi.R;
+	double3 ab = b - a;
+	double3 ac = c - a;
+	double3 ap = p - a;
+
+	double d1 = dot(ab, ap);
+	double d2 = dot(ac, ap);
+	if (d1 <= 0.0 && d2 <= 0.0){
+		//	*wc = 0;
+		ct = 0;
+		return a;
+	}
+
+	double3 bp = p - b;
+	double d3 = dot(ab, bp);
+	double d4 = dot(ac, bp);
+	if (d3 >= 0.0 && d4 <= d3){
+		//	*wc = 0;
+		ct = 0;
+		return b;
+	}
+	double vc = d1 * d4 - d3 * d2;
+	if (vc <= 0.0 && d1 >= 0.0 && d3 <= 0.0){
+		//	*wc = 1;
+		ct = 1;
+		double v = d1 / (d1 - d3);
+		return a + v * ab;
+	}
+
+	double3 cp = p - c;
+	double d5 = dot(ab, cp);
+	double d6 = dot(ac, cp);
+	if (d6 >= 0.0 && d5 <= d6){
+		//	*wc = 0;
+		ct = 0;
+		return c;
+	}
+
+	double vb = d5 * d2 - d1 * d6;
+	if (vb <= 0.0 && d2 >= 0.0 && d6 <= 0.0){
+		//	*wc = 1;
+		ct = 1;
+		double w = d2 / (d2 - d6);
+		return a + w * ac; // barycentric coordinates (1-w, 0, w)
+	}
+
+	// Check if P in edge region of BC, if so return projection of P onto BC
+	double va = d3 * d6 - d5 * d4;
+	if (va <= 0.0 && (d4 - d3) >= 0.0 && (d5 - d6) >= 0.0){
+		//	*wc = 1;
+		ct = 1;
+		double w = (d4 - d3) / ((d4 - d3) + (d5 - d6));
+		return b + w * (c - b); // barycentric coordinates (0, 1-w, w)
+	}
+	ct = 2;
+	//*wc = 2;
+	// P inside face region. Compute Q through its barycentric coordinates (u, v, w)
+	double denom = 1.0 / (va + vb + vc);
+	double v = vb * denom;
+	double w = vc * denom;
+
+	return a + v * ab + w * ac; // = u*a + v*b + w*c, u = va * denom = 1.0f - v - w
+}
+
 __global__ void calculate_particle_particle_contact_count(
 	double4* pos, pair_data* old_pppd, unsigned int *old_count, unsigned int *count,
 	unsigned int* sidx, unsigned int *sorted_index, unsigned int *cstart,
@@ -788,21 +862,19 @@ __global__ void calculate_particle_particle_contact_count(
 					end_index = cend[grid_hash];
 					for (unsigned int j = start_index; j < end_index; j++){
 						unsigned int k = sorted_index[j];
-						if (id == k || k >= np)
-							continue;
+						if (id == k || k >= np)	continue;
 						jpos = pos[k];
 						jr = jpos.w;
 						double3 rp = make_double3(jpos.x - ipos.x, jpos.y - ipos.y, jpos.z - ipos.z);
 						double dist = length(rp);
 						double cdist = (ir + jr) - dist;
-						for (unsigned int j = 0; j < old_count[id]; j++)
-						{
-							pair_data *pdata = old_pppd + (old_sid + j);
-							if (cdist <= 0 && pdata->type == 1)
-								pdata->enable = false;
+						if (cdist > 0) cnt++;
+						else{
+							for (unsigned int j = 0; j < old_count[id]; j++){
+								pair_data *pdata = old_pppd + (old_sid + j);
+								if (pdata->type == 1) pdata->enable = false;
+							}
 						}
-						if (cdist > 0)
-							cnt++;
 					}
 				}
 			}
@@ -810,6 +882,88 @@ __global__ void calculate_particle_particle_contact_count(
 	}
 	//old_count[id] = count[id];
 	count[id] = cnt;
+}
+
+__device__ bool checkOverlab(int3 ctype, double3 previous_cpt, double3 cpt)
+{
+	if (ctype.x || ctype.y || ctype.z)
+	{
+		if (previous_cpt.x == cpt.x && previous_cpt.y == cpt.y && previous_cpt.z == cpt.z)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+__global__ void calculate_particle_triangle_contact_count(
+	device_triangle_info* dpi, double4 *pos, pair_data* old_pppd, 
+	unsigned int* old_count, unsigned int* count,
+	unsigned int* sidx,	unsigned int* sorted_index, 
+	unsigned int* cstart, unsigned int* cend, unsigned int _np)
+{
+	unsigned id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
+	unsigned int np = _np;
+	if (id >= np) return;
+	double cdist = 0.0;
+	double4 ipos4 = pos[id];
+	double3 ipos = make_double3(ipos4.x, ipos4.y, ipos4.z);
+	double3 unit = make_double3(0.0, 0.0, 0.0);
+	int3 gridPos = calcGridPos(ipos);
+	double ir = pos[id].w;
+	int3 neighbour_pos = make_int3(0, 0, 0);
+	uint grid_hash = 0;
+	unsigned int start_index = 0;
+	unsigned int end_index = 0;
+	unsigned int cnt = 0;
+	unsigned int old_sid = 0;
+	unsigned int overlap_count = 0;
+	int3 ctype = make_int3(0, 0, 0);
+	double3 previous_cpt = make_double3(0.0, 0.0, 0.0);
+	if (id != 0) old_sid = sidx[id - 1];
+	for (int z = -1; z <= 1; z++){
+		for (int y = -1; y <= 1; y++){
+			for (int x = -1; x <= 1; x++){
+				neighbour_pos = make_int3(gridPos.x + x, gridPos.y + y, gridPos.z + z);
+				grid_hash = calcGridHash(neighbour_pos);
+				start_index = cstart[grid_hash];
+				if (start_index != 0xffffffff){
+					end_index = cend[grid_hash];
+					for (unsigned int j = start_index; j < end_index; j++){
+						unsigned int k = sorted_index[j];
+						if (k >= np){
+							k -= np;
+							int t = -1;
+//							unsigned int pidx = dpi[k].id;
+							double3 cpt = closestPtPointTriangle(dpi[k], ipos, ir, t);
+							cdist = ir - length(ipos - cpt);
+							if (cdist > 0)
+							{
+								bool overlap = checkOverlab(ctype, previous_cpt, cpt);
+								if (overlap)
+									continue;
+								if (overlap_count > 0)
+								{
+									overlap_count = overlap_count;
+								}
+								overlap_count++;
+								*(&(ctype.x) + t) += 1;
+								previous_cpt = cpt;
+								cnt++;
+							}								
+							else{
+								for (unsigned int j = 0; j < old_count[id]; j++){
+									pair_data *pdata = old_pppd + (old_sid + j);
+									if (pdata->type == 2) pdata->enable = false;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	count[id] += cnt;
 }
 
 __global__ void calculate_particle_plane_contact_count(
@@ -839,14 +993,17 @@ __global__ void calculate_particle_plane_contact_count(
 		double3 dp = make_double3(ipos.x, ipos.y, ipos.z) - pl.xw;
 		double3 wp = make_double3(dot(dp, pl.u1), dot(dp, pl.u2), dot(dp, pl.uw));
 		double cdist = particle_plane_contact_detection(pl, ipos3, wp, unit, ipos.w);
-		for (unsigned int j = 0; j < old_count[id]; j++)
-		{
-			pair_data *pdata = old_pppd + (old_sid + j);
-			if (cdist <= 0 && pdata->type == 2)
-				pdata->enable = false;
-		}
 		if (cdist > 0)
 			cnt++;
+		else
+		{
+			for (unsigned int j = 0; j < old_count[id]; j++)
+			{
+				pair_data *pdata = old_pppd + (old_sid + j);
+				if (pdata->j == i && pdata->type == 0)
+					pdata->enable = false;
+			}
+		}
 	}
 	//old_count[id] = count[id];
 	count[id] += cnt;
@@ -939,7 +1096,6 @@ __global__ void new_particle_particle_contact_kernel(
 						double cdist = (ir + jr) - dist;
 						if (cdist > 0)
 						{
-//							unsigned int pid = 0;
 							pair = { true, 1, id, k, 0.0, 0.0 };
 							for (unsigned int j = 0; j < old_cnt; j++)
 							{
@@ -953,7 +1109,6 @@ __global__ void new_particle_particle_contact_kernel(
 							jvel = vel[k];
 							jomega = omega[k];
 							jm = mass[k];
-							//double2 ds = make_double2(pair.ds, pair.dots);
 							double rcon = ipos.w - 0.5 * cdist;
 							double3 unit = rp / dist;
 							double3 rv = jvel + cross(jomega, -jpos.w * unit) - (ivel + cross(iomega, ipos.w * unit));
@@ -977,6 +1132,114 @@ __global__ void new_particle_particle_contact_kernel(
 	force[id] += sumF;
 	moment[id] += sumM;
 	type_count[id].x = tcnt;
+}
+
+__global__ void new_particle_polygon_object_conatct_kernel(
+	device_triangle_info* dpi, device_mesh_mass_info* dpmi, pair_data* old_pairs, pair_data* pairs,
+	unsigned int* old_count, unsigned int* count, unsigned int* old_sidx, unsigned int* sidx, int2* type_count,
+	double4 *pos, double3 *vel, double3 *omega, double3 *force, double3 *moment,
+	double* mass, unsigned int* sorted_index, unsigned int* cstart, unsigned int* cend,
+	device_contact_property *cp, unsigned int _np)
+{
+	unsigned id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
+	unsigned int np = _np;
+	if (id >= np) return;
+	unsigned int old_sid = 0;
+	unsigned int sid = type_count[id].x + type_count[id].y;
+	if (id != 0){
+		old_sid = old_sidx[id - 1];
+		sid += sidx[id - 1];
+	}
+	double cdist = 0.0;
+	double im = mass[id];
+	double4 ipos4 = pos[id];
+	double3 ipos = make_double3(ipos4.x, ipos4.y, ipos4.z);
+	double3 ivel = vel[id];
+	double3 iomega = omega[id];
+	double3 unit = make_double3(0.0, 0.0, 0.0);
+	int3 gridPos = calcGridPos(make_double3(ipos.x, ipos.y, ipos.z));
+	double ir = ipos4.w;
+	double3 M = make_double3(0, 0, 0);
+	int3 neighbour_pos = make_int3(0, 0, 0);
+	uint grid_hash = 0;
+	double3 Fn = make_double3(0, 0, 0);
+	double3 Ft = make_double3(0, 0, 0);
+	double3 sum_force = make_double3(0, 0, 0);
+	double3 sum_moment = make_double3(0, 0, 0);
+	unsigned int start_index = 0;
+	unsigned int end_index = 0;
+	unsigned int old_cnt = old_count[id];
+//	unsigned int cnt = count[id];
+	pair_data pair;
+	int3 ctype = make_int3(0, 0, 0);
+	double3 previous_cpt = make_double3(0.0, 0.0, 0.0);
+	for (int z = -1; z <= 1; z++){
+		for (int y = -1; y <= 1; y++){
+			for (int x = -1; x <= 1; x++){
+				neighbour_pos = make_int3(gridPos.x + x, gridPos.y + y, gridPos.z + z);
+				grid_hash = calcGridHash(neighbour_pos);
+				start_index = cstart[grid_hash];
+				if (start_index != 0xffffffff){
+					end_index = cend[grid_hash];
+					for (unsigned int j = start_index; j < end_index; j++){
+						unsigned int k = sorted_index[j];
+						if (k >= cte.np)
+						{
+							int t = -1;
+							k -= cte.np;
+							unsigned int pidx = dpi[k].id;
+							device_contact_property cmp = cp[pidx];
+							device_mesh_mass_info pmi = dpmi[pidx];
+							double3 cpt = closestPtPointTriangle(dpi[k], ipos, ir, t);
+							double3 po2cp = cpt - pmi.origin;
+							cdist = ir - length(ipos - cpt);
+							Fn = make_double3(0.0, 0.0, 0.0);
+							if (cdist > 0)
+							{
+								bool overlab = checkOverlab(ctype, previous_cpt, cpt);
+								if (overlab)
+									continue;
+
+								pair = { true, 2, id, k, 0.0, 0.0 };
+								for (unsigned int j = 0; j < old_cnt; j++)
+								{
+									pair_data* pd = old_pairs + old_sid + j;
+									if (pd->enable && pd->j == k)
+									{
+										pair = *pd;
+										break;
+									}
+								}
+								device_triangle_info tri = dpi[k];
+								double3 qp = tri.Q - tri.P;
+								double3 rp = tri.R - tri.P;
+								double rcon = ir - 0.5 * cdist;
+								unit = -cross(qp, rp);// -dpi[k].N;
+								unit = unit / length(unit);
+								previous_cpt = cpt;
+								*(&(ctype.x) + t) += 1;
+								double3 dv = pmi.vel + cross(pmi.omega, po2cp) - (ivel + cross(iomega, ir * unit));
+								device_force_constant c = getConstant(
+									1, ir, 0, im, 0, cmp.Ei, cmp.Ej,
+									cmp.pri, cmp.prj, cmp.Gi, cmp.Gj,
+									cmp.rest, cmp.fric, cmp.rfric, cmp.sratio);
+								DHSModel(
+									c, ir, 0, cp->Ei, cp->Ej, cp->pri, cp->prj,
+									cp->coh, rcon, cdist, iomega, pair.ds, pair.dots,
+									dv, unit, Ft, Fn, M);
+								sum_force += Fn + Ft;
+								sum_moment += M;
+								dpmi[pidx].force += -(Fn + Ft);
+								dpmi[pidx].moment += -cross(po2cp, Fn + Ft);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	force[id] += sum_force;
+	moment[id] += sum_moment;
 }
 
 __global__ void new_particle_plane_contact(
@@ -1041,7 +1304,7 @@ __global__ void new_particle_plane_contact(
 				cp->pri, cp->prj, cp->Gi, cp->Gj,
 				cp->rest, cp->fric, cp->rfric, cp->sratio);
 			DHSModel(
-				c, 0, 0, 0, 0, 0, 0, cp->coh, rcon, cdist,
+				c, ipos.w, 0, 0, 0, 0, 0, cp->coh, rcon, cdist,
 				iomega, ppp.ds, ppp.dots, dv, unit, Ft, Fn, M);
 			force[id] += Fn + Ft;// m_force + shear_force;
 			moment[id] += M;
@@ -1316,71 +1579,7 @@ __global__ void reduce6(T *g_idata, T *g_odata, unsigned int n)
 	if (tid == 0) g_odata[blockIdx.x] = mySum;
 }
 
-__device__ double3 closestPtPointTriangle(
-	device_mesh_info& dpi,
-	double3& p,
-	double pr)
-{
-	double3 a = dpi.P;
-	double3 b = dpi.Q;
-	double3 c = dpi.R;
-	double3 ab = b - a;
-	double3 ac = c - a;
-	double3 ap = p - a;
-
-	double d1 = dot(ab, ap);
-	double d2 = dot(ac, ap);
-	if (d1 <= 0.0 && d2 <= 0.0){
-		//	*wc = 0;
-		return a;
-	}
-
-	double3 bp = p - b;
-	double d3 = dot(ab, bp);
-	double d4 = dot(ac, bp);
-	if (d3 >= 0.0 && d4 <= d3){
-		//	*wc = 0;
-		return b;
-	}
-	double vc = d1 * d4 - d3 * d2;
-	if (vc <= 0.0 && d1 >= 0.0 && d3 <= 0.0){
-		//	*wc = 1;
-		double v = d1 / (d1 - d3);
-		return a + v * ab;
-	}
-
-	double3 cp = p - c;
-	double d5 = dot(ab, cp);
-	double d6 = dot(ac, cp);
-	if (d6 >= 0.0 && d5 <= d6){
-		//	*wc = 0;
-		return c;
-	}
-
-	double vb = d5 * d2 - d1 * d6;
-	if (vb <= 0.0 && d2 >= 0.0 && d6 <= 0.0){
-		//	*wc = 1;
-		double w = d2 / (d2 - d6);
-		return a + w * ac; // barycentric coordinates (1-w, 0, w)
-	}
-
-	// Check if P in edge region of BC, if so return projection of P onto BC
-	double va = d3 * d6 - d5 * d4;
-	if (va <= 0.0 && (d4 - d3) >= 0.0 && (d5 - d6) >= 0.0){
-		//	*wc = 1;
-		double w = (d4 - d3) / ((d4 - d3) + (d5 - d6));
-		return b + w * (c - b); // barycentric coordinates (0, 1-w, w)
-	}
-	//*wc = 2;
-	// P inside face region. Compute Q through its barycentric coordinates (u, v, w)
-	double denom = 1.0 / (va + vb + vc);
-	double v = vb * denom;
-	double w = vc * denom;
-
-	return a + v * ab + w * ac; // = u*a + v*b + w*c, u = va * denom = 1.0f - v - w
-}
-
-__device__ bool checkConcave(device_mesh_info* dpi, unsigned int* tid, unsigned int kid, double4* dsph, unsigned int cnt)
+__device__ bool checkConcave(device_triangle_info* dpi, unsigned int* tid, unsigned int kid, double4* dsph, unsigned int cnt)
 {
 	double3 p1 = make_double3(0, 0, 0);
 	double3 u1 = make_double3(0, 0, 0);
@@ -1404,7 +1603,7 @@ __device__ bool checkConcave(device_mesh_info* dpi, unsigned int* tid, unsigned 
 
 template<int TCM>
 __global__ void particle_polygonObject_collision_kernel(
-	device_mesh_info* dpi, double4* dsph, device_mesh_mass_info* dpmi,
+	device_triangle_info* dpi, double4* dsph, device_mesh_mass_info* dpmi,
 	double4 *pos, double3 *vel, double3 *omega, double3 *force, double3 *moment,
 	double* mass, unsigned int* sorted_index, unsigned int* cstart, unsigned int* cend,
 	device_contact_property *cp, unsigned int np)
@@ -1514,9 +1713,10 @@ __device__ double3 toGlobal(double3& v, double4& ep)
 		r2.x * v.x + r2.y * v.y + r2.z * v.z
 		);
 }
+
 __global__ void updatePolygonObjectData_kernel(
 	device_mesh_mass_info *dpmi, double* vList,
-	double4* sphere, device_mesh_info* dpi, unsigned int ntriangle)
+	double4* sphere, device_triangle_info* dpi, unsigned int ntriangle)
 {
 	unsigned id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
 	unsigned int np = ntriangle;

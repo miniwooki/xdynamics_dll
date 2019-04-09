@@ -10,6 +10,7 @@
 #include "xvGlew.h"
 #include "xvPlane.h"
 #include "xvCube.h"
+#include "xvMeshObject.h"
 // #include "cube.h"
 // #include "vcube.h"
 // #include "plane.h"
@@ -142,6 +143,39 @@ bool xGLWidget::Upload_DEM_Results(QStringList& sl)
 		}
 	}
 	return true;
+}
+
+void xGLWidget::createMeshObjectGeometry(QString& file)
+{
+	QFile qf(file);
+	qf.open(QIODevice::ReadOnly);
+	unsigned int ns;
+	QString obj_name;
+	int material = -1;
+	double loc[3] = { 0, };
+	unsigned int ntriangle = 0;
+	qf.read((char*)&ns, sizeof(int));
+	char* _name = new char[255];
+	memset(_name, 0, sizeof(char) * 255);
+	qf.read((char*)_name, sizeof(char) * ns);
+	obj_name.sprintf("%s", _name);
+	qf.read((char*)&material, sizeof(int));
+	qf.read((char*)&loc[0], sizeof(double) * 3);
+	qf.read((char*)&ntriangle, sizeof(unsigned int));
+	double* _vertex = new double[ntriangle * 9];
+	double* _normal = new double[ntriangle * 9];
+	qf.read((char*)_vertex, sizeof(double) * ntriangle * 9);
+	qf.read((char*)_normal, sizeof(double) * ntriangle * 9);
+	xvMeshObject *vm = new xvMeshObject(obj_name);
+	vm->defineMeshObject(ntriangle, _vertex, _normal);
+	vm->setPosition(loc[0], loc[1], loc[2]);
+	qf.close();
+	delete[] _name;
+	delete[] _vertex;
+	delete[] _normal;
+	v_objs[_name] = vm;
+	v_wobjs[vm->ID()] = (void*)vm;
+//	return vm;
 }
 
 void xGLWidget::createCubeGeometry(QString& _name, xCubeObjectData& d)

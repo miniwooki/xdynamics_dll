@@ -4,11 +4,14 @@
 #include "xdynamics_object/xConatct.h"
 #include "xdynamics_object/xMeshObject.h"
 
+class xParticleObject;
+class xMeshObject;
+
 class XDYNAMICS_API xParticleMeshObjectContact : public xContact
 {
 public:
 	xParticleMeshObjectContact();
-	xParticleMeshObjectContact(std::string _name);
+	xParticleMeshObjectContact(std::string _name, xObject* o1, xObject* o2);
 	virtual ~xParticleMeshObjectContact();
 
 	virtual void cudaMemoryAlloc(unsigned int np);

@@ -33,7 +33,7 @@ struct pair_data
 	double dots;
 };
 
-struct device_mesh_info
+struct device_triangle_info
 {
 	int id;
 	double3 P;
@@ -144,7 +144,7 @@ void XDYNAMICS_API cu_cube_contact_force(
 
 // Function for contact between particle and polygonObject
 void XDYNAMICS_API cu_particle_meshObject_collision(
-	const int tcm, device_mesh_info* dpi, double* dsph, device_mesh_mass_info* dpmi,
+	const int tcm, device_triangle_info* dpi, double* dsph, device_mesh_mass_info* dpmi,
 	double* pos, double* vel, double* omega,
 	double* force, double* moment, double* mass,
 	unsigned int* sidx, unsigned int* cstart, unsigned int* cend, device_contact_property *cp,
@@ -162,7 +162,7 @@ double3 XDYNAMICS_API reductionD3(double3* in, unsigned int np);
 
 void XDYNAMICS_API cu_update_meshObjectData(
 	device_mesh_mass_info *dpmi, double* vList,
-	double* sphere, device_mesh_info* dpi, unsigned int ntriangle);
+	double* sphere, device_triangle_info* dpi, unsigned int ntriangle);
 
 //void XDYNAMICS_API cu_calculate_contact_pair_count(double* pos, unsigned int *count, unsigned int* sidx, unsigned int* cstart, unsigned int* cend, unsigned int np);
 //void XDYNAMICS_API cu_check_no_collision_pair(double* pos, unsigned int* pinfo, unsigned int* pother, unsigned int np);
@@ -177,19 +177,41 @@ void XDYNAMICS_API cu_calculate_particle_particle_contact_count(
 	unsigned int* sorted_id, 
 	unsigned int* cell_start,
 	unsigned int* cell_end, unsigned int np);
-void XDYNAMICS_API cu_new_particle_particle_contact
-(double* pos, double* vel, double* omega, double* mass, double* force, double* moment, 
-pair_data* old_pairs, pair_data* pairs, 
-unsigned int* old_pair_count, unsigned int* pair_count, 
-unsigned int *old_pair_start, unsigned int *pair_start, 
-int *type_count, device_contact_property* cp, 
-unsigned int *sorted_id, unsigned int* cell_start, unsigned int* cell_end, unsigned int np);
 
-unsigned int XDYNAMICS_API cu_calculate_particle_plane_contact_count(
+void XDYNAMICS_API cu_calculate_particle_triangle_contact_count(
+	device_triangle_info *dpi, double* pos, pair_data* pairs,
+	unsigned int* old_pair_count,
+	unsigned int* pair_count,
+	unsigned int* pair_start,
+	unsigned int* sorted_id,
+	unsigned int* cell_start,
+	unsigned int* cell_end, unsigned int np);
+
+void XDYNAMICS_API cu_new_particle_polygon_object_contact(
+	device_triangle_info* dpi, device_mesh_mass_info* dpmi,
+	pair_data *old_pairs, pair_data *pairs,
+	unsigned int* old_count, unsigned int* count,
+	unsigned int* old_sidx, unsigned int* sidx, int* type_count,
+	double *pos, double *vel, double *omega, double *force, double *moment,
+	double* mass, unsigned int* sorted_index, unsigned int* cstart, unsigned int* cend,
+	device_contact_property *cp, unsigned int _np);
+
+void XDYNAMICS_API cu_new_particle_particle_contact(
+	double* pos, double* vel, double* omega, double* mass, double* force, double* moment, 
+	pair_data* old_pairs, pair_data* pairs, 
+	unsigned int* old_pair_count, unsigned int* pair_count, 
+	unsigned int *old_pair_start, unsigned int *pair_start, 
+	int *type_count, device_contact_property* cp, 
+	unsigned int *sorted_id, unsigned int* cell_start, unsigned int* cell_end, unsigned int np);
+
+void XDYNAMICS_API cu_calculate_particle_plane_contact_count(
 	device_plane_info *plane, pair_data* old_pppd, 
 	unsigned int* old_pair_count, unsigned int *count, 
 	unsigned int *sidx, double* pos, unsigned int _nplanes, 
 	unsigned int np);
+
+unsigned int XDYNAMICS_API cu_sumation_contact_count(unsigned int* count, unsigned int np);
+
 void XDYNAMICS_API cu_copy_old_to_new_pair(unsigned int *old_count, unsigned int *new_count, unsigned int* old_sidx, unsigned int* new_sidx, pair_data* old_pppd, pair_data* new_pppd, unsigned int nc, unsigned int np);
 void XDYNAMICS_API cu_new_particle_plane_contact(device_plane_info *plane, double* pos, double* vel, double* omega, double* mass, double* force, double* moment, unsigned int* old_pair_count, unsigned int *count, unsigned int *old_sidx, unsigned int *sidx, int* type_count, pair_data *old_pairs, pair_data *pairs, device_contact_property *cp, unsigned int nplanes, unsigned int np);
 #endif

@@ -56,7 +56,7 @@ bool xMeshObject::define(xImportShapeType t, vector3d& loc, int _ntriangle, doub
 	return true;
 }
 
-int xMeshObject::DefineShapeFromFile(std::string f)
+int xMeshObject::DefineShapeFromFile(vector3d& loc, std::string f)
 {
 	std::fstream ofs;
 	ofs.open(f, std::ios::in);
@@ -139,19 +139,20 @@ int xMeshObject::DefineShapeFromFile(std::string f)
 
 	}
 	ntriangle = ntri;
+	com = com / ntriangle;
 	double J[6] = { 0, };
 	for (unsigned int i = 0; i < ntri; i++)
 	{
 		int s = i * 9;
-		vertexList[s + 0] -= pos.x;
-		vertexList[s + 1] -= pos.y;
-		vertexList[s + 2] -= pos.z;
-		vertexList[s + 3] -= pos.x;
-		vertexList[s + 4] -= pos.y;
-		vertexList[s + 5] -= pos.z;
-		vertexList[s + 6] -= pos.x;
-		vertexList[s + 7] -= pos.y;
-		vertexList[s + 8] -= pos.z;
+		vertexList[s + 0] -= com.x;
+		vertexList[s + 1] -= com.y;
+		vertexList[s + 2] -= com.z;
+		vertexList[s + 3] -= com.x;
+		vertexList[s + 4] -= com.y;
+		vertexList[s + 5] -= com.z;
+		vertexList[s + 6] -= com.x;
+		vertexList[s + 7] -= com.y;
+		vertexList[s + 8] -= com.z;
 		vector3d cm = spos[i] - pos;
 		J[0] += cm.y * cm.y + cm.z * cm.z;
 		J[1] += cm.x * cm.x + cm.z * cm.z;
@@ -196,6 +197,120 @@ void xMeshObject::_fromSTLASCII(int _ntriangle, double* vList, vector3d& loc)
 	}
 }
 
+QList<xMeshObject::triangle_info> xMeshObject::_splitTriangle(triangle_info& ti, double to)
+{
+	QList<triangle_info> added_tri;
+	QList<triangle_info> temp_tri;
+	//ati.push_back(ti);
+	bool isAllDone = false;
+	while (!isAllDone)
+	{
+		isAllDone = true;
+		QList<triangle_info> ati;
+		if (temp_tri.size())
+		{
+			ati = temp_tri;
+			temp_tri.clear();
+		}
+		else
+			ati.push_back(ti);
+		foreach(triangle_info t, ati)
+		{
+			if (t.rad > to)
+			{
+				isAllDone = false;
+				int tid = 0;
+				vector3d midp;
+				double s_pq = length(t.q - t.p);
+				double s_qr = length(t.r - t.q);
+				double s_pr = length(t.r - t.p);
+				if (s_pq > s_qr)
+				{
+					if (s_pq > s_pr)
+					{
+						midp = 0.5 * (t.q + t.p);
+						tid = 3;
+					}
+					else
+					{
+						midp = 0.5 * (t.r + t.p);
+						tid = 2;
+					}
+				}
+				else
+				{
+					if (s_qr > s_pr)
+					{
+						midp = 0.5 * (t.r + t.q);
+						tid = 1;
+					}
+					else
+					{
+						midp = 0.5 * (t.r + t.p);
+						tid = 2;
+					}
+				}
+				vector3d aspos;//double aspos = 0.0;
+				double arad = 0.0;
+				vector3d an;
+				vector3d p = t.p;
+				vector3d q = t.q;
+				vector3d r = t.r;
+				if (tid == 1)
+				{
+					aspos = xUtilityFunctions::CenterOfTriangle(p, q, midp);
+					an = cross(q - p, midp - p);
+					an = an / length(an);
+					arad = length(p - aspos);
+					triangle_info ati0 = { arad, p, q, midp, an };
+					aspos = xUtilityFunctions::CenterOfTriangle(p, midp, r);
+					an = cross(midp - p, r - p);
+					an = an / length(an);
+					arad = length(p - aspos);
+					triangle_info ati1 = { arad, p, midp, r, an };
+					temp_tri.push_back(ati0);
+					temp_tri.push_back(ati1);
+				}
+				else if (tid == 2)
+				{
+					aspos = xUtilityFunctions::CenterOfTriangle(q, r, midp);
+					an = cross(r - q, midp - q);
+					an = an / length(an);
+					arad = length(q - aspos);
+					triangle_info ati0 = { arad, q, r, midp, an };
+					aspos = xUtilityFunctions::CenterOfTriangle(q, midp, p);
+					an = cross(midp - q, p - q);
+					an = an / length(an);
+					arad = length(q - aspos);
+					triangle_info ati1 = { arad, q, midp, p, an };
+					temp_tri.push_back(ati0);
+					temp_tri.push_back(ati1);
+				}
+				else if (tid == 3)
+				{
+					aspos = xUtilityFunctions::CenterOfTriangle(r, p, midp);
+					an = cross(p - r, midp - r);
+					an = an / length(an);
+					arad = length(r - aspos);
+					triangle_info ati0 = { arad, r, p, midp, an };
+					aspos = xUtilityFunctions::CenterOfTriangle(r, midp, q);
+					an = cross(midp - r,q - r);
+					an = an / length(an);
+					arad = length(r - aspos);
+					triangle_info ati1 = { arad, r, midp, q, an };
+					temp_tri.push_back(ati0);
+					temp_tri.push_back(ati1);
+				}
+			}
+			else
+			{
+				added_tri.push_back(t);
+			}
+		}
+	}
+	return added_tri;
+}
+
 QString xMeshObject::meshDataFile() const { return filePath; }
 double xMeshObject::maxRadius() const { return maxRadii; }
 unsigned int xMeshObject::NumTriangle() const { return ntriangle; }
@@ -203,4 +318,67 @@ double* xMeshObject::VertexList() { return vertexList; }
 double* xMeshObject::NormalList(){ return normalList; }
 vector3d xMeshObject::MaxPoint() const{ return max_point; }
 vector3d xMeshObject::MinPoint() const{ return min_point; }
+
+void xMeshObject::splitTriangles(double to)
+{
+	vector3d p, q, r, n;
+
+	QList<triangle_info> temp_tri;
+	for (unsigned int i = 0; i < ntriangle; i++)
+	{
+		int  s = i * 9;
+		p = new_vector3d(vertexList[s + 0], vertexList[s + 1], vertexList[s + 2]);
+		q = new_vector3d(vertexList[s + 3], vertexList[s + 4], vertexList[s + 5]);
+		r = new_vector3d(vertexList[s + 6], vertexList[s + 7], vertexList[s + 8]);
+		n = new_vector3d(normalList[s + 0], normalList[s + 1], normalList[s + 2]);
+		vector3d spos = xUtilityFunctions::CenterOfTriangle(p, q, r);
+		double rad = length(spos - p);
+		triangle_info tinfo = { rad, p, q, r, n };
+		if (rad > to)
+		{
+			QList<triangle_info> added_tri = _splitTriangle(tinfo, to);
+			foreach(triangle_info t, added_tri)
+			{
+				temp_tri.push_back(t);
+			}
+		}
+		else
+		{
+			temp_tri.push_back(tinfo);
+		}
+	}
+	//delete[] vertice;
+	delete[] vertexList;
+	delete[] normalList;
+	ntriangle = temp_tri.size();
+	//vertice = new double[ntriangle * 9];
+	normalList = new double[ntriangle * 9];
+	vertexList = new double[ntriangle * 9];
+	int cnt = 0;
+	foreach(triangle_info t, temp_tri)
+	{
+		int s = cnt * 9;
+		vertexList[s + 0] = t.p.x;
+		vertexList[s + 1] = t.p.y;
+		vertexList[s + 2] = t.p.z;
+		vertexList[s + 3] = t.q.x;
+		vertexList[s + 4] = t.q.y;
+		vertexList[s + 5] = t.q.z;
+		vertexList[s + 6] = t.r.x;
+		vertexList[s + 7] = t.r.y;
+		vertexList[s + 8] = t.r.z;
+
+		normalList[s + 0] = t.n.x;
+		normalList[s + 1] = t.n.y;
+		normalList[s + 2] = t.n.z;
+		normalList[s + 3] = t.n.x;
+		normalList[s + 4] = t.n.y;
+		normalList[s + 5] = t.n.z;
+		normalList[s + 6] = t.n.x;
+		normalList[s + 7] = t.n.y;
+		normalList[s + 8] = t.n.z;
+		cnt++;
+	}
+}
+
 //unsigned int* xMeshObject::IndexList() { return indexList; }

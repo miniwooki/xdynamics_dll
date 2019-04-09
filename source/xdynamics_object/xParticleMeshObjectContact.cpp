@@ -1,4 +1,6 @@
 #include "xdynamics_object/xParticleMeshObjectContact.h"
+#include "xdynamics_object/xParticleObject.h"
+#include "xdynamics_object/xCubeObject.h"
 
 xParticleMeshObjectContact::xParticleMeshObjectContact()
 	: xContact()
@@ -6,29 +8,22 @@ xParticleMeshObjectContact::xParticleMeshObjectContact()
 
 }
 
-xParticleMeshObjectContact::xParticleMeshObjectContact(std::string _name)
+xParticleMeshObjectContact::xParticleMeshObjectContact(std::string _name, xObject* o1, xObject* o2)
 	: xContact(_name, PARTICLE_MESH_SHAPE)
 	, maxRadii(0)
 	, p(NULL)
 	, po(NULL)
 {
-// 	contact::iobj = o1;
-// 	contact::jobj = o2;
-// 	po = dynamic_cast<polygonObject*>((o1->ObjectType() == POLYGON_SHAPE ? o1 : o2));
-// 	p = o1->ObjectType() != POLYGON_SHAPE ? o1 : o2;
-	// 	hpi = new host_polygon_info[po->numIndex()];
-	// 	for (unsigned int i = 0; i < po->numIndex(); i++)
-	// 	{
-	// 		host_polygon_info d;
-	// 		d.P = po->Vertex0(i);//vertice[indice[i].x];
-	// 		d.Q = po->Vertex1(i);
-	// 		d.R = po->Vertex2(i);
-	// 		d.V = d.Q - d.P;
-	// 		d.W = d.R - d.P;
-	// 		d.N = d.V.cross(d.W);
-	// 		d.N = d.N / d.N.length();
-	// 		hpi[i] = d;
-	// 	}
+	if (o1->Shape() == MESH_SHAPE)
+	{
+		po = dynamic_cast<xMeshObject*>(o1);
+		p = dynamic_cast<xParticleObject*>(o2);
+	}
+	else
+	{
+		po = dynamic_cast<xMeshObject*>(o2);
+		p = dynamic_cast<xParticleObject*>(o1);
+	}
 }
 
 xParticleMeshObjectContact::~xParticleMeshObjectContact()

@@ -125,7 +125,7 @@ void xDynamicsSimulator::exportPartData()
 // 	qf.open(QIODevice::WriteOnly);
 // 	QTextStream qts(&qf);
  	std::fstream of;
- 	of.open((xModel::path + xModel::name + "/result_list.rlt").toStdString(), std::ios::out);
+ 	of.open((xModel::path + xModel::name + "/" + xModel::name + ".rlt").toStdString(), std::ios::out);
 	
 	if (xmbd)
 	{

@@ -15,6 +15,11 @@ xvAnimationController::xvAnimationController()
 
 xvAnimationController::~xvAnimationController()
 {
+	
+}
+
+void xvAnimationController::releaseTimeMemory()
+{
 	if (times) delete[] times;
 }
 

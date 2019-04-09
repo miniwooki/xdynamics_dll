@@ -14,6 +14,7 @@ class XDYNAMICS_API xParticleMeshObjectsContact : public xContact
 	struct host_mesh_info
 	{
 		int id;
+		//vector3ui indice;
 		vector3d P;
 		vector3d Q;
 		vector3d R;
@@ -44,6 +45,7 @@ public:
 		unsigned int idx, double r, double m,
 		vector3d& p, vector3d& v, vector3d& o, vector3d& F, vector3d& M);
 	unsigned int NumContact() { return ncontact; }
+	unsigned int NumContactObjects() { return nPobjs; }
 	void setNumContact(unsigned int c) { ncontact = c; }
 	void updateMeshObjectData(xVectorD& q, xVectorD& qd);
 	void updateCollisionPair(unsigned int id, xContactPairList& xcpl, double r, vector3d pos);
@@ -53,6 +55,8 @@ public:
 		double *mass, double *force, double *moment,
 		unsigned int *sorted_id, unsigned int *cell_start, unsigned int *cell_end, unsigned int np);
 	void setZeroCollisionForce();
+	device_triangle_info* deviceTrianglesInfo();
+	device_mesh_mass_info* devicePolygonObjectMassInfo();
 
 private:
 	vector3d particle_polygon_contact_detection(host_mesh_info& dpi, vector3d& p, double r/*, polygonContactType& _pct*/);
@@ -71,7 +75,7 @@ private:
 	unsigned int* diList;
 	//double* dvertexList;
 	host_mesh_info* hpi;
-	device_mesh_info* dpi;
+	device_triangle_info* dpi;
 	QMap<unsigned int, xMeshObject*> pair_ip;
 	host_mesh_mass_info *hpmi;
 	device_mesh_mass_info *dpmi;

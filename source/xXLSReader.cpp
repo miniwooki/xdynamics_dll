@@ -363,20 +363,36 @@ void xXLSReader::ReadShapeObject(xObjectManager* xom, vector2i rc)
 			else if (form == xShapeType::MESH_SHAPE)
 			{
 				xMeshObject* xmo = xom->CreateMeshShapeObject(name, material);
+				std::wstring x;
+				vector3d loc;
+				double fsz = 0.0;
+				x = sheet->readStr(rc.x, rc.y++); uf::xsplit(x, ",", 3, &(loc.x) + 0);
+				fsz = sheet->readNum(rc.x, rc.y++);
 				std::string mf = uf::WideChar2String(sheet->readStr(rc.x, rc.y++));
-				xmo->DefineShapeFromFile(mf);
+				xmo->DefineShapeFromFile(loc, mf);
+				xmo->splitTriangles(fsz);
 				if (xve)
 				{
-					int t = VMESH;
-					xve->Write((char*)&t, sizeof(int));
+					std::fstream fs;
+					std::string file = xModel::makeFilePath(name + ".mesh");
+					fs.open(file, std::ios::out | std::ios::binary);
 					unsigned int ns = static_cast<unsigned int>(name.size()); 
-					xve->Write((char*)&ns, sizeof(unsigned int));
-					xve->Write((char*)name.c_str(), sizeof(char)*ns);
+					fs.write((char*)&ns, sizeof(unsigned int));
+					fs.write((char*)name.c_str(), sizeof(char)*ns);
 					double *_vertex = xmo->VertexList();
 					double *_normal = xmo->NormalList();
-					xve->Write((char*)&material, sizeof(int));
-					xve->Write((char*)_vertex, sizeof(double) * xmo->NumTriangle() * 9);
-					xve->Write((char*)_normal, sizeof(double) * xmo->NumTriangle() * 9);
+					fs.write((char*)&material, sizeof(int));
+					fs.write((char*)&loc, sizeof(double) * 3);
+					unsigned int nt = xmo->NumTriangle();
+					fs.write((char*)&nt, sizeof(unsigned int));
+					fs.write((char*)_vertex, sizeof(double) * xmo->NumTriangle() * 9);
+					fs.write((char*)_normal, sizeof(double) * xmo->NumTriangle() * 9);
+					fs.close();
+					int t = VMESH;
+					xve->Write((char*)&t, sizeof(int));
+					ns = (unsigned int)file.size();
+					xve->Write((char*)&ns, sizeof(unsigned int));
+					xve->Write((char*)file.c_str(), sizeof(char)*ns);
 				}
 			}
 		}

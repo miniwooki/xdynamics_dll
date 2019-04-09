@@ -243,6 +243,7 @@ xDynamicsManager::solverType xDynamicsManager::OpenModelXLS(const wchar_t* n)
 			int ns = pv_path.size(); xve.Write((char*)&ns, sizeof(int));
 			xve.Write((char*)pv_path.c_str(), sizeof(char)*pv_path.size());
 		}
+
 		xve.Close();
 	}
 	solverType stype;

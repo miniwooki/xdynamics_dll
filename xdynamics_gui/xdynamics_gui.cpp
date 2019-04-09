@@ -53,12 +53,15 @@ xdynamics_gui::~xdynamics_gui()
 	if (xgl) delete xgl; xgl = NULL;
 	if (xcw) delete xcw; xcw = NULL;
 	if (xnavi) delete xnavi; xnavi = NULL;
+	xvAnimationController::releaseTimeMemory();
 }
 
 bool xdynamics_gui::ReadViewModel(QString path)
 {
 	QFile qf(path);
 	qf.open(QIODevice::ReadOnly);
+	if (!qf.isOpen())
+		return false;
 	int ver = 0;
 	bool isExistParticle = false;
 	xViewObjectType vot;
@@ -93,6 +96,10 @@ bool xdynamics_gui::ReadViewModel(QString path)
 			QStringList qsl = xgl->vParticles()->ParticleGroupData().keys();
 			xnavi->addChilds(xModelNavigator::PARTICLE_ROOT, qsl);
 			isExistParticle = true;
+		}
+		else if (vot == xViewObjectType::VMESH)
+		{
+			xgl->createMeshObjectGeometry(name);
 		}
 		delete[] _name;
 	}
@@ -220,22 +227,22 @@ void xdynamics_gui::dropEvent(QDropEvent *event)
 		QString ext = s.mid(begin+1);
 		xcw->write(xCommandWindow::CMD_INFO, "File load - " + s);
 		if (ext == "vmd")
-		{
 			isOnViewModel = ReadViewModel(s);
-		}
 		else if (ext == "rlt")
 		{
-			if (isOnViewModel)
+			if (!isOnViewModel)
 			{
-				if (ReadModelResults(s))
+				QString p = s.left(begin) + ".vmd";
+				if (!ReadViewModel(p))
 				{
-					setupAnimationTool();
+					xcw->write(xCommandWindow::CMD_ERROR, kor("해석 결과에 부합하는 모델을 찾을 수 없습니다."));
+					continue;
 				}
+				else isOnViewModel = true;
 			}
+			if (ReadModelResults(s)) setupAnimationTool();
 		}
 		else
-		{
 			xcw->write(xCommandWindow::CMD_ERROR, kor("지원하지 않는 파일 형식입니다."));
-		}
 	}
 }

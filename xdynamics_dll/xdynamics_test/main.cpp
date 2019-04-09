@@ -15,19 +15,19 @@ int wmain(int argc, wchar_t* argv[])
 // 	QMap<QString, xPointMass*> pms;
 // 	pms["ddd"] = new xPointMass(L"ddd");
 // 	pms["dsf"] = new xPointMass(L"dsf");
-	xSparseD m(7,9);
-	//m.alloc(7*9);
-	m(1 - 1, 1 - 1) = m(2 - 1, 2 - 1) = m(3 - 1, 3 - 1) = m(4 - 1, 1 - 1) = m(5 - 1, 2 - 1) = m(7 - 1, 6 - 1) = 1;
-	m(4 - 1, 4 - 1) = m(5 - 1, 5 - 1) = m(7 - 1, 9 - 1) = -1;
-	m(4 - 1, 6 - 1) = 0.45;
-	m(5 - 1, 6 - 1) = -0.21;
-	m(6 - 1, 4 - 1) = -0.91;
-	m(6 - 1, 5 - 1) = 0.42;
-	m(6 - 1, 6 - 1) = -0.5;
-	m(6 - 1, 7 - 1) = 0.91;
-	m(6 - 1, 8 - 1) = -0.42;
-	int* v = new int[2];
-	coordinatePartitioning(m, v);
+// 	xSparseD m(7,9);
+// 	//m.alloc(7*9);
+// 	m(1 - 1, 1 - 1) = m(2 - 1, 2 - 1) = m(3 - 1, 3 - 1) = m(4 - 1, 1 - 1) = m(5 - 1, 2 - 1) = m(7 - 1, 6 - 1) = 1;
+// 	m(4 - 1, 4 - 1) = m(5 - 1, 5 - 1) = m(7 - 1, 9 - 1) = -1;
+// 	m(4 - 1, 6 - 1) = 0.45;
+// 	m(5 - 1, 6 - 1) = -0.21;
+// 	m(6 - 1, 4 - 1) = -0.91;
+// 	m(6 - 1, 5 - 1) = 0.42;
+// 	m(6 - 1, 6 - 1) = -0.5;
+// 	m(6 - 1, 7 - 1) = 0.91;
+// 	m(6 - 1, 8 - 1) = -0.42;
+// 	int* v = new int[2];
+// 	coordinatePartitioning(m, v);
 	xDynamicsManager *xdm = new xDynamicsManager;
 
 	if (argc != 1)	
@@ -88,7 +88,8 @@ int wmain(int argc, wchar_t* argv[])
 			//xdm.xRunResultWorld(argv[2]);
 		//}
 		//return 0;
-		xdm->OpenModelXLS(L"C:/xDynamics/resource/list_dem_test.xls");
+		//xdm->OpenModelXLS(L"C:/xDynamics/resource/triangle_contact_test.xls");
+		xdm->OpenModelXLS(L"C:/xDynamics/resource/four_bar3d.xls");
 	}
 	
 // 	xResultManager xrm;

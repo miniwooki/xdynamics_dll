@@ -53,6 +53,7 @@ public:
 
 	//	void setModeler(modeler* _md) { md = _md; }
 // 	void makeCube(cube* c);
+	void createMeshObjectGeometry(QString& _name);
 	void createCubeGeometry(QString& _name, xCubeObjectData& d);
 	void createPlaneGeometry(QString& _name, xPlaneObjectData& d);
 	xvParticle* createParticles();

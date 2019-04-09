@@ -84,8 +84,11 @@ unsigned int xParticleMeshObjectsContact::define(QMap<QString, xParticleMeshObje
 			euler_parameters ep = pobj->EulerParameters();
 			//unsigned int s = vi * 9;
 			hpi[i].P = pos + ToGlobal(ep, vList[vi++]);
+			//hpi[i].indice.x = vi++;
 			hpi[i].Q = pos + ToGlobal(ep, vList[vi++]);
+			//hpi[i].indice.y = vi++;
 			hpi[i].R = pos + ToGlobal(ep, vList[vi++]);
+			//hpi[i].indice.z = vi++;
 			
 			vector3d ctri = xUtilityFunctions::CenterOfTriangle(hpi[i].P, hpi[i].Q, hpi[i].R);
 			double rad = length(ctri - hpi[i].P);
@@ -247,13 +250,13 @@ void xParticleMeshObjectsContact::cudaMemoryAlloc(unsigned int np)
 			hcp[i].restitution, hcp[i].friction, hcp[i].rolling_friction, hcp[i].cohesion, hcp[i].stiffness_ratio };
 	}
 	checkCudaErrors(cudaMalloc((void**)&dsphere, sizeof(double) * npolySphere * 4));
-	checkCudaErrors(cudaMalloc((void**)&dpi, sizeof(device_mesh_info) * npolySphere));
+	checkCudaErrors(cudaMalloc((void**)&dpi, sizeof(device_triangle_info) * npolySphere));
 	checkCudaErrors(cudaMalloc((void**)&dcp, sizeof(device_contact_property) * nPobjs));
 	checkCudaErrors(cudaMalloc((void**)&dvList, sizeof(double) * npolySphere * 9));
 	checkCudaErrors(cudaMalloc((void**)&dpmi, sizeof(device_mesh_mass_info) * nPobjs));
 	//checkCudaErrors(cduaMalloc((void**)&diList, sizeof(unsigned int) * ))
 	checkCudaErrors(cudaMemcpy(dsphere, hsphere, sizeof(double) * npolySphere * 4, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMemcpy(dpi, hpi, sizeof(device_mesh_info) * npolySphere, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(dpi, hpi, sizeof(device_triangle_info) * npolySphere, cudaMemcpyHostToDevice));
 	checkCudaErrors(cudaMemcpy(dcp, _hcp, sizeof(device_contact_property) * nPobjs, cudaMemcpyHostToDevice));
 	unsigned int bPolySphere = 0;
 	unsigned int ePolySphere = 0;
@@ -298,6 +301,16 @@ void xParticleMeshObjectsContact::setZeroCollisionForce()
 		pobj->setContactForce(0.0, 0.0, 0.0);
 		pobj->setContactMoment(0.0, 0.0, 0.0);
 	}
+}
+
+device_triangle_info* xParticleMeshObjectsContact::deviceTrianglesInfo()
+{
+	return dpi;
+}
+
+device_mesh_mass_info* xParticleMeshObjectsContact::devicePolygonObjectMassInfo()
+{
+	return dpmi;
 }
 
 vector3d xParticleMeshObjectsContact::particle_polygon_contact_detection(host_mesh_info& hpi, vector3d& p, double r)

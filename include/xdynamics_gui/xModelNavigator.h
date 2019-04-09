@@ -7,7 +7,7 @@
 #include "ui_wview.h"
 
 class QScrollArea;
-
+class xvObject;
 
 class wcube : public QWidget, public Ui::wcube
 {

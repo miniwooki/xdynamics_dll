@@ -34,6 +34,7 @@ public:
 	static void setRealTimeParameter(bool rt) { real_time = rt; }
 	static bool getRealTimeParameter() { return real_time; }
 	static int currentPlayMode() { return play_mode; }
+	static void releaseTimeMemory();
 
 private:
 	static int play_mode;

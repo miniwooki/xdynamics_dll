@@ -82,12 +82,12 @@ void xContact::setRestitution(double d)
 
 void xContact::setFriction(double d)
 {
-	stiffnessRatio = d;
+	friction = d;
 }
 
 void xContact::setStiffnessRatio(double d)
 {
-	friction = d;
+	stiffnessRatio = d;
 }
 
 void xContact::setFirstObject(xObject* o1)

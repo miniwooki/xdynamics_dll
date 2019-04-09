@@ -98,3 +98,9 @@ void xModel::launchLogSystem(std::string lpath)
 {
 	xLog::launchLogSystem(lpath);
 }
+
+std::string xModel::makeFilePath(std::string file_name)
+{
+	std::string f = path.toStdString() + name.toStdString() + "/" + file_name;
+	return f;
+}

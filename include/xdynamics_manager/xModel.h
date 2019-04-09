@@ -29,6 +29,7 @@ public:
 	static void setModelPath(const QString p);
 	static void setGravity(double g, int d);
 	static void launchLogSystem(std::string lpath);
+	static std::string makeFilePath(std::string file_name);
 	//static void 
 
 	//static bool isSinglePrecision;
