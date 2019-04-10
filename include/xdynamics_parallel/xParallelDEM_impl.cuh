@@ -27,7 +27,7 @@ inline __device__ double3 operator-(double3& v1)
 	return make_double3(-v1.x, -v1.y, -v1.z);
 }
 
-inline __device__ double3 operator*(double v1, double3& v2)
+inline __device__ double3 operator*(double v1, double3 v2)
 {
 	return make_double3(v1 * v2.x, v1 * v2.y, v1 * v2.z);
 }
@@ -57,6 +57,11 @@ inline __device__ double length(double3& v1)
 inline __device__ double3 cross(double3 a, double3 b)
 {
 	return make_double3(a.y*b.z - a.z*b.y, a.z*b.x - a.x*b.z, a.x*b.y - a.y*b.x);
+}
+
+inline __device__ double3 normalize(double3 u)
+{
+	return u / length(u);
 }
 
 __device__
@@ -244,11 +249,11 @@ __device__ device_force_constant getConstant(
 	}
 	}
 
-	// 	dfc.kn = /*(16.f / 15.f)*sqrt(er) * eym * pow((T)((15.f * em * 1.0f) / (16.f * sqrt(er) * eym)), (T)0.2f);*/ (4.0f / 3.0f)*sqrt(er)*eym;
-	// 	dfc.vn = sqrt((4.0f*em * dfc.kn) / (1 + beta * beta));
-	// 	dfc.ks = dfc.kn * ratio;
-	// 	dfc.vs = dfc.vn * ratio;
-	// 	dfc.mu = fric;
+	// 	dfu1.kn = /*(16.f / 15.f)*sqrt(er) * eym * pow((T)((15.f * em * 1.0f) / (16.f * sqrt(er) * eym)), (T)0.2f);*/ (4.0f / 3.0f)*sqrt(er)*eym;
+	// 	dfu1.vn = sqrt((4.0f*em * dfu1.kn) / (1 + beta * beta));
+	// 	dfu1.ks = dfu1.kn * ratio;
+	// 	dfu1.vs = dfu1.vn * ratio;
+	// 	dfu1.mu = fric;
 	return dfc;
 }
 
@@ -311,28 +316,28 @@ __device__ double cohesionForce(
 // 		float3 relative_vel = jvel + cross(jomega, -jr * unit) - (ivel + cross(iomega, ir * unit));
 // 		//*riv = abs(length(relative_vel));
 // 		device_force_constant<float> c = getConstant<float>(ir, jr, im, jm, E, E, pr, pr, sh, sh, rest, fric, rfric);
-// 		float fsn = -c.kn * pow(collid_dist, 1.5f);
+// 		float fsn = -u1.kn * pow(collid_dist, 1.5f);
 // 		float fca = cohesionForce(ir, jr, E, E, pr, pr, coh, fsn);
-// 		float fsd = c.vn * dot(relative_vel, unit);
+// 		float fsd = u1.vn * dot(relative_vel, unit);
 // 		float3 single_force = (fsn + fca + fsd) * unit;
-// 		//float3 single_force = (-c.kn * pow(collid_dist, 1.5f) + c.vn * dot(relative_vel, unit)) * unit;
+// 		//float3 single_force = (-u1.kn * pow(collid_dist, 1.5f) + u1.vn * dot(relative_vel, unit)) * unit;
 // 		float3 single_moment = make_float3(0, 0, 0);
 // 		float3 e = relative_vel - dot(relative_vel, unit) * unit;
 // 		float mag_e = length(e);
 // 		if (mag_e){
 // 			float3 s_hat = e / mag_e;
 // 			float ds = mag_e * cte.dt;
-// 			float fst = -c.ks * ds;
-// 			float fdt = c.vs * dot(relative_vel, s_hat);
+// 			float fst = -u1.ks * ds;
+// 			float fdt = u1.vs * dot(relative_vel, s_hat);
 // 			shear_force = (fst + fdt) * s_hat;
-// 			if (length(shear_force) >= c.mu * length(single_force))
-// 				shear_force = c.mu * fsn * s_hat;
+// 			if (length(shear_force) >= u1.mu * length(single_force))
+// 				shear_force = u1.mu * fsn * s_hat;
 // 			single_moment = cross(rcon * unit, shear_force);
 // 			if (length(iomega)){
 // 				float3 on = iomega / length(iomega);
 // 				single_moment += -rfric * fsn * rcon * on;
 // 			}
-// 			//shear_force = min(c.ks * ds + c.vs * (dot(relative_vel, s_hat)), c.mu * length(single_force)) * s_hat;
+// 			//shear_force = min(u1.ks * ds + u1.vs * (dot(relative_vel, s_hat)), u1.mu * length(single_force)) * s_hat;
 // 			//single_moment = cross(ir * unit, shear_force);
 // 		}
 // 		force += single_force + shear_force;
@@ -398,7 +403,7 @@ __device__ void DHSModel(
 		M = cross(ir * unit, Ft);
 		/*if (length(iomega)){
 		double3 on = iomega / length(iomega);
-		M += c.ms * fsn * rcon * on;
+		M += u1.ms * fsn * rcon * on;
 		}*/
 	}
 }
@@ -771,64 +776,39 @@ __device__ double3 closestPtPointTriangle(
 	double3 ab = b - a;
 	double3 ac = c - a;
 	double3 ap = p - a;
-
+	double3 bp = p - b;
+	double3 cp = p - c;
 	double d1 = dot(ab, ap);
 	double d2 = dot(ac, ap);
-	if (d1 <= 0.0 && d2 <= 0.0){
-		//	*wc = 0;
-		ct = 0;
-		return a;
-	}
-
-	double3 bp = p - b;
 	double d3 = dot(ab, bp);
 	double d4 = dot(ac, bp);
-	if (d3 >= 0.0 && d4 <= d3){
-		//	*wc = 0;
-		ct = 0;
-		return b;
-	}
-	double vc = d1 * d4 - d3 * d2;
-	if (vc <= 0.0 && d1 >= 0.0 && d3 <= 0.0){
-		//	*wc = 1;
-		ct = 1;
-		double v = d1 / (d1 - d3);
-		return a + v * ab;
-	}
-
-	double3 cp = p - c;
 	double d5 = dot(ab, cp);
 	double d6 = dot(ac, cp);
-	if (d6 >= 0.0 && d5 <= d6){
-		//	*wc = 0;
-		ct = 0;
-		return c;
-	}
-
-	double vb = d5 * d2 - d1 * d6;
-	if (vb <= 0.0 && d2 >= 0.0 && d6 <= 0.0){
-		//	*wc = 1;
-		ct = 1;
-		double w = d2 / (d2 - d6);
-		return a + w * ac; // barycentric coordinates (1-w, 0, w)
-	}
-
-	// Check if P in edge region of BC, if so return projection of P onto BC
 	double va = d3 * d6 - d5 * d4;
-	if (va <= 0.0 && (d4 - d3) >= 0.0 && (d5 - d6) >= 0.0){
-		//	*wc = 1;
-		ct = 1;
-		double w = (d4 - d3) / ((d4 - d3) + (d5 - d6));
-		return b + w * (c - b); // barycentric coordinates (0, 1-w, w)
-	}
-	ct = 2;
-	//*wc = 2;
-	// P inside face region. Compute Q through its barycentric coordinates (u, v, w)
-	double denom = 1.0 / (va + vb + vc);
-	double v = vb * denom;
-	double w = vc * denom;
+	double vb = d5 * d2 - d1 * d6;
+	double vc = d1 * d4 - d3 * d2;
 
-	return a + v * ab + w * ac; // = u*a + v*b + w*c, u = va * denom = 1.0f - v - w
+	
+	if (d1 <= 0.0 && d2 <= 0.0){ ct = 0; return a; }
+	if (d3 >= 0.0 && d4 <= d3) { ct = 0; return b; }
+	if (d6 >= 0.0 && d5 <= d6) { ct = 0; return c; }
+
+	if (vc <= 0.0 && d1 >= 0.0 && d3 <= 0.0){ ct = 1; return a + (d1 / (d1 - d3)) * ab; }
+	if (vb <= 0.0 && d2 >= 0.0 && d6 <= 0.0){ ct = 1; return a + (d2 / (d2 - d6)) * ac; }
+	if (va <= 0.0 && (d4 - d3) >= 0.0 && (d5 - d6) >= 0.0){ ct = 1;	return b + ((d4 - d3) / ((d4 - d3) + (d5 - d6))) * (c - b); }
+	//ct = 2;
+	// P inside face region. Comu0te Q through its barycentric coordinates (u, v, w)
+	/*double denom = 1.0 / (va + vb + vc);
+	double v = vb * denom;
+	double w = vc * denom;*/
+	double denom = 1.0 / (va + vb + vc);
+	double3 v = vb * denom * ab;
+	double3 w = vc * denom * ac;
+	double3 _cpt = a + v + w;
+	//double _dist = pr - length(p - _cpt);
+	ct = 2;
+	//if (_dist > 0) return _cpt;
+	return _cpt; // = u*a + v*b + w*c, u = va * denom = 1.0f - v - w
 }
 
 __global__ void calculate_particle_particle_contact_count(
@@ -884,16 +864,22 @@ __global__ void calculate_particle_particle_contact_count(
 	count[id] = cnt;
 }
 
-__device__ bool checkOverlab(int3 ctype, double3 previous_cpt, double3 cpt)
+__device__ bool checkOverlab(int3 ctype, double3 p, double3 c, double3 u0, double3 u1)
 {
-	if (ctype.x || ctype.y || ctype.z)
+	bool b_over = false;
+	if (p.x >= u1.x - 1e-9 && p.x <= u1.x + 1e-9)
+		if (p.y >= u1.y - 1e-9 && p.y <= u1.y + 1e-9)
+			if (p.z >= u1.z - 1e-9 && p.z <= u1.z + 1e-9)
+				b_over = true;
+
+	if ((ctype.y || ctype.z) && !b_over)
 	{
-		if (previous_cpt.x == cpt.x && previous_cpt.y == cpt.y && previous_cpt.z == cpt.z)
-		{
-			return true;
-		}
+		if (u0.x >= u1.x - 1e-9 && u0.x <= u1.x + 1e-9)
+			if (u0.y >= u1.y - 1e-9 && u0.y <= u1.y + 1e-9)
+				if (u0.z >= u1.z - 1e-9 && u0.z <= u1.z + 1e-9)
+					b_over = true;
 	}
-	return false;
+	return b_over;
 }
 
 __global__ void calculate_particle_triangle_contact_count(
@@ -917,9 +903,10 @@ __global__ void calculate_particle_triangle_contact_count(
 	unsigned int end_index = 0;
 	unsigned int cnt = 0;
 	unsigned int old_sid = 0;
-	unsigned int overlap_count = 0;
+//	unsigned int overlap_count = 0;
 	int3 ctype = make_int3(0, 0, 0);
 	double3 previous_cpt = make_double3(0.0, 0.0, 0.0);
+	double3 previous_unit = make_double3(0.0, 0.0, 0.0);
 	if (id != 0) old_sid = sidx[id - 1];
 	for (int z = -1; z <= 1; z++){
 		for (int y = -1; y <= 1; y++){
@@ -935,20 +922,21 @@ __global__ void calculate_particle_triangle_contact_count(
 							k -= np;
 							int t = -1;
 //							unsigned int pidx = dpi[k].id;
+							device_triangle_info tri = dpi[k];
 							double3 cpt = closestPtPointTriangle(dpi[k], ipos, ir, t);
+							double3 unit = -normalize(cross(tri.Q - tri.P, tri.R - tri.P));
+							//double angle = dot(pc_unit, unit) / (length(pc_unit) * length(unit));*/
 							cdist = ir - length(ipos - cpt);
 							if (cdist > 0)
 							{
-								bool overlap = checkOverlab(ctype, previous_cpt, cpt);
+								//double len_cpt = sqrt(dot(cpt, cpt));
+							//	cpt = len_cpt ? cpt / sqrt(dot(cpt, cpt)) : cpt;								
+								bool overlap = checkOverlab(ctype, previous_cpt, cpt, previous_unit, unit);
 								if (overlap)
 									continue;
-								if (overlap_count > 0)
-								{
-									overlap_count = overlap_count;
-								}
-								overlap_count++;
-								*(&(ctype.x) + t) += 1;
 								previous_cpt = cpt;
+								previous_unit = unit;
+								*(&(ctype.x) + t) += 1;
 								cnt++;
 							}								
 							else{
@@ -963,6 +951,8 @@ __global__ void calculate_particle_triangle_contact_count(
 			}
 		}
 	}
+	if (cnt > 1)
+		cnt = cnt;
 	count[id] += cnt;
 }
 
@@ -1173,6 +1163,7 @@ __global__ void new_particle_polygon_object_conatct_kernel(
 	pair_data pair;
 	int3 ctype = make_int3(0, 0, 0);
 	double3 previous_cpt = make_double3(0.0, 0.0, 0.0);
+	double3 previous_unit = make_double3(0.0, 0.0, 0.0);
 	for (int z = -1; z <= 1; z++){
 		for (int y = -1; y <= 1; y++){
 			for (int x = -1; x <= 1; x++){
@@ -1196,10 +1187,18 @@ __global__ void new_particle_polygon_object_conatct_kernel(
 							Fn = make_double3(0.0, 0.0, 0.0);
 							if (cdist > 0)
 							{
-								bool overlab = checkOverlab(ctype, previous_cpt, cpt);
+								//double len_cpt = sqrt(dot(cpt, cpt));
+								//cpt = len_cpt ? cpt / sqrt(dot(cpt, cpt)) : cpt;
+								device_triangle_info tri = dpi[k];
+								double3 qp = tri.Q - tri.P;
+								double3 rp = tri.R - tri.P;
+								double rcon = ir - 0.5 * cdist;
+								unit = -normalize(cross(qp, rp));// unit / length(cross(qp, rp));
+								bool overlab = checkOverlab(ctype, previous_cpt, cpt, previous_unit, unit);
 								if (overlab)
 									continue;
-
+								*(&(ctype.x) + t) += 1;
+								previous_cpt = cpt;
 								pair = { true, 2, id, k, 0.0, 0.0 };
 								for (unsigned int j = 0; j < old_cnt; j++)
 								{
@@ -1209,14 +1208,9 @@ __global__ void new_particle_polygon_object_conatct_kernel(
 										pair = *pd;
 										break;
 									}
-								}
-								device_triangle_info tri = dpi[k];
-								double3 qp = tri.Q - tri.P;
-								double3 rp = tri.R - tri.P;
-								double rcon = ir - 0.5 * cdist;
-								unit = -cross(qp, rp);// -dpi[k].N;
-								unit = unit / length(unit);
+								}								
 								previous_cpt = cpt;
+								previous_unit = unit;
 								*(&(ctype.x) + t) += 1;
 								double3 dv = pmi.vel + cross(pmi.omega, po2cp) - (ivel + cross(iomega, ir * unit));
 								device_force_constant c = getConstant(

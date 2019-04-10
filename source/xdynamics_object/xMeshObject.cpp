@@ -141,18 +141,19 @@ int xMeshObject::DefineShapeFromFile(vector3d& loc, std::string f)
 	ntriangle = ntri;
 	com = com / ntriangle;
 	double J[6] = { 0, };
+	vector3d mov = loc - com;
 	for (unsigned int i = 0; i < ntri; i++)
 	{
 		int s = i * 9;
-		vertexList[s + 0] -= com.x;
-		vertexList[s + 1] -= com.y;
-		vertexList[s + 2] -= com.z;
-		vertexList[s + 3] -= com.x;
-		vertexList[s + 4] -= com.y;
-		vertexList[s + 5] -= com.z;
-		vertexList[s + 6] -= com.x;
-		vertexList[s + 7] -= com.y;
-		vertexList[s + 8] -= com.z;
+		vertexList[s + 0] += mov.x;
+		vertexList[s + 1] += mov.y;
+		vertexList[s + 2] += mov.z;
+		vertexList[s + 3] += mov.x;
+		vertexList[s + 4] += mov.y;
+		vertexList[s + 5] += mov.z;
+		vertexList[s + 6] += mov.x;
+		vertexList[s + 7] += mov.y;
+		vertexList[s + 8] += mov.z;
 		vector3d cm = spos[i] - pos;
 		J[0] += cm.y * cm.y + cm.z * cm.z;
 		J[1] += cm.x * cm.x + cm.z * cm.z;
@@ -166,7 +167,7 @@ int xMeshObject::DefineShapeFromFile(vector3d& loc, std::string f)
 	xPointMass::syme_inertia = new_vector3d(J[3], J[4], J[5]);
 	vol = _vol;
 	xPointMass::mass = this->Density() * vol;
-	xPointMass::pos = com / ntriangle;
+	xPointMass::pos = loc;
 	delete[] spos;
 	return 0;// xDynamicsError::xdynamicsSuccess;
 	//nvtriangle = ntriangle;
