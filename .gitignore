@@ -9,6 +9,8 @@
 *.cache
 *.pdb
 *.idp
+*.idb
+*.suo
 *.opensdf
 
 # Files for the ART/Dalvik VM
