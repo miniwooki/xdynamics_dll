@@ -872,7 +872,7 @@ __device__ bool checkOverlab(int3 ctype, double3 p, double3 c, double3 u0, doubl
 			if (p.z >= u1.z - 1e-9 && p.z <= u1.z + 1e-9)
 				b_over = true;
 
-	if ((ctype.y || ctype.z) && !b_over)
+	if (/*(ctype.y || ctype.z) &&*/ !b_over)
 	{
 		if (u0.x >= u1.x - 1e-9 && u0.x <= u1.x + 1e-9)
 			if (u0.y >= u1.y - 1e-9 && u0.y <= u1.y + 1e-9)
@@ -1198,7 +1198,7 @@ __global__ void new_particle_polygon_object_conatct_kernel(
 								if (overlab)
 									continue;
 								*(&(ctype.x) + t) += 1;
-								previous_cpt = cpt;
+								//previous_cpt = cpt;
 								pair = { true, 2, id, k, 0.0, 0.0 };
 								for (unsigned int j = 0; j < old_cnt; j++)
 								{
