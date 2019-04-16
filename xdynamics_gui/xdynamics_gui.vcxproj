@@ -45,7 +45,7 @@
       <OutputFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</OutputFile>
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">output</DynamicSource>
       <ExecutionDescription Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc'ing %(Identity)...</ExecutionDescription>
-      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles;.;$(USING_CUDA_SAMPLE_VERSION)\common\inc;.\GeneratedFiles\$(ConfigurationName)\.;$(USING_QT_VERSION)\include\QtCore;$(USING_QT_VERSION)\include\QtGui;$(USING_QT_VERSION)\include\QtANGLE;$(USING_QT_VERSION)\include\QtOpenGL;$(USING_QT_VERSION)\include\QtOpenGLExtensions;$(USING_QT_VERSION)\include\QtWidgets;$(USING_IRRLICHT_VERSION)\include;$(XDYNAMICS_Q)\include\xdynamics_gui;$(XDYNAMICS_Q)\include;$(USING_QT_VERSION)\include</IncludePath>
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles;.;$(USING_CUDA_SAMPLE_VERSION)\common\inc;.\GeneratedFiles\$(ConfigurationName);$(USING_QT_VERSION)\include\QtCore;$(USING_QT_VERSION)\include\QtGui;$(USING_QT_VERSION)\include\QtANGLE;$(USING_QT_VERSION)\include\QtOpenGL;$(USING_QT_VERSION)\include\QtOpenGLExtensions;$(USING_QT_VERSION)\include\QtWidgets;$(USING_IRRLICHT_VERSION)\include;$(XDYNAMICS_Q)\include\xdynamics_gui;$(XDYNAMICS_Q)\include;$(USING_QT_VERSION)\include;%(AdditionalIncludeDirectories)</IncludePath>
       <Define Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_USE_MATH_DEFINES;UNICODE;_UNICODE;WIN32;WIN64;QT_DLL;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_OPENGL_LIB;QT_OPENGLEXTENSIONS_LIB;QT_WIDGETS_LIB</Define>
       <QTDIR Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)</QTDIR>
     </QtMoc>
@@ -85,7 +85,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PreprocessorDefinitions>_USE_MATH_DEFINES;UNICODE;_UNICODE;WIN32;WIN64;QT_DLL;QT_CORE_LIB;QT_GUI_LIB;QT_OPENGL_LIB;QT_OPENGLEXTENSIONS_LIB;QT_WIDGETS_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\GeneratedFiles;.;$(USING_CUDA_SAMPLE_VERSION)\common\inc;.\GeneratedFiles\$(ConfigurationName);$(USING_QT_VERSION)\include\QtCore;$(USING_QT_VERSION)\include\QtGui;$(USING_QT_VERSION)\include\QtANGLE;$(USING_QT_VERSION)\include\QtOpenGL;$(USING_QT_VERSION)\include\QtOpenGLExtensions;$(USING_QT_VERSION)\include\QtWidgets;$(USING_IRRLICHT_VERSION)\include;$(XDYNAMICS_Q)\include\xdynamics_gui;$(XDYNAMICS_Q)\include;$(USING_QT_VERSION)\include;$(USING_CUDA_VERSION)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\GeneratedFiles;.;$(USING_CUDA_SAMPLE_VERSION)\common\inc;.\GeneratedFiles\$(ConfigurationName);$(USING_QT_VERSION)\include\QtCore;$(USING_QT_VERSION)\include\QtGui;$(USING_QT_VERSION)\include\QtANGLE;$(USING_QT_VERSION)\include\QtOpenGL;$(USING_QT_VERSION)\include\QtOpenGLExtensions;$(USING_QT_VERSION)\include\QtWidgets;$(USING_IRRLICHT_VERSION)\include;C:\xdynamics\include\xdynamics_gui;C:\xdynamics\include;$(USING_QT_VERSION)\include;$(USING_CUDA_VERSION)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -101,7 +101,7 @@
     <QtMoc>
       <OutputFile>.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</OutputFile>
       <ExecutionDescription>Moc'ing %(Identity)...</ExecutionDescription>
-      <IncludePath>.\GeneratedFiles;.;$(USING_CUDA_SAMPLE_VERSION)\common\inc;.\GeneratedFiles\$(ConfigurationName)\.;$(USING_QT_VERSION)\include\QtCore;$(USING_QT_VERSION)\include\QtGui;$(USING_QT_VERSION)\include\QtANGLE;$(USING_QT_VERSION)\include\QtOpenGL;$(USING_QT_VERSION)\include\QtOpenGLExtensions;$(USING_QT_VERSION)\include\QtWidgets;$(USING_IRRLICHT_VERSION)\include;$(XDYNAMICS_Q)\include\xdynamics_gui;$(XDYNAMICS_Q)\include;$(USING_QT_VERSION)\include;$(USING_CUDA_VERSION)\include</IncludePath>
+      <IncludePath>.\GeneratedFiles;.;$(USING_CUDA_SAMPLE_VERSION)\common\inc;.\GeneratedFiles\$(ConfigurationName);$(USING_QT_VERSION)\include\QtCore;$(USING_QT_VERSION)\include\QtGui;$(USING_QT_VERSION)\include\QtANGLE;$(USING_QT_VERSION)\include\QtOpenGL;$(USING_QT_VERSION)\include\QtOpenGLExtensions;$(USING_QT_VERSION)\include\QtWidgets;$(USING_IRRLICHT_VERSION)\include;C:\xdynamics\include\xdynamics_gui;C:\xdynamics\include;$(USING_QT_VERSION)\include;$(USING_CUDA_VERSION)\include;%(AdditionalIncludeDirectories)</IncludePath>
       <Define>_USE_MATH_DEFINES;UNICODE;_UNICODE;WIN32;WIN64;QT_DLL;QT_CORE_LIB;QT_GUI_LIB;QT_OPENGL_LIB;QT_OPENGLEXTENSIONS_LIB;QT_WIDGETS_LIB</Define>
     </QtMoc>
     <QtUic>
