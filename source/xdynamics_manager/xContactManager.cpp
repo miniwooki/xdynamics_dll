@@ -250,7 +250,7 @@ void xContactManager::deviceCollision(
 {
 	checkCudaErrors(cudaMemcpy(d_old_pair_count, d_pair_count, sizeof(unsigned int) * np, cudaMemcpyDeviceToDevice));
 	unsigned int nc = deviceContactCount(pos, vel, omega, mass, force, moment, sorted_id, cell_start, cell_end, np);
-	std::cout << "ncontact : " << nc << std::endl;
+//	std::cout << "ncontact : " << nc << std::endl;
 	if (!nc) return;
 	checkCudaErrors(cudaMemcpy(d_old_pair_start, d_pair_start, sizeof(unsigned int) * np, cudaMemcpyDeviceToDevice));
 	pair_data* d_old_pppd;

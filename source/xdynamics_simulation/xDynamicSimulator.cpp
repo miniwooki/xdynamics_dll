@@ -142,6 +142,17 @@ void xDynamicsSimulator::exportPartData()
 	of.close();
 }
 
+bool xDynamicsSimulator::xRunSimulationThread(double ct, unsigned int cstep)
+{
+	if (xdem)
+		if (checkXerror(xdem->OneStepSimulation(ct, cstep)))
+			return false;
+	if (xmbd)
+		if (checkXerror(xmbd->OneStepSimulation(ct, cstep)))
+			return false;
+	return true;
+}
+
 bool xDynamicsSimulator::xRunSimulation()
 {
 // 	isStop = false;

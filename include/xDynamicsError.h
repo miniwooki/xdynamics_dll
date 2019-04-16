@@ -20,7 +20,7 @@ public:
 	};
 	xDynamicsError();
 	~xDynamicsError();
-
+	static char* getErrorString();
 	//static void checkXerror(int val);
 	static bool _check(int result, char const *const func, const char* const file, int const line);
 private:

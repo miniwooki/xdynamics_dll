@@ -15,6 +15,11 @@ xDynamicsError::~xDynamicsError()
 
 }
 
+char* xDynamicsError::getErrorString()
+{
+	return err;
+}
+
 bool xDynamicsError::_check(int result, char const *const func, const char* const file, int const line)
 {
 	if (result)

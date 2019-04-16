@@ -9,6 +9,8 @@
 #include "xAnimationTool.h"
 #include "xModelNavigator.h"
 
+class xDynamicsManager;
+
 class xdynamics_gui : public QMainWindow
 {
 	Q_OBJECT
@@ -20,6 +22,7 @@ public:
 	~xdynamics_gui();
 
 	bool ReadViewModel(QString path);
+	QString ReadXLSFile(QString path);
 	bool ReadModelResults(QString path);
 
 private slots:
@@ -39,7 +42,7 @@ private:
 	xAnimationTool* myAnimationBar;
 	QList<QAction*> myMainActions;
 	
-
+	xDynamicsManager* xdm;
 	Ui::xdynamics_gui_mw ui;
 	QString path;
 	xGLWidget* xgl;

@@ -36,7 +36,7 @@ int wmain(int argc, wchar_t* argv[])
 		if (xdm->getSimulatorFromCommand(argc, argv))
 		{
 // 			double dt = 0, et = 0;
-// 			unsigned int st = 0;
+// 			unsigned int st = 0;Op
 // 			std::wcout
 // 				<< "Input the simulation conditions." << std::endl
 // 				<< "    - Time step : "; 
@@ -88,7 +88,7 @@ int wmain(int argc, wchar_t* argv[])
 			//xdm.xRunResultWorld(argv[2]);
 		//}
 		//return 0;
-		xdm->OpenModelXLS(L"C:/xDynamics/resource/triangle_contact_test.xls");
+		xdm->OpenModelXLS(L"C:/xDynamics/resource/dem_test.xls");
 		//xdm->OpenModelXLS(L"C:/xDynamics/resource/four_bar3d.xls");
 	}
 	

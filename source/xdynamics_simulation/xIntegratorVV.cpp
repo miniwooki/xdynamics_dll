@@ -22,7 +22,7 @@ int xIntegratorVV::OneStepSimulation(double ct, unsigned int cstep)
 {
 // 	if (per_np && !((cstep - 1) % per_np) && np < md->ParticleManager()->Np())
 // 		md->ParticleManager()->OneByOneCreating() ? np += md->ParticleManager()->NextCreatingOne(np) : np += md->ParticleManager()->NextCreatingPerGroup();
-	std::cout << "cstep : " << cstep << " ";
+	//std::cout << "cstep : " << cstep << " ";
 	this->updatePosition(dpos, dvel, dacc, np);
 	dtor->detection(dpos, (nPolySphere ? xcm->ContactParticlesMeshObjects()->SphereData() : NULL), np, nPolySphere);
 	if (xcm)

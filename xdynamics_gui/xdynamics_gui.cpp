@@ -1,4 +1,5 @@
 #include "xdynamics_gui.h"
+#include "xdynamics_manager/xDynamicsManager.h"
 #include <QtCore/QDir>
 #include <QtCore/QMimeData>
 #include <QtWidgets/QFileDialog>
@@ -8,10 +9,11 @@ xdynamics_gui::xdynamics_gui(int _argc, char** _argv, QWidget *parent)
 	, xgl(NULL)
 	, xcw(NULL)
 	, xnavi(NULL)
+	, xdm(NULL)
 	, isOnViewModel(false)
 {
 	path = QString::fromLocal8Bit(getenv("USERPROFILE"));
-	path += +"/Documents/xdynamics/";
+	path += "/Documents/xdynamics/";
 	if (_argc > 1)
 	{
 		QString model_name = _argv[2];
@@ -53,6 +55,7 @@ xdynamics_gui::~xdynamics_gui()
 	if (xgl) delete xgl; xgl = NULL;
 	if (xcw) delete xcw; xcw = NULL;
 	if (xnavi) delete xnavi; xnavi = NULL;
+	if (xdm) delete xdm; xdm = NULL;
 	xvAnimationController::releaseTimeMemory();
 }
 
@@ -157,6 +160,23 @@ void xdynamics_gui::xOpen()
 	{
 		isOnViewModel = ReadViewModel(file_path);
 	}
+	else if (ext == "xls")
+	{
+		QString vf = ReadXLSFile(file_path);
+		if (!vf.isEmpty())
+			isOnViewModel = ReadViewModel(vf);
+	}
+}
+
+QString xdynamics_gui::ReadXLSFile(QString xls_path)
+{
+	if (!xdm)
+		xdm = new xDynamicsManager;
+	xdm->OpenModelXLS(xls_path.toStdWString().c_str());
+	int begin = xls_path.lastIndexOf("/");
+	int end = xls_path.lastIndexOf(".");
+	QString viewFile = path + xls_path.mid(begin + 1, end - begin-1) + ".vmd";
+	return viewFile;
 }
 
 void xdynamics_gui::setupMainOperations()
@@ -241,6 +261,15 @@ void xdynamics_gui::dropEvent(QDropEvent *event)
 				else isOnViewModel = true;
 			}
 			if (ReadModelResults(s)) setupAnimationTool();
+		}
+		else if (ext == "xls")
+		{
+			if (!isOnViewModel)
+			{
+				QString vf = ReadXLSFile(s);
+				if (!vf.isEmpty())
+					isOnViewModel = ReadViewModel(vf);
+			}
 		}
 		else
 			xcw->write(xCommandWindow::CMD_ERROR, kor("지원하지 않는 파일 형식입니다."));

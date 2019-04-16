@@ -65,7 +65,7 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 	for (unsigned int i = 0; i < np; i++)
 	{
 		double r = pos[i * 4 + 3];
-		vel[0] = -0.1;
+		//vel[0] = -0.1;
 		force[i * 3 + 0] = mass[i] * xModel::gravity.x;
 		force[i * 3 + 1] = mass[i] * xModel::gravity.y;
 		force[i * 3 + 2] = mass[i] * xModel::gravity.z;

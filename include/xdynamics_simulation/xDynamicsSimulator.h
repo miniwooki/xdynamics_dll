@@ -17,14 +17,16 @@ public:
 	xMultiBodySimulation* setupMBDSimulation(xSimulation::MBDSolverType mst);
 	bool xInitialize(double _dt = 0, unsigned int _st = 0, double _et = 0, xMultiBodySimulation* _xmbd = NULL, xDiscreteElementMethodSimulation* _xdem = NULL);
 	bool xRunSimulation();
-
-private:
+	bool xRunSimulationThread(double ct, unsigned int pt);
 	bool savePartData(double ct, unsigned int pt);
 	void exportPartData();
+
+private:
 	xDynamicsManager* xdm;
 	xMultiBodySimulation* xmbd;
 	xDiscreteElementMethodSimulation* xdem;
 };
+
 
 
 
