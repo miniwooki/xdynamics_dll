@@ -20,7 +20,7 @@ public:
 	
 	xdynamics_gui(int _argc, char** _argv, QWidget *parent = Q_NULLPTR);
 	~xdynamics_gui();
-
+	static xdynamics_gui* XGUI();
 	bool ReadViewModel(QString path);
 	QString ReadXLSFile(QString path);
 	bool ReadModelResults(QString path);

@@ -14,6 +14,7 @@ xvPlane::xvPlane(QString _name)
 
 bool xvPlane::makePlaneGeometry(xPlaneObjectData& d)
 {
+	data = d;
 	width = d.dx;
 	height = d.dy;
 	

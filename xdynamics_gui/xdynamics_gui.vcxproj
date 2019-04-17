@@ -135,6 +135,8 @@
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="wcube.ui" />
+    <QtUic Include="wplane.ui" />
+    <QtUic Include="wsimulation.ui" />
     <QtUic Include="xdynamics_gui.ui" />
   </ItemGroup>
   <ItemGroup>
@@ -144,6 +146,8 @@
     <QtMoc Include="..\include\xdynamics_gui\xGLWidget.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GeneratedFiles\ui_wplane.h" />
+    <ClInclude Include="GeneratedFiles\ui_wsimulation.h" />
     <QtMoc Include="..\include\xdynamics_gui\xSimulationThread.h" />
     <ClInclude Include="..\include\xdynamics_gui\xvMeshObject.h" />
     <ClInclude Include="GeneratedFiles\ui_wcube.h" />

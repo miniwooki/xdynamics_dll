@@ -4,6 +4,13 @@
 #include <QtCore/QMimeData>
 #include <QtWidgets/QFileDialog>
 
+xdynamics_gui* xgui;
+
+xdynamics_gui* xdynamics_gui::XGUI()
+{
+	return xgui;
+}
+
 xdynamics_gui::xdynamics_gui(int _argc, char** _argv, QWidget *parent)
 	: QMainWindow(parent)
 	, xgl(NULL)
@@ -12,6 +19,7 @@ xdynamics_gui::xdynamics_gui(int _argc, char** _argv, QWidget *parent)
 	, xdm(NULL)
 	, isOnViewModel(false)
 {
+	xgui = this;
 	path = QString::fromLocal8Bit(getenv("USERPROFILE"));
 	path += "/Documents/xdynamics/";
 	if (_argc > 1)
@@ -47,6 +55,7 @@ xdynamics_gui::xdynamics_gui(int _argc, char** _argv, QWidget *parent)
 // 		
 // 		ReadViewModel(path);
 // 	}
+	//connect(xnavi->SimulationWidget(), SIGNAL(wsimulation::clickedSolveButton()), this, SLOT(xRunSimulationThread()));
 }
 
 
@@ -171,7 +180,10 @@ void xdynamics_gui::xOpen()
 QString xdynamics_gui::ReadXLSFile(QString xls_path)
 {
 	if (!xdm)
+	{
 		xdm = new xDynamicsManager;
+		//xnavi->setDynamicManager(xdm);
+	}		
 	xdm->OpenModelXLS(xls_path.toStdWString().c_str());
 	int begin = xls_path.lastIndexOf("/");
 	int end = xls_path.lastIndexOf(".");

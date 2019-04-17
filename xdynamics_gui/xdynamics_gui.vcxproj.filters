@@ -106,6 +106,12 @@
     <QtUic Include="wcube.ui">
       <Filter>Form Files</Filter>
     </QtUic>
+    <QtUic Include="wsimulation.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="wplane.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="xdynamics_gui.qrc">
@@ -145,6 +151,12 @@
     </ClInclude>
     <ClInclude Include="..\include\xdynamics_gui\xvMeshObject.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_wsimulation.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_wplane.h">
+      <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

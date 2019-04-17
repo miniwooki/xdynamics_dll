@@ -11,7 +11,7 @@ public:
 	xvPlane();
 	xvPlane(QString _name);
 	virtual ~xvPlane() { glDeleteLists(glList, 1); }
-
+	xPlaneObjectData PlaneData() { return data; }
 	virtual void draw(GLenum eMode);
 	bool makePlaneGeometry(xPlaneObjectData& d);
 
@@ -26,6 +26,7 @@ private:
 	vector3f p1;
 	vector3f p2;
 	vector3f p3;
+	xPlaneObjectData data;
 };
 
 #endif
