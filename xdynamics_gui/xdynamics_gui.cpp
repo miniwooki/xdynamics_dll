@@ -175,7 +175,8 @@ QString xdynamics_gui::ReadXLSFile(QString xls_path)
 	xdm->OpenModelXLS(xls_path.toStdWString().c_str());
 	int begin = xls_path.lastIndexOf("/");
 	int end = xls_path.lastIndexOf(".");
-	QString viewFile = path + xls_path.mid(begin + 1, end - begin-1) + ".vmd";
+	QString modelName = xls_path.mid(begin + 1, end - begin - 1);
+	QString viewFile = path + modelName + "/" + modelName + ".vmd";
 	return viewFile;
 }
 
@@ -274,4 +275,50 @@ void xdynamics_gui::dropEvent(QDropEvent *event)
 		else
 			xcw->write(xCommandWindow::CMD_ERROR, kor("지원하지 않는 파일 형식입니다."));
 	}
+}
+
+void xdynamics_gui::xRunSimulationThread()
+{
+// 	solveDialog sd;
+// 	int ret = sd.exec();
+// 	if (ret <= 0)
+// 		return;
+// 	if (model::isSinglePrecision && sd.isCpu)
+// 	{
+// 		messageBox::run("Single precision does NOT provide the CPU processing.");
+// 		return;
+// 	}
+// 	simulation::dt = sd.time_step;
+// 	simulation::et = sd.sim_time;
+// 	simulation::st = sd.save_step;
+// 	simulation::dev = sd.isCpu ? simulation::CPU : simulation::GPU;
+// 
+// 	deleteFileByEXT("txt");
+// 	deleteFileByEXT("bin");
+// 	if (!solver)
+// 		solver = new xDynamicsSolver(mg);
+// 	connect(solver, SIGNAL(finishedThread()), this, SLOT(exitThread()));
+// 	connect(solver, SIGNAL(excuteMessageBox()), this, SLOT(excuteMessageBox()));
+// 	connect(solver, SIGNAL(sendProgress(int, QString, QString)), this, SLOT(recieveProgress(int, QString, QString)));
+// 	if (solver->initialize(sd.dem_itor_type, sd.mbd_itor_type, st_model))
+// 	{
+// 
+// 	}
+// 	else
+// 	{
+// 		exitThread();
+// 	}
+// 	if (!pBar)
+// 		pBar = new QProgressBar;
+// 	pBar->setMaximum(solver->totalPart());
+// 	//
+// 	ui.statusBar->addWidget(pBar, 1);
+// 	myModelingActions[RUN_ANALYSIS]->disconnect();
+// 	myModelingActions[RUN_ANALYSIS]->setIcon(QIcon(":/Resources/stop.png"));
+// 	myModelingActions[RUN_ANALYSIS]->setStatusTip(tr("Pause for simulation."));
+// 	connect(myModelingActions[RUN_ANALYSIS], SIGNAL(triggered()), solver, SLOT(setStopCondition()));
+// 	myModelingActions[RUN_ANALYSIS]->setEnabled(true);
+// 	saveproj();
+// 	solver->start();
+// 	setAnimationAction(true);
 }

@@ -44,15 +44,19 @@ xModelNavigator::xModelNavigator(QWidget* parent)
 	vtree->setContextMenuPolicy(Qt::CustomContextMenu);
 	//vtree->setWindowTitle("xModelNavigator");
 	//setWidget();
-	roots[SHAPE_ROOT] = new QTreeWidgetItem(vtree);
-	roots[MASS_ROOT] = new QTreeWidgetItem(vtree);
-	roots[PARTICLE_ROOT] = new QTreeWidgetItem(vtree);
-	roots[PART_ROOT] = new QTreeWidgetItem(vtree);
+	mom_roots[OBJECT_ROOT] = new QTreeWidgetItem(vtree); mom_roots[OBJECT_ROOT]->setText(0, "Objects");
+	roots[SHAPE_ROOT] = new QTreeWidgetItem(mom_roots[OBJECT_ROOT]); roots[SHAPE_ROOT]->setText(0, "Shape");// addChild(OBJECT_ROOT, "Shape");
+	roots[MASS_ROOT] = new QTreeWidgetItem(mom_roots[OBJECT_ROOT]); roots[MASS_ROOT]->setText(0, "Mass");// addChild(OBJECT_ROOT, "Mass");
+	roots[PARTICLE_ROOT] = new QTreeWidgetItem(mom_roots[OBJECT_ROOT]); roots[PARTICLE_ROOT]->setText(0, "Particle"); //addChild(OBJECT_ROOT, "Particle");
+	//roots[PART_ROOT] = new QTreeWidgetItem(); addChild(OBJECT_ROOT)
+	mom_roots[RESULT_ROOT] = new QTreeWidgetItem(vtree); mom_roots[RESULT_ROOT]->setText(0, "Results");
+	mom_roots[SIMULATION_ROOT] = new QTreeWidgetItem(vtree); mom_roots[SIMULATION_ROOT]->setText(0, "Simulation");
+	
 
-	roots[SHAPE_ROOT]->setText(0, "Shape");
-	roots[MASS_ROOT]->setText(0, "Mass");
-	roots[PARTICLE_ROOT]->setText(0, "Particle");
-	roots[PART_ROOT]->setText(0, "Part");
+// 	roots[SHAPE_ROOT]->setText(0, "Shape");
+// 	roots[MASS_ROOT]->setText(0, "Mass");
+// 	roots[PARTICLE_ROOT]->setText(0, "Particle");
+// 	roots[PART_ROOT]->setText(0, "Part");
 	layout->setMargin(0);
 	frame->setLayout(layout);
 	this->setWidget(frame);
@@ -77,7 +81,7 @@ xModelNavigator::xModelNavigator(QWidget* parent)
 
 xModelNavigator::~xModelNavigator()
 {
-	qDeleteAll(roots.begin(), roots.end());
+	qDeleteAll(mom_roots.begin(), mom_roots.end());
 	if (vtree) delete vtree; vtree = NULL;
 	if (wv) delete wv; wv = NULL;
 	if (plate_frame) delete plate_frame; plate_frame = NULL;
@@ -89,12 +93,15 @@ xModelNavigator::~xModelNavigator()
 // 	return db;
 // }
 
-void xModelNavigator::addChild(tRoot tr, QString& _nm)
+void xModelNavigator::addChild(tRoot tr, QString _nm)
 {
+	QTreeWidgetItem* parent = getRootItem(tr);
+	if (!parent) return;
+	///QString t = parent->text(1);
 	QTreeWidgetItem* child = new QTreeWidgetItem();
 	child->setText(0, _nm);
 	//child->setData(0, (int)tr, v);
-	roots[tr]->addChild(child);		
+	parent->addChild(child);		
 }
 
 void xModelNavigator::addChilds(tRoot tr, QStringList& qsl)
@@ -103,6 +110,21 @@ void xModelNavigator::addChilds(tRoot tr, QStringList& qsl)
 	{
 		addChild(tr, s);
 	}
+}
+
+QTreeWidgetItem* xModelNavigator::getRootItem(tRoot tr)
+{
+	QList<tRoot> keys = roots.keys();
+	QList<tRoot>::const_iterator it = qFind(keys, tr);
+	if (it == keys.end() || !keys.size())
+	{
+		keys = roots.keys();
+		it = qFind(keys, tr);
+		if (it == keys.end() || !keys.size())
+			return NULL;
+		return roots[tr];
+	}
+	return mom_roots[tr];
 }
 
 void xModelNavigator::clickAction(QTreeWidgetItem* w, int i)
@@ -143,9 +165,9 @@ void xModelNavigator::CallShape(QString& n)
 		wc->LESZZ->setText(QString("%1").arg(d.p1z - d.p0z));
 		plate_layout->addWidget(wc);
 	}
-	wv->xo = xo;
-	CallViewWidget();
 	
+	CallViewWidget();
+	wv->xo = xo;
 	//frame->setLayout()
 	//plate->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	//plate->setAlignment(Qt::AlignTop);

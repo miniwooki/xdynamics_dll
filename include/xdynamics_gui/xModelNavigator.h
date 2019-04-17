@@ -49,14 +49,17 @@ class xModelNavigator : public QDockWidget
 	Q_OBJECT
 
 public:
-	enum tRoot { SHAPE_ROOT = 0, MASS_ROOT, PARTICLE_ROOT, PART_ROOT };
+	//enum tMotherRoot { OBJECT_ROOT = 0, RESULT_ROOT, SIMULATION_ROOT };
+	enum tRoot { OBJECT_ROOT = 0, RESULT_ROOT, SIMULATION_ROOT, SHAPE_ROOT, MASS_ROOT, PARTICLE_ROOT, PART_ROOT };
 
 	xModelNavigator();
 	xModelNavigator(QWidget* parent);
 	~xModelNavigator();
 
-	void addChild(tRoot, QString& _nm);
+	void addChild(tRoot, QString _nm);
 	void addChilds(tRoot, QStringList& qsl);
+	QTreeWidgetItem* getRootItem(tRoot tr);
+
 private slots:
 //	void contextMenu(const QPoint&);
 	void clickAction(QTreeWidgetItem*, int);
@@ -74,6 +77,7 @@ private:
 	QVBoxLayout *plate_layout;
 	QScrollArea *plate;
 	QTreeWidget *vtree;
+	QMap<tRoot, QTreeWidgetItem*> mom_roots;
 	QMap<tRoot, QTreeWidgetItem*> roots;
 };
 

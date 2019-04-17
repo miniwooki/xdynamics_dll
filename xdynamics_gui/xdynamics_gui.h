@@ -29,6 +29,7 @@ private slots:
 	void xNew();
 	void xSave();
 	void xOpen();
+	void xRunSimulationThread();
 	
 private:
 	void setupMainOperations();
