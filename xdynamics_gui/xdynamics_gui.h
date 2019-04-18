@@ -2,14 +2,18 @@
 
 #include <QtWidgets/QMainWindow>
 #include <QtCore/QList>
+#include <QProgressBar>
 #include "xdynamics_algebra/xUtilityFunctions.h"
 #include "ui_xdynamics_gui.h"
 #include "xCommandWindow.h"
-#include "xGLWidget.h"
+//#include "xGLWidget.h"
 #include "xAnimationTool.h"
-#include "xModelNavigator.h"
 
 class xDynamicsManager;
+class xModelNavigator;
+class xGLWidget;
+class wsimulation;
+//class xSimulationThread;
 
 class xdynamics_gui : public QMainWindow
 {
@@ -29,7 +33,10 @@ private slots:
 	void xNew();
 	void xSave();
 	void xOpen();
+	void xGetSimulationWidget(wsimulation*);
 	void xRunSimulationThread();
+	void xExitSimulationThread();
+	void xRecieveProgress(int, QString);
 	
 private:
 	void setupMainOperations();
@@ -43,6 +50,8 @@ private:
 	xAnimationTool* myAnimationBar;
 	QList<QAction*> myMainActions;
 	
+	//xSimulationThread* simThread;
+	QProgressBar *pbar;
 	xDynamicsManager* xdm;
 	Ui::xdynamics_gui_mw ui;
 	QString path;

@@ -122,7 +122,8 @@ void xSimulationThread::run()
 			part++;
 			if (xds->savePartData(ct, part))
 			{
-				ch.sprintf(buf, "Part%04d   %4.5f %10d      %5d      %4.5f     %4.5f    %ws", part, ctime, cstep, eachStep, elapsed_time - previous_time, total_time, xUtilityFunctions::GetDateTimeFormat("%d-%m-%y %H:%M:%S", 0).c_str());
+				QString ymd = QString::fromStdWString(xUtilityFunctions::GetDateTimeFormat("%d-%m-%y %H:%M:%S", 0));
+				ch.sprintf("Part%04d   %4.5f %10d      %5d      %4.5f     %4.5f    %s", part, ct, cstep, eachStep, elapsed_time - previous_time, total_time, ymd.toStdString().c_str());
 				sendProgress(part, ch);
 			}
 			eachStep = 0;

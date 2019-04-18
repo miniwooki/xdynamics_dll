@@ -1,3 +1,4 @@
+//#include "xdynamics_gui.h"
 #include "xModelNavigator.h"
 #include "xGLWidget.h"
 //#include "modelManager.h"
@@ -18,16 +19,10 @@ xModelNavigator* db;
 // wcube* wc = NULL;
 // wplane* wp = NULL;
 // wsimulation* xws = NULL;
-wsimulation::wsimulation(QWidget* parent /* = NULL */)
-	: QWidget(parent)
-{
-
-}
 
 xModelNavigator::xModelNavigator()
 	: plate(NULL)
 	, vtree(NULL)
-	, wv(NULL)
 	, plate_frame(NULL)
 	, plate_layout(NULL)
 	//, xdm(NULL)
@@ -40,7 +35,6 @@ xModelNavigator::xModelNavigator(QWidget* parent)
 	: QDockWidget(parent)
 	, plate(NULL)
 	, vtree(NULL)
-	, wv(NULL)
 	, plate_frame(NULL)
 	, plate_layout(NULL)
 	//, xdm(NULL)
@@ -250,6 +244,11 @@ void xModelNavigator::CallShape(QString& n)
 }
 
 
+void xModelNavigator::CallResultPart()
+{
+
+}
+
 void xModelNavigator::CallSimulation()
 {
 // 	if (!xdm)
@@ -258,7 +257,7 @@ void xModelNavigator::CallSimulation()
 	unsigned int st = xSimulation::st;
 	double et = xSimulation::et;
 	//if (!xws)
-	wsimulation *xws = new wsimulation(/*plate*/);
+	wsimulation *xws = new wsimulation(plate);
 	xws->LETimeStep->setText(QString("%1").arg(dt));
 	xws->LESaveStep->setText(QString("%1").arg(st));
 	xws->LEEndTime->setText(QString("%1").arg(et));
@@ -269,13 +268,14 @@ void xModelNavigator::CallSimulation()
 	plate_frame->setLayout(plate_layout);
 	plate->setWidget(plate_frame);
 	cwidget = SIMULATION_WIDGET;
+	emit definedSimulationWidget(xws);
 }
 
 void xModelNavigator::CallViewWidget(xvObject* xo)
 {
 // 	if (wv)
 // 		delete wv;
-	wv = new wview(plate);
+	wview *wv = new wview(plate);
 	wv->xo = xo;
 	plate_layout->addWidget(wv);
 	plate_layout->setAlignment(Qt::AlignTop);
@@ -290,85 +290,6 @@ void xModelNavigator::CallViewWidget(xvObject* xo)
 	wv->setupColor();
 }
 
-void xModelNavigator::RemovePlateWidget()
-{
-// 	switch (cwidget)
-// 	{
-// 	case CUBE_WIDGET:
-// 		//plate_layout->wi
-// 		plate_layout->removeWidget(wc);
-// 		plate_layout->removeWidget(wv);
-// 		break;
-// 	case SIMULATION_WIDGET:
-// 		plate_layout->removeWidget(xws);
-// 		break;
-// 	case PLANE_WIDGET:
-// 		plate_layout->removeWidget(wp);
-// 		plate_layout->removeWidget(wv);
-// 		break;
-// 	}
-}
-
-// void xModelNavigator::CallView()
-// {
-// 
-// }
-
-// void xModelNavigator::contextMenu(const QPoint& pos)
-// {
-// 	QTreeWidgetItem* item = vtree->itemAt(pos);
-// 	int col = vtree->currentColumn();
-// 	if (!item)
-// 		return;
-// 	if (!item->parent())
-// 		return;
-// 	QString it = item->text(0);
-// 	QMenu menu(item->text(0), this);
-// 	menu.addAction("Delete");
-// 	menu.addAction("Property");
-// 
-// 	QPoint pt(pos);
-// 	QAction *a = menu.exec(vtree->mapToGlobal(pos));
-// 
-// 	if (a)
-// 	{
-// 		QString txt = a->text();
-// 		if (txt == "Delete")
-// 		{
-// 			QTreeWidgetItem* parent = item->parent();
-// 			modelManager::MM()->ActionDelete(item->text(0));
-// 			GLWidget::GLObject()->actionDelete(item->text(0));
-// 			parent->removeChild(item);
-// 			delete item;
-// 		}
-// 		else if (txt == "Property")
-// 		{
-// 
-// 		}
-// 	}
-// 	menu.clear();
-	//	qDeleteAll(menu);
-//}
-
-// void xModelNavigator::actProperty()
-// {
-// 	//return;
-// }
-// 
-// void xModelNavigator::actDelete()
-// {
-// 	
-// }
-
-
-// wcube
-
-//  void wcube::setup(QString& name, xCubeObjectData* d)
-//{
-//	LEName->setText(name);
-//}
-
-// wview
 void wview::setupColor()
 {
 	QColor c = xo->Color();

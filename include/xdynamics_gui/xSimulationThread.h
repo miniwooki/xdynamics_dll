@@ -43,8 +43,8 @@ private:
 
 signals:
 	void finishedThread();
-	void sendProgress(int, QString, QString info = "");
-	void excuteMessageBox();
+	void sendProgress(int, QString);
+//	void excuteMessageBox();
 };
 
 #endif

@@ -22,6 +22,7 @@ public:
 	/*bool oneStepAnalysis_f(double ct, unsigned int cstep);*/
 	QString SaveStepResult(unsigned int pt, double ct);
 	void ExportResults(std::fstream& of);
+	void EnableSaveResultToMemory(bool b);
 	//QString saveResult_f(float *vp, float* vv, double ct, unsigned int pt);
 	//void setIntegratorType(dem_integrator_type itype) { itor_type = itype; }
 	//void saveFinalResult(QFile& qf);

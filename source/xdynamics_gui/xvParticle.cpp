@@ -431,10 +431,13 @@ void xvParticle::setBufferMemories(unsigned int sz)
 	if (buffers)
 		delete[] buffers;
 	buffers = new float[sz * np * 4];
+	if (vbuffers)
+		delete[] vbuffers;
 	vbuffers = new float[sz * np * 3];
 	if (color_buffers)
 		delete[] color_buffers;
 	color_buffers = new float[sz * np * 4];
+	xvAnimationController::allocTimeMemory(sz);
 }
 
 // void xvParticle::changeParticles(VEC4D_PTR _pos)

@@ -6,7 +6,9 @@
 #include "ui_wcube.h"
 #include "ui_wview.h"
 #include "ui_wplane.h"
-#include "ui_wsimulation.h"
+#include "xSimulationWidget.h"
+//#include "ui_wsimulation.h"
+//#include "xdynamics_gui.h"
 
 class QScrollArea;
 class xvObject;
@@ -28,20 +30,6 @@ public:
 	~wplane(){}
 
 	//void setup(QString& name, xCubeObjectData* d);
-};
-
-class wsimulation : public QWidget, public Ui::wsimulation
-{
-	Q_OBJECT
-public:
-	wsimulation(QWidget* parent = NULL);// { setupUi(this); }
-	~wsimulation(){}
-
-	signals:
-	void clickedSolveButton();
-
-	private slots:
-	void SolveButton() { emit clickedSolveButton(); }
 };
 
 class wview : public QWidget, public Ui::wview
@@ -86,8 +74,10 @@ public:
 	void addChild(tRoot, QString _nm);
 	void addChilds(tRoot, QStringList& qsl);
 	QTreeWidgetItem* getRootItem(tRoot tr);
-	//void setDynamicManager(xDynamicsManager* _xdm);
-	static wsimulation* SimulationWidget();
+	//static wsimulation* SimulationWidget();
+signals:
+	void definedSimulationWidget(wsimulation*);
+
 private slots:
 //	void contextMenu(const QPoint&);
 	void clickAction(QTreeWidgetItem*, int);
@@ -97,12 +87,11 @@ private slots:
 private:
 	void CallShape(QString& n);
 	//void CallView();
+	void CallResultPart();
 	void CallSimulation();
 	void CallViewWidget(xvObject* xo);
-	void RemovePlateWidget();
 
 	tWidget cwidget;
-	wview *wv;
 	QFrame *plate_frame;
 	QVBoxLayout *plate_layout;
 	QScrollArea *plate;

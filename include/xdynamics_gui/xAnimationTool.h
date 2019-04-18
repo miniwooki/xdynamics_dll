@@ -17,6 +17,7 @@ public:
 	~xAnimationTool();
 
 	void setup(xGLWidget* gl);
+	void update(int pt);
 	
 private slots:
 	void xAnimationOperator();

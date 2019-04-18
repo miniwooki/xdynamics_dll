@@ -106,6 +106,14 @@ void xAnimationTool::setup(xGLWidget* gl)
 	//myAnimationBar->hide();
 }
 
+void xAnimationTool::update(int pt)
+{
+	HSlider->setMaximum(pt);
+	QString ch;
+	QTextStream(&ch) << "/ " << pt;
+	Lframe->setText(ch);
+}
+
 void xAnimationTool::xAnimationOperator()
 {
 	QAction* a = (QAction*)sender();

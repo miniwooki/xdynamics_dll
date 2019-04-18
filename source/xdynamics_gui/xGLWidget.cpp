@@ -132,7 +132,7 @@ bool xGLWidget::Upload_DEM_Results(QStringList& sl)
 	{
 		unsigned int i = 0;
 		vp->setBufferMemories(sl.size());
-		xvAnimationController::allocTimeMemory(sl.size());
+		//xvAnimationController::allocTimeMemory(sl.size());
 		xvAnimationController::setTotalFrame(sl.size()-1);
 		foreach(QString s, sl)
 		{

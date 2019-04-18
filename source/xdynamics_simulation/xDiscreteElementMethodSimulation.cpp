@@ -214,6 +214,11 @@ void xDiscreteElementMethodSimulation::ExportResults(std::fstream& of)
 	}
 }
 
+void xDiscreteElementMethodSimulation::EnableSaveResultToMemory(bool b)
+{
+	isSaveMemory = b;
+}
+
 // vector4d xDiscreteElementMethodSimulation::GlobalSphereInertiaForce(const euler_parameters& ev, const double j, const euler_parameters& ep)
 // {
 // 	double GvP0 = -ev.e1*ep.e0 + ev.e0*ep.e1 + ev.e3*ep.e2 - ev.e2*ep.e3;

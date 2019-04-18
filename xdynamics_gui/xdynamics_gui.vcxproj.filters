@@ -78,6 +78,9 @@
     <ClCompile Include="..\source\xdynamics_gui\xSimulationThread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xSimulationWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="xdynamics_gui.h">
@@ -96,6 +99,9 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="..\include\xdynamics_gui\xSimulationThread.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="..\include\xdynamics_gui\xSimulationWidget.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

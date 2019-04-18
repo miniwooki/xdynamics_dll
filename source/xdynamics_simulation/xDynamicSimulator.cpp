@@ -53,7 +53,7 @@ xMultiBodySimulation* xDynamicsSimulator::setupMBDSimulation(xSimulation::MBDSol
 	return xmbd;
 }
 
-bool xDynamicsSimulator::xInitialize(double _dt, unsigned int _st, double _et, xMultiBodySimulation* _xmbd, xDiscreteElementMethodSimulation* _xdem)
+bool xDynamicsSimulator::xInitialize(bool exefromgui, double _dt, unsigned int _st, double _et, xMultiBodySimulation* _xmbd, xDiscreteElementMethodSimulation* _xdem)
 {
  	if(_dt) xSimulation::dt = _dt;
  	if(_st) xSimulation::st = _st;
@@ -102,6 +102,7 @@ bool xDynamicsSimulator::xInitialize(double _dt, unsigned int _st, double _et, x
 			if (!checkXerror(xdem->Initialize(xdm->XDEMModel(), xdm->XContact())))
 				xLog::log("The initialization of discrete element method model was succeeded.");
 		}
+		//xdem->EnableSaveResultToMemory(exefromgui);
 	}
 // 	xuf::DeleteFileByEXT(xuf::xstring(xModel::path) + xuf::xstring(xModel::name), "bin");
 // 	xuf::DeleteFileByEXT(xuf::xstring(xModel::path) + xuf::xstring(xModel::name), "bpm");
