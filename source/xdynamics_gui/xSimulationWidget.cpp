@@ -7,6 +7,9 @@ wsimulation::wsimulation(QWidget* parent /* = NULL */)
 {
 	setupUi(this);
 	connect(PBSolve, SIGNAL(clicked()), this, SLOT(SolveButton()));
+	connect(LETimeStep, SIGNAL(editingFinished()), this, SLOT(UpdateInformation()));
+	connect(LESaveStep, SIGNAL(editingFinished()), this, SLOT(UpdateInformation()));
+	connect(LEEndTime, SIGNAL(editingFinished()), this, SLOT(UpdateInformation()));
 }
 
 wsimulation::~wsimulation()
@@ -16,9 +19,20 @@ wsimulation::~wsimulation()
 
 void wsimulation::SolveButton()
 {
-	QString dt = LETimeStep->text();
-	xSimulation::dt = LETimeStep->text().toDouble();
-	xSimulation::st = LESaveStep->text().toUInt();
-	xSimulation::et = LEEndTime->text().toDouble();
-	emit clickedSolveButton();
+	//QString dt = LETimeStep->text();
+	double dt = LETimeStep->text().toDouble();
+	unsigned int st = LESaveStep->text().toUInt();
+	double et = LEEndTime->text().toDouble();
+	emit clickedSolveButton(dt, st, et);
+}
+
+void wsimulation::UpdateInformation()
+{
+	double dt = LETimeStep->text().toDouble();
+	unsigned int st = LESaveStep->text().toUInt();
+	double et = LEEndTime->text().toDouble();
+	unsigned int nstep = static_cast<unsigned int>((et / dt));
+	unsigned int npart = static_cast<unsigned int>((nstep / st)) + 1;
+	LENumSteps->setText(QString("%1").arg(nstep));
+	LENumParts->setText(QString("%1").arg(npart));
 }

@@ -141,6 +141,11 @@ void xPointMass::setHydroMoment(double x, double y, double z)
 	hm = new_vector3d(x, y, z);
 }
 
+void xPointMass::setEulerParameterMoment(double m0, double m1, double m2, double m3)
+{
+	em = new_vector4d(m0, m1, m2, m3);
+}
+
 void xPointMass::addContactForce(double x, double y, double z)
 {
 	cf += new_vector3d(x, y, z);
@@ -169,6 +174,11 @@ void xPointMass::addAxialForce(double x, double y, double z)
 void xPointMass::addAxialMoment(double x, double y, double z)
 {
 	am += new_vector3d(x, y, z);
+}
+
+void xPointMass::addEulerParameterMoment(double m0, double m1, double m2, double m3)
+{
+	em += new_vector4d(m0, m1, m2, m3);
 }
 
 int xPointMass::xpmIndex() const
@@ -252,6 +262,11 @@ vector3d xPointMass::HydroMoment() const
 	return hm;
 }
 
+vector4d xPointMass::EulerParameterMoment() const
+{
+	return em;
+}
+
 // Declaration operate functions
 void xPointMass::setupTransformationMatrix()
 {
@@ -300,6 +315,11 @@ void xPointMass::AllocResultMomory(unsigned int _s)
 		pmrs = NULL;
 	}
 	pmrs = new pointmass_result[_s];
+}
+
+void xPointMass::setZeroAllForce()
+{
+	memset(&af.x, 0, sizeof(double) * 22);
 }
 
 void xPointMass::SaveStepResult(unsigned int part, double time, xVectorD& q, xVectorD& qd, xVectorD& qdd)
@@ -373,6 +393,7 @@ void xPointMass::setNewData(xVectorD& q, xVectorD& qd)
 	ep.e0 = q(idx + 3); ep.e1 = q(idx + 4); ep.e2 = q(idx + 5); ep.e3 = q(idx + 6);
 	vel.x = qd(idx + 0); vel.y = qd(idx + 1); vel.z = qd(idx + 2);
 	ev.e0 = qd(idx + 3); ev.e1 = qd(idx + 4); ev.e2 = qd(idx + 5); ev.e3 = qd(idx + 6);
+	setZeroAllForce();
 	setupTransformationMatrix();
 }
 
@@ -381,6 +402,7 @@ void xPointMass::setNewPositionData(xVectorD& q)
 	unsigned int idx = index * xModel::OneDOF();
 	pos.x = q(idx + 0); pos.y = q(idx + 1); pos.z = q(idx + 2);
 	ep.e0 = q(idx + 3); ep.e1 = q(idx + 4); ep.e2 = q(idx + 5); ep.e3 = q(idx + 6);
+	//setZeroAllForce();
 	setupTransformationMatrix();
 }
 

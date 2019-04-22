@@ -5,6 +5,8 @@
 #include <ctime>
 #include <filesystem>
 #include <QtCore/QDir>
+#include <QtCore/QFile>
+//#include <QtWidgets/QtWidgets>
 #include <QtCore/QStringList>
 
 //using namespace boost::filesystem;
@@ -404,14 +406,25 @@ std::string xUtilityFunctions::xstring(QString v)
 
 void xUtilityFunctions::DeleteFilesInDirectory(std::string path)
 {
-	QString qpath = QString::fromStdString(path);
-	QDir dir = QDir(qpath);
-	dir.setNameFilters(QStringList() << "*.*");
-	dir.setFilter(QDir::Files);
-	foreach(QString dirFile, dir.entryList())
-	{
-		dir.remove(dirFile);
+	QString dDir = QString::fromStdString(path) + "/";
+	QDir dir = QDir(dDir);
+	QStringList delFileList;
+	delFileList = dir.entryList(QStringList("*.*"), QDir::Files | QDir::NoSymLinks);
+	//qDebug() << "The number of *.bin file : " << delFileList.length();
+	for (int i = 0; i < delFileList.length(); i++){
+		QString deleteFilePath = dDir + delFileList[i];
+		QFile::remove(deleteFilePath);
 	}
+// 	qDebug() << "Complete delete.";
+// 	QString qpath = QString::fromStdString(path);
+// 	QDir dir = QDir(qpath);
+//   	dir.setNameFilters(QStringList() << "*.*");
+//   	dir.setFilter(QDir::Files);
+// 	foreach(QString dirFile, dir.entryList())
+// 	{
+// 		QFile::remove(dirFile);
+// 		//dir.remove(dirFile);
+// 	}
 }
 
 void xUtilityFunctions::DeleteFileByEXT(std::string path, std::string ext)

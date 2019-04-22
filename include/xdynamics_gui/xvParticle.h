@@ -41,7 +41,7 @@ public:
 
 private:
 	bool _define();
-	void _drawPoints();
+	void _drawPoints(float* pos_buffer, float* color_buffer);
 	void resizePositionMemory(unsigned int n0, unsigned int n1);
 	bool isDefine;
 
@@ -50,11 +50,11 @@ private:
 	unsigned int m_program;
 
 	unsigned int np;
-	float *buffer;
+	//float *buffer;
 	float *buffers;
 	float *vbuffers;
 	float *color_buffers;
-	float *color_buffer;
+//	float *color_buffer;
 	float *pos;
 	float *color;
 

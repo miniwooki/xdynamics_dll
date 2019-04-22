@@ -4,6 +4,8 @@
 
 xAnimationTool::xAnimationTool(QWidget* parent)
 	: QToolBar(parent)
+	, HSlider(NULL)
+	, Lframe(NULL)
 {
 
 }
@@ -82,7 +84,7 @@ void xAnimationTool::setup(xGLWidget* gl)
  	connect(xgl, SIGNAL(changedAnimationFrame()), this, SLOT(xChangeAnimationFrame()));
 // 	connect(gl, SIGNAL(propertySignal(QString, context_object_type)), this, SLOT(propertySlot(QString, context_object_type)));
 // 	connect(db, SIGNAL(propertySignal(QString, context_object_type)), this, SLOT(propertySlot(QString, context_object_type)));
-	this->addWidget(HSlider);
+	this->addWidget(HSlider);// ->parentWidget();
 	HSlider->setMaximum(xvAnimationController::getTotalBuffers());
 	LEframe = new QLineEdit(this);
 	LEframe->setText(QString("0"));
@@ -113,6 +115,11 @@ void xAnimationTool::update(int pt)
 	QTextStream(&ch) << "/ " << pt;
 	Lframe->setText(ch);
 }
+
+// QSlider* xAnimationTool::AnimationSlider()
+// {
+// 	return HSlider;
+// }
 
 void xAnimationTool::xAnimationOperator()
 {

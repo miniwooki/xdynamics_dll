@@ -1,13 +1,13 @@
 /********************************************************************************
-** Form generated from reading UI file 'wsimulation.ui'
+** Form generated from reading UI file 'wsimulationsgKLPv.ui'
 **
 ** Created by: Qt User Interface Compiler version 5.10.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef UI_WSIMULATION_H
-#define UI_WSIMULATION_H
+#ifndef WSIMULATIONSGKLPV_H
+#define WSIMULATIONSGKLPV_H
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QAction>
@@ -45,8 +45,8 @@ public:
     QGroupBox *GBSimulationInformation;
     QGridLayout *gridLayout_6;
     QGridLayout *gridLayout_2;
-    QLabel *LMode;
-    QLabel *LModeValue;
+    QLabel *LNumSteps;
+    QLineEdit *LENumSteps;
     QLabel *LNunParts;
     QLineEdit *LENumParts;
     QPushButton *PBSetting;
@@ -55,14 +55,14 @@ public:
     {
         if (wsimulation->objectName().isEmpty())
             wsimulation->setObjectName(QStringLiteral("wsimulation"));
-        wsimulation->resize(265, 181);
+        wsimulation->resize(264, 190);
         QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(wsimulation->sizePolicy().hasHeightForWidth());
         wsimulation->setSizePolicy(sizePolicy);
-        wsimulation->setMinimumSize(QSize(0, 180));
-        wsimulation->setMaximumSize(QSize(16777215, 181));
+        wsimulation->setMinimumSize(QSize(0, 190));
+        wsimulation->setMaximumSize(QSize(16777215, 192));
         gridLayout = new QGridLayout(wsimulation);
         gridLayout->setSpacing(0);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
@@ -85,6 +85,7 @@ public:
         GBSimulationCondition->setMaximumSize(QSize(16777215, 102));
         gridLayout_5 = new QGridLayout(GBSimulationCondition);
         gridLayout_5->setObjectName(QStringLiteral("gridLayout_5"));
+        gridLayout_5->setVerticalSpacing(6);
         gridLayout_5->setContentsMargins(6, 6, 6, 6);
         gridLayout_3 = new QGridLayout();
         gridLayout_3->setObjectName(QStringLiteral("gridLayout_3"));
@@ -136,41 +137,49 @@ public:
         GBSimulationInformation->setObjectName(QStringLiteral("GBSimulationInformation"));
         sizePolicy.setHeightForWidth(GBSimulationInformation->sizePolicy().hasHeightForWidth());
         GBSimulationInformation->setSizePolicy(sizePolicy);
-        GBSimulationInformation->setMinimumSize(QSize(0, 69));
-        GBSimulationInformation->setMaximumSize(QSize(16777215, 69));
+        GBSimulationInformation->setMinimumSize(QSize(0, 80));
+        GBSimulationInformation->setMaximumSize(QSize(16777215, 75));
         gridLayout_6 = new QGridLayout(GBSimulationInformation);
         gridLayout_6->setObjectName(QStringLiteral("gridLayout_6"));
-        gridLayout_6->setContentsMargins(6, 6, 6, 6);
         gridLayout_2 = new QGridLayout();
         gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
-        LMode = new QLabel(GBSimulationInformation);
-        LMode->setObjectName(QStringLiteral("LMode"));
+        gridLayout_2->setVerticalSpacing(6);
+        LNumSteps = new QLabel(GBSimulationInformation);
+        LNumSteps->setObjectName(QStringLiteral("LNumSteps"));
+        LNumSteps->setMinimumSize(QSize(0, 20));
+        LNumSteps->setMaximumSize(QSize(16777215, 20));
 
-        gridLayout_2->addWidget(LMode, 0, 0, 1, 1);
+        gridLayout_2->addWidget(LNumSteps, 0, 0, 1, 1);
 
-        LModeValue = new QLabel(GBSimulationInformation);
-        LModeValue->setObjectName(QStringLiteral("LModeValue"));
+        LENumSteps = new QLineEdit(GBSimulationInformation);
+        LENumSteps->setObjectName(QStringLiteral("LENumSteps"));
+        LENumSteps->setMinimumSize(QSize(0, 20));
+        LENumSteps->setMaximumSize(QSize(16777215, 20));
 
-        gridLayout_2->addWidget(LModeValue, 0, 1, 1, 2);
+        gridLayout_2->addWidget(LENumSteps, 0, 1, 1, 1);
 
         LNunParts = new QLabel(GBSimulationInformation);
         LNunParts->setObjectName(QStringLiteral("LNunParts"));
+        LNunParts->setMinimumSize(QSize(0, 20));
+        LNunParts->setMaximumSize(QSize(16777215, 20));
 
-        gridLayout_2->addWidget(LNunParts, 1, 0, 1, 2);
+        gridLayout_2->addWidget(LNunParts, 1, 0, 1, 1);
 
         LENumParts = new QLineEdit(GBSimulationInformation);
         LENumParts->setObjectName(QStringLiteral("LENumParts"));
+        LENumParts->setMinimumSize(QSize(0, 20));
+        LENumParts->setMaximumSize(QSize(16777215, 20));
         LENumParts->setReadOnly(true);
 
-        gridLayout_2->addWidget(LENumParts, 1, 2, 1, 1);
+        gridLayout_2->addWidget(LENumParts, 1, 1, 1, 1);
 
 
         gridLayout_6->addLayout(gridLayout_2, 0, 0, 1, 1);
 
         PBSetting = new QPushButton(GBSimulationInformation);
         PBSetting->setObjectName(QStringLiteral("PBSetting"));
-        PBSetting->setMinimumSize(QSize(50, 40));
-        PBSetting->setMaximumSize(QSize(50, 40));
+        PBSetting->setMinimumSize(QSize(50, 45));
+        PBSetting->setMaximumSize(QSize(50, 45));
 
         gridLayout_6->addWidget(PBSetting, 0, 1, 1, 1);
 
@@ -198,8 +207,7 @@ public:
         LEndTime->setText(QApplication::translate("wsimulation", "End time", nullptr));
         PBSolve->setText(QApplication::translate("wsimulation", "Solve", nullptr));
         GBSimulationInformation->setTitle(QApplication::translate("wsimulation", "Simulation information", nullptr));
-        LMode->setText(QApplication::translate("wsimulation", "Mode", nullptr));
-        LModeValue->setText(QApplication::translate("wsimulation", "None", nullptr));
+        LNumSteps->setText(QApplication::translate("wsimulation", "Num. steps", nullptr));
         LNunParts->setText(QApplication::translate("wsimulation", "Num. parts", nullptr));
         PBSetting->setText(QApplication::translate("wsimulation", "Setting", nullptr));
     } // retranslateUi
@@ -212,4 +220,4 @@ namespace Ui {
 
 QT_END_NAMESPACE
 
-#endif // UI_WSIMULATION_H
+#endif // WSIMULATIONSGKLPV_H

@@ -3,7 +3,10 @@
 #include "xdynamics_simulation/xIntegratorHHT.h"
 #include "xXLSReader.h"
 #include "xViewExporter.h"
-
+#include <QtCore/QDir>
+#include <QtCore/QFile>
+//#include <QtWidgets/QtWidgets>
+#include <QtCore/QStringList>
 #include <map>
 
 xDynamicsManager::xDynamicsManager()
@@ -198,10 +201,21 @@ xDynamicsManager::solverType xDynamicsManager::OpenModelXLS(const wchar_t* n)
 		}
 		std::map<xXlsInputDataType, vector2i>::iterator bt = xx.begin();
 		std::map<xXlsInputDataType, vector2i>::iterator et = xx.end();
-		std::string model_name = xModel::name.toStdString();
-		std::string full_path = xModel::path.toStdString() + model_name + "/" + model_name;
-		xUtilityFunctions::DeleteFilesInDirectory(xUtilityFunctions::xstring(xModel::path) + model_name);
+ 		std::string model_name = xModel::name.toStdString();
+ 		std::string full_path = xModel::path.toStdString() + model_name + "/" + model_name;
+ 		//xUtilityFunctions::DeleteFilesInDirectory(xUtilityFunctions::xstring(xModel::path) + model_name);
+ 		//xUtilityFunctions
+		QString dDir = QString::fromStdString(full_path);
+		QDir dir = QDir(dDir);
+		QStringList delFileList;
+		delFileList = dir.entryList(QStringList("*.*"), QDir::Files | QDir::NoSymLinks);
+		//qDebug() << "The number of *.bin file : " << delFileList.length();
+		for (int i = 0; i < delFileList.length(); i++){
+			QString deleteFilePath = dDir + delFileList[i];
+			QFile::remove(deleteFilePath);
+		}
 		xViewExporter xve;
+
 		xve.Open(full_path + ".vmd");
 		xls.setViewExporter(&xve);
 		//xls.CreateViewModelOutput(full_path + ".vmd");
@@ -244,9 +258,9 @@ xDynamicsManager::solverType xDynamicsManager::OpenModelXLS(const wchar_t* n)
 			xve.Write((char*)pv_path.c_str(), sizeof(char)*pv_path.size());
 		}
 
-		xve.Close();
+ 		xve.Close();
 	}
-	solverType stype;
+	solverType stype= ONLY_MBD;
 	if (xmbd && xdem) stype = COUPLED_MBD_DEM;
 	else if (xmbd) stype = ONLY_MBD;
 	else if (xdem) stype = ONLY_DEM;

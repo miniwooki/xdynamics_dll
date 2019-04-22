@@ -9,6 +9,7 @@
 #include "xdynamics_object/xSphericalConstraint.h"
 #include "xdynamics_object/xUniversalConstraint.h"
 #include "xdynamics_object/xDrivingConstraint.h"
+#include "xdynamics_object/xRotationalAxialForce.h"
 
 class XDYNAMICS_API xMultiBodyModel 
 {

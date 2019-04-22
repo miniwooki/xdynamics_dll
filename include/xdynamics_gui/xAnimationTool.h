@@ -18,6 +18,7 @@ public:
 
 	void setup(xGLWidget* gl);
 	void update(int pt);
+//	QSlider* AnimationSlider();
 	
 private slots:
 	void xAnimationOperator();

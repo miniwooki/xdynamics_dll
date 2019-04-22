@@ -68,16 +68,16 @@ static const uint qt_meta_data_xdynamics_gui[] = {
        3,    0,   50,    2, 0x08 /* Private */,
        4,    0,   51,    2, 0x08 /* Private */,
        5,    1,   52,    2, 0x08 /* Private */,
-       7,    0,   55,    2, 0x08 /* Private */,
-       8,    0,   56,    2, 0x08 /* Private */,
-       9,    2,   57,    2, 0x08 /* Private */,
+       7,    3,   55,    2, 0x08 /* Private */,
+       8,    0,   62,    2, 0x08 /* Private */,
+       9,    2,   63,    2, 0x08 /* Private */,
 
  // slots: parameters
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void, 0x80000000 | 6,    2,
-    QMetaType::Void,
+    QMetaType::Void, QMetaType::Double, QMetaType::UInt, QMetaType::Double,    2,    2,    2,
     QMetaType::Void,
     QMetaType::Void, QMetaType::Int, QMetaType::QString,    2,    2,
 
@@ -94,7 +94,7 @@ void xdynamics_gui::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _i
         case 1: _t->xSave(); break;
         case 2: _t->xOpen(); break;
         case 3: _t->xGetSimulationWidget((*reinterpret_cast< wsimulation*(*)>(_a[1]))); break;
-        case 4: _t->xRunSimulationThread(); break;
+        case 4: _t->xRunSimulationThread((*reinterpret_cast< double(*)>(_a[1])),(*reinterpret_cast< uint(*)>(_a[2])),(*reinterpret_cast< double(*)>(_a[3]))); break;
         case 5: _t->xExitSimulationThread(); break;
         case 6: _t->xRecieveProgress((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2]))); break;
         default: ;

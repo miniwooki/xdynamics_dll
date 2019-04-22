@@ -31,8 +31,17 @@ void xForce::setBaseBodyName(std::string bn) { base = QString::fromStdString(bn)
 void xForce::setActionBodyName(std::string an) { action = QString::fromStdString(an); }
 void xForce::setBaseBodyIndex(int _i) { i = _i; }
 void xForce::setActionBodyIndex(int _j){ j = _j; }
-void xForce::setBaseLocalCoordinate(vector3d _spi) { spi = _spi; }
-void xForce::setActionLocalCoordinate(vector3d _spj) { spj = _spj; }
+// void xForce::setBaseLocalCoordinate() 
+// { 
+// 	if (i_ptr)
+// 	{
+// 
+// 	}
+// }
+// void xForce::setActionLocalCoordinate() 
+// { 
+// 	spj = _spj; 
+// }
 
 std::string xForce::Name()
 {

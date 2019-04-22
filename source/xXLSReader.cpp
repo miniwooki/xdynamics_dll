@@ -193,6 +193,26 @@ xTSDAData xXLSReader::ReadTSDAData(std::string& _name, int r, int& c)
 	return d;
 }
 
+xRotationalAxialForceData xXLSReader::ReadxRotationalAxialForceData(std::string& _name, int r, int& c)
+{
+	xRotationalAxialForceData d = { 0, };
+	double* ptr = &d.lx;
+	std::wstring x;
+	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 0);
+	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 3);
+	d.rforce = sheet->readNum(r, c++);
+	if (xve)
+	{
+		int t = VRAXIAL;
+		xve->Write((char*)&t, sizeof(int));
+		unsigned int ns = static_cast<unsigned int>(_name.size());
+		xve->Write((char*)&ns, sizeof(unsigned int));
+		xve->Write((char*)_name.c_str(), sizeof(char)*ns);
+		xve->Write((char*)&d, sizeof(xRotationalAxialForceData));
+	}
+	return d;
+}
+
 bool xXLSReader::Load(const wchar_t* n)
 {
 	book = xlCreateBook();
@@ -255,6 +275,7 @@ void xXLSReader::ReadJoint(xMultiBodyModel* xmbd, vector2i rc)
 
 void xXLSReader::ReadForce(xMultiBodyModel* xmbd, vector2i rc)
 {
+	vector2i init_rc = rc;
 	while (1)
 	{
 		if (IsEmptyCell(rc.x, rc.y)) break;
@@ -266,8 +287,12 @@ void xXLSReader::ReadForce(xMultiBodyModel* xmbd, vector2i rc)
 		//xkc->SetupDataFromStructure(ReadJointData(rc.x, rc.y));
 		switch (xf->Type())
 		{
-		case xForce::TSDA: (dynamic_cast<xSpringDamperForce*>(xf))->SetupDataFromStructure(ReadTSDAData(name, rc.x, rc.y)); break;
+		case xForce::TSDA: (dynamic_cast<xSpringDamperForce*>(xf))->SetupDataFromStructure(xmbd->XMass(xUtilityFunctions::xstring(base)), xmbd->XMass(xUtilityFunctions::xstring(action)), ReadTSDAData(name, rc.x, rc.y)); break;
+		case xForce::RSDA: break;
+		case xForce::RAXIAL: (dynamic_cast<xRotationalAxialForce*>(xf))->SetupDataFromStructure(xmbd->XMass(xUtilityFunctions::xstring(base)), xmbd->XMass(xUtilityFunctions::xstring(action)), ReadxRotationalAxialForceData(name, rc.x, rc.y)); break;
 		}
+		rc.x++;
+		rc.y = init_rc.y;
 	}
 }
 

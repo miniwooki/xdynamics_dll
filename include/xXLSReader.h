@@ -46,6 +46,7 @@ private:
 	xListParticleData ReadListParticleData(std::string& _name, int r, int& c);
 	xContactParameterData ReadContactData(std::string& _name, int r, int& c);
 	xTSDAData ReadTSDAData(std::string& _name, int r, int& c);
+	xRotationalAxialForceData ReadxRotationalAxialForceData(std::string& _name, int r, int& c);
 
 	Book* book;
 	Sheet* sheet;

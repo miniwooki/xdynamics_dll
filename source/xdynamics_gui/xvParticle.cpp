@@ -15,7 +15,7 @@
 #include <QComboBox>
 #include <QTabWidget>
 #include <QDialogButtonBox>
-
+#include <QDebug>
 //#include "vcube.h"
 
 xvParticle::xvParticle()
@@ -23,11 +23,9 @@ xvParticle::xvParticle()
 	, isSetColor(false)
 	, pos(NULL)
 	, color(NULL)
-	, buffer(NULL)
 	, buffers(NULL)
 	, vbuffers(NULL)
 	, color_buffers(NULL)
-	, color_buffer(NULL)
 	, pscale(0)
 	, isDefine(false)
 {
@@ -58,26 +56,28 @@ void xvParticle::draw(GLenum eModem, int wHeight, int protype, double z)
 {
 	if (!isDefine)
 		return;
+	float* pbuf = NULL;
+	float* cbuf = NULL;
 	if (xvAnimationController::Play())
 	{
 		unsigned int idx = xvAnimationController::getFrame();
-		buffer = buffers + idx * np * 4;
-		color_buffer = color_buffers + idx * np * 4;// model::rs->getPartColor(idx);
+		pbuf = buffers + idx * np * 4;
+		cbuf = color_buffers + idx * np * 4;// model::rs->getPartColor(idx);
 	}
 	else
 	{
 		unsigned int idx = xvAnimationController::getFrame();
 		if (idx)
 		{
-			buffer = buffers + idx * np * 4;
-			color_buffer = color_buffers + idx * np * 4;
+			pbuf = buffers + idx * np * 4;
+			cbuf = color_buffers + idx * np * 4;
 			//buffer = model::rs->getPartPosition(idx);
 			//color_buffer = model::rs->getPartColor(idx);
 		}
 		else
 		{
-			buffer = pos;
-			color_buffer = color;
+			pbuf = pos;
+			cbuf = color;
 		}
 	}
 
@@ -108,14 +108,14 @@ void xvParticle::draw(GLenum eModem, int wHeight, int protype, double z)
 	glUniform1f(glGetUniformLocation(program.Program(), "pointScale"), pscale);
 	//glUniform1f(glGetUniformLocation(m_program, "orthoDist"), abs(fTmp1[14]));
 
-	_drawPoints();
+	_drawPoints(pbuf, cbuf);
 
 	glUseProgram(0);
 	glDisable(GL_POINT_SPRITE_ARB);
 	glEnable(GL_LIGHTING);
 }
 
-void xvParticle::_drawPoints()
+void xvParticle::_drawPoints(float* pos_buffer, float* color_buffer)
 {
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	if (m_posVBO)
@@ -123,7 +123,7 @@ void xvParticle::_drawPoints()
 		glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_posVBO);
 		glVertexPointer(4, GL_FLOAT, 0, 0);
 		glEnableClientState(GL_VERTEX_ARRAY);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * np * 4, buffer);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * np * 4, pos_buffer);
 		if (m_colorVBO)
 		{
 			glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_colorVBO);
@@ -234,6 +234,7 @@ void xvParticle::setParticlePosition(double* p, unsigned int n)
 
 bool xvParticle::UploadParticleFromFile(unsigned int i, QString path)
 {
+	//qDebug() << i;
 	double ct = 0.0;
 	unsigned int inp = 0;
 	unsigned int sid = 0;
@@ -339,12 +340,12 @@ bool xvParticle::_define()
 	if (program.Program())
 		program.deleteProgram();
 	unsigned int memSize = sizeof(float) * 4 * np;
-	buffer = pos;
-	color_buffer = color;
+	//buffer = pos;
+	//color_buffer = color;
 	if (!m_posVBO)
-		m_posVBO = xvGlew::createVBO<float>(memSize, buffer);
+		m_posVBO = xvGlew::createVBO<float>(memSize, pos);
 	if (!m_colorVBO)
-		m_colorVBO = xvGlew::createVBO<float>(memSize, color_buffer);
+		m_colorVBO = xvGlew::createVBO<float>(memSize, color);
 
 	if (!program.Program())
 		program.compileProgram(vertexShader, spherePixelShader);

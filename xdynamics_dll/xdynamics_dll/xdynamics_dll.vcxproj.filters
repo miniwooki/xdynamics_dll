@@ -222,6 +222,9 @@
     <ClCompile Include="..\..\source\xdynamics_simulation\xKinematicAnalysis.cpp">
       <Filter>소스 파일\xdynamics_simulation</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xRotationalAxialForce.cpp">
+      <Filter>소스 파일\xdynamics_object\force</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\xdynamics_decl.h">
@@ -388,6 +391,9 @@
     </ClInclude>
     <ClInclude Include="..\..\include\xdynamics_parallel\xParallelDEM_impl.cuh">
       <Filter>헤더 파일\xParallel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_object\xRotationalAxialForce.h">
+      <Filter>헤더 파일\xdynamics_object\force</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

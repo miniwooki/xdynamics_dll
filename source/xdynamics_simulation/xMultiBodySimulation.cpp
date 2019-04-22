@@ -115,6 +115,7 @@ int xMultiBodySimulation::Initialize(xMultiBodyModel* _xmbd)
 		int action_idx = an == "ground" ? 0 : xmbd->XMass(an)->xpmIndex();
 		xf->setBaseBodyIndex(base_idx);
 		xf->setActionBodyIndex(action_idx);
+		//xf->setBaseLocalCoordinate();
 	}
 	dof = mdim - sdim;
 	if (dof < 0)
@@ -208,6 +209,10 @@ void xMultiBodySimulation::ConstructForceVector(xVectorD& v)
 	vector4d m;
 	//xPointMass* xpm = xmbd->BeginPointMass();
 	unsigned int i = 0, j = 0;
+	foreach(xForce* xf, xmbd->Forces())
+	{
+		xf->xCalculateForce(q, qd);
+	}
 	foreach(xPointMass* xpm, xmbd->Masses())
 	{
 		i = xpm->xpmIndex() * 7;
@@ -215,17 +220,14 @@ void xMultiBodySimulation::ConstructForceVector(xVectorD& v)
 		ev = xpm->DEulerParameters();// new_euler_parameters(qd(i + 3), qd(i + 4), qd(i + 5), qd(i + 6));
 		f = xpm->Mass() * xModel::gravity + xpm->ContactForce() + xpm->AxialForce() + xpm->HydroForce();
 		m = 2.0 * GMatrix(e) * (xpm->ContactMoment() + xpm->AxialMoment() + xpm->HydroMoment());
-		m += CalculateInertiaForce(ev, xpm->Inertia(), e);
+		m += CalculateInertiaForce(ev, xpm->Inertia(), e) + xpm->EulerParameterMoment();
 		v(j + 0) = f.x; v(j + 1) = f.y; v(j + 2) = f.z;
 		v(j + 3) = m.x; v(j + 4) = m.y; v(j + 5) = m.z; v(j + 6) = m.w;
 		i += xModel::OneDOF();
 		j += xModel::OneDOF();
 	}
 
-	foreach(xForce* xf, xmbd->Forces())
-	{
-		xf->xCalculateForce(q, qd, v);
-	}
+	
 // 	while (xpm != xmbd->EndPointMass())
 // 	{
 // 		i = xpm->xpmIndex() * 7;

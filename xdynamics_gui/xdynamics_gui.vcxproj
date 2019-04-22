@@ -29,7 +29,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_USE_MATH_DEFINES;UNICODE;_UNICODE;WIN32;WIN64;QT_DLL;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_OPENGL_LIB;QT_OPENGLEXTENSIONS_LIB;QT_WIDGETS_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles;.;$(USING_CUDA_SAMPLE_VERSION)\common\inc;.\GeneratedFiles\$(ConfigurationName);$(USING_QT_VERSION)\include\QtCore;$(USING_QT_VERSION)\include\QtGui;$(USING_QT_VERSION)\include\QtANGLE;$(USING_QT_VERSION)\include\QtOpenGL;$(USING_QT_VERSION)\include\QtOpenGLExtensions;$(USING_QT_VERSION)\include\QtWidgets;$(USING_IRRLICHT_VERSION)\include;$(XDYNAMICS_Q)\include\xdynamics_gui;$(XDYNAMICS_Q)\include;$(USING_QT_VERSION)\include;$(USING_CUDA_VERSION)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|x64'">None</DebugInformationFormat>
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MultiThreadedDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</TreatWChar_tAsBuiltInType>
     </ClCompile>
@@ -57,6 +57,31 @@
       <ExecutionDescription Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Rcc'ing %(Identity)...</ExecutionDescription>
       <OutputFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\qrc_%(Filename).cpp</OutputFile>
     </QtRcc>
+    <CudaCompile>
+      <InterleaveSourceInPTX Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</InterleaveSourceInPTX>
+      <CodeGeneration Condition="'$(Configuration)|$(Platform)'=='Release|x64'">compute_30,sm_30;compute_35,sm_35;compute_52,sm_52</CodeGeneration>
+      <GPUDebugInfo Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GPUDebugInfo>
+      <GenerateLineInfo Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</GenerateLineInfo>
+      <MaxRegCount Condition="'$(Configuration)|$(Platform)'=='Release|x64'">0</MaxRegCount>
+      <PtxAsOptionV Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</PtxAsOptionV>
+      <UseHostDefines Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</UseHostDefines>
+      <Emulation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</Emulation>
+      <HostDebugInfo Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</HostDebugInfo>
+      <FastMath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</FastMath>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">InheritFromHost</Optimization>
+      <Runtime Condition="'$(Configuration)|$(Platform)'=='Release|x64'">InheritFromHost</Runtime>
+      <RuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Release|x64'">InheritFromHost</RuntimeChecks>
+      <TypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|x64'">InheritFromHost</TypeInfo>
+      <Warning Condition="'$(Configuration)|$(Platform)'=='Release|x64'">InheritFromHost</Warning>
+      <CompileOut Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)%(Extension).obj</CompileOut>
+      <UseHostInclude Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</UseHostInclude>
+      <Keep Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</Keep>
+      <KeepDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(CudaIntDir)</KeepDir>
+      <GenerateRelocatableDeviceCode Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</GenerateRelocatableDeviceCode>
+      <NvccCompilation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">compile</NvccCompilation>
+      <CudaRuntime Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Static</CudaRuntime>
+      <TargetMachinePlatform Condition="'$(Configuration)|$(Platform)'=='Release|x64'">32</TargetMachinePlatform>
+    </CudaCompile>
   </ItemDefinitionGroup>
   <PropertyGroup Condition="'$(QtMsBuild)'=='' or !Exists('$(QtMsBuild)\qt.targets')">
     <QtMsBuild>$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
@@ -73,7 +98,9 @@
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.props')">
     <Import Project="$(QtMsBuild)\qt.props" />
   </ImportGroup>
-  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 9.0.props" />
+  </ImportGroup>
   <ImportGroup Label="Shared" />
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -112,6 +139,9 @@
       <ExecutionDescription>Rcc'ing %(Identity)...</ExecutionDescription>
       <OutputFile>.\GeneratedFiles\qrc_%(Filename).cpp</OutputFile>
     </QtRcc>
+    <CudaCompile>
+      <CodeGeneration>compute_30,sm_30;compute_35,sm_35;compute_52,sm_52</CodeGeneration>
+    </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\source\xdynamics_gui\xAnimationTool.cpp" />
@@ -176,6 +206,7 @@
     <Import Project="$(QtMsBuild)\qt.targets" />
   </ImportGroup>
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 9.0.targets" />
   </ImportGroup>
   <ProjectExtensions>
     <VisualStudio>

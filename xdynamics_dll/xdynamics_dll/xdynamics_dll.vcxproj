@@ -198,6 +198,7 @@
     <ClCompile Include="..\..\source\xdynamics_object\xSpringDamperForce.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xTranslationConstraint.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xUniversalConstraint.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xRotationalAxialForce.cpp" />
     <ClCompile Include="..\..\source\xdynamics_simulation\xDiscreteElementMethodSimulation.cpp" />
     <ClCompile Include="..\..\source\xdynamics_simulation\xDynamicSimulator.cpp" />
     <ClCompile Include="..\..\source\xdynamics_simulation\xIntegratorHHT.cpp" />
@@ -263,6 +264,7 @@
     <ClInclude Include="..\..\include\xdynamics_object\xPlaneObject.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xPointMass.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xRevoluteConstraint.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xRotationalAxialForce.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xSphericalConstraint.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xSpringDamperForce.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xTranslationConstraint.h" />

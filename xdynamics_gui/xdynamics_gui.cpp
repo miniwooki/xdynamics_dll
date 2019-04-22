@@ -24,6 +24,7 @@ xdynamics_gui::xdynamics_gui(int _argc, char** _argv, QWidget *parent)
 	, xnavi(NULL)
 	, xdm(NULL)
 	, pbar(NULL)
+	, myAnimationBar(NULL)
 	//, simThread(NULL)
 	, isOnViewModel(false)
 {
@@ -70,7 +71,7 @@ xdynamics_gui::xdynamics_gui(int _argc, char** _argv, QWidget *parent)
 void xdynamics_gui::xGetSimulationWidget(wsimulation* w)
 {
 	wsim = w;
-	connect(w, SIGNAL(clickedSolveButton()), this, SLOT(xRunSimulationThread()));
+	connect(w, SIGNAL(clickedSolveButton(double, unsigned int, double)), this, SLOT(xRunSimulationThread(double, unsigned int, double)));
 }
 
 xdynamics_gui::~xdynamics_gui()
@@ -320,38 +321,50 @@ void xdynamics_gui::xExitSimulationThread()
 
 void xdynamics_gui::xRecieveProgress(int pt, QString ch)
 {
-	if (pt >= 0)
+	if (pt >= 0 && !ch.isEmpty())
 	{
-		myAnimationBar->update(pt);
-		pbar->setValue(pt);
-		xcw->write(xCommandWindow::CMD_INFO, ch);
-		if (xgl->vParticles())
-		{
-			QString fileName;
+ 		myAnimationBar->update(pt);
+// 		//myAnimationBar->AnimationSlider()->setMaximum(pt);
+ 		 		
+ 		xcw->write(xCommandWindow::CMD_INFO, ch);
+ 		if (xgl->vParticles())
+ 		{
+ 			QString fileName;
 			fileName.sprintf("Part%04d", pt);
-			xgl->vParticles()->UploadParticleFromFile(pt, path + xModel::name + "/" + fileName + ".bin");
-		}
-		xvAnimationController::setTotalFrame(pt);
+ 			xgl->vParticles()->UploadParticleFromFile(pt, path + xModel::name + "/" + fileName + ".bin");
+ 		}
+ 		xvAnimationController::setTotalFrame(pt);
 	}
-	else if (pt == -1)
+	else if (pt == -1 && !ch.isEmpty())
 	{
 		xcw->write(xCommandWindow::CMD_INFO, ch);
+	}
+	else if (pt >= 0 && ch.isEmpty())
+	{
+		pbar->setValue(pt);
 	}
 }
 
-void xdynamics_gui::xRunSimulationThread()
+void xdynamics_gui::xRunSimulationThread(double dt, unsigned int st, double et)
 {
+	setupAnimationTool();
 	sThread = new xSimulationThread;
-	sThread->xInitialize(xdm);
+	sThread->xInitialize(xdm, dt, st, et);
+	//xcw->write(xCommandWindow::CMD_INFO, QString("%1, %1, %1").arg(dt).arg(st).arg(et));
+	//xcw->write(xCommandWindow::CMD_INFO, "Thread Initialize Done.");
 	xgl->vParticles()->setBufferMemories(xSimulation::npart);
 	connect(sThread, SIGNAL(finishedThread()), this, SLOT(xExitSimulationThread()));
 	connect(sThread, SIGNAL(sendProgress(int, QString)), this, SLOT(xRecieveProgress(int, QString)));
+	//xcw->write(xCommandWindow::CMD_INFO, "Thread Initialize Done.");
 	if (!pbar) pbar = new QProgressBar;
+	//xcw->write(xCommandWindow::CMD_INFO, "Thread Initialize Done.");
 	//unsigned int nstep = xSimulation::nstep;
-	pbar->setMaximum(xSimulation::npart);
+	pbar->setMaximum(xSimulation::nstep);
 	ui.statusBar->addWidget(pbar, 1);
+	
 	sThread->start();
-	setupAnimationTool();
+	
+	//xcw->write(xCommandWindow::CMD_INFO, "Thread Initialize Done.");
 // 	solveDialog sd;
 // 	int ret = sd.exec();
 // 	if (ret <= 0)

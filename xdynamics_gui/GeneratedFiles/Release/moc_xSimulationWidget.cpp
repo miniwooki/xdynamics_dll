@@ -21,8 +21,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_wsimulation_t {
-    QByteArrayData data[4];
-    char stringdata0[44];
+    QByteArrayData data[5];
+    char stringdata0[62];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -34,11 +34,12 @@ static const qt_meta_stringdata_wsimulation_t qt_meta_stringdata_wsimulation = {
 QT_MOC_LITERAL(0, 0, 11), // "wsimulation"
 QT_MOC_LITERAL(1, 12, 18), // "clickedSolveButton"
 QT_MOC_LITERAL(2, 31, 0), // ""
-QT_MOC_LITERAL(3, 32, 11) // "SolveButton"
+QT_MOC_LITERAL(3, 32, 17), // "UpdateInformation"
+QT_MOC_LITERAL(4, 50, 11) // "SolveButton"
 
     },
     "wsimulation\0clickedSolveButton\0\0"
-    "SolveButton"
+    "UpdateInformation\0SolveButton"
 };
 #undef QT_MOC_LITERAL
 
@@ -48,7 +49,7 @@ static const uint qt_meta_data_wsimulation[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-       2,   14, // methods
+       3,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -56,15 +57,17 @@ static const uint qt_meta_data_wsimulation[] = {
        1,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    0,   24,    2, 0x06 /* Public */,
+       1,    3,   29,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       3,    0,   25,    2, 0x08 /* Private */,
+       3,    0,   36,    2, 0x0a /* Public */,
+       4,    0,   37,    2, 0x08 /* Private */,
 
  // signals: parameters
-    QMetaType::Void,
+    QMetaType::Void, QMetaType::Double, QMetaType::UInt, QMetaType::Double,    2,    2,    2,
 
  // slots: parameters
+    QMetaType::Void,
     QMetaType::Void,
 
        0        // eod
@@ -76,21 +79,21 @@ void wsimulation::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
         wsimulation *_t = static_cast<wsimulation *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
-        case 0: _t->clickedSolveButton(); break;
-        case 1: _t->SolveButton(); break;
+        case 0: _t->clickedSolveButton((*reinterpret_cast< double(*)>(_a[1])),(*reinterpret_cast< uint(*)>(_a[2])),(*reinterpret_cast< double(*)>(_a[3]))); break;
+        case 1: _t->UpdateInformation(); break;
+        case 2: _t->SolveButton(); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
         int *result = reinterpret_cast<int *>(_a[0]);
         {
-            typedef void (wsimulation::*_t)();
+            typedef void (wsimulation::*_t)(double , unsigned int , double );
             if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&wsimulation::clickedSolveButton)) {
                 *result = 0;
                 return;
             }
         }
     }
-    Q_UNUSED(_a);
 }
 
 const QMetaObject wsimulation::staticMetaObject = {
@@ -120,21 +123,22 @@ int wsimulation::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 2)
+        if (_id < 3)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 2;
+        _id -= 3;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 2)
+        if (_id < 3)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 2;
+        _id -= 3;
     }
     return _id;
 }
 
 // SIGNAL 0
-void wsimulation::clickedSolveButton()
+void wsimulation::clickedSolveButton(double _t1, unsigned int _t2, double _t3)
 {
-    QMetaObject::activate(this, &staticMetaObject, 0, nullptr);
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)), const_cast<void*>(reinterpret_cast<const void*>(&_t3)) };
+    QMetaObject::activate(this, &staticMetaObject, 0, _a);
 }
 QT_WARNING_POP
 QT_END_MOC_NAMESPACE

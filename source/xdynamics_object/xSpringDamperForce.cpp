@@ -31,16 +31,20 @@ xSpringDamperForce::~xSpringDamperForce()
 
 }
 
-void xSpringDamperForce::SetupDataFromStructure(xTSDAData& d)
+void xSpringDamperForce::SetupDataFromStructure(xPointMass* ip, xPointMass* jp, xTSDAData& d)
 {
-	xForce::spi = new_vector3d(d.spix, d.spiy, d.spiz);
-	xForce::spj = new_vector3d(d.spjx, d.spjy, d.spjz);
+	xForce::i_ptr = ip;
+	xForce::j_ptr = jp;
+	loc_i = new_vector3d(d.spix, d.spiy, d.spiz);
+	loc_j = new_vector3d(d.spjx, d.spjy, d.spjz);
 	k = d.k;
 	c = d.c;
 	init_l = d.init_l;
+	xForce::spi = i_ptr->toLocal(loc_i - i_ptr->Position());
+	xForce::spj = j_ptr->toLocal(loc_j - j_ptr->Position());
 }
 
-void xSpringDamperForce::xCalculateForce(const xVectorD& q, const xVectorD& qd, xVectorD& rhs)
+void xSpringDamperForce::xCalculateForce(const xVectorD& q, const xVectorD& qd)
 {
 	vector3d Qi;
 	vector4d QRi;
@@ -73,13 +77,17 @@ void xSpringDamperForce::xCalculateForce(const xVectorD& q, const xVectorD& qd, 
 
 	if (i)
 	{
-		int irc = (i - 1) * xModel::OneDOF();
-		rhs.plus(irc, Qi, QRi);
+		//int irc = (i - 1) * xModel::OneDOF();
+		i_ptr->addAxialForce(Qi.x, Qi.y, Qi.z);
+		i_ptr->addEulerParameterMoment(QRi.x, QRi.y, QRi.z, QRi.w);
+		//rhs.plus(irc, Qi, QRi);
 	}
 	if (j)
 	{
-		int jrc = (j - 1) * xModel::OneDOF();// action->ID() * 7;
-		rhs.plus(jrc, Qj, QRj);
+		//int jrc = (j - 1) * xModel::OneDOF();// action->ID() * 7;
+		j_ptr->addAxialForce(Qj.x, Qj.y, Qj.z);
+		j_ptr->addEulerParameterMoment(QRj.x, QRj.y, QRj.z, QRj.w);
+		//rhs.plus(jrc, Qj, QRj);
 	}
 }
 

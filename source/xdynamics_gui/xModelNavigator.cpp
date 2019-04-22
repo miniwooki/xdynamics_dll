@@ -261,6 +261,7 @@ void xModelNavigator::CallSimulation()
 	xws->LETimeStep->setText(QString("%1").arg(dt));
 	xws->LESaveStep->setText(QString("%1").arg(st));
 	xws->LEEndTime->setText(QString("%1").arg(et));
+	xws->UpdateInformation();
 	//xws->setParent(plate);
 	plate_layout->addWidget(xws);
 	plate_layout->setAlignment(Qt::AlignTop);
@@ -268,6 +269,7 @@ void xModelNavigator::CallSimulation()
 	plate_frame->setLayout(plate_layout);
 	plate->setWidget(plate_frame);
 	cwidget = SIMULATION_WIDGET;
+
 	emit definedSimulationWidget(xws);
 }
 

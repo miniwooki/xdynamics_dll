@@ -34,7 +34,7 @@ private slots:
 	void xSave();
 	void xOpen();
 	void xGetSimulationWidget(wsimulation*);
-	void xRunSimulationThread();
+	void xRunSimulationThread(double, unsigned int, double);
 	void xExitSimulationThread();
 	void xRecieveProgress(int, QString);
 	

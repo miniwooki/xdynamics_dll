@@ -39,13 +39,76 @@
 #define SAND_POISSON_RATIO 0.3
 #define SAND_SHEAR_MODULUS 0.0
 
-enum xMaterialType{	NO_MATERIAL = 0, STEEL, MEDIUM_CLAY, POLYETHYLENE, GLASS, ACRYLIC, ALUMINUM, SAND, USER_INPUT };
-enum xContactPairType{ NO_CONTACT_PAIR = 0, PARTICLE_PARTICLE = 26, PARTICLE_CUBE = 15, PARTICLE_PANE = 16, PARTICLE_MESH_SHAPE = 32, PLANE_MESH_SHAPE = 22 };
-enum xShapeType{ NO_SHAPE = 0, CUBE_SHAPE = 2, PLANE_SHAPE = 3, LINE_SHAPE = 5, SPHERE_SHAPE = 7, MESH_SHAPE = 19, PARTICLES = 13, RECTANGLE_SHAPE = 17, CIRCLE_SHAPE = 23, CYLINDER_SHAPE = 27, NO_SHAPE_AND_LIST = 99, OBJECT = 100 };
-enum xContactForceModelType{ DHS = 0 };
-enum xXlsInputDataType { XLS_SHAPE = 0, XLS_MASS, XLS_JOINT, XLS_FORCE, XLS_PARTICLE, XLS_CONTACT, XLS_INTEGRATOR, XLS_SIMULATION };
-enum xImportShapeType { NO_SUPPORT_MESH_SHAPE = 0, STL_ASCII };
-enum xViewObjectType { VMARKER = 0, VJOINT, VPLANE, VCUBE, VMESH, VPARTICLE, VTSDA };
+enum xMaterialType
+{	
+	NO_MATERIAL = 0, 
+	STEEL, 
+	MEDIUM_CLAY, 
+	POLYETHYLENE, 
+	GLASS, 
+	ACRYLIC, 
+	ALUMINUM, 
+	SAND, 
+	USER_INPUT 
+};
+
+enum xContactPairType
+{ 
+	NO_CONTACT_PAIR = 0,
+	PARTICLE_PARTICLE = 26,
+	PARTICLE_CUBE = 15,
+	PARTICLE_PANE = 16,
+	PARTICLE_MESH_SHAPE = 32,
+	PLANE_MESH_SHAPE = 22 
+};
+
+enum xShapeType
+{ 
+	NO_SHAPE = 0,
+	CUBE_SHAPE = 2,
+	PLANE_SHAPE = 3, 
+	LINE_SHAPE = 5, 
+	SPHERE_SHAPE = 7,
+	MESH_SHAPE = 19, 
+	PARTICLES = 13, 
+	RECTANGLE_SHAPE = 17,
+	CIRCLE_SHAPE = 23, 
+	CYLINDER_SHAPE = 27,
+	NO_SHAPE_AND_LIST = 99,
+	OBJECT = 100 
+};
+enum xContactForceModelType
+{ DHS = 0 };
+
+enum xXlsInputDataType 
+{ 
+	XLS_SHAPE = 0,
+	XLS_MASS, 
+	XLS_JOINT,
+	XLS_FORCE,
+	XLS_PARTICLE,
+	XLS_CONTACT,
+	XLS_INTEGRATOR,
+	XLS_SIMULATION 
+};
+
+enum xImportShapeType
+{ 
+	NO_SUPPORT_MESH_SHAPE = 0,
+	STL_ASCII 
+};
+
+enum xViewObjectType
+{ 
+	VMARKER = 0,
+	VJOINT, 
+	VPLANE, 
+	VCUBE, 
+	VMESH, 
+	VPARTICLE, 
+	VTSDA,
+	VRAXIAL
+};
 /*enum xInputDataFormType { FORM_OBJECT_PLANE = 2, FORM_OBJECT_CUBE = 3, FORM_OBJECT_SHAPE = 4 };*/
 
 typedef struct{	double density, youngs, poisson, shear; }xMaterial;
@@ -60,6 +123,14 @@ typedef struct{ double Ei, Ej, Pri, Prj, Gi, Gj; }xMaterialPair;
 typedef struct{ double coh_r, coh_e, kn, vn, ks, vs; }xContactParameters;
 typedef struct{ double restitution, friction, rolling_friction, cohesion, stiffness_ratio; }xContactMaterialParameters;
 typedef struct{ double spix, spiy, spiz, spjx, spjy, spjz, k, c, init_l; }xTSDAData;
+
+typedef struct 
+{
+	double lx, ly, lz;
+	double dx, dy, dz;
+	double rforce;
+}xRotationalAxialForceData;
+
 typedef struct
 { 
 	xShapeType type;  

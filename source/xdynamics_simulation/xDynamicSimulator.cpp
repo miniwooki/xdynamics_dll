@@ -58,8 +58,8 @@ bool xDynamicsSimulator::xInitialize(bool exefromgui, double _dt, unsigned int _
  	if(_dt) xSimulation::dt = _dt;
  	if(_st) xSimulation::st = _st;
  	if(_et) xSimulation::et = _et;
-	xSimulation::nstep = static_cast<unsigned int>((xSimulation::et / xSimulation::dt) + 1);
-	xSimulation::npart = static_cast<unsigned int>((nstep / xSimulation::st) + 1);
+	xSimulation::nstep = static_cast<unsigned int>((xSimulation::et / xSimulation::dt));
+	xSimulation::npart = static_cast<unsigned int>((nstep / xSimulation::st)) + 1;
 	if (_xmbd)
 	{
 		xmbd = _xmbd;

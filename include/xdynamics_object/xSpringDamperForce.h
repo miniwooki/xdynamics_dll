@@ -10,9 +10,9 @@ public:
 	xSpringDamperForce(std::string _name);
 	virtual ~xSpringDamperForce();
 
-	void SetupDataFromStructure(xTSDAData& d);
+	void SetupDataFromStructure(xPointMass* ip, xPointMass* jp, xTSDAData& d);
 
-	virtual void xCalculateForce(const xVectorD& q, const xVectorD& qd, xVectorD& rhs);
+	virtual void xCalculateForce(const xVectorD& q, const xVectorD& qd);
 	virtual void xDerivate(xMatrixD& lhs, const xVectorD& q, const xVectorD& qd, double mul);
 	virtual void xDerivateVelocity(xMatrixD& lhs, const xVectorD& q, const xVectorD& qd, double mul);
 
@@ -20,6 +20,8 @@ private:
 	double init_l;
 	double k;
 	double c;
+	vector3d loc_i;
+	vector3d loc_j;
 
 	vector3d L;
 	double f;

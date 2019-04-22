@@ -41,6 +41,7 @@ public:
 	void setContactMoment(double x, double y, double z);
 	void setHydroForce(double x, double y, double z);
 	void setHydroMoment(double x, double y, double z);
+	void setEulerParameterMoment(double m0, double m1, double m2, double m3);
 
 	void addContactForce(double x, double y, double z);
 	void addContactMoment(double x, double y, double z);
@@ -48,6 +49,7 @@ public:
 	void addHydroMoment(double x, double y, double z);
 	void addAxialForce(double x, double y, double z);
 	void addAxialMoment(double x, double y, double z);
+	void addEulerParameterMoment(double m0, double m1, double m2, double m3);
 
 	// Declaration get functions
 	int xpmIndex() const;
@@ -69,6 +71,7 @@ public:
 	vector3d ContactMoment() const;
 	vector3d HydroForce() const;
 	vector3d HydroMoment() const;
+	vector4d EulerParameterMoment() const;
 
 	// Declaration operate functions
 	void setupTransformationMatrix();
@@ -79,6 +82,7 @@ public:
 	vector3d toGlobal(const vector3d& v);
 
 	void AllocResultMomory(unsigned int _s);
+	void setZeroAllForce();
 	void SaveStepResult(unsigned int part, double time, xVectorD& q, xVectorD& qd, xVectorD& qdd);
 	void ExportResults(std::fstream& of);
 	void SetDataFromStructure(int id, xPointMassData& d);
@@ -109,6 +113,7 @@ protected:
 	vector3d cm;			// contact moment
 	vector3d hf;			// hydro force
 	vector3d hm;			// hydro moment
+	vector4d em;
 
 	vector3d omega;			// angular velocity
 	vector3d alpha;			// angular acceleration

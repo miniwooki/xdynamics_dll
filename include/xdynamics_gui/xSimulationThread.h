@@ -17,11 +17,11 @@ public:
 	xSimulationThread();
 	~xSimulationThread();
 
-	bool xInitialize(xDynamicsManager* _xdm);
+	bool xInitialize(xDynamicsManager* _xdm, double dt, unsigned int st, double et);
 	//bool xInitialize(QString xmlFile);
 
-	unsigned int totalStep() { return nstep; }
-	unsigned int totalPart() { return npart; }
+// 	unsigned int totalStep() { return nstep; }
+// 	unsigned int totalPart() { return npart; }
 
 	public slots:
 	void setStopCondition();
@@ -33,8 +33,6 @@ private:
 	//bool saveFinalResult(double ct);
 
 	bool isStop;
-	unsigned int nstep;
-	unsigned int npart;
 	QMutex m_mutex;
 	xDynamicsSimulator* xds;
 // 	modelManager* mg;

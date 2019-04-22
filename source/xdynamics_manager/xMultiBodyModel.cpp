@@ -157,6 +157,12 @@ xForce* xMultiBodyModel::CreateForceElement(std::string _name, xForce::fType _ty
 		xf = new xSpringDamperForce(_name);
 		xLog::log("Create Translational Spring Damper Element : " + _name);
 		break;
+	case xForce::RSDA:
+		break;
+	case xForce::RAXIAL:
+		xf = new xRotationalAxialForce(_name);
+		xLog::log("Create Rotational Axial Force Element : " + _name);
+		break;
 	}
 	if (xf)
 	{
