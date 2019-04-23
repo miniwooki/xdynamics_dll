@@ -152,6 +152,7 @@
     <ClCompile Include="..\source\xdynamics_gui\xSimulationWidget.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xvAnimationController.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xvCube.cpp" />
+    <ClCompile Include="..\source\xdynamics_gui\xvCylinder.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xvMarker.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xvMeshObject.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xvObject.cpp" />
@@ -183,6 +184,7 @@
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles;.;$(USING_CUDA_SAMPLE_VERSION)\common\inc;.\GeneratedFiles\$(ConfigurationName);$(USING_QT_VERSION)\include\QtCore;$(USING_QT_VERSION)\include\QtGui;$(USING_QT_VERSION)\include\QtANGLE;$(USING_QT_VERSION)\include\QtOpenGL;$(USING_QT_VERSION)\include\QtOpenGLExtensions;$(USING_QT_VERSION)\include\QtWidgets;$(USING_IRRLICHT_VERSION)\include;$(XDYNAMICS_Q)\include\xdynamics_gui;$(XDYNAMICS_Q)\include;$(USING_QT_VERSION)\include</IncludePath>
       <Define Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_USE_MATH_DEFINES;UNICODE;_UNICODE;WIN32;WIN64;QT_DLL;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_OPENGL_LIB;QT_OPENGLEXTENSIONS_LIB;QT_WIDGETS_LIB;%(PreprocessorDefinitions)</Define>
     </QtMoc>
+    <ClInclude Include="..\include\xdynamics_gui\xvCylinder.h" />
     <ClInclude Include="GeneratedFiles\ui_wplane.h" />
     <ClInclude Include="GeneratedFiles\ui_wsimulation.h" />
     <QtMoc Include="..\include\xdynamics_gui\xSimulationThread.h" />

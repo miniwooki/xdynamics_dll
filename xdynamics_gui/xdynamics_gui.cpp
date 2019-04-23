@@ -66,6 +66,8 @@ xdynamics_gui::xdynamics_gui(int _argc, char** _argv, QWidget *parent)
 // 	}
 	//connect(xnavi->SimulationWidget(), SIGNAL(wsimulation::clickedSolveButton()), this, SLOT(xRunSimulationThread()));
 	connect(xnavi, SIGNAL(definedSimulationWidget(wsimulation*)), this, SLOT(xGetSimulationWidget(wsimulation*)));
+	xCylinderObjectData d = { 0, };
+	xgl->createCylinderGeometry(QString("cylinder"), d);
 }
 
 void xdynamics_gui::xGetSimulationWidget(wsimulation* w)

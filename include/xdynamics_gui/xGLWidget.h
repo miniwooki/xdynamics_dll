@@ -56,6 +56,7 @@ public:
 	void createMeshObjectGeometry(QString& _name);
 	void createCubeGeometry(QString& _name, xCubeObjectData& d);
 	void createPlaneGeometry(QString& _name, xPlaneObjectData& d);
+	void createCylinderGeometry(QString& _name, xCylinderObjectData& d);
 	xvParticle* createParticles();
 // 	void makeLine();
 // 	void makeCylinder(cylinder* cy);

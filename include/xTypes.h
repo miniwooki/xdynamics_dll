@@ -126,6 +126,13 @@ typedef struct{ double spix, spiy, spiz, spjx, spjy, spjz, k, c, init_l; }xTSDAD
 
 typedef struct 
 {
+	double length;
+	double p0x, p0y, p0z;
+	double p1x, p1y, p1z;
+}xCylinderObjectData;
+
+typedef struct 
+{
 	double lx, ly, lz;
 	double dx, dy, dz;
 	double rforce;

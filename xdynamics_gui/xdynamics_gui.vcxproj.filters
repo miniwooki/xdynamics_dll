@@ -81,6 +81,9 @@
     <ClCompile Include="..\source\xdynamics_gui\xSimulationWidget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xvCylinder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="xdynamics_gui.h">
@@ -163,6 +166,9 @@
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_wplane.h">
       <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xdynamics_gui\xvCylinder.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

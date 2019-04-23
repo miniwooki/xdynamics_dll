@@ -10,6 +10,7 @@
 #include "xvGlew.h"
 #include "xvPlane.h"
 #include "xvCube.h"
+#include "xvCylinder.h"
 #include "xvMeshObject.h"
 // #include "cube.h"
 // #include "vcube.h"
@@ -193,6 +194,14 @@ void xGLWidget::createPlaneGeometry(QString& _name, xPlaneObjectData& d)
 	v_objs[_name] = vpp;
 	v_wobjs[vpp->ID()] = (void*)vpp;
 	//qDebug() << p->Name() << " is made";
+}
+
+void xGLWidget::createCylinderGeometry(QString& _name, xCylinderObjectData& d)
+{
+	xvCylinder *vcy = new xvCylinder(_name);
+	vcy->makeCylinderGeometry(d);
+	v_objs[_name] = vcy;
+	v_wobjs[vcy->ID()] = (void*)vcy;
 }
 
 xvParticle* xGLWidget::createParticles()
