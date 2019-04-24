@@ -4,6 +4,9 @@
 #include "xGLWidget.h"
 #include "xSimulationThread.h"
 #include "xdynamics_simulation/xSimulation.h"
+#include "xNewDialog.h"
+#include "xLineEditWidget.h"
+#include "xCommandLine.h"
 #include <QtCore/QDir>
 #include <QtCore/QMimeData>
 #include <QtWidgets/QFileDialog>
@@ -24,6 +27,8 @@ xdynamics_gui::xdynamics_gui(int _argc, char** _argv, QWidget *parent)
 	, xnavi(NULL)
 	, xdm(NULL)
 	, pbar(NULL)
+	, xcomm(NULL)
+	, xcl(NULL)
 	, myAnimationBar(NULL)
 	//, simThread(NULL)
 	, isOnViewModel(false)
@@ -45,30 +50,37 @@ xdynamics_gui::xdynamics_gui(int _argc, char** _argv, QWidget *parent)
 			path = _path;
 		}
 	}
+	
 	ui.setupUi(this);
 	xgl = new xGLWidget(_argc, _argv, NULL);
+	xcw = new xCommandWindow(this);
+	xcomm = new QDockWidget(this);
+	xcomm->setWindowTitle("Command Line");
+	QLineEdit* LE_Comm = new xLineEditWidget;
+	xcomm->setWidget(LE_Comm);
+	//connect(LE_Comm, SIGNAL(up_arrow_key_press()), this, SLOT(write_command_line_passed_data()));
+	connect(LE_Comm, SIGNAL(editingFinished()), this, SLOT(xEditCommandLine()));
+	//layout_comm->addWidget(LE_Comm);
+	xcl = new xCommandLine;
+	addDockWidget(Qt::TopDockWidgetArea, xcomm);
 	ui.xIrrchlitArea->setWidget(xgl);
 	QMainWindow::show();
-	xcw = new xCommandWindow(this);
+
 	addDockWidget(Qt::BottomDockWidgetArea, xcw);
 	this->setWindowState(Qt::WindowState::WindowMaximized);
 	setupMainOperations();
+	setupObjectOperations();
 	xnavi = new xModelNavigator(this);
 	addDockWidget(Qt::LeftDockWidgetArea, xnavi);
 	setAcceptDrops(true);
-// 	if (argc > 1)
-// 	{
-// 		QString model_name = argv[2];
-// 		QString _path = path + model_name;
-// 		if (!QDir(_path).exists())
-// 		
-// 		ReadViewModel(path);
-// 	}
-	//connect(xnavi->SimulationWidget(), SIGNAL(wsimulation::clickedSolveButton()), this, SLOT(xRunSimulationThread()));
 	connect(xnavi, SIGNAL(definedSimulationWidget(wsimulation*)), this, SLOT(xGetSimulationWidget(wsimulation*)));
-	xCylinderObjectData d = { 0, };
-	xgl->createCylinderGeometry(QString("cylinder"), d);
+	xNew();
 }
+
+// void xdynamics_gui::xInitializeGUI()
+// {
+// 	
+// }
 
 void xdynamics_gui::xGetSimulationWidget(wsimulation* w)
 {
@@ -82,7 +94,18 @@ xdynamics_gui::~xdynamics_gui()
 	if (xcw) delete xcw; xcw = NULL;
 	if (xnavi) delete xnavi; xnavi = NULL;
 	if (xdm) delete xdm; xdm = NULL;
+	if (xcomm) delete xcomm; xcomm = NULL;
+	if (xcl) delete xcl; xcl = NULL;
 	xvAnimationController::releaseTimeMemory();
+}
+
+void xdynamics_gui::Clear()
+{
+	xgl->ClearViewObject();
+	xnavi->ClearTreeObject();
+	xcw->ClearCommandText();
+	if (xdm) delete xdm; xdm = NULL;
+	isOnViewModel = false;
 }
 
 bool xdynamics_gui::ReadViewModel(QString path)
@@ -119,12 +142,34 @@ bool xdynamics_gui::ReadViewModel(QString path)
 			xgl->createCubeGeometry(name, d);
 			xnavi->addChild(xModelNavigator::SHAPE_ROOT, name);
 		}
+		else if (vot == xViewObjectType::VMARKER)
+		{
+			xPointMassData d = { 0, };
+			qf.read((char*)&d, sizeof(xPointMassData));
+			xgl->makeMarker(name, d);
+			xnavi->addChild(xModelNavigator::MASS_ROOT, name);
+		}
 		else if (vot == xViewObjectType::VPARTICLE)
 		{
 			xgl->vParticles()->defineFromViewFile(name);
 			QStringList qsl = xgl->vParticles()->ParticleGroupData().keys();
 			xnavi->addChilds(xModelNavigator::PARTICLE_ROOT, qsl);
 			isExistParticle = true;
+		}
+		else if (vot == xViewObjectType::VJOINT)
+		{
+			xJointData d = { 0, };
+			qf.read((char*)&d, sizeof(xJointData));
+		}
+		else if (vot == xViewObjectType::VTSDA)
+		{
+			xTSDAData d = { 0, };
+			qf.read((char*)&d, sizeof(xTSDAData));
+		}
+		else if (vot == xViewObjectType::VRAXIAL)
+		{
+			xRotationalAxialForceData d = { 0, };
+			qf.read((char*)&d, sizeof(xRotationalAxialForceData));
 		}
 		else if (vot == xViewObjectType::VMESH)
 		{
@@ -167,7 +212,21 @@ bool xdynamics_gui::ReadModelResults(QString path)
 
 void xdynamics_gui::xNew()
 {
+	xNewDialog nd(NULL, path);
+	int ret = nd.exec();
+	if (ret)
+	{
+		path = nd.path;
+		Clear();
+		//ClearMemory();
+		//xInitializeGUI();
+		if (nd.isBrowser)
+			OpenFile(nd.pathinbrowser);
+		else
+		{
 
+		}
+	}
 }
 
 void xdynamics_gui::xSave()
@@ -180,18 +239,58 @@ void xdynamics_gui::xOpen()
 	QString file_path = QFileDialog::getOpenFileName(
 		this, tr("open"), path,
 		tr("View model file (*.vmd);;All files (*.*)"));
-	int begin = file_path.lastIndexOf(".");
-	QString ext = file_path.mid(begin + 1);
+	if (!file_path.isEmpty())
+		OpenFile(file_path);
+}
+
+void xdynamics_gui::xCylinder()
+{
+	caction = CYLINDER;
+	xcomm->widget()->setFocus();
+	xcomm->setWindowTitle("Input the top point.");
+	xcl->SetCurrentAction(caction);
+}
+
+void xdynamics_gui::xCube()
+{
+	caction = CUBE;
+	xcomm->widget()->setFocus();
+	xcomm->setWindowTitle("Input the minimum point.");
+	xcl->SetCurrentAction(caction);
+}
+
+void xdynamics_gui::OpenFile(QString s)
+{
+	int begin = s.lastIndexOf('.');
+	QString ext = s.mid(begin + 1);
+	xcw->write(xCommandWindow::CMD_INFO, "File load - " + s);
 	if (ext == "vmd")
+		isOnViewModel = ReadViewModel(s);
+	else if (ext == "rlt")
 	{
-		isOnViewModel = ReadViewModel(file_path);
+		if (!isOnViewModel)
+		{
+			QString p = s.left(begin) + ".vmd";
+			if (!ReadViewModel(p))
+			{
+				xcw->write(xCommandWindow::CMD_ERROR, kor("해석 결과에 부합하는 모델을 찾을 수 없습니다."));
+				return;
+			}
+			else isOnViewModel = true;
+		}
+		if (ReadModelResults(s)) setupAnimationTool();
 	}
 	else if (ext == "xls")
 	{
-		QString vf = ReadXLSFile(file_path);
-		if (!vf.isEmpty())
-			isOnViewModel = ReadViewModel(vf);
+		if (!isOnViewModel)
+		{
+			QString vf = ReadXLSFile(s);
+			if (!vf.isEmpty())
+				isOnViewModel = ReadViewModel(vf);
+		}
 	}
+	else
+		xcw->write(xCommandWindow::CMD_ERROR, kor("지원하지 않는 파일 형식입니다."));
 }
 
 QString xdynamics_gui::ReadXLSFile(QString xls_path)
@@ -237,6 +336,34 @@ void xdynamics_gui::setupMainOperations()
 	/*connect(ui.Menu_import, SIGNAL(triggered()), this, SLOT(SHAPE_Import()));*/
 }
 
+void xdynamics_gui::setupObjectOperations()
+{
+	myObjectBar = addToolBar(tr("Object Operations"));
+	QAction* a;
+
+	//ui.mainToolBar->setWindowTitle("Main Operations");
+
+	a = new QAction(QIcon(":/Resources/icon/cube.png"), tr("&Cube"), this);
+	a->setStatusTip(tr("Cube object"));
+	connect(a, SIGNAL(triggered()), this, SLOT(xCube()));
+	myObjectActions.insert(CUBE, a);
+
+	a = new QAction(QIcon(":/Resources/icon/cylinder.png"), tr("&Cylinder"), this);
+	a->setStatusTip(tr("Cylinder object"));
+	connect(a, SIGNAL(triggered()), this, SLOT(xCylinder()));
+	myObjectActions.insert(CYLINDER, a);
+
+// 	a = new QAction(QIcon(":/Resources/icon/save.png"), tr("&Save"), this);
+// 	a->setStatusTip(tr("Save project"));
+// 	connect(a, SIGNAL(triggered()), this, SLOT(xSave()));
+// 	myMainActions.insert(SAVE, a);
+
+	for (int i = 0; i < myObjectActions.size(); i++)
+	{
+		myObjectBar->addAction(myObjectActions.at(i));
+	}
+}
+
 void xdynamics_gui::setupAnimationTool()
 {
 	if (!myAnimationBar)
@@ -246,6 +373,29 @@ void xdynamics_gui::setupAnimationTool()
 		this->addToolBar(myAnimationBar);
 		//connect(xgl, SIGNAL(changedAnimationFrame()), this, SLOT(xChangeAnimationFrame()));
 		//this->insertToolBar(ui.mainToolBar, myAnimationBar);
+	}
+}
+
+void xdynamics_gui::setupBindingPointer()
+{
+	if (sThread)
+	{
+		if (xdm)
+		{
+// 			QString n = "crank";
+// 			xPointMass* pm = xdm->XMBDModel()->XMass(n.toStdString());
+// 			xvObject* obj = xgl->Object(n + "d");
+// 			obj->bindPointMassResultsPointer(pm->XPointMassResultPointer());
+			if (xdm->XMBDModel())
+			{
+				foreach(xPointMass* pm, xdm->XMBDModel()->Masses())
+				{
+					QString n = pm->Name();
+					xvObject* obj = xgl->Object(n);
+					obj->bindPointMassResultsPointer(pm->XPointMassResultPointer());
+				}
+			}			
+		}
 	}
 }
 
@@ -273,36 +423,7 @@ void xdynamics_gui::dropEvent(QDropEvent *event)
 	}
 	foreach(QString s, pathList)
 	{
-		int begin = s.lastIndexOf('.');
-		QString ext = s.mid(begin+1);
-		xcw->write(xCommandWindow::CMD_INFO, "File load - " + s);
-		if (ext == "vmd")
-			isOnViewModel = ReadViewModel(s);
-		else if (ext == "rlt")
-		{
-			if (!isOnViewModel)
-			{
-				QString p = s.left(begin) + ".vmd";
-				if (!ReadViewModel(p))
-				{
-					xcw->write(xCommandWindow::CMD_ERROR, kor("해석 결과에 부합하는 모델을 찾을 수 없습니다."));
-					continue;
-				}
-				else isOnViewModel = true;
-			}
-			if (ReadModelResults(s)) setupAnimationTool();
-		}
-		else if (ext == "xls")
-		{
-			if (!isOnViewModel)
-			{
-				QString vf = ReadXLSFile(s);
-				if (!vf.isEmpty())
-					isOnViewModel = ReadViewModel(vf);
-			}
-		}
-		else
-			xcw->write(xCommandWindow::CMD_ERROR, kor("지원하지 않는 파일 형식입니다."));
+		OpenFile(s);
 	}
 }
 
@@ -347,8 +468,73 @@ void xdynamics_gui::xRecieveProgress(int pt, QString ch)
 	}
 }
 
+void xdynamics_gui::xEditCommandLine()
+{
+	QLineEdit* e = (QLineEdit*)sender();
+	QString c = e->text();
+	switch (caction)
+	{
+	case CYLINDER:
+	{
+		QString msg = xcl->CylinderCommandProcess(c);
+		if (xcl->IsWrongCommand())
+		{
+			xcw->write(xCommandWindow::CMD_INFO, msg);
+		}
+		xcomm->setWindowTitle(msg);
+		if (xcl->IsFinished())
+		{
+			xCylinderObjectData d = xcl->GetCylinderParameters();
+			QString n = QString("Cylinder%1").arg(xvObject::xvObjectCount());
+			xgl->createCylinderGeometry(n, d);
+			xnavi->addChild(xModelNavigator::SHAPE_ROOT, n);
+			caction = -1;
+		}
+		e->clear();
+		break;
+	}
+	case CUBE:
+	{
+		QString msg = xcl->CubeCommandProcess(c);
+		if (xcl->IsWrongCommand())
+		{
+			xcw->write(xCommandWindow::CMD_INFO, msg);
+		}
+		xcomm->setWindowTitle(msg);
+		if (xcl->IsFinished())
+		{
+			xCubeObjectData d = xcl->GetCubeParameters();
+			QString n = QString("Cube%1").arg(xvObject::xvObjectCount());
+			xgl->createCubeGeometry(n, d);
+			xnavi->addChild(xModelNavigator::SHAPE_ROOT, n);
+			caction = -1;
+		}
+		e->clear();
+		break;
+	}
+	default:
+		break;
+	}
+}
+
+void xdynamics_gui::deleteFileByEXT(QString ext)
+{
+	QString dDir = path + xModel::name;
+	QDir dir = QDir(dDir);
+	QStringList delFileList;
+	delFileList = dir.entryList(QStringList("*." + ext), QDir::Files | QDir::NoSymLinks);
+	qDebug() << "The number of *.bin file : " << delFileList.length();
+	for (int i = 0; i < delFileList.length(); i++){
+		QString deleteFilePath = dDir + "/" + delFileList[i];
+		QFile::remove(deleteFilePath);
+	}
+	qDebug() << "Complete delete.";
+}
+
 void xdynamics_gui::xRunSimulationThread(double dt, unsigned int st, double et)
 {
+	deleteFileByEXT("txt");
+	deleteFileByEXT("bin");
 	setupAnimationTool();
 	sThread = new xSimulationThread;
 	sThread->xInitialize(xdm, dt, st, et);
@@ -363,7 +549,7 @@ void xdynamics_gui::xRunSimulationThread(double dt, unsigned int st, double et)
 	//unsigned int nstep = xSimulation::nstep;
 	pbar->setMaximum(xSimulation::nstep);
 	ui.statusBar->addWidget(pbar, 1);
-	
+	setupBindingPointer();
 	sThread->start();
 	
 	//xcw->write(xCommandWindow::CMD_INFO, "Thread Initialize Done.");

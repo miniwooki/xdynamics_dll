@@ -8,7 +8,7 @@ xvMarker::xvMarker()
 	: xvObject()
 	, attachObject("")
 	, markerScaleFlag(true)
-	, isAttachMass(true)
+	, isAttachMass(false)
 	, scale(1.0)
 {
 
@@ -18,7 +18,7 @@ xvMarker::xvMarker(QString& n, bool mcf)
 	: xvObject(V_MARKER, n)
 	, attachObject("")
 	, markerScaleFlag(mcf)
-	, isAttachMass(true)
+	, isAttachMass(false)
 	, scale(1.0)
 {
 
@@ -40,28 +40,17 @@ void xvMarker::draw(GLenum eMode)
 		glDisable(GL_LIGHTING);
 		if (markerScaleFlag)
 			glScalef(scale, scale, scale);
-		unsigned int idx = xvAnimationController::getFrame();
-		if (idx != 0)
+		bool isAnimation = (xvAnimationController::Play() || xvAnimationController::getFrame()) && isAttachMass;
+		if (isAnimation)
 		{
-// 			if (model::rs->pointMassResults().find(attachObject) != model::rs->pointMassResults().end())
-// 			{
-// 				VEC3D p = model::rs->pointMassResults()[attachObject].at(idx).pos;
-// 				EPD ep = model::rs->pointMassResults()[attachObject].at(idx).ep;
-// 				animationFrame(p, ep);// p.x, p.y, p.z);
-// 			}
-// 			else
-// 			{
-// 				glTranslated(pos0.x, pos0.y, pos0.z);
-// 				glRotated(ang0.x, 0, 0, 1);
-// 				glRotated(ang0.y, 1, 0, 0);
-// 				glRotated(ang0.z, 0, 0, 1);
-// 				if (!isAttachMass)
-// 				{
-// 					glRotated(cang.x / 16, 1.0, 0.0, 0.0);
-// 					glRotated(cang.y / 16, 0.0, 1.0, 0.0);
-// 					glRotated(cang.z / 16, 0.0, 0.0, 1.0);
-// 				}
-// 			}
+			double t = 180 / M_PI;
+			unsigned int idx = xvAnimationController::getFrame();
+			xPointMass::pointmass_result pmr = xvObject::pmrs[idx];
+			glTranslated(pmr.pos.x, pmr.pos.y, pmr.pos.z);
+			vector3d euler = EulerParameterToEulerAngle(pmr.ep);
+			glRotated(t*euler.x, 0, 0, 1);
+			glRotated(t*euler.y, 1, 0, 0);
+			glRotated(t*euler.z, 0, 0, 1);
 		}
 		else
 		{
@@ -69,12 +58,6 @@ void xvMarker::draw(GLenum eMode)
 			glRotated(ang.x, 1, 0, 0);
 			glRotated(ang.y, 0, 1, 0);
 			glRotated(ang.z, 0, 0, 1);
-			if (!isAttachMass)
-			{
-// 				glRotated(cang.x / 16, 1.0, 0.0, 0.0);
-// 				glRotated(cang.y / 16, 0.0, 1.0, 0.0);
-// 				glRotated(cang.z / 16, 0.0, 0.0, 1.0);
-			}
 		}
 		glCallList(glList);
 		glEnable(GL_LIGHTING);
@@ -148,5 +131,16 @@ bool xvMarker::define(float x, float y, float z, bool isdefine_text)
 
 	glEndList();
 	display = true;
+	return true;
+}
+
+bool xvMarker::define(xPointMassData& d)
+{
+	data = d;
+// 	pos.x = static_cast<float>(data.px);
+// 	pos.y = static_cast<float>(data.py);
+// 	pos.z = static_cast<float>(data.pz);
+	define(static_cast<float>(data.px), static_cast<float>(data.py), static_cast<float>(data.pz), false);
+	isAttachMass = true;
 	return true;
 }

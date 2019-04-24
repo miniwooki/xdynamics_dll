@@ -39,6 +39,8 @@
 #define SAND_POISSON_RATIO 0.3
 #define SAND_SHEAR_MODULUS 0.0
 
+#include <QtCore/QString>
+
 enum xMaterialType
 {	
 	NO_MATERIAL = 0, 
@@ -49,8 +51,28 @@ enum xMaterialType
 	ACRYLIC, 
 	ALUMINUM, 
 	SAND, 
+	WATER,
 	USER_INPUT 
 };
+
+inline QString NameOfMaterial(int i)
+{
+	xMaterialType xmt = (xMaterialType)(i);
+	QString n;
+	switch (xmt)
+	{
+	case NO_MATERIAL: n = "No Material"; break;
+	case STEEL: n = "Steel"; break;
+	case MEDIUM_CLAY: n = "Medium clay"; break;
+	case POLYETHYLENE: n = "Polyethylene"; break;
+	case GLASS: n = "Glass"; break;
+	case ACRYLIC: n = "Acrylic"; break;
+	case ALUMINUM: n = "Aluminum"; break;
+	case SAND: n = "Sand"; break;
+	case USER_INPUT: n = "User input"; break;
+	}
+	return n;
+}
 
 enum xContactPairType
 { 
@@ -86,8 +108,9 @@ enum xXlsInputDataType
 	XLS_MASS, 
 	XLS_JOINT,
 	XLS_FORCE,
+	XLS_KERNEL,
 	XLS_PARTICLE,
-	XLS_CONTACT,
+	XLS_CONTACT,	
 	XLS_INTEGRATOR,
 	XLS_SIMULATION 
 };
@@ -103,16 +126,54 @@ enum xViewObjectType
 	VMARKER = 0,
 	VJOINT, 
 	VPLANE, 
+	VLINE,
 	VCUBE, 
 	VMESH, 
 	VPARTICLE, 
 	VTSDA,
-	VRAXIAL
+	VRAXIAL,
+	VSPHPLANE
 };
+
+enum xKenelType
+{
+	CUBIC_SPLINE_KERNEL = 0,
+	QUADRATIC_KERNEL,
+	QUINTIC_KERNEL,
+	WENDLAND_KERNEL,
+	GAUSS_KERNEL,
+	MODIFIED_GAUSS_KERNEL
+};
+
+enum xSPHCorrectionType
+{
+	NO_CORRECTION = 0,
+	GRADIENT_CORRECTION, 
+	KERNEL_CORRECTION,
+	MIXED_CORRECTION
+};
+
+enum xTurbulenceType
+{
+	NO_TURBULENCE = 0,
+	TURBULENCE_MIXING_LENGTH,
+	TURBULENCE_K_LM,
+	TURBULENCE_K_E
+};
+
+enum xBoundaryTreatmentType
+{
+	DUMMY_PARTICLE_METHOD = 0,
+	GHOST_PARTICLE_METHOD
+};
+
+enum xUnitType{ MKS = 0, MMKS };
+enum xGravityDirection{ PLUS_X = 0, PLUS_Y, PLUS_Z, MINUS_X, MINUS_Y, MINUS_Z };
 /*enum xInputDataFormType { FORM_OBJECT_PLANE = 2, FORM_OBJECT_CUBE = 3, FORM_OBJECT_SHAPE = 4 };*/
 
 typedef struct{	double density, youngs, poisson, shear; }xMaterial;
 typedef struct{ double dx, dy, drx, dry, drz, pox, poy, poz, p1x, p1y, p1z; }xPlaneObjectData;
+typedef struct{ double dx, dy, lx, ly, lz, ps, visc, rho; }xSPHPlaneObjectData;
 typedef struct{ double p0x, p0y, p0z, p1x, p1y, p1z; }xCubeObjectData;
 typedef struct{ double dx, dy, dz, lx, ly, lz, minr, maxr; }xCubeParticleData;
 typedef struct{ unsigned int number; }xListParticleData;
@@ -123,10 +184,13 @@ typedef struct{ double Ei, Ej, Pri, Prj, Gi, Gj; }xMaterialPair;
 typedef struct{ double coh_r, coh_e, kn, vn, ks, vs; }xContactParameters;
 typedef struct{ double restitution, friction, rolling_friction, cohesion, stiffness_ratio; }xContactMaterialParameters;
 typedef struct{ double spix, spiy, spiz, spjx, spjy, spjz, k, c, init_l; }xTSDAData;
+typedef struct{ int correction, dim, type; double factor; }xKernelFunctionData;
+typedef struct{ double p0x, p0y, p0z, p1x, p1y, p1z, nx, ny, nz; }xLineObjectData;
 
 typedef struct 
 {
 	double length;
+	double r_top, r_bottom;
 	double p0x, p0y, p0z;
 	double p1x, p1y, p1z;
 }xCylinderObjectData;
@@ -155,7 +219,7 @@ inline xContactPairType getContactPair(xShapeType t1, xShapeType t2)
 
 inline xMaterial GetMaterialConstant(int mt)
 {
-	xMaterial cmt;
+	xMaterial cmt = { 0, };
 	switch (mt){
 	case STEEL: cmt.density = STEEL_DENSITY; cmt.youngs = STEEL_YOUNGS_MODULUS; cmt.poisson = STEEL_POISSON_RATIO; cmt.shear = STEEL_SHEAR_MODULUS; break;
 	case ACRYLIC: cmt.density = ACRYLIC_DENSITY; cmt.youngs = ACRYLIC_YOUNG_MODULUS; cmt.poisson = ACRYLIC_POISSON_RATIO; cmt.shear = ACRYLIC_SHEAR_MODULUS; break;

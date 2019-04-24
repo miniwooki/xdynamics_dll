@@ -128,6 +128,21 @@ xDiscreteElementMethodModel* xDynamicsManager::XDEMModel()
 	return xdem;
 }
 
+xSmoothedParticleHydrodynamicsModel* xDynamicsManager::XSPHModel()
+{
+	return xsph;
+}
+
+xSmoothedParticleHydrodynamicsModel* xDynamicsManager::XSPHModel(std::string& n)
+{
+	QString n = QString::fromStdString(_n);
+	QStringList keys = xsphs.keys();
+	QStringList::const_iterator it = qFind(keys, n);
+	if (it == keys.end() || !keys.size())
+		return NULL;
+	return xsphs[n];
+}
+
 xObjectManager* xDynamicsManager::XObject()
 {
 	return xom;
@@ -196,6 +211,7 @@ xDynamicsManager::solverType xDynamicsManager::OpenModelXLS(const wchar_t* n)
 			else if (tn == "FORCE") xx[XLS_FORCE] = d;
 			else if (tn == "PARTICLE") xx[XLS_PARTICLE] = d;
 			else if (tn == "CONTACT") xx[XLS_CONTACT] = d;
+			else if (tn == "KERNEL") xx[XLS_KERNEL] = d;
 			else if (tn == "INTEGRATOR") xx[XLS_INTEGRATOR] = d;
 			else if (tn == "SIMULATION") xx[XLS_SIMULATION] = d;
 		}
@@ -232,10 +248,17 @@ xDynamicsManager::solverType xDynamicsManager::OpenModelXLS(const wchar_t* n)
 				}break;
 			case XLS_JOINT: xls.ReadJoint(xmbd, bt->second); break;
 			case XLS_FORCE: xls.ReadForce(xmbd, bt->second); break;
+			case XLS_KERNEL:
+				if (!this->XSPHModel(model_name))
+				{
+					CreateModel(model_name, SPH);
+					xls.ReadKernel(xsph, bt->second); break;
+				}
 			case XLS_PARTICLE:
 				if (!this->XDEMModel(model_name))
 				{
-					CreateModel(model_name, DEM);
+					if(!xsph)
+						CreateModel(model_name, DEM);
 					xls.ReadParticle(xdem->XParticleManager(), bt->second);
 				}break;
 			case XLS_CONTACT:
@@ -274,6 +297,7 @@ void xDynamicsManager::CreateModel(std::string n, modelType t, bool isOnAir /*= 
 	{
 	case MBD: xmbds[qname] = new xMultiBodyModel(n); break;
 	case DEM: xdems[qname] = new xDiscreteElementMethodModel(n); break;
+	case SPH: xsphs[qname] = new xSmoothedParticleHydrodynamicsModel(n); break;
 	case OBJECT: xoms[qname] = new xObjectManager(); break;
 	case CONTACT: xcms[qname] = new xContactManager(); break;
 	}
@@ -288,6 +312,7 @@ void xDynamicsManager::setOnAirModel(modelType t, std::string n)
 	{
 	case DEM: xdem = XDEMModel(n); break;
 	case MBD: xmbd = XMBDModel(n); break;
+	case SPH: xsph = XSPHModel(n); break;
 	case OBJECT: xom = XObject(n); break;
 	case CONTACT: xcm = XContact(n); break;
 	}

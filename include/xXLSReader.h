@@ -9,6 +9,7 @@ using namespace libxl;
 
 class xMultiBodyModel;
 class xDiscreteElementMethodModel;
+class xSmoothedParticleHydrodynamicsModel;
 class xParticleManager;
 class xObjectManager;
 class xContactManager;
@@ -24,6 +25,7 @@ public:
 	void ReadMass(xMultiBodyModel* xmbd, vector2i rc);
 	void ReadJoint(xMultiBodyModel* xmbd, vector2i rc);
 	void ReadForce(xMultiBodyModel* xmbd, vector2i rc);
+	void ReadKernel(xSmoothedParticleHydrodynamicsModel* xsph, vector2i rc);
 	void ReadParticle(xParticleManager* xparticle, vector2i rc);
 	void ReadContact(xContactManager* xcm, vector2i rc);
 	void ReadShapeObject(xObjectManager* xom, vector2i rc);
@@ -40,6 +42,7 @@ private:
 	bool _IsEmptyCell(int cid);
 	xPointMassData ReadPointMassData(std::string& _name, int r, int& c);
 	xJointData ReadJointData(std::string& _name, int r, int& c);
+	xLineObjectData ReadLineObjectData(std::string& _name, int mat, int r, int& c);
 	xPlaneObjectData ReadPlaneObjectData(std::string& _name, int mat, int r, int& c);
 	xCubeObjectData ReadCubeObjectData(std::string& _name, int mat, int r, int& c);
 	xCubeParticleData ReadCubeParticleData(std::string& _name, int r, int& c);
@@ -47,6 +50,7 @@ private:
 	xContactParameterData ReadContactData(std::string& _name, int r, int& c);
 	xTSDAData ReadTSDAData(std::string& _name, int r, int& c);
 	xRotationalAxialForceData ReadxRotationalAxialForceData(std::string& _name, int r, int& c);
+	xSPHPlaneObjectData ReadSPHPlaneParticleData(std::string& _name, int r, int& c);
 
 	Book* book;
 	Sheet* sheet;

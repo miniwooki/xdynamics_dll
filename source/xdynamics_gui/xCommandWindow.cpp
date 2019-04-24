@@ -18,6 +18,11 @@ xCommandWindow::~xCommandWindow()
 	if (cmd) delete cmd; cmd = NULL;
 }
 
+void xCommandWindow::ClearCommandText()
+{
+	cmd->clear();
+}
+
 void xCommandWindow::write(mode tw, QString c)
 {
 	QString t;

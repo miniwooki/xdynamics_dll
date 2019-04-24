@@ -13,5 +13,7 @@
         <file>Resources/icon/ani_playback.png</file>
         <file>Resources/icon/ani_tobegin.png</file>
         <file>Resources/icon/ani_toEnd.png</file>
+        <file>Resources/icon/cube.png</file>
+        <file>Resources/icon/cylinder.png</file>
     </qresource>
 </RCC>

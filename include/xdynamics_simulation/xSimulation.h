@@ -11,6 +11,7 @@ public:
 	enum deviceType{ CPU = 0, GPU };
 	enum MBDSolverType{ MBD_SOLVER = 0, EXPLICIT_RK4 = 1, IMPLICIT_HHT = 2, KINEMATIC = 10 };
 	enum DEMSolverType{ DEM_SOLVER = 0, EXPLICIT_VV = 1 };
+	enum SPHSolverType{ SPH_SOLVER = 0, DEFAULT };
 	//enum integratorType{ };
 	xSimulation();
 	~xSimulation();
@@ -26,6 +27,7 @@ public:
 	static void setEndTime(double _et);
 	static void setMBDSolverType(MBDSolverType mst);
 	static void setDEMSolverType(DEMSolverType dst);
+	static void setSPHSolverType(SPHSolverType sst);
 
 	static double start_time;
 	static double et;
@@ -38,6 +40,7 @@ public:
 	static deviceType dev;
 	static MBDSolverType mbd_solver_type;
 	static DEMSolverType dem_solver_type;
+	static SPHSolverType sph_solver_type;
 };
 
 #endif

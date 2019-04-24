@@ -73,6 +73,8 @@ public:
 	vector3d HydroMoment() const;
 	vector4d EulerParameterMoment() const;
 
+	pointmass_result* XPointMassResultPointer();
+
 	// Declaration operate functions
 	void setupTransformationMatrix();
 	void setupInertiaMatrix();

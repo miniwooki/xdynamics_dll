@@ -53,6 +53,7 @@ public:
 
 	//	void setModeler(modeler* _md) { md = _md; }
 // 	void makeCube(cube* c);
+	void ClearViewObject();
 	void createMeshObjectGeometry(QString& _name);
 	void createCubeGeometry(QString& _name, xCubeObjectData& d);
 	void createPlaneGeometry(QString& _name, xPlaneObjectData& d);
@@ -63,6 +64,7 @@ public:
 // 	void makeParticle(double* pos, unsigned int n);
 // 	void makeParticle_f(float* pos, unsigned int n);
 	xvMarker* makeMarker(QString n, double x, double y, double z, bool mcf = true);
+	xvMarker* makeMarker(QString& _name, xPointMassData& d);
 // 	vpolygon* makePolygonObject(QString _nm, import_shape_type t, QString file, double x, double y, double z);
 // 	//	bool change(QString& fp, tChangeType ct, tFileType ft);
 // 	void makeMassCoordinate(QString& _name);

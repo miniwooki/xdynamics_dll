@@ -146,6 +146,15 @@ bool xGLWidget::Upload_DEM_Results(QStringList& sl)
 	return true;
 }
 
+void xGLWidget::ClearViewObject()
+{
+	qDeleteAll(v_objs);
+	v_objs.clear();
+	v_wobjs.clear();
+	selectedObjects.clear();
+	if (vp) delete vp; vp = NULL;
+}
+
 void xGLWidget::createMeshObjectGeometry(QString& file)
 {
 	QFile qf(file);
@@ -384,23 +393,28 @@ void xGLWidget::initializeGL()
 	glEnable(GL_LIGHT0);
 	//glEnable(GL_RESCALE_NORMAL); 
 
-	GLfloat LightAmbient[] = { 0.3f, 0.3f, 0.3f, 1.0f };
-	GLfloat LightDiffuse[] = { 0.5f, 0.5f, 0.5f, 1.0f };
+	GLfloat LightAmbient[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	GLfloat LightDiffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	GLfloat LightSpecular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	GLfloat Lightemissive[] = { 0.f, 0.f, 0.f, 1.0f };
-	GLfloat LightPosition[] = { 100.0f, 100.0f, 100.0f, 1.0f };
-
+	GLfloat LightPosition[] = { 0.0f, 0.0f, 1.0f, 1.0f };
+//	GLfloat LightPosition1[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	glLightfv(GL_LIGHT0, GL_AMBIENT, LightAmbient);		// Setup The Ambient Light
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, LightDiffuse);		// Setup The Diffuse Light
 	glLightfv(GL_LIGHT0, GL_SPECULAR, LightSpecular);
 	glLightfv(GL_LIGHT0, GL_POSITION, LightPosition);	// Position The Light
-
-	GLfloat material_Ka[] = { 0.5f, 0.0f, 0.0f, 1.0f };
-	GLfloat material_Kd[] = { 0.4f, 0.4f, 0.5f, 1.0f };
-	GLfloat material_Ks[] = { 0.8f, 0.8f, 0.0f, 1.0f };
-	GLfloat material_Ke[] = { 0.1f, 0.0f, 0.0f, 0.0f };
-	GLfloat material_Se = 20.0f;
-
+// 	glEnable(GL_LIGHT1);
+// 	glLightfv(GL_LIGHT1, GL_AMBIENT, LightAmbient);		// Setup The Ambient Light
+// 	glLightfv(GL_LIGHT1, GL_DIFFUSE, LightDiffuse);		// Setup The Diffuse Light
+// 	glLightfv(GL_LIGHT1, GL_SPECULAR, LightSpecular);
+// 	glLightfv(GL_LIGHT1, GL_POSITION, LightPosition1);	// Position The Light
+	float m = 1.f / 255.f;
+	GLfloat material_Ka[] = { 51.f*m, 51.f*m, 51.f*m, 1.0f };
+	GLfloat material_Kd[] = { 204.f*m, 204.f*m, 204.f*m, 1.0f };
+	GLfloat material_Ks[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	GLfloat material_Ke[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	GLfloat material_Se = 0.0f;
+	
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, material_Ka);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, material_Kd);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, material_Ks);
@@ -1070,7 +1084,7 @@ xvObject* xGLWidget::Object(QString nm)
 
 xvMarker* xGLWidget::makeMarker(QString n, double x, double y, double z, bool mcf)
 {
-	QString _name = n + "_marker";
+	QString _name = n;
 	xvMarker* vm = new xvMarker(_name, mcf);
 	//vm->setAttachObject(n);
 	vm->define(x, y, z);
@@ -1079,6 +1093,19 @@ xvMarker* xGLWidget::makeMarker(QString n, double x, double y, double z, bool mc
 
 	setMaxViewPosition(x, y, z);
 	setMinViewPosition(x, y, z);
+	return vm;
+}
+
+xvMarker* xGLWidget::makeMarker(QString& _name, xPointMassData& d)
+{
+	xvMarker* vm = new xvMarker(_name, false);
+	//vm->setAttachObject(n);
+	vm->define(d);
+	v_objs[_name] = vm;
+	v_wobjs[vm->ID()] = (void*)vm;
+
+// 	setMaxViewPosition(x, y, z);
+// 	setMinViewPosition(x, y, z);
 	return vm;
 }
 

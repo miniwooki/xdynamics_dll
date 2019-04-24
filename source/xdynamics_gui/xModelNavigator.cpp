@@ -77,51 +77,36 @@ xModelNavigator::xModelNavigator(QWidget* parent)
 	//plate->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	
 	connect(vtree, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(clickAction(QTreeWidgetItem*, int)));
-// 	roots[PLANE_ROOT]->setIcon(0, QIcon(":/Resources/icRect.png"));
-// 	roots[LINE_ROOT]->setIcon(0, QIcon(":/Resources/icLine.png"));
-// 	roots[CUBE_ROOT]->setIcon(0, QIcon(":/Resources/pRec.png"));
-// 	roots[CYLINDER_ROOT]->setIcon(0, QIcon(":/Resources/cylinder.png"));
-// 	roots[POLYGON_ROOT]->setIcon(0, QIcon(":/Resources/icPolygon.png"));
-// 	roots[RIGID_BODY_ROOT]->setIcon(0, QIcon(":/Resources/mass.png"));
-// 	roots[COLLISION_ROOT]->setIcon(0, QIcon(":/Resources/collision.png"));
-// 	roots[PARTICLES_ROOT]->setIcon(0, QIcon(":/Resources/particle.png"));
-// 	roots[CONSTRAINT_ROOT]->setIcon(0, QIcon(":/Resources/spherical.png"));
-// 	roots[SPRING_DAMPER_ROOT]->setIcon(0, QIcon(":/Resources/TSDA_icon.png"));
-	//connect(vtree, &QTreeWidget::customContextMenuRequested, this, &xModelNavigator::contextMenu);
-//	md->setxModelNavigator(this);
-// 	plate_frame->setMaximumWidth(220);
-// 	plate_frame->setLayout(plate_layout);
-// 	//QGridLayout *glayout = new QGridLayout;
-// 	//glayout->addWidget(frame);
-// 	//plate->setLayout(glayout);
-// 	plate->setWidget(plate_frame);
-	//xws = new wsimulation;
-	//wv = new wview;
-	
 }
 
 xModelNavigator::~xModelNavigator()
 {
-	//qDeleteAll(mom_roots.begin(), mom_roots.end());
 	qDeleteAll(roots);
 	if (vtree) delete vtree; vtree = NULL;
-	
-	//RemovePlateWidget();
 	if (plate_layout) delete plate_layout; plate_layout = NULL;
 	if (plate_frame) delete plate_frame; plate_frame = NULL;
 	if (plate) delete plate; plate = NULL;
-	//if (wv) delete wv; wv = NULL;
-//	if (xws) delete xws; xws = NULL;
-	//if (wp) delete wp; wp = NULL;
-	
-
-	//if (plate_layout) delete plate_layout; plate_layout = NULL;
 }
 
-// xModelNavigator* xModelNavigator::DB()
-// {
-// 	return db;
-// }
+void xModelNavigator::ClearTreeObject()
+{
+	QList<QTreeWidgetItem*> result_root, shape_root, mass_root, particle_root;
+	result_root = mom_roots[RESULT_ROOT]->takeChildren(); 
+	if (result_root.size()) qDeleteAll(result_root);
+	shape_root = roots[SHAPE_ROOT]->takeChildren();
+	if (shape_root.size()) qDeleteAll(shape_root);
+	mass_root = roots[MASS_ROOT]->takeChildren();
+	if (mass_root.size()) qDeleteAll(mass_root);
+	particle_root = roots[PARTICLE_ROOT]->takeChildren();
+	if (particle_root.size()) qDeleteAll(particle_root);
+	if (plate_layout) delete plate_layout; plate_layout = NULL;
+	if (plate_frame) delete plate_frame; plate_frame = NULL;
+}
+
+void xModelNavigator::InitPlate()
+{
+
+}
 
 void xModelNavigator::addChild(tRoot tr, QString _nm)
 {
@@ -158,6 +143,8 @@ QTreeWidgetItem* xModelNavigator::getRootItem(tRoot tr)
 	return mom_roots[tr];
 }
 
+
+
 // wsimulation* xModelNavigator::SimulationWidget()
 // {
 // 	return xws;
@@ -188,7 +175,7 @@ void xModelNavigator::clickAction(QTreeWidgetItem* w, int i)
 		{
 		case SHAPE_ROOT: CallShape(name); break;
 		case MASS_ROOT: break;
-		case PARTICLE_ROOT: break;
+		case PARTICLE_ROOT: CallParticles(name); break;
 		}
 	}
 	else
@@ -238,11 +225,38 @@ void xModelNavigator::CallShape(QString& n)
 		plate_layout->addWidget(wp);
 		cwidget = PLANE_WIDGET;
 	}
-	
 	CallViewWidget(xo);
-	
 }
 
+
+void xModelNavigator::CallParticles(QString& n)
+{
+	xvParticle* xp = xGLWidget::GLObject()->vParticles();
+	if (xp)
+	{
+		QString nm = xp->NameOfGroupData(n);
+		QString mat = xp->MaterialOfGroupData(n);
+		unsigned int num_this = xp->NumParticlesOfGroupData(n);
+		unsigned int num_total = xp->NumParticles();
+		double min_rad = xp->MinRadiusOfGroupData(n);
+		double max_rad = xp->MaxnRadiusOfGroupData(n);
+		wparticles *wp = new wparticles(plate);
+		wp->LEName->setText(n);
+		wp->LEMaterial->setText(mat);
+		wp->LENumThis->setText(QString("%1").arg(num_this));
+		wp->LENumTotal->setText(QString("%1").arg(num_total));
+		wp->LEMinRadius->setText(QString("%1").arg(min_rad));
+		wp->LEMaxRadius->setText(QString("%1").arg(max_rad));
+		plate_layout->addWidget(wp);
+		plate_layout->setAlignment(Qt::AlignTop);
+		plate_frame->setMaximumWidth(240);
+		plate_frame->setLayout(plate_layout);
+	//	plate_layout->addWidget(wp);
+		plate->setWidget(plate_frame);
+		cwidget = PARTICLE_WIDGET;
+	}
+	//CallViewWidget(n)
+}
 
 void xModelNavigator::CallResultPart()
 {
@@ -303,6 +317,11 @@ void wview::setupColor()
 	LEBlue->setText(QString("%1").arg(c.blue()));
 }
 
+void wview::changeTransparency(int c)
+{
+	xo->setBlendAlpha((100 - c) * 0.01);
+}
+
 void wview::colorPalette()
 {
 	QColor c = QColorDialog::getColor();
@@ -315,20 +334,23 @@ void wview::colorPalette()
 	LERed->setText(QString("%1").arg(red));
 	LEGreen->setText(QString("%1").arg(green));
 	LEBlue->setText(QString("%1").arg(blue));
-	
+	xo->setColor(c);
 }
 
 void wview::changeRedColor(int r)
 {
 	LERed->setText(QString("%1").arg(r));
+	xo->Color().setRed(r);
 }
 
 void wview::changeGreenColor(int g)
 {
 	LEGreen->setText(QString("%1").arg(g));
+	xo->Color().setGreen(g);
 }
 
 void wview::changeBlueColor(int b)
 {
 	LEBlue->setText(QString("%1").arg(b));
+	xo->Color().setBlue(b);
 }

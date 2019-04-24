@@ -67,6 +67,12 @@
     <Filter Include="소스 파일\xdynamics_object\force">
       <UniqueIdentifier>{8b60814d-eba0-4255-9835-fa82a3e6629e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="헤더 파일\xdynamics_object\kernel">
+      <UniqueIdentifier>{c85be8ed-fe15-4cd4-8051-29dc8de365fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\xdynamics_object\kernel">
+      <UniqueIdentifier>{738e3839-9609-4239-8c2d-8f25f6f57ba5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -224,6 +230,27 @@
     </ClCompile>
     <ClCompile Include="..\..\source\xdynamics_object\xRotationalAxialForce.cpp">
       <Filter>소스 파일\xdynamics_object\force</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_manager\xSmoothedParticleHydrodynamicsModel.cpp">
+      <Filter>소스 파일\xdynamics_manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xKernelFunction.cpp">
+      <Filter>소스 파일\xdynamics_object\kernel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xCubicSplineKernel.cpp">
+      <Filter>소스 파일\xdynamics_object\kernel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xQuadraticKernel.cpp">
+      <Filter>소스 파일\xdynamics_object\kernel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xQuinticKernel.cpp">
+      <Filter>소스 파일\xdynamics_object\kernel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xWendlandKernel.cpp">
+      <Filter>소스 파일\xdynamics_object\kernel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xLineObject.cpp">
+      <Filter>소스 파일\xdynamics_object\shapeObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -394,6 +421,30 @@
     </ClInclude>
     <ClInclude Include="..\..\include\xdynamics_object\xRotationalAxialForce.h">
       <Filter>헤더 파일\xdynamics_object\force</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_simulation\xSmoothedParticleHydrodynamicsSimulation.h">
+      <Filter>헤더 파일\xdynamics_simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_manager\xSmoothedParticleHydrodynamicsModel.h">
+      <Filter>헤더 파일\xdynamics_manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_object\xKernelFunction.h">
+      <Filter>헤더 파일\xdynamics_object\kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_object\xCubicSplineKernel.h">
+      <Filter>헤더 파일\xdynamics_object\kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_object\xQuadraticKernel.h">
+      <Filter>헤더 파일\xdynamics_object\kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_object\xQuinticKernel.h">
+      <Filter>헤더 파일\xdynamics_object\kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_object\xWendlandKernel.h">
+      <Filter>헤더 파일\xdynamics_object\kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_object\xLineObject.h">
+      <Filter>헤더 파일\xdynamics_object\shapeObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

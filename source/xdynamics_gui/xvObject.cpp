@@ -9,6 +9,8 @@ xvObject::xvObject()
 //	, vot(VIEW_OBJECT)
 	, drawingMode(GL_FILL)
 	, type(V_OBJECT)
+	, pmrs(NULL)
+	, blend_alpha(0.5f)
 	//, m_type(NO_MATERIAL)
 	, display(false)
 	, isSelected(false)
@@ -32,6 +34,8 @@ xvObject::xvObject(Type tp, QString _name)
 //	, vot(VIEW_OBJECT)
 	, drawingMode(GL_LINE)
 	, type(tp)
+	, pmrs(NULL)
+	, blend_alpha(1.0f)
 //	, m_type(NO_MATERIAL)
 	, display(false)
 	, isSelected(false)
@@ -60,6 +64,11 @@ void xvObject::setAngle(float x, float y, float z)
 void xvObject::setPosition(float x, float y, float z)
 {
 	pos.x = x; pos.y = y; pos.z = z;
+}
+
+void xvObject::bindPointMassResultsPointer(xPointMass::pointmass_result* _pmrs)
+{
+	pmrs = _pmrs;
 }
 
 void xvObject::setSelected(bool b)

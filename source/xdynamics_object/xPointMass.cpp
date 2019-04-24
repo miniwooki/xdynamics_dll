@@ -267,6 +267,11 @@ vector4d xPointMass::EulerParameterMoment() const
 	return em;
 }
 
+xPointMass::pointmass_result* xPointMass::XPointMassResultPointer()
+{
+	return pmrs;
+}
+
 // Declaration operate functions
 void xPointMass::setupTransformationMatrix()
 {

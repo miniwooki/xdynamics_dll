@@ -37,6 +37,12 @@ public:
 	void upParticleScale(double v) { pscale += v; }
 	void downParticleScale(double v) { pscale -= v; }
 	void setBufferMemories(unsigned int sz);
+	QString NameOfGroupData(QString& n);
+	QString MaterialOfGroupData(QString& n);
+	unsigned int NumParticlesOfGroupData(QString& n);
+	unsigned int NumParticles();
+	double MinRadiusOfGroupData(QString& n);
+	double MaxnRadiusOfGroupData(QString& n);
 	QMap<QString, particleGroupData>& ParticleGroupData() { return pgds; }
 
 private:

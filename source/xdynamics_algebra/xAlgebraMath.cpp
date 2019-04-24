@@ -81,6 +81,21 @@ void coordinatePartitioning(xSparseD& lhs, int* uID)
 		uID[id] = buf2;
 	}
 }
+
+vector3d EulerParameterToEulerAngle(const euler_parameters& ep)
+{
+	double m13 = 2.0 * (ep.e1 * ep.e3 + ep.e0 * ep.e2);
+	double m23 = 2.0 * (ep.e2 * ep.e3 - ep.e0 * ep.e1);
+	double m33 = ep.e0*ep.e0 - ep.e1*ep.e1 - ep.e2*ep.e2 + ep.e3*ep.e3;
+	double m31 = 2.0 * (ep.e1 * ep.e3 - ep.e0 * ep.e2);
+	double m32 = 2.0 * (ep.e2 * ep.e3 + ep.e0 * ep.e1);
+
+	return new_vector3d(
+		atan2(m13, -m23),
+		atan2(sqrt(1 - m33 * m33), m33),
+		atan2(m31, m32));
+}
+
 vector3d ToVector3D(vector3ui& v3)
 {
 	return

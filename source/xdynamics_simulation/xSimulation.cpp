@@ -5,6 +5,8 @@ double xSimulation::dt = 0.0001;
 xSimulation::deviceType xSimulation::dev = xSimulation::CPU;
 xSimulation::MBDSolverType xSimulation::mbd_solver_type = xSimulation::MBD_SOLVER;
 xSimulation::DEMSolverType xSimulation::dem_solver_type = xSimulation::DEM_SOLVER;
+xSimulation::SPHSolverType xSimulation::sph_solver_type = xSimulation::SPH_SOLVER;
+
 double xSimulation::ctime = 0.0;
 double xSimulation::et = 1.0;
 double xSimulation::start_time = 0.0;
@@ -76,4 +78,9 @@ void xSimulation::setMBDSolverType(MBDSolverType mst)
 void xSimulation::setDEMSolverType(DEMSolverType dst)
 {
 	dem_solver_type = dst;
+}
+
+void xSimulation::setSPHSolverType(SPHSolverType sst)
+{
+	sph_solver_type = sst;
 }

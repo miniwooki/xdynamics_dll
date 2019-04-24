@@ -23,10 +23,10 @@ private:
 	void setNormalList();
 	unsigned int glList;
 	unsigned int glHiList;
-	float len;
-	float r_top, r_bottom;
-	float p0[3];
-	float p1[3];
+// 	float len;
+// 	float r_top, r_bottom;
+// 	float p0[3];
+// 	float p1[3];
 	xCylinderObjectData data;
 };
 

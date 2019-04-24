@@ -176,12 +176,16 @@
     <ClCompile Include="..\..\source\xdynamics_manager\xMultiBodyModel.cpp" />
     <ClCompile Include="..\..\source\xdynamics_manager\xParticleManager.cpp" />
     <ClCompile Include="..\..\source\xdynamics_manager\xResultManager.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_manager\xSmoothedParticleHydrodynamicsModel.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xContact.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xContactPairList.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xCubeObject.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xCubicSplineKernel.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xDrivingConstraint.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xForce.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xKernelFunction.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xKinematicConstraint.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xLineObject.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xMeshObject.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xObejct.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xParticleCubeContact.cpp" />
@@ -193,12 +197,15 @@
     <ClCompile Include="..\..\source\xdynamics_object\xParticlePlanesContact.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xPlaneObject.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xPointMass.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xQuadraticKernel.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xQuinticKernel.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xRevoluteConstraint.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xSphericalConstraint.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xSpringDamperForce.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xTranslationConstraint.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xUniversalConstraint.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xRotationalAxialForce.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xWendlandKernel.cpp" />
     <ClCompile Include="..\..\source\xdynamics_simulation\xDiscreteElementMethodSimulation.cpp" />
     <ClCompile Include="..\..\source\xdynamics_simulation\xDynamicSimulator.cpp" />
     <ClCompile Include="..\..\source\xdynamics_simulation\xIntegratorHHT.cpp" />
@@ -246,12 +253,16 @@
     <ClInclude Include="..\..\include\xdynamics_manager\xParticleMananger.h" />
     <ClInclude Include="..\..\include\xdynamics_manager\xResultManager.h" />
     <ClInclude Include="..\..\include\xdynamics_manager\xResultStorage.h" />
+    <ClInclude Include="..\..\include\xdynamics_manager\xSmoothedParticleHydrodynamicsModel.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xConatct.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xContactPairList.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xCubeObject.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xCubicSplineKernel.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xDrivingConstraint.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xForce.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xKernelFunction.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xKinematicConstraint.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xLineObject.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xMeshObject.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xObject.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xParticleCubeContact.h" />
@@ -263,12 +274,15 @@
     <ClInclude Include="..\..\include\xdynamics_object\xParticlePlanesContact.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xPlaneObject.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xPointMass.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xQuadraticKernel.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xQuinticKernel.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xRevoluteConstraint.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xRotationalAxialForce.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xSphericalConstraint.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xSpringDamperForce.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xTranslationConstraint.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xUniversalConstraint.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xWendlandKernel.h" />
     <ClInclude Include="..\..\include\xdynamics_parallel\xParallelDEM_impl.cuh">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
@@ -280,6 +294,7 @@
     <ClInclude Include="..\..\include\xdynamics_simulation\xKinematicAnalysis.h" />
     <ClInclude Include="..\..\include\xdynamics_simulation\xMultiBodySimulation.h" />
     <ClInclude Include="..\..\include\xdynamics_simulation\xSimulation.h" />
+    <ClInclude Include="..\..\include\xdynamics_simulation\xSmoothedParticleHydrodynamicsSimulation.h" />
     <ClInclude Include="..\..\include\xLog.h" />
     <ClInclude Include="..\..\include\xTypes.h" />
     <ClInclude Include="..\..\include\xViewExporter.h" />

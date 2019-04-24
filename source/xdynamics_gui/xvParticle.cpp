@@ -1,5 +1,6 @@
 #include "xvParticle.h"
 #include "xvShader.h"
+#include "../xTypes.h"
 //#include "colors.h"
 //#include "msgBox.h"
 //#include "model.h"
@@ -203,6 +204,7 @@ bool xvParticle::defineFromViewFile(QString path)
 		memset(_name, 0, sizeof(char) * 255);
 		qf.read((char*)_name, sizeof(char) * ns);
 		name.sprintf("%s", _name);
+		pgds[name].name = name;
 		qf.read((char*)&(pgds[name].mat), sizeof(int));
 		qf.read((char*)&(pgds[name].sid), sizeof(unsigned int));
 		qf.read((char*)&(pgds[name].np), sizeof(unsigned int));
@@ -439,6 +441,36 @@ void xvParticle::setBufferMemories(unsigned int sz)
 		delete[] color_buffers;
 	color_buffers = new float[sz * np * 4];
 	xvAnimationController::allocTimeMemory(sz);
+}
+
+QString xvParticle::NameOfGroupData(QString& n)
+{
+	return pgds[n].name;
+}
+
+QString xvParticle::MaterialOfGroupData(QString& n)
+{
+	return NameOfMaterial(pgds[n].mat);
+}
+
+unsigned int xvParticle::NumParticlesOfGroupData(QString& n)
+{
+	return pgds[n].np;
+}
+
+unsigned int xvParticle::NumParticles()
+{
+	return np;
+}
+
+double xvParticle::MinRadiusOfGroupData(QString& n)
+{
+	return pgds[n].min_rad;
+}
+
+double xvParticle::MaxnRadiusOfGroupData(QString& n)
+{
+	return pgds[n].max_rad;
 }
 
 // void xvParticle::changeParticles(VEC4D_PTR _pos)

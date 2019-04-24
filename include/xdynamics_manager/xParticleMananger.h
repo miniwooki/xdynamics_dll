@@ -27,9 +27,11 @@ public:
 	static unsigned int GetNumCubeParticles(double dx, double dy, double dz, double min_radius, double max_radius);
 	static unsigned int GetNumPlaneParticles(double dx, unsigned int ny, double dy, double min_radius, double max_radius);
 	static unsigned int GetNumCircleParticles(double d, unsigned int ny, double min_radius, double max_radius);
+	static unsigned int GetNumSPHPlaneParticles(double dx, double dy, double ps);
 
 	xParticleObject* CreateParticleFromList(std::string n, xMaterialType mt, unsigned int _np, vector4d* d);
 	xParticleObject* CreateCubeParticle(std::string n, xMaterialType mt, unsigned int _np, xCubeParticleData& d);
+	xParticleObject* CreateSPHPlaneParticle(std::string n, unsigned int _np, xSPHPlaneObjectData& d);
 
 private:
 // 	bool is_realtime_creating;

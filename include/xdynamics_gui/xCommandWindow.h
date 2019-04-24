@@ -15,6 +15,7 @@ public:
 	xCommandWindow(QWidget* parent);
 	~xCommandWindow();
 
+	void ClearCommandText();
 	void write(mode tw, QString c);
 	void printLine();
 	//void addChild(tRoot, QString& _nm);

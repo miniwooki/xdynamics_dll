@@ -18,6 +18,7 @@
 #include "xvAnimationController.h"
 #include "../xTypes.h"
 #include "xdynamics_algebra/xAlgebraMath.h"
+#include "xdynamics_object/xPointMass.h"
 //#include "types.h"
 //#include "algebraMath.h"
 
@@ -30,6 +31,7 @@ public:
 	virtual ~xvObject();
 
  	Type ObjectType() { return type; }
+	static int xvObjectCount() { return count; }
 // // 	void setInitialPosition( ip) { pos0 = ip; }
 // // 	void setInitialAngle(VEC3D ia) { ang0 = ia; }
 // //	void setCurrentPosition(VEC3D cp) { cpos = cp; }
@@ -47,9 +49,11 @@ public:
 	void setName(QString n);// { nm = n; }
 	void setAngle(float x, float y, float z);
 	void setPosition(float x, float y, float z);
+	void setBlendAlpha(float v) { blend_alpha = v; }
+	void bindPointMassResultsPointer(xPointMass::pointmass_result* _pmrs);
 // 	void setDisplay(bool _dis) { display = _dis; }
- 	QColor Color() { return clr; }
-// 	void setColor(color_type ct);
+ 	QColor& Color() { return clr; }
+	void setColor(QColor ct) { clr = ct; }
 // 	static void msgBox(QString ch, QMessageBox::Icon ic);
 // 	void copyCoordinate(GLuint _coord);
 // 	void setDrawingMode(GLenum dm) { drawingMode = dm; }
@@ -79,9 +83,12 @@ protected:
 	GLenum drawingMode;
 	bool display;
 	QColor clr;
+	float blend_alpha;
 	static int count;
 	vector3f pos;
 	vector3f ang;
+
+	xPointMass::pointmass_result* pmrs;
 // 	VEC3D pos0;
 // 	VEC3D ang0;
 // 	VEC3D cpos;

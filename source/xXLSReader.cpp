@@ -2,6 +2,7 @@
 #include "xViewExporter.h"
 #include "xdynamics_manager/xMultiBodyModel.h"
 #include "xdynamics_manager/XDiscreteElementMethodModel.h"
+#include "xdynamics_manager/xSmoothedParticleHydrodynamicsModel.h"
 #include "xdynamics_manager/xObjectManager.h"
 #include "xdynamics_manager/xContactManager.h"
 #include "xdynamics_simulation/xSimulation.h"
@@ -75,6 +76,26 @@ xJointData xXLSReader::ReadJointData(std::string& _name, int r, int& c)
 		xve->Write((char*)&ns, sizeof(unsigned int));
 		xve->Write((char*)_name.c_str(), sizeof(char)*ns);
 		xve->Write((char*)&d, sizeof(xJointData));
+	}
+	return d;
+}
+
+xLineObjectData xXLSReader::ReadLineObjectData(std::string& _name, int mat, int r, int& c)
+{
+	xLineObjectData d = { 0, };
+	double* ptr = &d.p0x;
+	std::wstring x;
+	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 0);
+	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 3);
+	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 6);
+	if (xve)
+	{
+		int t = VLINE;
+		xve->Write((char*)&t, sizeof(int));
+		unsigned int ns = static_cast<unsigned int>(_name.size());
+		xve->Write((char*)&ns, sizeof(unsigned int));
+		xve->Write((char*)_name.c_str(), sizeof(char)*ns);
+		xve->Write((char*)&d, sizeof(xLineObjectData));
 	}
 	return d;
 }
@@ -213,6 +234,27 @@ xRotationalAxialForceData xXLSReader::ReadxRotationalAxialForceData(std::string&
 	return d;
 }
 
+xSPHPlaneObjectData xXLSReader::ReadSPHPlaneParticleData(std::string& _name, int r, int& c)
+{
+	xSPHPlaneObjectData d = { 0, };
+	double* ptr = &d.dx;
+	std::wstring x;
+	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 2, ptr + 0);
+	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 2);
+	d.ps = sheet->readNum(r, c++);
+	d.visc = sheet->readNum(r, c++);
+	d.rho = sheet->readNum(r, c++);
+	if (xve)
+	{
+		int t = VSPHPLANE;
+		xve->Write((char*)&t, sizeof(int));
+		unsigned int ns = static_cast<unsigned int>(_name.size());
+		xve->Write((char*)&ns, sizeof(unsigned int));
+		xve->Write((char*)_name.c_str(), sizeof(char)*ns);
+		xve->Write((char*)&d, sizeof(xSPHPlaneObjectData));
+	}
+}
+
 bool xXLSReader::Load(const wchar_t* n)
 {
 	book = xlCreateBook();
@@ -296,6 +338,17 @@ void xXLSReader::ReadForce(xMultiBodyModel* xmbd, vector2i rc)
 	}
 }
 
+void xXLSReader::ReadKernel(xSmoothedParticleHydrodynamicsModel* xsph, vector2i rc)
+{
+	if (IsEmptyCell(rc.x, rc.y)) return;
+	xKernelFunctionData d = { 0, };
+	d.type = static_cast<int>(sheet->readNum(rc.x, rc.y++));
+	d.factor = sheet->readNum(rc.x, rc.y++);
+	d.dim = static_cast<int>(sheet->readNum(rc.x, rc.y++));
+	d.correction = static_cast<int>(sheet->readNum(rc.x, rc.y));
+	xsph->setKernelFunctionData(d);
+}
+
 void xXLSReader::ReadParticle(xParticleManager* xparticle, vector2i rc)
 {
 	if (xparticle)
@@ -309,9 +362,29 @@ void xXLSReader::ReadParticle(xParticleManager* xparticle, vector2i rc)
 			int material = static_cast<int>(sheet->readNum(rc.x, rc.y++));
 			if (form == CUBE_SHAPE)
 			{
-				xCubeParticleData d = ReadCubeParticleData(name, rc.x++, rc.y);
-				unsigned int np = xparticle->GetNumCubeParticles(d.dx, d.dy, d.dz, d.minr, d.maxr);
-				xparticle->CreateCubeParticle(name.c_str(), (xMaterialType)material, np, d);
+				if (material == static_cast<int>(WATER))
+				{
+					
+				}
+				else
+				{
+					xCubeParticleData d = ReadCubeParticleData(name, rc.x++, rc.y);
+					unsigned int np = xparticle->GetNumCubeParticles(d.dx, d.dy, d.dz, d.minr, d.maxr);
+					xparticle->CreateCubeParticle(name.c_str(), (xMaterialType)material, np, d);
+				}				
+			}
+			else if (form == PLANE_SHAPE)
+			{
+				if (material == static_cast<int>(WATER))
+				{
+					xSPHPlaneObjectData d = ReadSPHPlaneParticleData(name, rc.x++, rc.y);
+					unsigned int np = xparticle->GetNumSPHPlaneParticles(d.dx, d.dy, d.ps);
+					xparticle->CreateSPHPlaneParticle(name.c_str(), np, d);
+				}
+				else
+				{
+
+				}
 			}
 			else if (form == NO_SHAPE_AND_LIST)
 			{
@@ -380,6 +453,11 @@ void xXLSReader::ReadShapeObject(xObjectManager* xom, vector2i rc)
 				xCubeObject* xco = xom->CreateCubeShapeObject(name, material);
 				xco->SetupDataFromStructure(ReadCubeObjectData(name, material, rc.x++, rc.y));
 			}
+			else if (form == xShapeType::LINE_SHAPE)
+			{
+				xLineObject* xlo = xom->CreateLineShapeObject(name, material);
+				xlo->SetupDataFromStructure(ReadLineObjectData(name, material, rc.x++, rc.y));
+			}
 			else if (form == xShapeType::PLANE_SHAPE)
 			{
 				xPlaneObject* xpo = xom->CreatePlaneShapeObject(name, material);
@@ -445,6 +523,16 @@ void xXLSReader::ReadIntegrator(vector2i rc)
 		{
 			xSimulation::DEMSolverType type = static_cast<xSimulation::DEMSolverType>(static_cast<int>(sheet->readNum(rc.x++, rc.y)));
 			xSimulation::setDEMSolverType(type);
+		}
+	}
+	rc.y = ic;
+	if (!IsEmptyCell(rc.x, rc.y))
+	{
+		sol = sheet->readStr(rc.x, rc.y++);
+		if (sol == L"SPH")
+		{
+			xSimulation::SPHSolverType type = static_cast<xSimulation::SPHSolverType>(static_cast<int>(sheet->readNum(rc.x++, rc.y)));
+			xSimulation::setSPHSolverType(type);
 		}
 	}
 }

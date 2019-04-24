@@ -17,6 +17,7 @@ public:
 
 	//void setMarkerScale
 	bool define(float x, float y, float z, bool isdefine_text = false);
+	bool define(xPointMassData& d);
 	//void setAttchedMass(bool b) { isAttachMass = b; }
 	//void setAttachObject(QString o) { attachObject = o; }
 	//void setMarkerScaleFlag(bool b) { markerScaleFlag = b; }
@@ -36,6 +37,7 @@ private:
 	// 	int indice[24];
 	// 	float vertice[24];
 	// 	float normal[18];
+	xPointMassData data;
 };
 
 #endif

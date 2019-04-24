@@ -133,6 +133,7 @@ xParticleObject* xParticleManager::CreateCubeParticle(
 	xParticleObject* xpo = new xParticleObject(n);
 	vector4d* pos = xpo->AllocMemory(_np);
 	xpo->setStartIndex(np);
+	xpo->setMaterialType(mt);
 	np += _np;
 	xMaterial xm = GetMaterialConstant(mt);
 	xpo->setDensity(xm.density);
@@ -247,4 +248,16 @@ void xParticleManager::AllocParticleResultMemory(unsigned int npart, unsigned in
 	r_vel = new double[n * 3];
 	memset(r_pos, 0, sizeof(double) * n * 4);
 	memset(r_vel, 0, sizeof(double) * n * 3);
+}
+
+unsigned int xParticleManager::GetNumSPHPlaneParticles(double dx, double dy, double ps)
+{
+	double s = ps;
+	unsigned int count = 0;
+	for (unsigned int x = 0; x < )
+}
+
+xParticleObject* xParticleManager::CreateSPHPlaneParticle(std::string n, unsigned int _np, xSPHPlaneObjectData& d)
+{
+
 }

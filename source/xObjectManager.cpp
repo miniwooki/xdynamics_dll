@@ -40,8 +40,19 @@ QMap<QString, xObject*>& xObjectManager::XObjects()
 	return objects;
 }
 
-xPlaneObject* xObjectManager::CreatePlaneShapeObject(
-	std::string _name, int _xmt)
+xLineObject* xObjectManager::CreateLineShapeObject(std::string _name, int _xmt)
+{
+	QString name = QString::fromStdString(_name);
+	xLineObject* xlo = new xLineObject(_name);
+	xMaterial xm = GetMaterialConstant(_xmt);
+	xlo->setDensity(xm.density);
+	xlo->setYoungs(xm.youngs);
+	xlo->setPoisson(xm.poisson);
+	objects[name] = xlo;
+	return xlo;
+}
+
+xPlaneObject* xObjectManager::CreatePlaneShapeObject(std::string _name, int _xmt)
 {
 	QString name = QString::fromStdString(_name);
 	xPlaneObject* xpo = new xPlaneObject(_name);

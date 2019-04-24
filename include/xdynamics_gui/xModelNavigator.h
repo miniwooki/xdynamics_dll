@@ -6,6 +6,7 @@
 #include "ui_wcube.h"
 #include "ui_wview.h"
 #include "ui_wplane.h"
+#include "ui_wparticles.h"
 #include "xSimulationWidget.h"
 //#include "ui_wsimulation.h"
 //#include "xdynamics_gui.h"
@@ -32,6 +33,15 @@ public:
 	//void setup(QString& name, xCubeObjectData* d);
 };
 
+class wparticles : public QWidget, public Ui::wparticles
+{
+public:
+	wparticles(QWidget* parent = NULL) : QWidget(parent) { setupUi(this); }
+	~wparticles(){}
+
+	//void setup(QString& name, xCubeObjectData* d);
+};
+
 class wview : public QWidget, public Ui::wview
 {
 	Q_OBJECT
@@ -39,6 +49,7 @@ public:
 	wview(QWidget* parent = NULL) : QWidget(parent) 
 	{ 
 		setupUi(this);
+		connect(HSTransparency, SIGNAL(valueChanged(int)), this, SLOT(changeTransparency(int)));
 		connect(PBPalette, SIGNAL(clicked()), this, SLOT(colorPalette()));
 		connect(HSRed, SIGNAL(valueChanged(int)), this, SLOT(changeRedColor(int)));
 		connect(HSGreen, SIGNAL(valueChanged(int)), this, SLOT(changeGreenColor(int)));
@@ -50,6 +61,7 @@ public:
 	void setupColor();
 
 	private slots :
+	void changeTransparency(int);
 		void colorPalette();
 		void changeRedColor(int);
 		void changeGreenColor(int);
@@ -64,7 +76,7 @@ class xModelNavigator : public QDockWidget
 
 public:
 	//enum tMotherRoot { OBJECT_ROOT = 0, RESULT_ROOT, SIMULATION_ROOT };
-	enum tWidget{ NO_WIDGET = 0, CUBE_WIDGET, PLANE_WIDGET, SIMULATION_WIDGET };
+	enum tWidget{ NO_WIDGET = 0, CUBE_WIDGET, PLANE_WIDGET, SIMULATION_WIDGET, PARTICLE_WIDGET };
 	enum tRoot { OBJECT_ROOT = 0, RESULT_ROOT, SIMULATION_ROOT, SHAPE_ROOT, MASS_ROOT, PARTICLE_ROOT, PART_ROOT };
 
 	xModelNavigator();
@@ -74,6 +86,8 @@ public:
 	void addChild(tRoot, QString _nm);
 	void addChilds(tRoot, QStringList& qsl);
 	QTreeWidgetItem* getRootItem(tRoot tr);
+	void ClearTreeObject();
+	void InitPlate();
 	//static wsimulation* SimulationWidget();
 signals:
 	void definedSimulationWidget(wsimulation*);
@@ -86,6 +100,7 @@ private slots:
 // 	void propertySignal(QString, context_object_type);
 private:
 	void CallShape(QString& n);
+	void CallParticles(QString& n);
 	//void CallView();
 	void CallResultPart();
 	void CallSimulation();

@@ -59,10 +59,12 @@ bool xvCube::makeCubeGeometry(xCubeObjectData& d)
 void xvCube::draw(GLenum eMode)
 {
 	if (display){
+		//glEnable(GL_BLEND);
+		//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glPushMatrix();
-		glDisable(GL_LIGHTING);
-		glColor3f(clr.redF(), clr.greenF(), clr.blueF());
+		//glDisable(GL_LIGHTING);
+		glColor4f(clr.redF(), clr.greenF(), clr.blueF(), blend_alpha);
 // 		if (vcontroller::getFrame() && outPos && outRot)
 // 			//animationFrame();
 		if (eMode == GL_SELECT)
@@ -83,7 +85,8 @@ void xvCube::draw(GLenum eMode)
 			glDisable(GL_LINE_STIPPLE);
 		}
 		glPopMatrix();
-		glEnable(GL_LIGHTING);
+		//glEnable(GL_LIGHTING);
+		//glDisable(GL_BLEND);
 	}
 }
 
