@@ -102,3 +102,13 @@ void xCubeObject::SetupDataFromStructure(xCubeObjectData& d)
 		new_vector3d(d.p0x, d.p0y, d.p0z),
 		new_vector3d(d.p1x, d.p1y, d.p1z));
 }
+
+unsigned int xCubeObject::create_sph_particles(double ps, vector4d* p)
+{
+	return 0;
+}
+
+QVector<xCorner> xCubeObject::get_sph_boundary_corners()
+{
+	return QVector<xCorner>();
+}

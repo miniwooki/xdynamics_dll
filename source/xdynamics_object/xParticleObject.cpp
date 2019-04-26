@@ -69,9 +69,24 @@ double xParticleObject::MaxRadius() const
 	return max_radius;
 }
 
+xShapeType xParticleObject::ShapeForm() const
+{
+	return form;
+}
+
 vector4d* xParticleObject::Position() const
 {
 	return pos;
+}
+
+unsigned int xParticleObject::create_sph_particles(double ps, vector4d* p)
+{
+	return 0;
+}
+
+QVector<xCorner> xParticleObject::get_sph_boundary_corners()
+{
+	return QVector<xCorner>();
 }
 
 void xParticleObject::setMinRadius(double _mr)
@@ -82,4 +97,9 @@ void xParticleObject::setMinRadius(double _mr)
 void xParticleObject::setMaxRadius(double _mr)
 {
 	max_radius = _mr;
+}
+
+void xParticleObject::setShapeForm(xShapeType xst)
+{
+	form = xst;
 }

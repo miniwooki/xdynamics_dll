@@ -13,6 +13,7 @@ public:
 	void setStartIndex(unsigned int sid);
 	void setMinRadius(double _mr);
 	void setMaxRadius(double _mr);
+	void setShapeForm(xShapeType xst);
 
 	vector4d* AllocMemory(unsigned int _np);
 
@@ -21,8 +22,11 @@ public:
 	unsigned int NumParticle() const;
 	double MinRadius() const;
 	double MaxRadius() const;
+	xShapeType ShapeForm() const;
 	vector4d* Position() const;
 
+	virtual unsigned int create_sph_particles(double ps, vector4d* p = NULL);
+	virtual QVector<xCorner> get_sph_boundary_corners();
 // 	static unsigned int calculateNumCubeParticles(double dx, double dy, double dz, double min_radius, double max_radius);
 // 	static unsigned int calculateNumPlaneParticles(double dx, unsigned int ny, double dy, double min_radius, double max_radius);
 // 	static unsigned int calculateNumCircleParticles(double d, unsigned int ny, double min_radius, double max_radius);
@@ -35,6 +39,7 @@ public:
 
 private:
 	static unsigned int xpo_count;
+	xShapeType form;
 	unsigned int sid;
 	unsigned int np;
 	double min_radius;

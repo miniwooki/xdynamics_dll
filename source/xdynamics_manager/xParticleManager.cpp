@@ -126,6 +126,74 @@ xParticleObject* xParticleManager::CreateParticleFromList(
 	return xpo;
 }
 
+xParticleObject* xParticleManager::CreateSPHParticles(xObject* xobj, double ps)
+{
+	xParticleObject* xpo = new xParticleObject(xobj->Name().toStdString());
+	//vector4d* pos = xpo->AllocMemory(_np);
+	xpo->setStartIndex(np);
+	xpo->setMaterialType(xobj->Material());
+	//np += _np;
+	xMaterial xm = GetMaterialConstant(xobj->Material());
+	xpo->setDensity(xm.density);
+	xpo->setYoungs(xm.youngs);
+	xpo->setPoisson(xm.poisson);
+	xpo->setMinRadius(ps * 0.5);
+	xpo->setMaxRadius(ps * 0.5);
+	unsigned int _np = xobj->create_sph_particles(ps);
+	np += _np;
+	xobj->create_sph_particles(ps, xpo->AllocMemory(_np));
+	xpcos[xobj->Name()] = xpo;
+	xObjectManager::XOM()->addObject(xpo);
+	return xpo;
+}
+
+// void xParticleManager::create_sph_particles_with_plane_shape(
+// 	double dx, double dy, double lx, double ly, double lz, double ps)
+// {
+// 
+// }
+
+// unsigned int xParticleManager::GetNumSPHPlaneParticles(double dx, double dy, double ps)
+// {
+// 	unsigned int nx = static_cast<unsigned int>((dx / ps) + 1e-9) - 1;
+// 	unsigned int ny = static_cast<unsigned int>((dy / ps) + 1e-9) - 1;
+// 	return nx * ny;
+// }
+
+// xParticleObject* xParticleManager::CreateSPHPlaneParticleObject(
+// 	std::string n, xMaterialType mt, xSPHPlaneObjectData& d)
+// {
+// 	QString name = QString::fromStdString(n);
+// 	xParticleObject* xpo = new xParticleObject(n);
+// 	//vector4d* pos = xpo->AllocMemory(_np);
+// 	//xpo->setStartIndex(np);
+// 	xpo->setMaterialType(mt);
+// 	//np += _np;
+// 	xMaterial xm = GetMaterialConstant(mt);
+// 	xpo->setDensity(xm.density);
+// 	xpo->setYoungs(xm.youngs);
+// 	xpo->setPoisson(xm.poisson);
+// 	xpo->setMinRadius(d.ps * 0.5);
+// 	xpo->setMaxRadius(d.ps * 0.5);
+// // 	unsigned int nx = static_cast<unsigned int>((d.dx / d.ps) + 1e-9) - 1;
+// // 	unsigned int ny = static_cast<unsigned int>((d.dy / d.ps) + 1e-9) - 1;
+// // 	unsigned int count = 0;
+// // 	for (unsigned int x = 0; x < nx; x++)
+// // 	{
+// // 		double px = x * d.lx + d.ps;
+// // 		for (unsigned int y = 0; y < ny; y++)
+// // 		{
+// // 			pos[count].x = px;
+// // 			pos[count].y = y * d.ly + d.ps;
+// // 			pos[count].z = 0.0;
+// // 			count++;
+// // 		}
+// // 	}
+// 	xpcos[name] = xpo;
+// 	xObjectManager::XOM()->addObject(xpo);
+// 	return xpo;
+// }
+
 xParticleObject* xParticleManager::CreateCubeParticle(
 	std::string n, xMaterialType mt, unsigned int _np, xCubeParticleData& d)
 {
@@ -250,14 +318,3 @@ void xParticleManager::AllocParticleResultMemory(unsigned int npart, unsigned in
 	memset(r_vel, 0, sizeof(double) * n * 3);
 }
 
-unsigned int xParticleManager::GetNumSPHPlaneParticles(double dx, double dy, double ps)
-{
-	double s = ps;
-	unsigned int count = 0;
-	for (unsigned int x = 0; x < )
-}
-
-xParticleObject* xParticleManager::CreateSPHPlaneParticle(std::string n, unsigned int _np, xSPHPlaneObjectData& d)
-{
-
-}

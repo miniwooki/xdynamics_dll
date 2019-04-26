@@ -1,4 +1,5 @@
 #include "xdynamics_manager/xObjectManager.h"
+#include "xdynamics_manager/xParticleMananger.h"
 #include "xdynamics_object/xPlaneObject.h"
 
 xObjectManager* _xom = NULL;
@@ -44,6 +45,7 @@ xLineObject* xObjectManager::CreateLineShapeObject(std::string _name, int _xmt)
 {
 	QString name = QString::fromStdString(_name);
 	xLineObject* xlo = new xLineObject(_name);
+	xlo->setMaterialType((xMaterialType)_xmt);
 	xMaterial xm = GetMaterialConstant(_xmt);
 	xlo->setDensity(xm.density);
 	xlo->setYoungs(xm.youngs);
@@ -56,6 +58,7 @@ xPlaneObject* xObjectManager::CreatePlaneShapeObject(std::string _name, int _xmt
 {
 	QString name = QString::fromStdString(_name);
 	xPlaneObject* xpo = new xPlaneObject(_name);
+	xpo->setMaterialType((xMaterialType)_xmt);
 	xMaterial xm = GetMaterialConstant(_xmt);
 	xpo->setDensity(xm.density);
 	xpo->setYoungs(xm.youngs);
@@ -68,6 +71,7 @@ xCubeObject* xObjectManager::CreateCubeShapeObject(std::string _name, int _xmt)
 {
 	QString name = QString::fromStdString(_name);
 	xCubeObject* xco = new xCubeObject(_name);
+	xco->setMaterialType((xMaterialType)_xmt);
 	xMaterial xm = GetMaterialConstant(_xmt);
 	xco->setDensity(xm.density);
 	xco->setYoungs(xm.youngs);
@@ -86,4 +90,15 @@ xMeshObject* xObjectManager::CreateMeshShapeObject(std::string _name, int _xmt)
 	xmo->setPoisson(xm.poisson);
 	objects[name] = xmo;
 	return xmo;
+}
+
+void xObjectManager::CreateSPHBoundaryParticles(xParticleManager* xpm)
+{
+// 	foreach(xObject *xo, XObjects())
+// 	{
+// 		if (xo->Material() == BOUNDARY)
+// 		{
+// 			xpm->CreateLineParticle
+// 		}
+// 	}
 }

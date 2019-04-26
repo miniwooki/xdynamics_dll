@@ -26,7 +26,8 @@ public:
 	void ReadJoint(xMultiBodyModel* xmbd, vector2i rc);
 	void ReadForce(xMultiBodyModel* xmbd, vector2i rc);
 	void ReadKernel(xSmoothedParticleHydrodynamicsModel* xsph, vector2i rc);
-	void ReadParticle(xParticleManager* xparticle, vector2i rc);
+	void ReadDEMParticle(xDiscreteElementMethodModel* xdem, vector2i rc);
+	void ReadSPHParticle(xSmoothedParticleHydrodynamicsModel* xsph, vector2i rc);
 	void ReadContact(xContactManager* xcm, vector2i rc);
 	void ReadShapeObject(xObjectManager* xom, vector2i rc);
 	void ReadIntegrator(vector2i rc);
@@ -50,7 +51,7 @@ private:
 	xContactParameterData ReadContactData(std::string& _name, int r, int& c);
 	xTSDAData ReadTSDAData(std::string& _name, int r, int& c);
 	xRotationalAxialForceData ReadxRotationalAxialForceData(std::string& _name, int r, int& c);
-	xSPHPlaneObjectData ReadSPHPlaneParticleData(std::string& _name, int r, int& c);
+	//xSPHPlaneObjectData ReadSPHPlaneParticleData(std::string& _name, int r, int& c);
 
 	Book* book;
 	Sheet* sheet;

@@ -187,7 +187,7 @@
     <ClCompile Include="..\..\source\xdynamics_object\xKinematicConstraint.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xLineObject.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xMeshObject.cpp" />
-    <ClCompile Include="..\..\source\xdynamics_object\xObejct.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xObject.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xParticleCubeContact.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xParticleMeshObjectContact.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xParticleMeshObjectsContact.cpp" />
@@ -214,6 +214,7 @@
     <ClCompile Include="..\..\source\xdynamics_simulation\xKinematicAnalysis.cpp" />
     <ClCompile Include="..\..\source\xdynamics_simulation\xMultiBodySimulation.cpp" />
     <ClCompile Include="..\..\source\xdynamics_simulation\xSimulation.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_simulation\xSmoothedParticleHydrodynamicsSimulation.cpp" />
     <ClCompile Include="..\..\source\xLog.cpp" />
     <ClCompile Include="..\..\source\xViewExporter.cpp" />
     <ClCompile Include="..\..\source\xXLSReader.cpp" />

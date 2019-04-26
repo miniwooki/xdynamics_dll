@@ -129,9 +129,6 @@
     <ClCompile Include="..\..\source\xdynamics_manager\xParticleManager.cpp">
       <Filter>소스 파일\xdynamics_manager</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\xdynamics_object\xObejct.cpp">
-      <Filter>소스 파일\xdynamics_object</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\xdynamics_algebra\xAlgebraType.cpp">
       <Filter>소스 파일\xdynamics_algebra</Filter>
     </ClCompile>
@@ -251,6 +248,12 @@
     </ClCompile>
     <ClCompile Include="..\..\source\xdynamics_object\xLineObject.cpp">
       <Filter>소스 파일\xdynamics_object\shapeObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xObject.cpp">
+      <Filter>소스 파일\xdynamics_object</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_simulation\xSmoothedParticleHydrodynamicsSimulation.cpp">
+      <Filter>소스 파일\xdynamics_simulation</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

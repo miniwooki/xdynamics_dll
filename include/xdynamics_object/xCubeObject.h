@@ -31,6 +31,9 @@ public:
 
 	void SetupDataFromStructure(xCubeObjectData& d);
 
+	virtual unsigned int create_sph_particles(double ps, vector4d* p = NULL);
+	virtual QVector<xCorner> get_sph_boundary_corners();
+
 private:
 	xPlaneObject *planes;
 	vector3d ori;

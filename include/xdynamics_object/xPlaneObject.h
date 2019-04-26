@@ -12,7 +12,7 @@ public:
 	virtual ~xPlaneObject();
 
 	bool define(vector3d& _xw, vector3d& _pa, vector3d& _pb);
-	bool define(double dx, double dy, vector3d& d, vector3d& _xw, vector3d& _pc);
+	bool define(vector3d& p0, vector3d& p1, vector3d& p2, vector3d& p3);
 	double L1() const;// { return l1; }
 	double L2() const;// { return l2; }
 	vector3d U1() const;// { return u1; }
@@ -29,6 +29,9 @@ public:
 
 	void SetupDataFromStructure(xPlaneObjectData& d);
 
+	virtual unsigned int create_sph_particles(double ps, vector4d* p = NULL);
+	virtual QVector<xCorner> get_sph_boundary_corners();
+
 private:
 	double l1, l2;
 	vector3d minp;
@@ -43,6 +46,8 @@ private:
 	vector3d w2;
 	vector3d w3;
 	vector3d w4;
+
+	xPlaneObjectData data;
 };
 
 #endif

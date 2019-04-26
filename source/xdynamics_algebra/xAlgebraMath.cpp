@@ -494,6 +494,11 @@ double length(const vector3ui &v) { return sqrt(dot(v, v)); }
 double length(const vector3f &v) { return sqrt(dot(v, v)); }
 double length(const vector3d &v) { return sqrt(dot(v, v)); }
 
+vector3d normalize(const vector3d& v)
+{
+	return v / length(v);
+}
+
 double xmin(double v1, double v2, double v3)
 {
 	return v1 < v2 ? (v1 < v3 ? v1 : (v3 < v2 ? v3 : v2)) : (v2 < v3 ? v2 : v3);

@@ -9,6 +9,8 @@
 #include "xdynamics_object/xPlaneObject.h"
 #include "xdynamics_object/xMeshObject.h"
 
+class xParticleManager;
+
 class XDYNAMICS_API xObjectManager
 {
 public:
@@ -24,6 +26,8 @@ public:
 	xPlaneObject* CreatePlaneShapeObject(std::string _name, int _xmt);
 	xCubeObject* CreateCubeShapeObject(std::string _name, int _xmt);
 	xMeshObject* CreateMeshShapeObject(std::string _name, int _xmt);
+
+	void CreateSPHBoundaryParticles(xParticleManager* xpm);
 
 private:
 	QMap<QString, xObject*> objects;

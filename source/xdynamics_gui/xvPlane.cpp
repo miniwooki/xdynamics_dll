@@ -15,25 +15,29 @@ xvPlane::xvPlane(QString _name)
 bool xvPlane::makePlaneGeometry(xPlaneObjectData& d)
 {
 	data = d;
-	width = d.dx;
-	height = d.dy;
+	//width = length(;
+	//height = d.dy;
 	
-	pos.x = 0.5f * (d.p1x + d.pox);
-	pos.y = 0.5f * (d.p1y + d.poy);
-	pos.z = 0.5f * (d.p1z + d.poz);
+// 	pos.x = 0.5f * (d.p1x + d.pox);
+// 	pos.y = 0.5f * (d.p1y + d.poy);
+// 	pos.z = 0.5f * (d.p1z + d.poz);
 
-	p0 = new_vector3f(d.pox, d.poy, d.poz);
-	p2 = new_vector3f(d.p1x, d.p1y, d.p1z);
+	p0 = new_vector3f(d.p0x, d.p0y, d.p0z);
+	p1 = new_vector3f(d.p1x, d.p1y, d.p1z);
+	p2 = new_vector3f(d.p2x, d.p2y, d.p2z);
+	p3 = new_vector3f(d.p3x, d.p3y, d.p3z);
+	pos = 0.5f * (p0 + p2);
+	width = length(p1 - p0);
+	height = length(p3 - p0);
+// 	vector3f dr = new_vector3f(d.drx, d.dry, d.drz);
+// 	p1 = cross(dr, p0);
+// 	p1 = p1 / length(p1);
+// 	double hl = sqrt(0.25 * d.dx * d.dx + 0.25 * d.dy * d.dy);
+// 	p1 = hl * p1;
 
-	vector3f dr = new_vector3f(d.drx, d.dry, d.drz);
-	p1 = cross(dr, p0);
-	p1 = p1 / length(p1);
-	double hl = sqrt(0.25 * d.dx * d.dx + 0.25 * d.dy * d.dy);
-	p1 = hl * p1;
-
-	p3 = cross(dr, p2);
-	p3 = p3 / length(p3);
-	p3 = hl * p3;
+// 	p3 = cross(dr, p2);
+// 	p3 = p3 / length(p3);
+// 	p3 = hl * p3;
 	display = define();
 	return display;
 }

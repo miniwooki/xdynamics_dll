@@ -154,6 +154,8 @@ XDYNAMICS_API double length(const vector3ui &v);
 XDYNAMICS_API double length(const vector3f &v);
 XDYNAMICS_API double length(const vector3d &v);
 
+XDYNAMICS_API vector3d normalize(const vector3d& v);
+
 XDYNAMICS_API double xmin(double v1, double v2, double v3 = FLT_MAX);
 XDYNAMICS_API double xmax(double v1, double v2, double v3 = -FLT_MIN);
 

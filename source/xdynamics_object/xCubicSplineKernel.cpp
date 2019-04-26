@@ -39,7 +39,7 @@ double xCubicSplineKernel::sphKernel(double QSq)
 vector3d xCubicSplineKernel::sphKernelGrad(double QSq, vector3d& distVec)
 {
 	double Q = sqrt(QSq);
-	vector3d grad;
+	//vector3d grad;
 	if (Q <= 1.0)
 		return kernel_grad_const * (4.0 - 3.0 * Q) * distVec;
 	else {

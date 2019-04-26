@@ -103,12 +103,12 @@ xLineObjectData xXLSReader::ReadLineObjectData(std::string& _name, int mat, int 
 xPlaneObjectData xXLSReader::ReadPlaneObjectData(std::string& _name, int mat, int r, int& c)
 {
 	xPlaneObjectData d = { 0, };
-	double *ptr = &d.dx;
+	double *ptr = &d.p0x;
 	std::wstring x;
-	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 2, ptr + 0);
-	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 2);
-	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 5);
-	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 8);
+	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 0);
+	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 3);
+	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 6);
+	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 9);
 	if (xve)
 	{
 		int t = VPLANE;
@@ -234,26 +234,26 @@ xRotationalAxialForceData xXLSReader::ReadxRotationalAxialForceData(std::string&
 	return d;
 }
 
-xSPHPlaneObjectData xXLSReader::ReadSPHPlaneParticleData(std::string& _name, int r, int& c)
-{
-	xSPHPlaneObjectData d = { 0, };
-	double* ptr = &d.dx;
-	std::wstring x;
-	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 2, ptr + 0);
-	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 2);
-	d.ps = sheet->readNum(r, c++);
-	d.visc = sheet->readNum(r, c++);
-	d.rho = sheet->readNum(r, c++);
-	if (xve)
-	{
-		int t = VSPHPLANE;
-		xve->Write((char*)&t, sizeof(int));
-		unsigned int ns = static_cast<unsigned int>(_name.size());
-		xve->Write((char*)&ns, sizeof(unsigned int));
-		xve->Write((char*)_name.c_str(), sizeof(char)*ns);
-		xve->Write((char*)&d, sizeof(xSPHPlaneObjectData));
-	}
-}
+// xSPHPlaneObjectData xXLSReader::ReadSPHPlaneParticleData(std::string& _name, int r, int& c)
+// {
+// 	xSPHPlaneObjectData d = { 0, };
+// 	double* ptr = &d.dx;
+// 	std::wstring x;
+// 	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 2, ptr + 0);
+// 	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 2);
+// 	d.ps = sheet->readNum(r, c++);
+// 	d.visc = sheet->readNum(r, c++);
+// 	d.rho = sheet->readNum(r, c++);
+// 	if (xve)
+// 	{
+// 		int t = VSPHPLANE;
+// 		xve->Write((char*)&t, sizeof(int));
+// 		unsigned int ns = static_cast<unsigned int>(_name.size());
+// 		xve->Write((char*)&ns, sizeof(unsigned int));
+// 		xve->Write((char*)_name.c_str(), sizeof(char)*ns);
+// 		xve->Write((char*)&d, sizeof(xSPHPlaneObjectData));
+// 	}
+// }
 
 bool xXLSReader::Load(const wchar_t* n)
 {
@@ -349,9 +349,9 @@ void xXLSReader::ReadKernel(xSmoothedParticleHydrodynamicsModel* xsph, vector2i 
 	xsph->setKernelFunctionData(d);
 }
 
-void xXLSReader::ReadParticle(xParticleManager* xparticle, vector2i rc)
+void xXLSReader::ReadDEMParticle(xDiscreteElementMethodModel* xdem, vector2i rc)
 {
-	if (xparticle)
+	if (xdem->XParticleManager())
 	{
 		while (1)
 		{
@@ -362,31 +362,32 @@ void xXLSReader::ReadParticle(xParticleManager* xparticle, vector2i rc)
 			int material = static_cast<int>(sheet->readNum(rc.x, rc.y++));
 			if (form == CUBE_SHAPE)
 			{
-				if (material == static_cast<int>(WATER))
-				{
-					
-				}
-				else
-				{
-					xCubeParticleData d = ReadCubeParticleData(name, rc.x++, rc.y);
-					unsigned int np = xparticle->GetNumCubeParticles(d.dx, d.dy, d.dz, d.minr, d.maxr);
-					xparticle->CreateCubeParticle(name.c_str(), (xMaterialType)material, np, d);
-				}				
+// 				if (material == static_cast<int>(FLUID))
+// 				{
+// 					
+// 				}
+// 				else
+// 				{
+				xCubeParticleData d = ReadCubeParticleData(name, rc.x++, rc.y);
+				unsigned int np = xdem->XParticleManager()->GetNumCubeParticles(d.dx, d.dy, d.dz, d.minr, d.maxr);
+				xdem->XParticleManager()->CreateCubeParticle(name.c_str(), (xMaterialType)material, np, d);
+//				}				
 			}
 			else if (form == PLANE_SHAPE)
 			{
-				if (material == static_cast<int>(WATER))
-				{
-					xSPHPlaneObjectData d = ReadSPHPlaneParticleData(name, rc.x++, rc.y);
-					unsigned int np = xparticle->GetNumSPHPlaneParticles(d.dx, d.dy, d.ps);
-					xparticle->CreateSPHPlaneParticle(name.c_str(), np, d);
-				}
-				else
-				{
-
-				}
+// 				if (material == static_cast<int>(FLUID))
+// 				{
+// 					xSPHPlaneObjectData d = ReadSPHPlaneParticleData(name, rc.x++, rc.y);
+// 					//unsigned int np = xparticle->GetNumSPHPlaneParticles(d.dx, d.dy, d.ps);
+// 					xparticle->CreateSPHPlaneParticleObject(name.c_str(), material, d)->setShapeForm(form);
+// 				}
+// 				else
+// 				{
+// 
+// 				}
 			}
-			else if (form == NO_SHAPE_AND_LIST)
+
+			if (form == NO_SHAPE_AND_LIST)
 			{
 				//xListParticleData d = ReadListParticleData(name, rc.x++, rc.y);
 				unsigned int number = static_cast<int>(sheet->readNum(rc.x, rc.y++));
@@ -407,11 +408,31 @@ void xXLSReader::ReadParticle(xParticleManager* xparticle, vector2i rc)
 					d[i].w = sheet->readNum(_rc.x++, _rc.y);
 					_rc.y = start_column;
 				}
-				xparticle->CreateParticleFromList(name.c_str(), (xMaterialType)material, number, d);
+				xdem->XParticleManager()->CreateParticleFromList(name.c_str(), (xMaterialType)material, number, d);
 				delete[] d;
 			}
 		}
 	}
+}
+
+void xXLSReader::ReadSPHParticle(xSmoothedParticleHydrodynamicsModel* xsph, vector2i rc)
+{
+	if (IsEmptyCell(rc.x, rc.y))
+		return;
+	//	std::string name = xUtilityFunctions::WideChar2String(sheet->readStr(rc.x, rc.y++));
+	//	double loc[3] = { 0, };			
+	double visc = 0;
+	double rho = 0;
+	double ps = 0;
+	//uf::xsplit(sheet->readStr(rc.x, rc.y++), ",", 3, loc);
+	ps = sheet->readNum(rc.x, rc.y++);
+	visc = sheet->readNum(rc.x, rc.y++);
+	rho = sheet->readNum(rc.x, rc.y++);
+	//	xObject* xobj = xom->XObject(name);
+	xsph->setParticleSpacing(ps);
+	xsph->setKinematicViscosity(visc);
+	xsph->setReferenceDensity(rho);
+		//	xsph->XParticleManager()->CreateSPHParticles(xobj, ps);
 }
 
 void xXLSReader::ReadContact(xContactManager* xcm, vector2i rc)
@@ -442,6 +463,7 @@ void xXLSReader::ReadShapeObject(xObjectManager* xom, vector2i rc)
 {
 	if (xom)
 	{
+		int init_col = rc.y;
 		while (1)
 		{
 			if (IsEmptyCell(rc.x, rc.y)) break;
@@ -498,6 +520,7 @@ void xXLSReader::ReadShapeObject(xObjectManager* xom, vector2i rc)
 					xve->Write((char*)file.c_str(), sizeof(char)*ns);
 				}
 			}
+			rc.y = init_col;
 		}
 	}
 }

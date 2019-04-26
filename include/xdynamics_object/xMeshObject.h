@@ -29,6 +29,8 @@ public:
 	vector3d MaxPoint() const;
 	vector3d MinPoint() const;
 	void splitTriangles(double to);
+	virtual unsigned int create_sph_particles(double ps, vector4d* p = NULL);
+	virtual QVector<xCorner> get_sph_boundary_corners();
 
 private:
 	void _fromSTLASCII(int _ntriangle, double* vList, vector3d& loc);

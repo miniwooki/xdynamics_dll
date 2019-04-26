@@ -19,26 +19,29 @@ xPlaneObject::~xPlaneObject()
 
 }
 
-bool xPlaneObject::define(double dx, double dy, vector3d& d, vector3d& _xw, vector3d& _pc)
+bool xPlaneObject::define(vector3d& p0, vector3d& p1, vector3d& p2, vector3d& p3)
 {
-	xw = _xw;
+	xw = p0;
+	w2 = p1;
+	w3 = p2;
+	w4 = p3;
 	minp.x = xw.x < minp.x ? xw.x : minp.x; minp.y = xw.y < minp.y ? xw.y : minp.y; minp.z = xw.z < minp.z ? xw.z : minp.z;
 	maxp.x = xw.x > maxp.x ? xw.x : maxp.x; maxp.y = xw.y > maxp.y ? xw.y : maxp.y; maxp.z = xw.z > maxp.z ? xw.z : maxp.z;
-	w3 = _pc;
+	//w3 = p2;
 	minp.x = w3.x < minp.x ? w3.x : minp.x; minp.y = w3.y < minp.y ? w3.y : minp.y; minp.z = w3.z < minp.z ? w3.z : minp.z;
 	maxp.x = w3.x > maxp.x ? w3.x : maxp.x; maxp.y = w3.y > maxp.y ? w3.y : maxp.y; maxp.z = w3.z > maxp.z ? w3.z : maxp.z;
-	w2 = cross(d, _xw);
-	w2 = w2 /length(w2);
-	double hl = sqrt(0.25 * dx * dx + 0.25 * dy * dy);
-	w2 = hl * w2;
+	//w2 = cross(d, _xw);
+	//w2 = w2 /length(w2);
+	//double hl = sqrt(0.25 * dx * dx + 0.25 * dy * dy);
+	//w2 = hl * w2;
 	minp.x = w2.x < minp.x ? w2.x : minp.x; minp.y = w2.y < minp.y ? w2.y : minp.y; minp.z = w2.z < minp.z ? w2.z : minp.z;
 	maxp.x = w2.x > maxp.x ? w2.x : maxp.x; maxp.y = w2.y > maxp.y ? w2.y : maxp.y; maxp.z = w2.z > maxp.z ? w2.z : maxp.z;
-	w4 = cross(d, _pc);
-	w4 = w4 / length(w4);
-	w4 = hl * w4;
+	//w4 = cross(d, _pc);
+	//w4 = w4 / length(w4);
+	//w4 = hl * w4;
 	minp.x = w4.x < minp.x ? w4.x : minp.x; minp.y = w4.y < minp.y ? w4.y : minp.y; minp.z = w4.z < minp.z ? w4.z : minp.z;
 	maxp.x = w4.x > maxp.x ? w4.x : maxp.x; maxp.y = w4.y > maxp.y ? w4.y : maxp.y; maxp.z = w4.z > maxp.z ? w4.z : maxp.z;
-	xPointMass::pos = 0.5 * (_xw + _pc);
+	xPointMass::pos = 0.5 * (xw + w3);
 	pa = w2 - xw;
 	pb = w4 - xw;
 	l1 = length(pa);// .length();
@@ -87,9 +90,39 @@ vector3d xPlaneObject::MaxPoint() const { return maxp; }
 
 void xPlaneObject::SetupDataFromStructure(xPlaneObjectData& d)
 {
+	data = d;
 	this->define(
-		d.dx, d.dy,
-		new_vector3d(d.drx, d.dry, d.drz),
-		new_vector3d(d.pox, d.poy, d.poz),
-		new_vector3d(d.p1x, d.p1y, d.p1z));
+		new_vector3d(d.p0x, d.p0y, d.p0z),
+		new_vector3d(d.p1x, d.p1y, d.p1z),
+		new_vector3d(d.p2x, d.p2y, d.p2z),
+		new_vector3d(d.p3x, d.p3y, d.p3z));
+}
+
+unsigned int xPlaneObject::create_sph_particles(double ps, vector4d* p)
+{
+	unsigned int nx = static_cast<unsigned int>((l1 / ps) + 1e-9) - 1;
+	unsigned int ny = static_cast<unsigned int>((l2 / ps) + 1e-9) - 1;
+	unsigned int count = 0;
+	for (unsigned int x = 0; x < nx; x++)
+	{
+		vector3d px = xw + (x * ps) * pa;
+		for (unsigned int y = 0; y < ny; y++)
+		{
+			if (p)
+			{
+				vector3d _p = px + (xw + (y * ps) * pb);
+				p[count].x = _p.x;
+				p[count].y = _p.y;
+				p[count].z = _p.z;
+				p[count].w = 0.5 * ps;
+			}			
+			count++;
+		}
+	}
+	return count;
+}
+
+QVector<xCorner> xPlaneObject::get_sph_boundary_corners()
+{
+	return QVector<xCorner>();
 }

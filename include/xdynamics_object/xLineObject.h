@@ -19,11 +19,16 @@ public:
 
 	void SetupDataFromStructure(xLineObjectData& d);
 
+	virtual unsigned int create_sph_particles(double ps, vector4d* p = NULL);
+	virtual QVector<xCorner> get_sph_boundary_corners();
+
 private:
 	double len;
 	vector3d normal;
+	vector3d tangential;
 	vector3d spoint;
 	vector3d epoint;
+	xLineObjectData data;
 };
 
 #endif

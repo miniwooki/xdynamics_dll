@@ -382,4 +382,14 @@ void xMeshObject::splitTriangles(double to)
 	}
 }
 
+unsigned int xMeshObject::create_sph_particles(double ps, vector4d* p)
+{
+	return 0;
+}
+
+QVector<xCorner> xMeshObject::get_sph_boundary_corners()
+{
+	return QVector<xCorner>();
+}
+
 //unsigned int* xMeshObject::IndexList() { return indexList; }

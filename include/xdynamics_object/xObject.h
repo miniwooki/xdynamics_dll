@@ -4,6 +4,7 @@
 #include "xdynamics_decl.h"
 #include "xdynamics_algebra/xAlgebraMath.h"
 #include <QtCore/QString>
+#include <QtCore/QVector>
 
 class XDYNAMICS_API xObject
 {
@@ -12,6 +13,9 @@ public:
 	xObject(std::string _name, xShapeType _s = NO_SHAPE);
 	xObject(const xObject& o);
 	virtual ~xObject();
+
+	virtual unsigned int create_sph_particles(double ps, vector4d* p = NULL);
+	virtual QVector<xCorner> get_sph_boundary_corners();
 
 	void setObjectID(int _id);
 	void setDensity(double _d);

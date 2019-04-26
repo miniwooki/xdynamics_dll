@@ -39,6 +39,11 @@
 #define SAND_POISSON_RATIO 0.3
 #define SAND_SHEAR_MODULUS 0.0
 
+#define FLUID_YOUNG_MODULUS 0.0
+#define FLUID_DENSITY 1000
+#define FLUID_POISSON_RATIO 0.0
+#define FLUID_SHEAR_MODULUS 0.0
+
 #include <QtCore/QString>
 
 enum xMaterialType
@@ -51,7 +56,9 @@ enum xMaterialType
 	ACRYLIC, 
 	ALUMINUM, 
 	SAND, 
-	WATER,
+	FLUID,
+	BOUNDARY,
+	DUMMY,
 	USER_INPUT 
 };
 
@@ -104,11 +111,11 @@ enum xContactForceModelType
 
 enum xXlsInputDataType 
 { 
-	XLS_SHAPE = 0,
+	XLS_KERNEL = 0,
+	XLS_SHAPE,
 	XLS_MASS, 
 	XLS_JOINT,
-	XLS_FORCE,
-	XLS_KERNEL,
+	XLS_FORCE,	
 	XLS_PARTICLE,
 	XLS_CONTACT,	
 	XLS_INTEGRATOR,
@@ -172,8 +179,8 @@ enum xGravityDirection{ PLUS_X = 0, PLUS_Y, PLUS_Z, MINUS_X, MINUS_Y, MINUS_Z };
 /*enum xInputDataFormType { FORM_OBJECT_PLANE = 2, FORM_OBJECT_CUBE = 3, FORM_OBJECT_SHAPE = 4 };*/
 
 typedef struct{	double density, youngs, poisson, shear; }xMaterial;
-typedef struct{ double dx, dy, drx, dry, drz, pox, poy, poz, p1x, p1y, p1z; }xPlaneObjectData;
-typedef struct{ double dx, dy, lx, ly, lz, ps, visc, rho; }xSPHPlaneObjectData;
+typedef struct{ double p0x, p0y, p0z, p1x, p1y, p1z, p2x, p2y, p2z, p3x, p3y, p3z; }xPlaneObjectData;
+//typedef struct{ double dx, dy, lx, ly, lz; }xSPHPlaneObjectData;
 typedef struct{ double p0x, p0y, p0z, p1x, p1y, p1z; }xCubeObjectData;
 typedef struct{ double dx, dy, dz, lx, ly, lz, minr, maxr; }xCubeParticleData;
 typedef struct{ unsigned int number; }xListParticleData;
@@ -212,6 +219,24 @@ typedef struct
 	double gab, nx, ny, nz; 
 }xPairData;
 
+typedef struct  
+{
+	double px, py, pz;
+	double nx, ny, nz;
+	double tx, ty, tz;
+}xCorner;
+
+typedef struct
+{
+	unsigned int sid;
+	unsigned int cnt;
+	double ivx, ivy, ivz;// iniVel;
+	xCorner c1;
+	xCorner c2;
+	xCorner c3;
+	bool inner;
+}xOverlapCorner;
+
 inline xContactPairType getContactPair(xShapeType t1, xShapeType t2)
 {
 	return static_cast<xContactPairType>(t1 + t2);
@@ -228,7 +253,7 @@ inline xMaterial GetMaterialConstant(int mt)
 	case GLASS: cmt.density = GLASS_DENSITY; cmt.youngs = GLASS_YOUNG_MODULUS; cmt.poisson = GLASS_POISSON_RATIO; cmt.shear = GLASS_SHEAR_MODULUS; break;
 	case ALUMINUM: cmt.density = ALUMINUM_DENSITY; cmt.youngs = ALUMINUM_YOUNG_MODULUS; cmt.poisson = ALUMINUM_POISSON_RATIO; cmt.shear = ALUMINUM_SHEAR_MODULUS; break;
 	case SAND: cmt.density = SAND_DENSITY; cmt.youngs = SAND_YOUNG_MODULUS; cmt.poisson = SAND_POISSON_RATIO; cmt.shear = SAND_SHEAR_MODULUS; break;
-		//case SAND: cmt.density = SAND_DENSITY; cmt.youngs = SAND_YOUNGS_MODULUS; cmt.poisson = SAND_POISSON_RATIO; break;
+	case FLUID: cmt.density = FLUID_DENSITY; cmt.youngs = FLUID_YOUNG_MODULUS; cmt.poisson = FLUID_POISSON_RATIO; break;
 	}
 
 	return cmt;

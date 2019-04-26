@@ -135,12 +135,12 @@ xSmoothedParticleHydrodynamicsModel* xDynamicsManager::XSPHModel()
 
 xSmoothedParticleHydrodynamicsModel* xDynamicsManager::XSPHModel(std::string& n)
 {
-	QString n = QString::fromStdString(_n);
+	QString nm = QString::fromStdString(n);
 	QStringList keys = xsphs.keys();
-	QStringList::const_iterator it = qFind(keys, n);
+	QStringList::const_iterator it = qFind(keys, nm);
 	if (it == keys.end() || !keys.size())
 		return NULL;
-	return xsphs[n];
+	return xsphs[nm];
 }
 
 xObjectManager* xDynamicsManager::XObject()
@@ -257,9 +257,17 @@ xDynamicsManager::solverType xDynamicsManager::OpenModelXLS(const wchar_t* n)
 			case XLS_PARTICLE:
 				if (!this->XDEMModel(model_name))
 				{
-					if(!xsph)
+					if (xsph)
+					{
+						xls.ReadSPHParticle(xsph, bt->second);
+						xsph->CreateParticles(xom);
+						//xsph->CreateParticles(xom);
+					}
+					else
+					{
 						CreateModel(model_name, DEM);
-					xls.ReadParticle(xdem->XParticleManager(), bt->second);
+						xls.ReadDEMParticle(xdem, bt->second);
+					}					
 				}break;
 			case XLS_CONTACT:
 				if (!this->XContact(model_name))
@@ -271,7 +279,11 @@ xDynamicsManager::solverType xDynamicsManager::OpenModelXLS(const wchar_t* n)
 			case XLS_SIMULATION: xls.ReadSimulationCondition(bt->second); break;
 			}
 		}
-		if (xdem)
+		if (xsph)
+		{
+			xom->CreateSPHBoundaryParticles(xsph->XParticleManager());
+		}
+		if (xdem || xsph)
 		{
 			std::string pv_path = full_path + ".par";
 			xdem->XParticleManager()->ExportParticleDataForView(pv_path);
