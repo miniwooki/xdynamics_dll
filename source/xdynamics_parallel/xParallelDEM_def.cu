@@ -1,4 +1,4 @@
-#include "xdynamics_parallel/xParallelDEM_decl.cuh"
+//#include "xdynamics_parallel/xParallelDEM_decl.cuh"
 #include "xdynamics_parallel/xParallelDEM_impl.cuh"
 #include <helper_functions.h>
 #include <thrust/device_ptr.h>
@@ -8,28 +8,29 @@
 #include <thrust/sort.h>
 //#include <helper_cuda.h>
 
-void setSymbolicParameter(device_parameters *h_paras)
-{
-	checkCudaErrors(cudaMemcpyToSymbol(cte, h_paras, sizeof(device_parameters)));
-}
-
-unsigned int numThreads, numBlocks;
-
-//Round a / b to nearest higher integer value
-unsigned iDivUp(unsigned a, unsigned b)
-{
-	return (a % b != 0) ? (a / b + 1) : (a / b);
-}
-
-// compute grid and thread block size for a given number of elements
-void computeGridSize(unsigned n, unsigned blockSize, unsigned &numBlocks, unsigned &numThreads)
-{
-	numThreads = min(blockSize, n);
-	numBlocks = iDivUp(n, numThreads);
-}
+//void setSymbolicParameter(device_parameters *h_paras)
+//{
+//	checkCudaErrors(cudaMemcpyToSymbol(cte, h_paras, sizeof(device_parameters)));
+//}
+//
+//unsigned int numThreads, numBlocks;
+//
+////Round a / b to nearest higher integer value
+//unsigned iDivUp(unsigned a, unsigned b)
+//{
+//	return (a % b != 0) ? (a / b + 1) : (a / b);
+//}
+//
+//// compute grid and thread block size for a given number of elements
+//void computeGridSize(unsigned n, unsigned blockSize, unsigned &numBlocks, unsigned &numThreads)
+//{
+//	numThreads = min(blockSize, n);
+//	numBlocks = iDivUp(n, numThreads);
+//}
 
 void vv_update_position(double *pos, double *vel, double *acc, unsigned int np)
 {
+	unsigned int numBlocks, numThreads;
 	computeGridSize(np, 512, numBlocks, numThreads);
 	vv_update_position_kernel << < numBlocks, numThreads >> >(
 		(double4 *)pos,
@@ -40,6 +41,7 @@ void vv_update_position(double *pos, double *vel, double *acc, unsigned int np)
 
 void vv_update_velocity(double *vel, double *acc, double *omega, double *alpha, double *force, double *moment, double* mass, double* iner, unsigned int np)
 {
+	unsigned int numBlocks, numThreads;
 	computeGridSize(np, 512, numBlocks, numThreads);
 	vv_update_velocity_kernel << < numBlocks, numThreads >> >(
 		(double3 *)vel,
@@ -59,6 +61,7 @@ void cu_calculateHashAndIndex(
 	double *pos,
 	unsigned int np)
 {
+	unsigned int numBlocks, numThreads;
 	computeGridSize(np, 512, numBlocks, numThreads);
 	calculateHashAndIndex_kernel << < numBlocks, numThreads >> >(hash, index, (double4 *)pos, np);
 }
@@ -70,12 +73,13 @@ void cu_calculateHashAndIndexForPolygonSphere(
 	unsigned int nsphere,
 	double *sphere)
 {
+	unsigned int numBlocks, numThreads;
 	computeGridSize(nsphere, 512, numBlocks, numThreads);
 	calculateHashAndIndexForPolygonSphere_kernel << <numBlocks, numThreads >> >(hash, index, sid, nsphere, (double4 *)sphere);
 }
 
 
-void cu_reorderDataAndFindCellStart(
+void cu_dem_reorderDataAndFindCellStart(
 	unsigned int* hash,
 	unsigned int* index,
 	unsigned int* cstart,
@@ -91,6 +95,7 @@ void cu_reorderDataAndFindCellStart(
 		thrust::device_ptr<unsigned>(hash + np),
 		thrust::device_ptr<unsigned>(index));
 	//std::cout << "step 2" << std::endl;
+	unsigned int numBlocks, numThreads;
 	computeGridSize(np, 512, numBlocks, numThreads);
 	checkCudaErrors(cudaMemset(cstart, 0xffffffff, ncell*sizeof(unsigned int)));
 	checkCudaErrors(cudaMemset(cend, 0, ncell*sizeof(unsigned int)));
@@ -111,6 +116,7 @@ void cu_calculate_p2p(
 	double* mass, unsigned int* sorted_index, unsigned int* cstart,
 	unsigned int* cend, device_contact_property* cp, unsigned int np)
 {
+	unsigned int numBlocks, numThreads;
 	computeGridSize(np, 256, numBlocks, numThreads);
 	switch (tcm)
 	{
@@ -139,6 +145,7 @@ void cu_plane_contact_force(
 	double* force, double* moment, double* mass,
 	unsigned int np, device_contact_property *cp)
 {
+	unsigned int numBlocks, numThreads;
 	computeGridSize(np, 256, numBlocks, numThreads);
 	switch (tcm)
 	{
@@ -159,6 +166,7 @@ void cu_cube_contact_force(
 	double* force, double* moment, double* mass,
 	unsigned int np, device_contact_property *cp)
 {
+	unsigned int numBlocks, numThreads;
 	computeGridSize(np, 256, numBlocks, numThreads);
 	for (unsigned int i = 0; i < 6; i++)
 	{
@@ -183,6 +191,7 @@ void cu_cylinder_hertzian_contact_force(
 	double* mass, unsigned int np, device_contact_property *cp,
 	double3* mpos, double3* mf, double3* mm, double3& _mf, double3& _mm)
 {
+	unsigned int numBlocks, numThreads;
 	computeGridSize(np, 512, numBlocks, numThreads);
 	switch (tcm)
 	{
@@ -205,6 +214,7 @@ void cu_particle_meshObject_collision(
 	unsigned int* sorted_index, unsigned int* cstart, unsigned int* cend, device_contact_property *cp,
 	unsigned int np)
 {
+	unsigned int numBlocks, numThreads;
 	computeGridSize(np, 512, numBlocks, numThreads);
 	switch (tcm)
 	{
@@ -218,31 +228,33 @@ void cu_particle_meshObject_collision(
 	}
 }
 
-double3 reductionD3(double3* in, unsigned int np)
-{
-	double3 rt = make_double3(0.0, 0.0, 0.0);
-	computeGridSize(np, 512, numBlocks, numThreads);
-	double3* d_out;
-	double3* h_out = new double3[numBlocks];
-	checkCudaErrors(cudaMalloc((void**)&d_out, sizeof(double3) * numBlocks));
-	checkCudaErrors(cudaMemset(d_out, 0, sizeof(double3) * numBlocks));
-	//unsigned smemSize = sizeof(double3)*(512);
-	reduce6<double3, 512> << < numBlocks, numThreads/*, smemSize*/ >> >(in, d_out, np);
-	checkCudaErrors(cudaMemcpy(h_out, d_out, sizeof(double3) * numBlocks, cudaMemcpyDeviceToHost));
-	for (unsigned int i = 0; i < numBlocks; i++){
-		rt.x += h_out[i].x;
-		rt.y += h_out[i].y;
-		rt.z += h_out[i].z;
-	}
-	delete[] h_out;
-	checkCudaErrors(cudaFree(d_out));
-	return rt;
-}
+//double3 reductionD3(double3* in, unsigned int np)
+//{
+//	unsigned int numBlocks, numThreads;
+//	double3 rt = make_double3(0.0, 0.0, 0.0);
+//	computeGridSize(np, 512, numBlocks, numThreads);
+//	double3* d_out;
+//	double3* h_out = new double3[numBlocks];
+//	checkCudaErrors(cudaMalloc((void**)&d_out, sizeof(double3) * numBlocks));
+//	checkCudaErrors(cudaMemset(d_out, 0, sizeof(double3) * numBlocks));
+//	//unsigned smemSize = sizeof(double3)*(512);
+//	reduce6<double3, 512> << < numBlocks, numThreads/*, smemSize*/ >> >(in, d_out, np);
+//	checkCudaErrors(cudaMemcpy(h_out, d_out, sizeof(double3) * numBlocks, cudaMemcpyDeviceToHost));
+//	for (unsigned int i = 0; i < numBlocks; i++){
+//		rt.x += h_out[i].x;
+//		rt.y += h_out[i].y;
+//		rt.z += h_out[i].z;
+//	}
+//	delete[] h_out;
+//	checkCudaErrors(cudaFree(d_out));
+//	return rt;
+//}
 
 void cu_update_meshObjectData(
 	device_mesh_mass_info *dpmi, double* vList,
 	double* sphere, device_triangle_info* dpi, unsigned int ntriangle)
 {
+	unsigned int numBlocks, numThreads;
 	computeGridSize(ntriangle, 512, numBlocks, numThreads);
 	updatePolygonObjectData_kernel << <numBlocks, numThreads >> >(dpmi, vList, (double4 *)sphere, dpi, ntriangle);
 }
@@ -300,6 +312,7 @@ void cu_calculate_particle_particle_contact_count(
 	unsigned int* pair_start, unsigned int* sorted_id,
 	unsigned int* cell_start, unsigned int* cell_end, unsigned int np)
 {
+	unsigned int numBlocks, numThreads;
 	computeGridSize(np, 512, numBlocks, numThreads);
 	calculate_particle_particle_contact_count << <numBlocks, numThreads >> >(
 		(double4*)pos,
@@ -322,6 +335,7 @@ void cu_calculate_particle_triangle_contact_count(
 	unsigned int* cell_start,
 	unsigned int* cell_end, unsigned int np)
 {
+	unsigned int numBlocks, numThreads;
 	computeGridSize(np, 512, numBlocks, numThreads);
 	calculate_particle_triangle_contact_count << <numBlocks, numThreads >> >(
 		dpi,
@@ -341,6 +355,7 @@ void cu_calculate_particle_plane_contact_count(
 	unsigned int* old_pair_count, unsigned int *count,
 	unsigned int *sidx, double* pos, unsigned int nplanes, unsigned int np)
 {
+	unsigned int numBlocks, numThreads;
 	computeGridSize(np, 512, numBlocks, numThreads);
 	calculate_particle_plane_contact_count << <numBlocks, numThreads >> >(
 		plane,
@@ -365,6 +380,7 @@ void cu_copy_old_to_new_pair(
 	pair_data* old_pppd, pair_data* new_pppd,
 	unsigned int nc, unsigned int np)
 {
+	unsigned int numBlocks, numThreads;
 	computeGridSize(np, 512, numBlocks, numThreads);
 	thrust::inclusive_scan(
 		thrust::device_ptr<unsigned int>(new_count), 
@@ -389,6 +405,7 @@ void cu_new_particle_particle_contact(
 	device_contact_property* cp, unsigned int *sorted_id, 
 	unsigned int* cell_start, unsigned int* cell_end, unsigned int np)
 {
+	unsigned int numBlocks, numThreads;
 	computeGridSize(np, 512, numBlocks, numThreads);
 	new_particle_particle_contact_kernel << < numBlocks, numThreads >> >(
 		(double4 *)pos,
@@ -416,6 +433,7 @@ void cu_new_particle_plane_contact(
 	pair_data *old_pairs, pair_data *pairs, device_contact_property *cp,
 	unsigned int nplanes, unsigned int np)
 {
+	unsigned int numBlocks, numThreads;
 	computeGridSize(np, 512, numBlocks, numThreads);
 	new_particle_plane_contact << < numBlocks, numThreads >> >(
 		plane,
@@ -443,6 +461,7 @@ void cu_new_particle_polygon_object_contact(
 	double* mass, unsigned int* sorted_index, unsigned int* cstart, unsigned int* cend,
 	device_contact_property *cp, unsigned int np)
 {
+	unsigned int numBlocks, numThreads;
 	computeGridSize(np, 512, numBlocks, numThreads);
 	new_particle_polygon_object_conatct_kernel << < numBlocks, numThreads >> >(
 		dpi, dpmi,

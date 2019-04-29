@@ -284,9 +284,12 @@
     <ClInclude Include="..\..\include\xdynamics_object\xTranslationConstraint.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xUniversalConstraint.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xWendlandKernel.h" />
+    <ClInclude Include="..\..\include\xdynamics_parallel\xParallelCommon_decl.cuh" />
     <ClInclude Include="..\..\include\xdynamics_parallel\xParallelDEM_impl.cuh">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_parallel\xParallelSPH_decl.cuh" />
+    <ClInclude Include="..\..\include\xdynamics_parallel\xParallelSPH_impl.cuh" />
     <ClInclude Include="..\..\include\xdynamics_simulation\xDiscreteElementMethodSimulation.h" />
     <ClInclude Include="..\..\include\xdynamics_simulation\xDynamicsSimulator.h" />
     <ClInclude Include="..\..\include\xdynamics_simulation\xIngegratorVV.h" />
@@ -305,7 +308,9 @@
     <ClInclude Include="..\..\include\xdynamics_parallel\xParallelDEM_decl.cuh" />
   </ItemGroup>
   <ItemGroup>
+    <CudaCompile Include="..\..\source\xdynamics_parallel\xParallelCommon_def.cu" />
     <CudaCompile Include="..\..\source\xdynamics_parallel\xParallelDEM_def.cu" />
+    <CudaCompile Include="..\..\source\xdynamics_parallel\xParallelSPH_def.cu" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

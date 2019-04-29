@@ -1,76 +1,13 @@
 #include "xdynamics_parallel/xParallelDEM_decl.cuh"
 #include <helper_math.h>
 
-__constant__ device_parameters cte;
-
-inline __device__ int sign(float L)
-{
-	return L < 0 ? -1 : 1;
-}
-
-inline __device__ int sign(double L)
-{
-	return L < 0 ? -1 : 1;
-}
-
-inline __device__ double dot(double3& v1, double3& v2)
-{
-	return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
-}
-
-inline __device__ double3 operator-(double3& v1, double3& v2)
-{
-	return make_double3(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
-}
-inline __device__ double3 operator-(double3& v1)
-{
-	return make_double3(-v1.x, -v1.y, -v1.z);
-}
-
-inline __device__ double3 operator*(double v1, double3 v2)
-{
-	return make_double3(v1 * v2.x, v1 * v2.y, v1 * v2.z);
-}
-
-inline __device__ double3 operator+(double3& v1, double3& v2)
-{
-	return make_double3(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
-}
-
-inline __host__ __device__ void operator+=(double3& a, double3 b)
-{
-	a.x += b.x;
-	a.y += b.y;
-	a.z += b.z;
-}
-
-inline __device__ double3 operator/(double3& v1, double v2)
-{
-	return make_double3(v1.x / v2, v1.y / v2, v1.z / v2);
-}
-
-inline __device__ double length(double3& v1)
-{
-	return sqrt(dot(v1, v1));
-}
-
-inline __device__ double3 cross(double3 a, double3 b)
-{
-	return make_double3(a.y*b.z - a.z*b.y, a.z*b.x - a.x*b.z, a.x*b.y - a.y*b.x);
-}
-
-inline __device__ double3 normalize(double3 u)
-{
-	return u / length(u);
-}
-
 __device__
 uint calcGridHash(int3 gridPos)
 {
-	gridPos.x = gridPos.x & (cte.grid_size.x - 1);  // wrap grid, assumes size is power of 2
-	gridPos.y = gridPos.y & (cte.grid_size.y - 1);
-	gridPos.z = gridPos.z & (cte.grid_size.z - 1);
-	return __umul24(__umul24(gridPos.z, cte.grid_size.y), cte.grid_size.x) + __umul24(gridPos.y, cte.grid_size.x) + gridPos.x;
+	gridPos.x = gridPos.x & (dcte.grid_size.x - 1);  // wrap grid, assumes size is power of 2
+	gridPos.y = gridPos.y & (dcte.grid_size.y - 1);
+	gridPos.z = gridPos.z & (dcte.grid_size.z - 1);
+	return __umul24(__umul24(gridPos.z, dcte.grid_size.y), dcte.grid_size.x) + __umul24(gridPos.y, dcte.grid_size.x) + gridPos.x;
 }
 
 // calculate position in uniform grid
@@ -78,9 +15,9 @@ __device__
 int3 calcGridPos(double3 p)
 {
 	int3 gridPos;
-	gridPos.x = floor((p.x - cte.world_origin.x) / cte.cell_size);
-	gridPos.y = floor((p.y - cte.world_origin.y) / cte.cell_size);
-	gridPos.z = floor((p.z - cte.world_origin.z) / cte.cell_size);
+	gridPos.x = floor((p.x - dcte.world_origin.x) / dcte.cell_size);
+	gridPos.y = floor((p.y - dcte.world_origin.y) / dcte.cell_size);
+	gridPos.z = floor((p.z - dcte.world_origin.z) / dcte.cell_size);
 	return gridPos;
 }
 
@@ -90,7 +27,7 @@ __global__ void vv_update_position_kernel(double4* pos, double3* vel, double3* a
 	if (id >= np)
 		return;
 
-	double3 _p = cte.dt * vel[id] + cte.half2dt * acc[id];
+	double3 _p = dcte.dt * vel[id] + dcte.half2dt * acc[id];
 	pos[id].x += _p.x;
 	pos[id].y += _p.y;
 	pos[id].z += _p.z;
@@ -118,16 +55,16 @@ __global__ void vv_update_velocity_kernel(
 	//double3 aa = alpha[id];
 	double3 a = (1.0 / m) * force[id];
 	double3 in = (1.0 / iner[id]) * moment[id];
-	v += 0.5 * cte.dt * (acc[id] + a);
-	av += 0.5 * cte.dt * (alpha[id] + in);// aa;
+	v += 0.5 * dcte.dt * (acc[id] + a);
+	av += 0.5 * dcte.dt * (alpha[id] + in);// aa;
 	//L = (1.0 / m) * force[id];
 	//aa = (1.0 / in) * moment[id];
-	//v += 0.5 * cte.dt * L;
-	//av += 0.5 * cte.dt * aa;
+	//v += 0.5 * dcte.dt * L;
+	//av += 0.5 * dcte.dt * aa;
 	// 	if(id == 0){
 	// 		printf("Velocity --- > id = %d -> [%f.6, %f.6, %f.6]\n", id, v.x, v.y, v.z);
 	// 	}
-	force[id] = m * cte.gravity;
+	force[id] = m * dcte.gravity;
 	moment[id] = make_double3(0.0, 0.0, 0.0);
 	vel[id] = v;
 	omega[id] = av;
@@ -146,7 +83,7 @@ __global__ void calculateHashAndIndex_kernel(
 
 	int3 gridPos = calcGridPos(make_double3(p.x, p.y, p.z));
 	unsigned _hash = calcGridHash(gridPos);
-	/*if(_hash >= cte.ncell)
+	/*if(_hash >= dcte.ncell)
 	printf("Over limit - hash number : %d", _hash);*/
 	hash[id] = _hash;
 	index[id] = id;
@@ -178,7 +115,7 @@ __global__ void reorderDataAndFindCellStart_kernel(
 
 	unsigned _hash;
 
-	//unsigned int tnp = ;// cte.np + cte.nsphere;
+	//unsigned int tnp = ;// dcte.np + dcte.nsphere;
 
 	if (id < np)
 	{
@@ -326,7 +263,7 @@ __device__ double cohesionForce(
 // 		float mag_e = length(e);
 // 		if (mag_e){
 // 			float3 s_hat = e / mag_e;
-// 			float ds = mag_e * cte.dt;
+// 			float ds = mag_e * dcte.dt;
 // 			float fst = -u1.ks * ds;
 // 			float fdt = u1.vs * dot(relative_vel, s_hat);
 // 			shear_force = (fst + fdt) * s_hat;
@@ -364,7 +301,7 @@ __device__ void HMCModel(
 	double mag_e = length(e);
 	if (mag_e){
 		double3 s_hat = -(e / mag_e);
-		double ds = mag_e * cte.dt;
+		double ds = mag_e * dcte.dt;
 		double fst = -c.ks * ds;
 		double fdt = c.vs * dot(dv, s_hat);
 		Ft = (fst + fdt) * s_hat;
@@ -393,10 +330,10 @@ __device__ void DHSModel(
 	{
 		double3 sh = e / mag_e;
 		double s_dot = dot(dv, sh);
-		double ds = _ds + cte.dt * (s_dot + dots);
+		double ds = _ds + dcte.dt * (s_dot + dots);
 		_ds = ds;
 		dots = s_dot;
-		//double ds = mag_e * cte.dt;
+		//double ds = mag_e * dcte.dt;
 		double ft0 = c.ks * ds + c.vs * (dot(dv, sh));
 		double ft1 = c.mu * length(Fn);
 		Ft = min(ft0, ft1) * sh;
@@ -514,7 +451,7 @@ __device__ void DHSModel(
 //	double3 jvel = make_double3(0.0, 0.0, 0.0);
 //	double3 jomega = make_double3(0.0, 0.0, 0.0);
 //	double3 Ft = make_double3(0, 0, 0);
-//	double3 Fn = make_double3(0, 0, 0);// [id] * cte.gravity;
+//	double3 Fn = make_double3(0, 0, 0);// [id] * dcte.gravity;
 //	double3 M = make_double3(0, 0, 0);
 //	double3 sumF = make_double3(0, 0, 0);
 //	double3 sumM = make_double3(0, 0, 0);
@@ -621,7 +558,7 @@ __global__ void calculate_p2p_kernel(
 	//double ir = ipos.w; double jr = 0;
 	//double im = mass[id]; double jm = 0;
 	//double3 Ft = make_double3(0, 0, 0);
-	//double3 Fn = make_double3(0, 0, 0);// [id] * cte.gravity;
+	//double3 Fn = make_double3(0, 0, 0);// [id] * dcte.gravity;
 	//double3 M = make_double3(0, 0, 0);
 	//double3 sumF = make_double3(0, 0, 0);
 	//double3 sumM = make_double3(0, 0, 0);
@@ -649,7 +586,7 @@ __global__ void calculate_p2p_kernel(
 	//					if (cdist > 0){
 	//						double rcon = ir - 0.5 * cdist;
 	//						double3 unit = rp / dist;
-	//						double3 rv = cte.rollingCondition ? jvel + cross(jomega, -jr * unit) - (ivel + cross(iomega, ir * unit)) : (jvel - ivel);
+	//						double3 rv = dcte.rollingCondition ? jvel + cross(jomega, -jr * unit) - (ivel + cross(iomega, ir * unit)) : (jvel - ivel);
 	//						device_force_constant c = getConstant(
 	//							TCM, ir, jr, im, jm, cp->Ei, cp->Ej,
 	//							cp->pri, cp->prj, cp->Gi, cp->Gj,
@@ -1046,7 +983,7 @@ __global__ void new_particle_particle_contact_kernel(
 	double3 sumF = make_double3(0.0, 0.0, 0.0);
 	double3 sumM = make_double3(0.0, 0.0, 0.0);
 	double3 Ft = make_double3(0, 0, 0);
-	double3 Fn = make_double3(0, 0, 0);// [id] * cte.gravity;
+	double3 Fn = make_double3(0, 0, 0);// [id] * dcte.gravity;
 	double3 M = make_double3(0, 0, 0);
 	int3 gridPos = calcGridPos(make_double3(ipos.x, ipos.y, ipos.z));
 	double ir = ipos.w; double jr = 0;
@@ -1174,10 +1111,10 @@ __global__ void new_particle_polygon_object_conatct_kernel(
 					end_index = cend[grid_hash];
 					for (unsigned int j = start_index; j < end_index; j++){
 						unsigned int k = sorted_index[j];
-						if (k >= cte.np)
+						if (k >= dcte.np)
 						{
 							int t = -1;
-							k -= cte.np;
+							k -= dcte.np;
 							unsigned int pidx = dpi[k].id;
 							device_contact_property cmp = cp[pidx];
 							device_mesh_mass_info pmi = dpmi[pidx];
@@ -1336,7 +1273,7 @@ __global__ void plane_contact_force_kernel(
 	//double cdist = particle_plane_contact_detection(plane, ipos3, wp, unit, r);
 	//if (cdist > 0){
 	//	double rcon = r - 0.5 * cdist;
-	//	double3 dv = cte.rollingCondition ? -(ivel + cross(iomega, r * unit)) : -ivel;
+	//	double3 dv = dcte.rollingCondition ? -(ivel + cross(iomega, r * unit)) : -ivel;
 	//	device_force_constant c = getConstant(
 	//		TCM, r, 0.0, m, 0.0, cp->Ei, cp->Ej,
 	//		cp->pri, cp->prj, cp->Gi, cp->Gj,
@@ -1604,7 +1541,7 @@ __global__ void particle_polygonObject_collision_kernel(
 {
 	//unsigned id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
 	////unsigned int np = _np;
-	//if (id >= cte.np)
+	//if (id >= dcte.np)
 	//	return;
 
 	//double cdist = 0.0;
@@ -1636,9 +1573,9 @@ __global__ void particle_polygonObject_collision_kernel(
 	//				end_index = cend[grid_hash];
 	//				for (unsigned int j = start_index; j < end_index; j++){
 	//					unsigned int k = sorted_index[j];
-	//					if (k >= cte.np)
+	//					if (k >= dcte.np)
 	//					{
-	//						k -= cte.np;
+	//						k -= dcte.np;
 	//						//printf("%d", k);
 	//						double3 distVec;
 	//						double dist;
@@ -1659,7 +1596,7 @@ __global__ void particle_polygonObject_collision_kernel(
 	//							double rcon = ir - 0.5 * cdist;
 	//							unit = -cross(qp, rp);// -dpi[k].N;
 	//							unit = unit / length(unit);
-	//							double3 dv = cte.rollingCondition ? pmi.vel + cross(pmi.omega, po2cp) - (ivel + cross(iomega, ir * unit)) : pmi.vel - ivel;
+	//							double3 dv = dcte.rollingCondition ? pmi.vel + cross(pmi.omega, po2cp) - (ivel + cross(iomega, ir * unit)) : pmi.vel - ivel;
 	//							device_force_constant c = getConstant(
 	//								TCM, ir, 0, im, 0, cmp.Ei, cmp.Ej,
 	//								cmp.pri, cmp.prj, cmp.Gi, cmp.Gj,

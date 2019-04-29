@@ -116,7 +116,7 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 // 			foreach(xContact* c, xcm->Contacts())
 // 				c->cudaMemoryAlloc();
 		}
-		device_parameters dp;
+		device_dem_parameters dp;
 		dp.np = np;
 		dp.rollingCondition = false;// xmd->RollingCondition();
 		dp.nsphere = 0;
@@ -134,7 +134,7 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 		dp.world_origin.x = xGridCell::wo.x;
 		dp.world_origin.y = xGridCell::wo.y;
 		dp.world_origin.z = xGridCell::wo.z;
-		setSymbolicParameter(&dp);
+		setDEMSymbolicParameter(&dp);
 	}
 	else
 	{

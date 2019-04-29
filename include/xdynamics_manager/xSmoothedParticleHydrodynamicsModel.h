@@ -18,7 +18,7 @@ public:
 
 	static xSmoothedParticleHydrodynamicsModel* XSPH();
 
-	xParticleManager* XParticleManager();
+	//xParticleManager* XParticleManager();
 	void setParticleSpacing(double ps);
 	void setFreeSurfaceFactor(double fs);
 	void setReferenceDensity(double d);
@@ -30,14 +30,30 @@ public:
 	bool CheckCorner(vector3d p);
 	void DefineCorners(xObjectManager* xobj);
 	void CreateParticles(xObjectManager* xobj);
+	void ExportParticleDataForView(std::string& path);
+
+private:
+	unsigned int CreateOverlapCornerDummyParticles(unsigned int sid, bool isOnlyCount);
+	unsigned int CreateOverlapCornerDummyParticle(unsigned int id, vector3d& p, vector3d& n1, vector3d& n2, bool isOnlyCount);
 
 private:
 	QString name;
+
+	unsigned int np;
+	unsigned int nfluid;
+	unsigned int nbound;
+	unsigned int ndummy;
+	unsigned int nlayers;
+
 	double k_viscosity;
 	double ref_rho;
 	double fs_factor;
 	double pspace;
 	double water_depth;
+
+	vector3d* pos;
+	vector3d* vel;
+	xMaterialType* type;
 
 	xSPHCorrectionType corr;
 	xTurbulenceType turb;
@@ -45,7 +61,7 @@ private:
 	//xKenelType ker;
 	xKernelFunctionData ker_data;
 	xKernelFunction *xker;
-	xParticleManager *xpmgr;
+	//xParticleManager *xpmgr;
 
 	QVector<xOverlapCorner> overlappingCorners;
 };

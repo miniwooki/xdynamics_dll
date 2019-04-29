@@ -79,7 +79,7 @@ vector4d* xParticleObject::Position() const
 	return pos;
 }
 
-unsigned int xParticleObject::create_sph_particles(double ps, vector4d* p)
+unsigned int xParticleObject::create_sph_particles(double ps, unsigned int nlayers, vector3d* p, xMaterialType* t)
 {
 	return 0;
 }

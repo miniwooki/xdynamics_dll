@@ -1,27 +1,9 @@
 #ifndef XPARALLELDEM_DECL_CUH
 #define XPARALLELDEM_DECL_CUH
 
-#include "xdynamics_decl.h"
-#include <cuda_runtime.h>
-#include <vector_types.h>
-#include <helper_cuda.h>
+#include "xdynamics_parallel/xParallelCommon_decl.cuh"
 
 #define MAXIMUM_PAIR_NUMBER 5
-
-struct device_parameters
-{
-	bool rollingCondition;
-	unsigned int np;
-	unsigned int nsphere;
-	unsigned int ncell;
-	uint3 grid_size;
-	double dt;
-	double half2dt;
-	double cell_size;
-	double cohesion;
-	double3 gravity;
-	double3 world_origin;
-};
 
 struct pair_data
 {
@@ -111,16 +93,16 @@ struct device_force_constant_d
 	double mu;
 };
 
-void XDYNAMICS_API setSymbolicParameter(device_parameters *h_paras);
+//void XDYNAMICS_API setSymbolicParameter(device_parameters *h_paras);
 
 void XDYNAMICS_API vv_update_position(double *pos, double *vel, double *acc, unsigned int np);
 void XDYNAMICS_API vv_update_velocity(double *vel, double *acc, double *omega, double *alpha, double *force, double *moment, double* mass, double* iner, unsigned int np);
 
-void XDYNAMICS_API cu_calculateHashAndIndex(unsigned int* hash, unsigned int* index, double *pos, unsigned int np);
-void XDYNAMICS_API cu_calculateHashAndIndexForPolygonSphere(
+void XDYNAMICS_API cu_dem_calculateHashAndIndex(unsigned int* hash, unsigned int* index, double *pos, unsigned int np);
+void XDYNAMICS_API cu_dem_calculateHashAndIndexForPolygonSphere(
 	unsigned int* hash, unsigned int* index,
 	unsigned int sid, unsigned int nsphere, double *sphere);
-void XDYNAMICS_API cu_reorderDataAndFindCellStart(unsigned int* hash, unsigned int* index, unsigned int* cstart, unsigned int* cend, unsigned int* sorted_index, unsigned int np, /*unsigned int nsphere,*/ unsigned int ncell);
+void XDYNAMICS_API cu_dem_reorderDataAndFindCellStart(unsigned int* hash, unsigned int* index, unsigned int* cstart, unsigned int* cend, unsigned int* sorted_index, unsigned int np, /*unsigned int nsphere,*/ unsigned int ncell);
 
 void XDYNAMICS_API cu_calculate_p2p(
 	const int tcm, double* pos, double* vel,

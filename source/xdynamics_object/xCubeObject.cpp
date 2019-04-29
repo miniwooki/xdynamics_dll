@@ -103,7 +103,7 @@ void xCubeObject::SetupDataFromStructure(xCubeObjectData& d)
 		new_vector3d(d.p1x, d.p1y, d.p1z));
 }
 
-unsigned int xCubeObject::create_sph_particles(double ps, vector4d* p)
+unsigned int xCubeObject::create_sph_particles(double ps, unsigned int nlayers, vector3d* p, xMaterialType* t)
 {
 	return 0;
 }

@@ -98,27 +98,25 @@ void xPlaneObject::SetupDataFromStructure(xPlaneObjectData& d)
 		new_vector3d(d.p3x, d.p3y, d.p3z));
 }
 
-unsigned int xPlaneObject::create_sph_particles(double ps, vector4d* p)
+unsigned int xPlaneObject::create_sph_particles(double ps, unsigned int nlayers, vector3d* p, xMaterialType* t)
 {
 	unsigned int nx = static_cast<unsigned int>((l1 / ps) + 1e-9) - 1;
 	unsigned int ny = static_cast<unsigned int>((l2 / ps) + 1e-9) - 1;
 	unsigned int count = 0;
-	for (unsigned int x = 0; x < nx; x++)
-	{
-		vector3d px = xw + (x * ps) * pa;
-		for (unsigned int y = 0; y < ny; y++)
-		{
-			if (p)
-			{
-				vector3d _p = px + (xw + (y * ps) * pb);
-				p[count].x = _p.x;
-				p[count].y = _p.y;
-				p[count].z = _p.z;
-				p[count].w = 0.5 * ps;
-			}			
-			count++;
+	if (material == FLUID){
+		for (unsigned int x = 0; x < nx; x++){
+			vector3d px = xw + (x * ps) * pa;
+			for (unsigned int y = 0; y < ny; y++){
+				if (p){
+					vector3d _p = px + (xw + (y * ps) * pb);
+					p[count] = new_vector3d(_p.x, _p.y, _p.z);
+					t[count] = FLUID;
+				}
+				count++;
+			}
 		}
 	}
+	
 	return count;
 }
 

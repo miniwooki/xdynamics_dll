@@ -59,6 +59,7 @@ enum xMaterialType
 	FLUID,
 	BOUNDARY,
 	DUMMY,
+	FLOATING,
 	USER_INPUT 
 };
 
@@ -193,6 +194,8 @@ typedef struct{ double restitution, friction, rolling_friction, cohesion, stiffn
 typedef struct{ double spix, spiy, spiz, spjx, spjy, spjz, k, c, init_l; }xTSDAData;
 typedef struct{ int correction, dim, type; double factor; }xKernelFunctionData;
 typedef struct{ double p0x, p0y, p0z, p1x, p1y, p1z, nx, ny, nz; }xLineObjectData;
+typedef struct{ double xx, xy, xz, yy, yz, zz; }symatrix;
+typedef struct{ double s0, s1, s2, s3, s4, s5; }double6;
 
 typedef struct 
 {

@@ -1,6 +1,6 @@
 #include "xdynamics_algebra/xGridCell.h"
 #include "xdynamics_simulation/xSimulation.h"
-#include "xdynamics_parallel/xParallelDEM_decl.cuh"
+#include "xdynamics_parallel/xParallelCommon_decl.cuh"
 
 vector3d xGridCell::wo;				// world origin
 double xGridCell::cs = 0.0;			// cell size

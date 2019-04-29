@@ -3,6 +3,8 @@
 #include <cuda_runtime.h>
 #include <helper_cuda.h>
 
+#include "xdynamics_parallel/xParallelSPH_decl.cuh"
+
 xSmoothedParticleHydrodynamicsSimulation::xSmoothedParticleHydrodynamicsSimulation()
 {
 
@@ -51,5 +53,5 @@ void xSmoothedParticleHydrodynamicsSimulation::allocationMemory()
 int xSmoothedParticleHydrodynamicsSimulation::Initialize(xSmoothedParticleHydrodynamicsModel* _xsph)
 {
 	xsph = _xsph;
-	
+	return xDynamicsError::xdynamicsSuccess;
 }

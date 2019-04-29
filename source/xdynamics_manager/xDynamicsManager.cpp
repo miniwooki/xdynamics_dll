@@ -279,14 +279,16 @@ xDynamicsManager::solverType xDynamicsManager::OpenModelXLS(const wchar_t* n)
 			case XLS_SIMULATION: xls.ReadSimulationCondition(bt->second); break;
 			}
 		}
-		if (xsph)
-		{
-			xom->CreateSPHBoundaryParticles(xsph->XParticleManager());
-		}
+// 		if (xsph)
+// 		{
+// 			//xom->CreateSPHBoundaryParticles(xsph->XParticleManager());
+// 			xsph->
+// 		}
 		if (xdem || xsph)
 		{
 			std::string pv_path = full_path + ".par";
-			xdem->XParticleManager()->ExportParticleDataForView(pv_path);
+			if(xdem) xdem->XParticleManager()->ExportParticleDataForView(pv_path);
+			else if (xsph) xsph->ExportParticleDataForView(pv_path);
 			int vot = VPARTICLE;
 			xve.Write((char*)&vot, sizeof(xViewObjectType));
 			int ns = pv_path.size(); xve.Write((char*)&ns, sizeof(int));

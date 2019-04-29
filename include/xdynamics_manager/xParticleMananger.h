@@ -29,11 +29,11 @@ public:
 	static unsigned int GetNumCubeParticles(double dx, double dy, double dz, double min_radius, double max_radius);
 	static unsigned int GetNumPlaneParticles(double dx, unsigned int ny, double dy, double min_radius, double max_radius);
 	static unsigned int GetNumCircleParticles(double d, unsigned int ny, double min_radius, double max_radius);
-	static unsigned int GetNumSPHPlaneParticles(double dx, double dy, double ps);
+//	static unsigned int GetNumSPHPlaneParticles(double dx, double dy, double ps);
 
 	xParticleObject* CreateParticleFromList(std::string n, xMaterialType mt, unsigned int _np, vector4d* d);
 	xParticleObject* CreateCubeParticle(std::string n, xMaterialType mt, unsigned int _np, xCubeParticleData& d);
-	xParticleObject* CreateSPHParticles(xObject* xobj, double ps);
+//	xParticleObject* CreateSPHParticles(xObject* xobj, double ps, unsigned int nlayer);
 //	xParticleObject* CreateBoundaryParticles(xObject* xobj, double lx, double ly, double lz, double ps);
 	//xParticleObject* CreateSPHLineParticle(std::string n, xMa)
 	//xParticleObject* CreateSPHPlaneParticleObject(std::string n, xMaterialType mt, xSPHPlaneObjectData& d);
@@ -50,6 +50,7 @@ private:
 
 	double *r_pos;
 	double *r_vel;
+	xMaterialType *r_type;
 };
 
 

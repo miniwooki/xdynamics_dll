@@ -44,7 +44,7 @@ xObject::~xObject()
 
 }
 
-unsigned int xObject::create_sph_particles(double ps, vector4d* p /*= NULL*/)
+unsigned int xObject::create_sph_particles(double ps, unsigned int nlayers, vector3d* p /*= NULL*/, xMaterialType* t)
 {
 	return 0;
 }

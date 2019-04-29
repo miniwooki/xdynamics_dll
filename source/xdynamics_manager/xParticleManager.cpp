@@ -126,26 +126,26 @@ xParticleObject* xParticleManager::CreateParticleFromList(
 	return xpo;
 }
 
-xParticleObject* xParticleManager::CreateSPHParticles(xObject* xobj, double ps)
-{
-	xParticleObject* xpo = new xParticleObject(xobj->Name().toStdString());
-	//vector4d* pos = xpo->AllocMemory(_np);
-	xpo->setStartIndex(np);
-	xpo->setMaterialType(xobj->Material());
-	//np += _np;
-	xMaterial xm = GetMaterialConstant(xobj->Material());
-	xpo->setDensity(xm.density);
-	xpo->setYoungs(xm.youngs);
-	xpo->setPoisson(xm.poisson);
-	xpo->setMinRadius(ps * 0.5);
-	xpo->setMaxRadius(ps * 0.5);
-	unsigned int _np = xobj->create_sph_particles(ps);
-	np += _np;
-	xobj->create_sph_particles(ps, xpo->AllocMemory(_np));
-	xpcos[xobj->Name()] = xpo;
-	xObjectManager::XOM()->addObject(xpo);
-	return xpo;
-}
+// xParticleObject* xParticleManager::CreateSPHParticles(xObject* xobj, double ps, unsigned int nlayer)
+// {
+// 	xParticleObject* xpo = new xParticleObject(xobj->Name().toStdString());
+// 	//vector4d* pos = xpo->AllocMemory(_np);
+// 	xpo->setStartIndex(np);
+// 	xpo->setMaterialType(xobj->Material());
+// 	//np += _np;
+// 	xMaterial xm = GetMaterialConstant(xobj->Material());
+// 	xpo->setDensity(xm.density);
+// 	xpo->setYoungs(xm.youngs);
+// 	xpo->setPoisson(xm.poisson);
+// 	xpo->setMinRadius(ps * 0.5);
+// 	xpo->setMaxRadius(ps * 0.5);
+// 	unsigned int _np = xobj->create_sph_particles(ps, nlayer);
+// 	np += _np;
+// 	xobj->create_sph_particles(ps, nlayer, xpo->AllocMemory(_np));
+// 	xpcos[xobj->Name()] = xpo;
+// 	xObjectManager::XOM()->addObject(xpo);
+// 	return xpo;
+// }
 
 // void xParticleManager::create_sph_particles_with_plane_shape(
 // 	double dx, double dy, double lx, double ly, double lz, double ps)

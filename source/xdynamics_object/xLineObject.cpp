@@ -53,24 +53,32 @@ void xLineObject::SetupDataFromStructure(xLineObjectData& d)
 	data = d;
 }
 
-unsigned int xLineObject::create_sph_particles(double ps, vector4d* p)
+unsigned int xLineObject::create_sph_particles(double ps, unsigned int nlayers, vector3d* p, xMaterialType* t)
 {
 	unsigned int nx = static_cast<unsigned int>((len / ps) + 1e-9);
 	unsigned int count = 0;
-	for (unsigned int i=0; i <= nx; i++)
+	if (material == FLUID)
 	{
-		vector3d _p = spoint + (i * ps) * tangential;
-		if (xSmoothedParticleHydrodynamicsModel::XSPH()->CheckCorner(_p))
-			continue;
-		if (p)
-		{
-			p[count].x = _p.x;
-			p[count].y = _p.y;
-			p[count].z = _p.z;
-			p[count].w = ps * 0.5;
-		}
-		count++;
+
 	}
+	else if (material == BOUNDARY){
+		for (unsigned int i = 0; i <= nx; i++){
+			vector3d _p = spoint + (i * ps) * tangential;
+			if (xSmoothedParticleHydrodynamicsModel::XSPH()->CheckCorner(_p))
+				continue;
+			if (p){
+				p[count] = new_vector3d(_p.x, _p.y, _p.z);
+				t[count] = BOUNDARY;
+				for (unsigned int j = 1; j <= nlayers; j++){
+					vector3d _d = _p + (j * ps) * normal;
+					p[count + j] = new_vector3d(_d.x, _d.y, _d.z);
+					t[count + j] = DUMMY;
+				}
+			}
+			count += 1 + nlayers;
+		}
+	}
+	
 	return count;
 }
 

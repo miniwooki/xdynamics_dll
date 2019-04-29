@@ -14,7 +14,7 @@ public:
 	xObject(const xObject& o);
 	virtual ~xObject();
 
-	virtual unsigned int create_sph_particles(double ps, vector4d* p = NULL);
+	virtual unsigned int create_sph_particles(double ps, unsigned int nlayers, vector3d* p = NULL, xMaterialType* t = NULL);
 	virtual QVector<xCorner> get_sph_boundary_corners();
 
 	void setObjectID(int _id);
