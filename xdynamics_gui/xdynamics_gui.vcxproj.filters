@@ -93,6 +93,9 @@
     <ClCompile Include="..\source\xdynamics_gui\xLineEditWidget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xPointMassWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="xdynamics_gui.h">
@@ -113,14 +116,17 @@
     <QtMoc Include="..\include\xdynamics_gui\xSimulationThread.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="..\include\xdynamics_gui\xSimulationWidget.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
     <QtMoc Include="..\include\xdynamics_gui\xNewDialog.h">
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="..\include\xdynamics_gui\xLineEditWidget.h">
       <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="..\include\xdynamics_gui\xSimulationWidget.h">
+      <Filter>Header Files\widget</Filter>
+    </QtMoc>
+    <QtMoc Include="..\include\xdynamics_gui\xPointMassWidget.h">
+      <Filter>Header Files\widget</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
@@ -140,6 +146,9 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="wview.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="wpointmass.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
@@ -201,6 +210,9 @@
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_wview.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_wpointmass.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>

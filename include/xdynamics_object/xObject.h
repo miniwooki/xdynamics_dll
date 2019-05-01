@@ -23,6 +23,7 @@ public:
 	void setPoisson(double _p);
 	void setShapeType(xShapeType xst);
 	void setMaterialType(xMaterialType xmt);
+	void setConnectedGeometryName(QString n);
 
 	double Density() const;// { return d; }
 	double Youngs() const;// { return y; }
@@ -33,11 +34,13 @@ public:
 	xMaterialType Material() const;
 
 	QString Name() const;
+	QString ConnectedGeometryName() const;
 	int ObjectID() const;
 
 protected:
 	static int count;
 	QString name;			// Object name
+	QString connected_geometry_name;
 	xShapeType shape;
 	xMaterialType material;
 	int id;

@@ -26,11 +26,29 @@ public:
 	void setKernelFunctionData(xKernelFunctionData& d);
 
 	xBoundaryTreatmentType BoundaryTreatmentType();
+	xSPHCorrectionType CorrectionType();
 
 	bool CheckCorner(vector3d p);
 	void DefineCorners(xObjectManager* xobj);
 	void CreateParticles(xObjectManager* xobj);
 	void ExportParticleDataForView(std::string& path);
+
+	unsigned int NumTotalParticle();
+	unsigned int NumFluid();
+	unsigned int NumBoundary();
+	unsigned int NumDummy();
+	unsigned int Dimension();
+
+	double ParticleMass();
+	double ParticleVolume();
+	double ReferenceDensity();
+	double ParticleSpacing();
+	double KinematicViscosity();
+	double FreeSurfaceFactor();
+	vector3d* Position();
+	vector3d* Velocity();
+	xKernelFunctionData& KernelData();
+	xWaveDampingData& WaveDampingData();
 
 private:
 	unsigned int CreateOverlapCornerDummyParticles(unsigned int sid, bool isOnlyCount);
@@ -39,12 +57,15 @@ private:
 private:
 	QString name;
 
+	unsigned int dim;
 	unsigned int np;
 	unsigned int nfluid;
 	unsigned int nbound;
 	unsigned int ndummy;
 	unsigned int nlayers;
 
+	double p_mass;
+	double p_volume;
 	double k_viscosity;
 	double ref_rho;
 	double fs_factor;
@@ -60,6 +81,7 @@ private:
 	xBoundaryTreatmentType bound;
 	//xKenelType ker;
 	xKernelFunctionData ker_data;
+	xWaveDampingData wave_damping_data;
 	xKernelFunction *xker;
 	//xParticleManager *xpmgr;
 

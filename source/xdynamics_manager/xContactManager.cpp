@@ -5,6 +5,7 @@
 #include <thrust/reduce.h>
 #include <thrust/execution_policy.h>
 #include <list>
+#include <QtCore/QDebug>
 
 xContactManager::xContactManager()
 	: cpp(NULL)
@@ -172,6 +173,10 @@ bool xContactManager::runCollision(double *pos, double *vel, double *omega, doub
 
 void xContactManager::update()
 {
+	if (cpmeshes && ncontact)
+	{
+		cpmeshes->updateMeshObjectData();
+	}
 // 	if (cppoly)
 // 	{
 // 		model::isSinglePrecision ?
@@ -282,11 +287,14 @@ void xContactManager::deviceCollision(
 
 	if (cpmeshes && cpmeshes->NumContactObjects())
 	{
+		cpmeshes->updateMeshMassData();
+	//	qDebug() << "new_polygon_contact";
 		cu_new_particle_polygon_object_contact(
 			cpmeshes->deviceTrianglesInfo(), cpmeshes->devicePolygonObjectMassInfo(),
 			d_old_pppd, d_pppd, d_old_pair_count, d_pair_count, d_old_pair_start, d_pair_start,
 			d_type_count, pos, vel, omega, force, moment, mass,
 			sorted_id, cell_start, cell_end, cpmeshes->DeviceContactProperty(), np);
+		cpmeshes->getMeshContactForce();
 	}
 	ncontact = nc;
 	checkCudaErrors(cudaFree(d_old_pppd));

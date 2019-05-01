@@ -1,7 +1,7 @@
 #ifndef XNEIBORHOODCELL_H
 #define XNEIBORHOODCELL_H
 
-#include "xdynamics_decl.h"
+/*#include "xdynamics_decl.h"*/
 #include "xdynamics_algebra/xGridCell.h"
 
 class XDYNAMICS_API xNeiborhoodCell : public xGridCell

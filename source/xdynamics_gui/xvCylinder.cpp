@@ -56,13 +56,14 @@ bool xvCylinder::makeCylinderGeometry(xCylinderObjectData& d)
 void xvCylinder::draw(GLenum eMode)
 {
 	if (display){
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glPolygonMode(GL_FRONT_AND_BACK, drawingMode);
 		glPushMatrix();
 		glDisable(GL_LIGHTING);
 		glColor3f(clr.redF(), clr.greenF(), clr.blueF());
 		if (eMode == GL_SELECT)
 			glLoadName((GLuint)ID());
-		if (xvAnimationController::Play() || xvAnimationController::getFrame())
+		bool isplaymode = (xvAnimationController::Play() || xvAnimationController::getFrame()) && xvObject::pmrs;
+		if (isplaymode)
 		{
 			double t = 180 / M_PI;
 			unsigned int idx = xvAnimationController::getFrame();
@@ -111,7 +112,7 @@ bool xvCylinder::define()
 	data.length = length(to);
 	double h_len = data.length * 0.5;
 	vector3d u = to / length(to);							//x
-	vector3d pu = cross(u, new_vector3d(1.0, 0.0, 0.0));	//y
+	vector3d pu = cross(u, new_vector3d(1.0-u.x, 1.0-u.y, 1.0-u.z));	//y
 	vector3d qu = cross(u, pu);					
 	
 	//vector3d u0 = new_vector3d(0.0, 0.0, 1.0);

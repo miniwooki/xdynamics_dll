@@ -5,6 +5,7 @@
 #include <cuda_runtime.h>
 #include <vector_types.h>
 #include <helper_cuda.h>
+//#include <helper_math.h>
 
 inline __device__ int sign(float L)
 {
@@ -57,7 +58,7 @@ inline __device__ double3 operator/(double3& v1, double v2)
 	return make_double3(v1.x / v2, v1.y / v2, v1.z / v2);
 }
 
-inline __device__ double length(double3& v1)
+inline __device__ double length(double3 v1)
 {
 	return sqrt(dot(v1, v1));
 }
@@ -71,6 +72,149 @@ inline __device__ double3 normalize(double3 u)
 {
 	return u / length(u);
 }
+
+// sph
+struct device_sinusoidal_expression
+{
+	unsigned int sid;
+	unsigned int count;
+	double period;
+	double freq;
+	double c1;
+	double c2;
+	double stime;
+};
+
+struct device_simple_sin_expression
+{
+	unsigned int sid;
+	unsigned int count;
+	double freq;
+	double amp;
+	double stime;
+};
+
+struct device_wave_damping
+{
+	double enable;
+	double alpha;
+	double start_point;
+	double length;
+};
+
+struct device_periodic_condition
+{
+	bool b;
+	double3 dir;
+	double3 limits;
+	double3 velocity;
+};
+
+struct device_pointMass_info
+{
+	double mass;
+	double3 pos;
+	double3 vel;
+	double3 omega;
+	double3 force;
+	double3 moment;
+};
+
+struct device_circle_info
+{
+	unsigned int sid;
+	unsigned int count;
+	double r;
+};
+
+// dem
+struct pair_data
+{
+	bool enable;
+	unsigned int type;
+	unsigned int i;
+	unsigned int j;
+	double ds;
+	double dots;
+};
+
+struct device_triangle_info
+{
+	int id;
+	double3 P;
+	double3 Q;
+	double3 R;
+	double3 V;
+	double3 W;
+	double3 N;
+};
+
+struct device_plane_info
+{
+	double l1, l2;
+	double3 u1;
+	double3 u2;
+	double3 uw;
+	double3 xw;
+	double3 pa;
+	double3 pb;
+	double3 w2;
+	double3 w3;
+	double3 w4;
+};
+
+struct device_mesh_mass_info
+{
+	double3 origin;
+	double3 vel;
+	double3 omega;
+	double3 force;
+	double3 moment;
+	double4 ep;
+};
+
+struct device_cylinder_info
+{
+	double len, rbase, rtop;
+	double3 pbase;
+	double3 ptop;
+	double3 origin;
+	double3 vel;
+	double3 omega;
+	double4 ep;
+};
+
+struct device_contact_property
+{
+	double Ei, Ej;
+	double pri, prj;
+	double Gi, Gj;
+	double rest;
+	double fric;
+	double rfric;
+	double coh;
+	double sratio;
+};
+
+
+struct device_force_constant
+{
+	double kn;
+	double vn;
+	double ks;
+	double vs;
+	double mu;
+	double ms;
+};
+
+struct device_force_constant_d
+{
+	double kn;
+	double vn;
+	double ks;
+	double vs;
+	double mu;
+};
 
 struct device_dem_parameters
 {
@@ -112,7 +256,7 @@ struct device_sph_parameters
 
 	//double deltaPKernelInv;
 	double gridCellSize;
-	int3 gridCellCount;
+	uint3 gridCellCount;
 	double cellsizeInv;
 	//double mass;
 	//double bmass;
@@ -135,20 +279,14 @@ struct device_sph_parameters
 	double shifting_factor;
 };
 
-__constant__ device_dem_parameters dcte;
-__constant__ device_sph_parameters scte;
 
-void XDYNAMICS_API cu_calculateHashAndIndex(unsigned int* hash, unsigned int* index, double *pos, unsigned int np);
-void XDYNAMICS_API cu_calculateHashAndIndexForPolygonSphere(
-	unsigned int* hash, unsigned int* index,
-	unsigned int sid, unsigned int nsphere, double *sphere);
-void XDYNAMICS_API cu_reorderDataAndFindCellStart(unsigned int* hash, unsigned int* index, unsigned int* cstart, unsigned int* cend, unsigned int* sorted_index, unsigned int np, /*unsigned int nsphere,*/ unsigned int ncell);
+//__constant__ device_sph_parameters scte;
 
 void XDYNAMICS_API cudaMemoryAlloc(void** data, unsigned int size);
 unsigned int XDYNAMICS_API iDivUp(unsigned int a, unsigned int b);
 void XDYNAMICS_API computeGridSize(unsigned int n, unsigned int blockSize, unsigned int& numBlocks, unsigned int& numThreads);
-void XDYNAMICS_API setDEMSymbolicParameter(device_dem_parameters* h_paras);
-void XDYNAMICS_API setSPHSymbolicParameter(device_sph_parameters* h_paras);
+
+//void XDYNAMICS_API setSPHSymbolicParameter(device_sph_parameters* h_paras);
 void XDYNAMICS_API cuMaxDouble3(double* indata, double* odata, unsigned int np);
 double3 XDYNAMICS_API reductionD3(double3* in, unsigned int np);
 

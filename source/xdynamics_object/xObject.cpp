@@ -64,6 +64,11 @@ QString xObject::Name() const
 	return name;
 }
 
+QString xObject::ConnectedGeometryName() const
+{
+	return connected_geometry_name;
+}
+
 int xObject::ObjectID() const
 {
 	return id;
@@ -121,6 +126,11 @@ void xObject::setShapeType(xShapeType xst)
 void xObject::setMaterialType(xMaterialType xmt)
 {
 	material = xmt;
+}
+
+void xObject::setConnectedGeometryName(QString n)
+{
+	connected_geometry_name = n;
 }
 
 xMaterialType xObject::Material() const

@@ -197,6 +197,8 @@ private:
 
 signals:
 	void changedAnimationFrame();
+	void signalGeometrySelection(QString);
+	void releaseOperation();
 	//void propertySignal(QString, context_object_type);
 	//void contextSignal(QString, context_menu);
 };

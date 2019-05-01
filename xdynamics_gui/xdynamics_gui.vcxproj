@@ -87,10 +87,10 @@
     <QtMsBuild>$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>..\bin\debug\x64\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>..\bin\release\x64\</OutDir>
   </PropertyGroup>
   <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
     <Message Importance="High" Text="QtMsBuild: could not locate qt.targets, qt.props; project may not build correctly." />
@@ -144,6 +144,7 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\source\xdynamics_gui\xPointMassWidget.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xAnimationTool.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xCommandLine.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xCommandWindow.cpp" />
@@ -172,6 +173,7 @@
     <QtUic Include="wcube.ui" />
     <QtUic Include="wparticles.ui" />
     <QtUic Include="wplane.ui" />
+    <QtUic Include="wpointmass.ui" />
     <QtUic Include="wsimulation.ui" />
     <QtUic Include="wview.ui" />
     <QtUic Include="xdynamics_gui.ui" />
@@ -187,12 +189,17 @@
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles;.;$(USING_CUDA_SAMPLE_VERSION)\common\inc;.\GeneratedFiles\$(ConfigurationName)\.;$(USING_QT_VERSION)\include\QtCore;$(USING_QT_VERSION)\include\QtGui;$(USING_QT_VERSION)\include\QtANGLE;$(USING_QT_VERSION)\include\QtOpenGL;$(USING_QT_VERSION)\include\QtOpenGLExtensions;$(USING_QT_VERSION)\include\QtWidgets;$(USING_IRRLICHT_VERSION)\include;C:\xdynamics\include\xdynamics_gui;C:\xdynamics\include;$(USING_QT_VERSION)\include;$(USING_CUDA_VERSION)\include</IncludePath>
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles;.;$(USING_CUDA_SAMPLE_VERSION)\common\inc;.\GeneratedFiles\$(ConfigurationName)\.;$(USING_QT_VERSION)\include\QtCore;$(USING_QT_VERSION)\include\QtGui;$(USING_QT_VERSION)\include\QtANGLE;$(USING_QT_VERSION)\include\QtOpenGL;$(USING_QT_VERSION)\include\QtOpenGLExtensions;$(USING_QT_VERSION)\include\QtWidgets;$(USING_IRRLICHT_VERSION)\include;$(XDYNAMICS_Q)\include\xdynamics_gui;$(XDYNAMICS_Q)\include;$(USING_QT_VERSION)\include;$(USING_CUDA_VERSION)\include</IncludePath>
     </QtMoc>
+    <QtMoc Include="..\include\xdynamics_gui\xPointMassWidget.h">
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles;.;$(USING_CUDA_SAMPLE_VERSION)\common\inc;.\GeneratedFiles\$(ConfigurationName)\.;$(USING_QT_VERSION)\include\QtCore;$(USING_QT_VERSION)\include\QtGui;$(USING_QT_VERSION)\include\QtANGLE;$(USING_QT_VERSION)\include\QtOpenGL;$(USING_QT_VERSION)\include\QtOpenGLExtensions;$(USING_QT_VERSION)\include\QtWidgets;$(USING_IRRLICHT_VERSION)\include;C:\xdynamics\include\xdynamics_gui;C:\xdynamics\include;$(USING_QT_VERSION)\include;$(USING_CUDA_VERSION)\include</IncludePath>
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles;.;$(USING_CUDA_SAMPLE_VERSION)\common\inc;.\GeneratedFiles\$(ConfigurationName)\.;$(USING_QT_VERSION)\include\QtCore;$(USING_QT_VERSION)\include\QtGui;$(USING_QT_VERSION)\include\QtANGLE;$(USING_QT_VERSION)\include\QtOpenGL;$(USING_QT_VERSION)\include\QtOpenGLExtensions;$(USING_QT_VERSION)\include\QtWidgets;$(USING_IRRLICHT_VERSION)\include;$(XDYNAMICS_Q)\include\xdynamics_gui;$(XDYNAMICS_Q)\include;$(USING_QT_VERSION)\include;$(USING_CUDA_VERSION)\include</IncludePath>
+    </QtMoc>
     <ClInclude Include="..\include\xdynamics_gui\xCommandLine.h" />
     <QtMoc Include="..\include\xdynamics_gui\xLineEditWidget.h">
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles;.;$(USING_CUDA_SAMPLE_VERSION)\common\inc;.\GeneratedFiles\$(ConfigurationName)\.;$(USING_QT_VERSION)\include\QtCore;$(USING_QT_VERSION)\include\QtGui;$(USING_QT_VERSION)\include\QtANGLE;$(USING_QT_VERSION)\include\QtOpenGL;$(USING_QT_VERSION)\include\QtOpenGLExtensions;$(USING_QT_VERSION)\include\QtWidgets;$(USING_IRRLICHT_VERSION)\include;C:\xdynamics\include\xdynamics_gui;C:\xdynamics\include;$(USING_QT_VERSION)\include;$(USING_CUDA_VERSION)\include</IncludePath>
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles;.;$(USING_CUDA_SAMPLE_VERSION)\common\inc;.\GeneratedFiles\$(ConfigurationName)\.;$(USING_QT_VERSION)\include\QtCore;$(USING_QT_VERSION)\include\QtGui;$(USING_QT_VERSION)\include\QtANGLE;$(USING_QT_VERSION)\include\QtOpenGL;$(USING_QT_VERSION)\include\QtOpenGLExtensions;$(USING_QT_VERSION)\include\QtWidgets;$(USING_IRRLICHT_VERSION)\include;$(XDYNAMICS_Q)\include\xdynamics_gui;$(XDYNAMICS_Q)\include;$(USING_QT_VERSION)\include;$(USING_CUDA_VERSION)\include</IncludePath>
     </QtMoc>
     <ClInclude Include="GeneratedFiles\ui_wparticles.h" />
+    <ClInclude Include="GeneratedFiles\ui_wpointmass.h" />
     <ClInclude Include="GeneratedFiles\ui_wview.h" />
     <ClInclude Include="GeneratedFiles\ui_xnew.h" />
     <QtMoc Include="..\include\xdynamics_gui\xSimulationWidget.h">

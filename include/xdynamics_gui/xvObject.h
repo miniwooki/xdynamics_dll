@@ -44,9 +44,11 @@ public:
 // 	material_type MaterialType() { return m_type; }
  	int ID() { return id; }
  	QString& Name() { return name; }
+	QString ConnectedMassName() { return connected_mass_name; }
 // 	QString FilePath() { return file_path; }
 // 	import_shape_type ImportType() { return ist; }
 	void setName(QString n);// { nm = n; }
+	void setConnectedMassName(QString n);
 	void setAngle(float x, float y, float z);
 	void setPosition(float x, float y, float z);
 	void setBlendAlpha(float v) { blend_alpha = v; }
@@ -56,7 +58,7 @@ public:
 	void setColor(QColor ct) { clr = ct; }
 // 	static void msgBox(QString ch, QMessageBox::Icon ic);
 // 	void copyCoordinate(GLuint _coord);
-// 	void setDrawingMode(GLenum dm) { drawingMode = dm; }
+ 	void setDrawingMode(GLenum dm) { drawingMode = dm; }
 	void setSelected(bool b);//; { isSelected = b; }
 // 	context_object_type ViewGeometryObjectType() { return vot; }
  	virtual void draw(GLenum eMode) = 0;
@@ -78,6 +80,7 @@ protected:
 // 	context_object_type vot;
 // 	import_shape_type ist;
 	QString name;			// object name
+	QString connected_mass_name;
 	QString file_path;
 	GLuint coord;
 	GLenum drawingMode;

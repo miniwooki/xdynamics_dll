@@ -81,6 +81,11 @@ xBoundaryTreatmentType xSmoothedParticleHydrodynamicsModel::BoundaryTreatmentTyp
 	return bound;
 }
 
+xSPHCorrectionType xSmoothedParticleHydrodynamicsModel::CorrectionType()
+{
+	return corr;
+}
+
 bool xSmoothedParticleHydrodynamicsModel::CheckCorner(vector3d p)
 {
 	foreach(xOverlapCorner xoc, overlappingCorners)
@@ -101,9 +106,9 @@ void xSmoothedParticleHydrodynamicsModel::DefineCorners(xObjectManager* xobj)
 		if (xo->Material() != BOUNDARY)
 			continue;
 		QVector<xCorner> objCorners = xo->get_sph_boundary_corners();
-		for (unsigned int i = 0; i < objCorners.size(); i++)
+		for (int i = 0; i < objCorners.size(); i++)
 		{
-			for (unsigned int j = 0; j < corners.size(); j++)
+			for (int j = 0; j < corners.size(); j++)
 			{
 				xCorner xc0 = objCorners[i];
 				xCorner xc1 = corners[j];
@@ -113,7 +118,7 @@ void xSmoothedParticleHydrodynamicsModel::DefineCorners(xObjectManager* xobj)
 				{
 					if (xo->Shape() == PLANE_SHAPE){
 						// if geometry is plane
-						for (unsigned int k = 0; k < overlappingCorners.size(); k++){
+						for (int k = 0; k < overlappingCorners.size(); k++){
 							xOverlapCorner c = overlappingCorners[k];
 							p1 = new_vector3d(c.c1.px, c.c1.py, c.c1.pz);
 							if (length(p1 - p0) < 1e-9){
@@ -165,6 +170,9 @@ void xSmoothedParticleHydrodynamicsModel::CreateParticles(xObjectManager* xobj)
 		case DUMMY: ndummy++; break;
 		}
 	}
+	dim = ker_data.dim;
+	p_volume = pow(pspace, dim);
+	p_mass = p_volume * ref_rho;
 // 	foreach(xParticleObject* xpo, xpmgr->XParticleObjects())
 // 	{
 // 		if (xpo->Material() == FLUID)
@@ -234,12 +242,87 @@ void xSmoothedParticleHydrodynamicsModel::ExportParticleDataForView(std::string&
 	of.close();
 }
 
+unsigned int xSmoothedParticleHydrodynamicsModel::NumTotalParticle()
+{
+	return np;
+}
+
+unsigned int xSmoothedParticleHydrodynamicsModel::NumFluid()
+{
+	return nfluid;
+}
+
+unsigned int xSmoothedParticleHydrodynamicsModel::NumBoundary()
+{
+	return nbound;
+}
+
+unsigned int xSmoothedParticleHydrodynamicsModel::NumDummy()
+{
+	return ndummy;
+}
+
+unsigned int xSmoothedParticleHydrodynamicsModel::Dimension()
+{
+	return dim;
+}
+
+double xSmoothedParticleHydrodynamicsModel::ParticleMass()
+{
+	return p_mass;
+}
+
+double xSmoothedParticleHydrodynamicsModel::ParticleVolume()
+{
+	return p_volume;
+}
+
+double xSmoothedParticleHydrodynamicsModel::ReferenceDensity()
+{
+	return ref_rho;
+}
+
+double xSmoothedParticleHydrodynamicsModel::ParticleSpacing()
+{
+	return pspace;
+}
+
+double xSmoothedParticleHydrodynamicsModel::KinematicViscosity()
+{
+	return k_viscosity;
+}
+
+double xSmoothedParticleHydrodynamicsModel::FreeSurfaceFactor()
+{
+	return fs_factor;
+}
+
+vector3d* xSmoothedParticleHydrodynamicsModel::Position()
+{
+	return pos;
+}
+
+vector3d* xSmoothedParticleHydrodynamicsModel::Velocity()
+{
+	return vel;
+}
+
+xKernelFunctionData& xSmoothedParticleHydrodynamicsModel::KernelData()
+{
+	return ker_data;
+}
+
+xWaveDampingData& xSmoothedParticleHydrodynamicsModel::WaveDampingData()
+{
+	return wave_damping_data;
+}
+
 unsigned int xSmoothedParticleHydrodynamicsModel::CreateOverlapCornerDummyParticle(unsigned int id, vector3d& p, vector3d& n1, vector3d& n2, bool isOnlyCount)
 {
 	unsigned int count = 0;
 	//int layers = ;// (int)(fd->gridCellSize() / pspace) + 1;
 	/*VEC3D v0 = vel;*/
-	for (int i = 1; i <= nlayers; i++)
+	for (unsigned int i = 1; i <= nlayers; i++)
 	{
 		vector3d p1 = p - (i * pspace) * n1;
 		vector3d p2 = p - (i * pspace) * n2;
@@ -266,7 +349,7 @@ unsigned int xSmoothedParticleHydrodynamicsModel::CreateOverlapCornerDummyPartic
 		count += 2;
 
 		if (i > 1){
-			for (int j = 1; j < i; j++){
+			for (unsigned int j = 1; j < i; j++){
 				//count += 2;
 				vector3d p3 = p1 - (j * pspace) * n2;
 				vector3d p4 = p2 - (j * pspace) * n1;

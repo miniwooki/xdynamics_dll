@@ -61,7 +61,7 @@ void xvCube::draw(GLenum eMode)
 	if (display){
 		//glEnable(GL_BLEND);
 		//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glPolygonMode(GL_FRONT_AND_BACK, drawingMode);
 		glPushMatrix();
 		//glDisable(GL_LIGHTING);
 		glColor4f(clr.redF(), clr.greenF(), clr.blueF(), blend_alpha);
@@ -69,10 +69,26 @@ void xvCube::draw(GLenum eMode)
 // 			//animationFrame();
 		if (eMode == GL_SELECT)
 			glLoadName((GLuint)ID());
-		glTranslated(pos.x, pos.y, pos.z);
-		glRotated(ang.x, 0, 0, 1);
-		glRotated(ang.y, 1, 0, 0);
-		glRotated(ang.z, 0, 0, 1);
+		bool isplaymode = (xvAnimationController::Play() || xvAnimationController::getFrame()) && xvObject::pmrs;
+		if (isplaymode)
+		{
+			double t = 180 / M_PI;
+			unsigned int idx = xvAnimationController::getFrame();
+			xPointMass::pointmass_result pmr = xvObject::pmrs[idx];
+			glTranslated(pmr.pos.x, pmr.pos.y, pmr.pos.z);
+			vector3d euler = EulerParameterToEulerAngle(pmr.ep);
+			glRotated(t*euler.x, 0, 0, 1);
+			glRotated(t*euler.y, 1, 0, 0);
+			glRotated(t*euler.z, 0, 0, 1);
+		}
+		else
+		{
+			glTranslated(pos.x, pos.y, pos.z);
+			glRotated(ang.x, 0, 0, 1);
+			glRotated(ang.y, 1, 0, 0);
+			glRotated(ang.z, 0, 0, 1);
+		}
+		
 		glCallList(glList);
 		if (isSelected)
 		{

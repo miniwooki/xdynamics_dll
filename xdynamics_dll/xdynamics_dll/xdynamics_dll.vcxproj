@@ -167,6 +167,7 @@
     <ClCompile Include="..\..\source\xdynamics_algebra\xGridCell.cpp" />
     <ClCompile Include="..\..\source\xdynamics_algebra\xNeiborhoodCell.cpp" />
     <ClCompile Include="..\..\source\xdynamics_algebra\xParabolaPredictor.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_algebra\xSmoothCell.cpp" />
     <ClCompile Include="..\..\source\xdynamics_algebra\xUtilityFunction.cpp" />
     <ClCompile Include="..\..\source\xdynamics_global.cpp" />
     <ClCompile Include="..\..\source\xdynamics_manager\xContactManager.cpp" />
@@ -242,6 +243,7 @@
     <ClInclude Include="..\..\include\xdynamics_algebra\xGridCell.h" />
     <ClInclude Include="..\..\include\xdynamics_algebra\xNeiborhoodCell.h" />
     <ClInclude Include="..\..\include\xdynamics_algebra\xParaboalPredictor.h" />
+    <ClInclude Include="..\..\include\xdynamics_algebra\xSmoothCell.h" />
     <ClInclude Include="..\..\include\xdynamics_algebra\xUtilityFunctions.h" />
     <ClInclude Include="..\..\include\xdynamics_decl.h" />
     <ClInclude Include="..\..\include\xdynamics_global.h" />
@@ -285,6 +287,7 @@
     <ClInclude Include="..\..\include\xdynamics_object\xUniversalConstraint.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xWendlandKernel.h" />
     <ClInclude Include="..\..\include\xdynamics_parallel\xParallelCommon_decl.cuh" />
+    <ClInclude Include="..\..\include\xdynamics_parallel\xParallelContactDetection_decl.cuh" />
     <ClInclude Include="..\..\include\xdynamics_parallel\xParallelDEM_impl.cuh">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
@@ -309,6 +312,7 @@
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\..\source\xdynamics_parallel\xParallelCommon_def.cu" />
+    <CudaCompile Include="..\..\source\xdynamics_parallel\xParallelContactDetection_def.cu" />
     <CudaCompile Include="..\..\source\xdynamics_parallel\xParallelDEM_def.cu" />
     <CudaCompile Include="..\..\source\xdynamics_parallel\xParallelSPH_def.cu" />
   </ItemGroup>

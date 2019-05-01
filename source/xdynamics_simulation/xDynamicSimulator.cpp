@@ -188,8 +188,13 @@ bool xDynamicsSimulator::xRunSimulation()
 			if (checkXerror(xdem->OneStepSimulation(ct, cstep)))
 				return false;
 		if (xmbd)
+		{
 			if (checkXerror(xmbd->OneStepSimulation(ct, cstep)))
 				return false;
+			if (xdem)
+				xdem->updateObjectFromMBD();
+		}
+			
 		if (!((cstep) % xSimulation::st))
 		{
 			previous_time = elapsed_time;

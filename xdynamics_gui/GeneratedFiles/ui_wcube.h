@@ -1,13 +1,13 @@
 /********************************************************************************
-** Form generated from reading UI file 'wcube.ui'
+** Form generated from reading UI file 'wcubeMdLFWB.ui'
 **
 ** Created by: Qt User Interface Compiler version 5.10.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef UI_WCUBE_H
-#define UI_WCUBE_H
+#ifndef WCUBEMDLFWB_H
+#define WCUBEMDLFWB_H
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QAction>
@@ -54,7 +54,7 @@ public:
     {
         if (wcube->objectName().isEmpty())
             wcube->setObjectName(QStringLiteral("wcube"));
-        wcube->resize(256, 146);
+        wcube->resize(202, 146);
         QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -231,4 +231,4 @@ namespace Ui {
 
 QT_END_NAMESPACE
 
-#endif // UI_WCUBE_H
+#endif // WCUBEMDLFWB_H

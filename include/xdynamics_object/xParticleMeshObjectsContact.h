@@ -26,11 +26,11 @@ class XDYNAMICS_API xParticleMeshObjectsContact : public xContact
 	struct host_mesh_mass_info
 	{
 		vector3d pos;
-		euler_parameters ep;
 		vector3d vel;
 		vector3d omega;
 		vector3d force;
 		vector3d moment;
+		euler_parameters ep;
 	};
 
 public:
@@ -47,7 +47,9 @@ public:
 	unsigned int NumContact() { return ncontact; }
 	unsigned int NumContactObjects() { return nPobjs; }
 	void setNumContact(unsigned int c) { ncontact = c; }
-	void updateMeshObjectData(xVectorD& q, xVectorD& qd);
+	void updateMeshObjectData();
+	void updateMeshMassData();
+	void getMeshContactForce();
 	void updateCollisionPair(unsigned int id, xContactPairList& xcpl, double r, vector3d pos);
 	virtual void cudaMemoryAlloc(unsigned int np);
 	virtual void cuda_collision(

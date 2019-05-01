@@ -13,6 +13,7 @@ xDynamicsManager::xDynamicsManager()
 	: xModel("Model1")
 	, xmbd(NULL)
 	, xdem(NULL)
+	, xsph(NULL)
 	, xom(NULL)
 	, xcm(NULL)
 {
@@ -23,6 +24,7 @@ xDynamicsManager::~xDynamicsManager()
 {
 	qDeleteAll(xmbds);
 	qDeleteAll(xdems);
+	qDeleteAll(xsphs);
 	qDeleteAll(xoms);
 	qDeleteAll(xcms);
 }

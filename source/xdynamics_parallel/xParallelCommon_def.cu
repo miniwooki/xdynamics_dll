@@ -1,5 +1,23 @@
 #include "xdynamics_parallel/xParallelCommon_decl.cuh"
 
+//__device__ int calcGridHash(int3 gridPos, uint3 grid_size)
+//{
+//	gridPos.x = gridPos.x & (grid_size.x - 1);  // wrap grid, assumes size is power of 2
+//	gridPos.y = gridPos.y & (grid_size.y - 1);
+//	gridPos.z = gridPos.z & (grid_size.z - 1);
+//	return __umul24(__umul24(gridPos.z, grid_size.y), grid_size.x) + __umul24(gridPos.y, grid_size.x) + gridPos.x;
+//}
+//
+//// calculate position in uniform grid
+//__device__ int3 calcGridPos(double3 p, double3 world_origin, double cell_size)
+//{
+//	int3 gridPos;
+//	gridPos.x = floor((p.x - world_origin.x) / cell_size);
+//	gridPos.y = floor((p.y - world_origin.y) / cell_size);
+//	gridPos.z = floor((p.z - world_origin.z) / cell_size);
+//	return gridPos;
+//}
+
 void cudaMemoryAlloc(void** data, unsigned int size)
 {
 	checkCudaErrors(cudaMalloc(data, size));
@@ -17,15 +35,12 @@ void computeGridSize(unsigned n, unsigned blockSize, unsigned &numBlocks, unsign
 	numBlocks = iDivUp(n, numThreads);
 }
 
-void setSPHSymbolicParameter(device_sph_parameters *h_paras)
-{
-	checkCudaErrors(cudaMemcpyToSymbol(scte, h_paras, sizeof(device_sph_parameters)));
-}
+//void setSPHSymbolicParameter(device_sph_parameters *h_paras)
+//{
+//	checkCudaErrors(cudaMemcpyToSymbol(scte, h_paras, sizeof(device_sph_parameters)));
+//}
 
-void setDEMSymbolicParameter(device_dem_parameters *h_paras)
-{
-	checkCudaErrors(cudaMemcpyToSymbol(dcte, h_paras, sizeof(device_dem_parameters)));
-}
+
 
 double __device__ maxfunc(double a, double b)
 {

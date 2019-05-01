@@ -72,8 +72,8 @@ xModelNavigator::xModelNavigator(QWidget* parent)
 	layout->setMargin(0);
 	frame->setLayout(layout);
 	this->setWidget(frame);
-	this->setMinimumWidth(240);
-	this->setMaximumWidth(240);
+	this->setMinimumWidth(270);
+	this->setMaximumWidth(270);
 	//plate->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	
 	connect(vtree, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(clickAction(QTreeWidgetItem*, int)));
@@ -86,6 +86,11 @@ xModelNavigator::~xModelNavigator()
 	if (plate_layout) delete plate_layout; plate_layout = NULL;
 	if (plate_frame) delete plate_frame; plate_frame = NULL;
 	if (plate) delete plate; plate = NULL;
+}
+
+xModelNavigator* xModelNavigator::NAVIGATOR()
+{
+	return db;
 }
 
 void xModelNavigator::ClearTreeObject()
@@ -108,6 +113,14 @@ void xModelNavigator::InitPlate()
 
 }
 
+void xModelNavigator::deleteChild(tRoot t, QString _nm)
+{
+	QTreeWidgetItem* it = roots[t]->takeChild(idx_child[_nm]);
+	if (it)
+		delete it;
+	idx_child.take(_nm);
+}
+
 void xModelNavigator::addChild(tRoot tr, QString _nm)
 {
 	QTreeWidgetItem* parent = getRootItem(tr);
@@ -118,6 +131,7 @@ void xModelNavigator::addChild(tRoot tr, QString _nm)
 	//child->setData(0, (int)tr, v);
 	parent->addChild(child);		
 	parent->setExpanded(true);
+	idx_child[_nm] = parent->indexOfChild(child);
 }
 
 void xModelNavigator::addChilds(tRoot tr, QStringList& qsl)
@@ -142,9 +156,6 @@ QTreeWidgetItem* xModelNavigator::getRootItem(tRoot tr)
 	}
 	return mom_roots[tr];
 }
-
-
-
 // wsimulation* xModelNavigator::SimulationWidget()
 // {
 // 	return xws;
@@ -160,7 +171,7 @@ void xModelNavigator::clickAction(QTreeWidgetItem* w, int i)
 	//tRoot tr = w->data(i, (int)w)
 	if (plate_layout) delete plate_layout;
 	if (plate_frame) delete plate_frame;
-	
+	emit InitializeWidgetStatement();
 	plate_frame = new QFrame;
 	plate_layout = new QVBoxLayout;
 	QTreeWidgetItem *parent = w->parent();
@@ -174,7 +185,7 @@ void xModelNavigator::clickAction(QTreeWidgetItem* w, int i)
 		switch (tr)
 		{
 		case SHAPE_ROOT: CallShape(name); break;
-		case MASS_ROOT: break;
+		case MASS_ROOT: CallPointMass(name); break;
 		case PARTICLE_ROOT: CallParticles(name); break;
 		}
 	}
@@ -203,6 +214,7 @@ void xModelNavigator::CallShape(QString& n)
 		////if (!wc)
 		wcube *wc = new wcube(plate);
 		wc->LEName->setText(n);
+		wc->setMinimumWidth(230);
 		wc->LEP1X->setText(QString("%1").arg(d.p0x)); wc->LEP1Y->setText(QString("%1").arg(d.p0y)); wc->LEP1Z->setText(QString("%1").arg(d.p0z));
 		wc->LEP2X->setText(QString("%1").arg(d.p1x)); wc->LEP2Y->setText(QString("%1").arg(d.p1y)); wc->LEP2Z->setText(QString("%1").arg(d.p1z));
 		wc->LESZX->setText(QString("%1").arg(d.p1x - d.p0x));
@@ -219,9 +231,15 @@ void xModelNavigator::CallShape(QString& n)
 // 			delete wp;
 		wplane *wp = new wplane(plate);
 		wp->LEName->setText(n);
-		wp->LEP1X->setText(QString("%1").arg(d.pox)); wp->LEP1Y->setText(QString("%1").arg(d.poy)); wp->LEP1Z->setText(QString("%1").arg(d.poz));
-		wp->LEP2X->setText(QString("%1").arg(d.p1x)); wp->LEP2Y->setText(QString("%1").arg(d.p1y)); wp->LEP2Z->setText(QString("%1").arg(d.p1z));
-		wp->LEDIRX->setText(QString("%1").arg(d.drx)); wp->LEDIRY->setText(QString("%1").arg(d.dry)); wp->LEDIRZ->setText(QString("%1").arg(d.drz));
+		wp->setMinimumWidth(250);
+		vector3d p0 = new_vector3d(d.p0x, d.p0y, d.p0z);
+		vector3d p1 = new_vector3d(d.p1x, d.p1y, d.p1z);
+		vector3d p3 = new_vector3d(d.p3x, d.p3y, d.p3z);
+		vector3d dir = cross(p1 - p0, p3 - p0);
+		dir = dir / length(dir);
+		wp->LEP1X->setText(QString("%1").arg(d.p0x)); wp->LEP1Y->setText(QString("%1").arg(d.p0y)); wp->LEP1Z->setText(QString("%1").arg(d.p0z));
+		wp->LEP2X->setText(QString("%1").arg(d.p2x)); wp->LEP2Y->setText(QString("%1").arg(d.p2y)); wp->LEP2Z->setText(QString("%1").arg(d.p2z));
+		wp->LEDIRX->setText(QString("%1").arg(dir.x)); wp->LEDIRY->setText(QString("%1").arg(dir.y)); wp->LEDIRZ->setText(QString("%1").arg(dir.z));
 		plate_layout->addWidget(wp);
 		cwidget = PLANE_WIDGET;
 	}
@@ -249,7 +267,7 @@ void xModelNavigator::CallParticles(QString& n)
 		wp->LEMaxRadius->setText(QString("%1").arg(max_rad));
 		plate_layout->addWidget(wp);
 		plate_layout->setAlignment(Qt::AlignTop);
-		plate_frame->setMaximumWidth(240);
+		plate_frame->setMaximumWidth(270);
 		plate_frame->setLayout(plate_layout);
 	//	plate_layout->addWidget(wp);
 		plate->setWidget(plate_frame);
@@ -279,7 +297,7 @@ void xModelNavigator::CallSimulation()
 	//xws->setParent(plate);
 	plate_layout->addWidget(xws);
 	plate_layout->setAlignment(Qt::AlignTop);
-	plate_frame->setMaximumWidth(240);
+	plate_frame->setMaximumWidth(270);
 	plate_frame->setLayout(plate_layout);
 	plate->setWidget(plate_frame);
 	cwidget = SIMULATION_WIDGET;
@@ -287,21 +305,32 @@ void xModelNavigator::CallSimulation()
 	emit definedSimulationWidget(xws);
 }
 
+void xModelNavigator::CallPointMass(QString& n)
+{
+	wpointmass* xpm = new wpointmass(plate);
+	xpm->LEName->setText(n);
+	plate_layout->addWidget(xpm);
+	plate_layout->setAlignment(Qt::AlignTop);
+	plate_frame->setMaximumWidth(270);
+	plate_frame->setLayout(plate_layout);
+	plate->setWidget(plate_frame);
+	cwidget = POINTMASS_WIDGET;
+
+	emit definedPointMassWidget(xpm);
+}
+
 void xModelNavigator::CallViewWidget(xvObject* xo)
 {
 // 	if (wv)
 // 		delete wv;
 	wview *wv = new wview(plate);
+	wv->setMinimumWidth(250);
 	wv->xo = xo;
 	plate_layout->addWidget(wv);
 	plate_layout->setAlignment(Qt::AlignTop);
-	plate_layout->setMargin(0);
-	plate_layout->setStretch(0, 0);
-	plate_frame->setMaximumWidth(240);
+	//plate_layout->setMargin(0);
+	plate_frame->setMaximumWidth(270);
 	plate_frame->setLayout(plate_layout);
-	//QGridLayout *glayout = new QGridLayout;
-	//glayout->addWidget(frame);
-	//plate->setLayout(glayout);
 	plate->setWidget(plate_frame);
 	wv->setupColor();
 }

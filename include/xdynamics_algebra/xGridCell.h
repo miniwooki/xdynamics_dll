@@ -10,7 +10,7 @@ public:
 	virtual ~xGridCell();
 
 	void clear();
-	void initialize(unsigned int np);
+	virtual void initialize(unsigned int np);
 	virtual void detection(double *pos = NULL, double* spos = NULL, unsigned int np = 0, unsigned int snp = 0) = 0;
 
 	void setWorldOrigin(vector3d _wo) { wo = _wo; }
@@ -36,6 +36,7 @@ public:
 
 protected:
 	//Type type;
+
 	unsigned int* sorted_id;
 	unsigned int* cell_id;
 	unsigned int* body_id;

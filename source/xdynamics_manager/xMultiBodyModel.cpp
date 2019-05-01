@@ -182,3 +182,8 @@ xDrivingConstraint* xMultiBodyModel::CreateDrivingConstraint(std::string _name, 
 	//std::wcout << "Create driving constraint - " << _name.c_str() << ", Num. driving constraint - " << dconstraints.size() << std::endl;
 	return xdc;
 }
+
+// void xMultiBodyModel::InsertPointMassFromShape(xPointMass* pm)
+// {
+// 
+// }

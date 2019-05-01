@@ -8,6 +8,7 @@
 #include "ui_wplane.h"
 #include "ui_wparticles.h"
 #include "xSimulationWidget.h"
+#include "xPointMassWidget.h"
 //#include "ui_wsimulation.h"
 //#include "xdynamics_gui.h"
 
@@ -76,21 +77,24 @@ class xModelNavigator : public QDockWidget
 
 public:
 	//enum tMotherRoot { OBJECT_ROOT = 0, RESULT_ROOT, SIMULATION_ROOT };
-	enum tWidget{ NO_WIDGET = 0, CUBE_WIDGET, PLANE_WIDGET, SIMULATION_WIDGET, PARTICLE_WIDGET };
+	enum tWidget{ NO_WIDGET = 0, CUBE_WIDGET, PLANE_WIDGET, SIMULATION_WIDGET, POINTMASS_WIDGET, PARTICLE_WIDGET };
 	enum tRoot { OBJECT_ROOT = 0, RESULT_ROOT, SIMULATION_ROOT, SHAPE_ROOT, MASS_ROOT, PARTICLE_ROOT, PART_ROOT };
 
 	xModelNavigator();
 	xModelNavigator(QWidget* parent);
 	~xModelNavigator();
-
+	static xModelNavigator* NAVIGATOR();
 	void addChild(tRoot, QString _nm);
 	void addChilds(tRoot, QStringList& qsl);
 	QTreeWidgetItem* getRootItem(tRoot tr);
 	void ClearTreeObject();
 	void InitPlate();
+	void deleteChild(tRoot, QString _nm);
 	//static wsimulation* SimulationWidget();
 signals:
 	void definedSimulationWidget(wsimulation*);
+	void definedPointMassWidget(wpointmass*);
+	void InitializeWidgetStatement();
 
 private slots:
 //	void contextMenu(const QPoint&);
@@ -101,6 +105,7 @@ private slots:
 private:
 	void CallShape(QString& n);
 	void CallParticles(QString& n);
+	void CallPointMass(QString& n);
 	//void CallView();
 	void CallResultPart();
 	void CallSimulation();
@@ -114,6 +119,7 @@ private:
 	//xDynamicsManager* xdm;
 	QMap<tRoot, QTreeWidgetItem*> mom_roots;
 	QMap<tRoot, QTreeWidgetItem*> roots;
+	QMap<QString, int> idx_child;
 };
 
 //struct xCubeObjectData;

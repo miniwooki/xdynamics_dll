@@ -41,6 +41,8 @@ XDYNAMICS_API void operator+= (vector3d &v1, const vector3d &v2);
 XDYNAMICS_API void operator-= (vector3d &v1, const vector3d &v2);
 XDYNAMICS_API vector3d operator- (const vector3d &v1);
 XDYNAMICS_API vector3d operator~ (const vector3d &v1);
+XDYNAMICS_API bool operator<=(const vector3d& a, const vector3d& b);
+XDYNAMICS_API bool operator>=(const vector3d& a, const vector3d& b);
 
 // Declaration vector4i operators
 XDYNAMICS_API vector4i operator+ (const vector4i &v1, const vector4i &v2);

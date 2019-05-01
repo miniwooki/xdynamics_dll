@@ -270,14 +270,17 @@ void xXLSReader::ReadMass(xMultiBodyModel* xmbd, vector2i rc)
 {
 	if (xmbd)
 	{
+		int init_col = rc.y;
 		//std::wstring name, str;			
 		while (1)
 		{
 			if (IsEmptyCell(rc.x, rc.y)) break;
 			std::string name = xUtilityFunctions::WideChar2String(sheet->readStr(rc.x, rc.y++));
-			xPointMass* xpm = xmbd->CreatePointMass(name);
+			xObject *obj = xObjectManager::XOM()->XObject(name);
+			xPointMass* xpm = NULL;
+			xpm = xmbd->CreatePointMass(name);
 			xpm->SetDataFromStructure(xmbd->NumMass(), ReadPointMassData(name, rc.x++, rc.y));
-			rc.y = 0;
+			rc.y = init_col;
 		}
 	}
 }
@@ -520,6 +523,7 @@ void xXLSReader::ReadShapeObject(xObjectManager* xom, vector2i rc)
 					xve->Write((char*)file.c_str(), sizeof(char)*ns);
 				}
 			}
+			rc.x++;
 			rc.y = init_col;
 		}
 	}
@@ -529,7 +533,7 @@ void xXLSReader::ReadIntegrator(vector2i rc)
 {
 	std::wstring sol;
 	int ic = rc.y;
-	if (!IsEmptyCell(rc.x, rc.y))
+	while (!IsEmptyCell(rc.x, rc.y))
 	{
 		sol = sheet->readStr(rc.x, rc.y++);
 		if (sol == L"MBD")
@@ -537,27 +541,35 @@ void xXLSReader::ReadIntegrator(vector2i rc)
 			xSimulation::MBDSolverType type = static_cast<xSimulation::MBDSolverType>(static_cast<int>(sheet->readNum(rc.x++, rc.y)));
 			xSimulation::setMBDSolverType(type);
 		}
-	}
-	rc.y = ic;
-	if (!IsEmptyCell(rc.x, rc.y))
-	{
-		sol = sheet->readStr(rc.x, rc.y++);
-		if (sol == L"DEM")
+		else if (sol == L"DEM")
 		{
 			xSimulation::DEMSolverType type = static_cast<xSimulation::DEMSolverType>(static_cast<int>(sheet->readNum(rc.x++, rc.y)));
 			xSimulation::setDEMSolverType(type);
 		}
-	}
-	rc.y = ic;
-	if (!IsEmptyCell(rc.x, rc.y))
-	{
-		sol = sheet->readStr(rc.x, rc.y++);
-		if (sol == L"SPH")
+		else if (sol == L"SPH")
 		{
 			xSimulation::SPHSolverType type = static_cast<xSimulation::SPHSolverType>(static_cast<int>(sheet->readNum(rc.x++, rc.y)));
 			xSimulation::setSPHSolverType(type);
 		}
+		//rc.x++;
+		rc.y = ic;
 	}
+	
+		
+// 		
+// 	}
+// 	rc.y = ic;
+// 	if (!IsEmptyCell(rc.x, rc.y))
+// 	{
+// 		sol = sheet->readStr(rc.x, rc.y++);
+// 		
+// 	}
+// 	rc.y = ic;
+// 	if (!IsEmptyCell(rc.x, rc.y))
+// 	{
+// 		sol = sheet->readStr(rc.x, rc.y++);
+// 		
+// 	}
 }
 
 void xXLSReader::ReadSimulationCondition(vector2i rc)

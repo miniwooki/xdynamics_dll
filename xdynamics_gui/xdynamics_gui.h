@@ -17,6 +17,7 @@ class xModelNavigator;
 class xCommandLine;
 class xGLWidget;
 class wsimulation;
+class wpointmass;
 //class xSimulationThread;
 
 class xdynamics_gui : public QMainWindow
@@ -44,10 +45,15 @@ private slots:
 	void xCylinder();
 	void xCube();
 	void xGetSimulationWidget(wsimulation*);
+	void xGetPointMassWidget(wpointmass*);
 	void xRunSimulationThread(double, unsigned int, double);
 	void xExitSimulationThread();
 	void xRecieveProgress(int, QString);
 	void xEditCommandLine();
+	void xGeometrySelection(QString);
+	void xReleaseOperation();
+	void xInitializeWidgetStatement();
+	void xOnGeometrySelectionOfPointMass();
 	
 private:
 	void setupMainOperations();

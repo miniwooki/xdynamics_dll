@@ -71,14 +71,14 @@ void xNeiborhoodCell::detection(double *pos, double* spos, unsigned int np, unsi
 {
 	if (xSimulation::Gpu())
 	{
-		cu_calculateHashAndIndex(d_cell_id, d_body_id, pos, np);
+		cu_dem_calculateHashAndIndex(d_cell_id, d_body_id, pos, np);
 		//	qDebug() << "detection0 done";
 		if (snp && spos)
 		{
-			cu_calculateHashAndIndexForPolygonSphere(d_cell_id, d_body_id, np, snp, spos);
+			cu_dem_calculateHashAndIndexForPolygonSphere(d_cell_id, d_body_id, np, snp, spos);
 			// 		//	qDebug() << "detection1 done";
 		}
-		cu_reorderDataAndFindCellStart(d_cell_id, d_body_id, d_cell_start, d_cell_end, d_sorted_id, np + snp,/* md->numPolygonSphere(),*/ ng);
+		cu_dem_reorderDataAndFindCellStart(d_cell_id, d_body_id, d_cell_start, d_cell_end, d_sorted_id, np + snp,/* md->numPolygonSphere(),*/ ng);
 	}
 	else
 		_detection((vector4d*)pos, (vector4d*)spos, np, snp);

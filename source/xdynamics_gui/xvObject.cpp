@@ -7,7 +7,7 @@ xvObject::xvObject()
 //	, outRot(NULL)
 	 select_cube(NULL)
 //	, vot(VIEW_OBJECT)
-	, drawingMode(GL_FILL)
+	, drawingMode(GL_LINE)
 	, type(V_OBJECT)
 	, pmrs(NULL)
 	, blend_alpha(0.5f)
@@ -54,6 +54,11 @@ xvObject::~xvObject()
 void xvObject::setName(QString n)
 {
 	name = n;
+}
+
+void xvObject::setConnectedMassName(QString n)
+{
+	connected_mass_name = n;
 }
 
 void xvObject::setAngle(float x, float y, float z)

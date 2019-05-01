@@ -7,12 +7,14 @@
 #include "xNewDialog.h"
 #include "xLineEditWidget.h"
 #include "xCommandLine.h"
+//#include "xPointMassWidget.h"
 #include <QtCore/QDir>
 #include <QtCore/QMimeData>
 #include <QtWidgets/QFileDialog>
 
 xdynamics_gui* xgui;
 wsimulation* wsim;
+wpointmass* wpm;
 static xSimulationThread* sThread = NULL;
 
 xdynamics_gui* xdynamics_gui::XGUI()
@@ -74,6 +76,10 @@ xdynamics_gui::xdynamics_gui(int _argc, char** _argv, QWidget *parent)
 	addDockWidget(Qt::LeftDockWidgetArea, xnavi);
 	setAcceptDrops(true);
 	connect(xnavi, SIGNAL(definedSimulationWidget(wsimulation*)), this, SLOT(xGetSimulationWidget(wsimulation*)));
+	connect(xnavi, SIGNAL(definedPointMassWidget(wpointmass*)), this, SLOT(xGetPointMassWidget(wpointmass*)));
+	connect(xnavi, SIGNAL(InitializeWidgetStatement()), this, SLOT(xInitializeWidgetStatement()));
+	connect(xgl, SIGNAL(signalGeometrySelection(QString)), this, SLOT(xGeometrySelection(QString)));
+	connect(xgl, SIGNAL(releaseOperation()), this, SLOT(xReleaseOperation()));
 	xNew();
 }
 
@@ -86,6 +92,21 @@ void xdynamics_gui::xGetSimulationWidget(wsimulation* w)
 {
 	wsim = w;
 	connect(w, SIGNAL(clickedSolveButton(double, unsigned int, double)), this, SLOT(xRunSimulationThread(double, unsigned int, double)));
+}
+
+void xdynamics_gui::xGetPointMassWidget(wpointmass* w)
+{
+	wpm = w;
+	QString n = wpm->LEName->text();
+	xPointMass* xpm = NULL;
+	if (xdm)
+		if (xdm->XMBDModel())
+			xpm = xdm->XMBDModel()->XMass(n.toStdString());
+	if (xpm)
+	{
+		wpm->UpdateInformation(xpm);
+	}
+	connect(w, SIGNAL(clickEnableConnectGeometry(bool)), this, SLOT(xOnGeometrySelectionOfPointMass()));
 }
 
 xdynamics_gui::~xdynamics_gui()
@@ -146,7 +167,8 @@ bool xdynamics_gui::ReadViewModel(QString path)
 		{
 			xPointMassData d = { 0, };
 			qf.read((char*)&d, sizeof(xPointMassData));
-			xgl->makeMarker(name, d);
+			QString marker_name = name + "_marker";
+			xgl->makeMarker(marker_name, d);
 			xnavi->addChild(xModelNavigator::MASS_ROOT, name);
 		}
 		else if (vot == xViewObjectType::VPARTICLE)
@@ -238,7 +260,7 @@ void xdynamics_gui::xOpen()
 {
 	QString file_path = QFileDialog::getOpenFileName(
 		this, tr("open"), path,
-		tr("View model file (*.vmd);;All files (*.*)"));
+		tr("View model file (*.vmd);;Ecxel File(*.xls);;All files(*.*)"));
 	if (!file_path.isEmpty())
 		OpenFile(file_path);
 }
@@ -265,7 +287,13 @@ void xdynamics_gui::OpenFile(QString s)
 	QString ext = s.mid(begin + 1);
 	xcw->write(xCommandWindow::CMD_INFO, "File load - " + s);
 	if (ext == "vmd")
+	{
+		if (isOnViewModel)
+		{
+			Clear();
+		}
 		isOnViewModel = ReadViewModel(s);
+	}		
 	else if (ext == "rlt")
 	{
 		if (!isOnViewModel)
@@ -282,6 +310,10 @@ void xdynamics_gui::OpenFile(QString s)
 	}
 	else if (ext == "xls")
 	{
+		if (isOnViewModel)
+		{
+			Clear();
+		}
 		if (!isOnViewModel)
 		{
 			QString vf = ReadXLSFile(s);
@@ -390,9 +422,13 @@ void xdynamics_gui::setupBindingPointer()
 			{
 				foreach(xPointMass* pm, xdm->XMBDModel()->Masses())
 				{
-					QString n = pm->Name();
+					QString n = pm->ConnectedGeometryName();
 					xvObject* obj = xgl->Object(n);
-					obj->bindPointMassResultsPointer(pm->XPointMassResultPointer());
+					if(obj)
+						obj->bindPointMassResultsPointer(pm->XPointMassResultPointer());
+					obj = xgl->Object(pm->Name() + "_marker");
+					if (obj)
+						obj->bindPointMassResultsPointer(pm->XPointMassResultPointer());
 				}
 			}			
 		}
@@ -515,6 +551,51 @@ void xdynamics_gui::xEditCommandLine()
 	default:
 		break;
 	}
+}
+
+void xdynamics_gui::xGeometrySelection(QString n)
+{
+	if (wpm)
+	{
+		if (wpm->IsOnConnectGeomegry())
+		{
+			if (xdm)
+			{
+				if (xdm->XMBDModel())
+				{
+					xPointMass* pm = xdm->XMBDModel()->XMass(wpm->LEName->text().toStdString());
+					if (pm)
+					{
+						//QString n = pm->Name();
+						xvObject* obj = xgl->Object(n);
+						obj->setConnectedMassName(pm->Name());
+						pm->setConnectedGeometryName(obj->Name());
+						if (pm->XPointMassResultPointer())
+							obj->bindPointMassResultsPointer(pm->XPointMassResultPointer());
+					}
+				}
+			}
+		}
+		wpm->IsOnConnectGeomegry() = false;
+	}
+}
+
+void xdynamics_gui::xReleaseOperation()
+{
+	if (wpm)
+		wpm->IsOnConnectGeomegry() = false;
+	ui.statusBar->setStatusTip(QString(""));
+}
+
+void xdynamics_gui::xInitializeWidgetStatement()
+{
+	if (wpm) wpm = NULL;
+	if (wsim) wsim = NULL;
+}
+
+void xdynamics_gui::xOnGeometrySelectionOfPointMass()
+{
+	ui.statusBar->setStatusTip(QString("Select the geometry for connecting the point mass"));
 }
 
 void xdynamics_gui::deleteFileByEXT(QString ext)

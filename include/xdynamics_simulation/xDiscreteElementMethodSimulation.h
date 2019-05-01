@@ -23,6 +23,7 @@ public:
 	QString SaveStepResult(unsigned int pt, double ct);
 	void ExportResults(std::fstream& of);
 	void EnableSaveResultToMemory(bool b);
+	void updateObjectFromMBD();
 
 protected:
 	void clearMemory();

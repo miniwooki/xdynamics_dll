@@ -158,6 +158,8 @@ void operator+= (vector3d &v1, const vector3d &v2) { v1.x += v2.x, v1.y += v2.y,
 void operator-= (vector3d &v1, const vector3d &v2) { v1.x -= v2.x, v1.y -= v2.y, v1.z -= v2.z; }
 vector3d operator- (const vector3d& v1) { return vector3d{ -v1.x, -v1.y, -v1.z }; }
 vector3d operator~ (const vector3d &v1) { return v1; }
+bool operator<=(const vector3d& a, const vector3d& b) { return (a.x <= b.x && a.y <= b.y && a.z <= b.z); }
+bool operator>=(const vector3d& a, const vector3d& b) { return (a.x >= b.x && a.y >= b.y && a.z >= b.z); }
 
 // Define vector4 operators
 vector4i operator+ (const vector4i &v1, const vector4i &v2) { return vector4i{ v1.x + v2.x, v1.y + v2.y, v1.z + v2.z, v1.w + v2.w }; }

@@ -263,7 +263,7 @@ xCylinderObjectData xCommandLine::GetCylinderParameters()
 		d = *cylinder;
 		isOnCommand = false;
 		delete cylinder; cylinder = NULL;
-		
+		is_finished = false;
 	}
 	return d;
 }
@@ -276,7 +276,7 @@ xCubeObjectData xCommandLine::GetCubeParameters()
 		d = *cube;
 		isOnCommand = false;
 		delete cube; cube = NULL;
-
+		is_finished = false;
 	}
 	return d;
 }

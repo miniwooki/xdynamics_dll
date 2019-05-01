@@ -196,6 +196,7 @@ typedef struct{ int correction, dim, type; double factor; }xKernelFunctionData;
 typedef struct{ double p0x, p0y, p0z, p1x, p1y, p1z, nx, ny, nz; }xLineObjectData;
 typedef struct{ double xx, xy, xz, yy, yz, zz; }symatrix;
 typedef struct{ double s0, s1, s2, s3, s4, s5; }double6;
+typedef struct{	bool enable; double alpha, start_point, length; }xWaveDampingData;
 
 typedef struct 
 {
