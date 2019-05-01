@@ -168,7 +168,21 @@ bool xdynamics_gui::ReadViewModel(QString path)
 			xPointMassData d = { 0, };
 			qf.read((char*)&d, sizeof(xPointMassData));
 			QString marker_name = name + "_marker";
-			xgl->makeMarker(marker_name, d);
+			xvMarker* xvm = xgl->makeMarker(marker_name, d);
+			xvObject* xvo = xgl->Object(name);
+			if (xvo)
+			{
+				xvo->setConnectedMassName(name);
+				if (xdm)
+				{
+					if (xdm->XMBDModel())
+					{
+						xPointMass* xpm = xdm->XMBDModel()->XMass(name.toStdString());
+						if (xpm)
+							xpm->setConnectedGeometryName(xvo->Name());
+					}
+				}
+			}
 			xnavi->addChild(xModelNavigator::MASS_ROOT, name);
 		}
 		else if (vot == xViewObjectType::VPARTICLE)

@@ -398,7 +398,9 @@ void xPointMass::setNewData(xVectorD& q, xVectorD& qd)
 	ep.e0 = q(idx + 3); ep.e1 = q(idx + 4); ep.e2 = q(idx + 5); ep.e3 = q(idx + 6);
 	vel.x = qd(idx + 0); vel.y = qd(idx + 1); vel.z = qd(idx + 2);
 	ev.e0 = qd(idx + 3); ev.e1 = qd(idx + 4); ev.e2 = qd(idx + 5); ev.e3 = qd(idx + 6);
-	setZeroAllForce();
+	//setZeroAllForce();
+	af = new_vector3d(0.0, 0.0, 0.0);
+	am = new_vector3d(0.0, 0.0, 0.0);
 	setupTransformationMatrix();
 }
 

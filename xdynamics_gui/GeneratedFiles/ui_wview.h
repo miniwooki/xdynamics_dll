@@ -1,13 +1,13 @@
 /********************************************************************************
-** Form generated from reading UI file 'wviewOJeFJO.ui'
+** Form generated from reading UI file 'wview.ui'
 **
 ** Created by: Qt User Interface Compiler version 5.10.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef WVIEWOJEFJO_H
-#define WVIEWOJEFJO_H
+#ifndef UI_WVIEW_H
+#define UI_WVIEW_H
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QAction>
@@ -190,4 +190,4 @@ namespace Ui {
 
 QT_END_NAMESPACE
 
-#endif // WVIEWOJEFJO_H
+#endif // UI_WVIEW_H

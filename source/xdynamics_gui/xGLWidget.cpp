@@ -184,7 +184,7 @@ void xGLWidget::createMeshObjectGeometry(QString& file)
 	delete[] _name;
 	delete[] _vertex;
 	delete[] _normal;
-	v_objs[_name] = vm;
+	v_objs[obj_name] = vm;
 	v_wobjs[vm->ID()] = (void*)vm;
 //	return vm;
 }

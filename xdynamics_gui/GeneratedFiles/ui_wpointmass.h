@@ -1,13 +1,13 @@
 /********************************************************************************
-** Form generated from reading UI file 'wpointmassxAUhBz.ui'
+** Form generated from reading UI file 'wpointmass.ui'
 **
 ** Created by: Qt User Interface Compiler version 5.10.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef WPOINTMASSXAUHBZ_H
-#define WPOINTMASSXAUHBZ_H
+#ifndef UI_WPOINTMASS_H
+#define UI_WPOINTMASS_H
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QAction>
@@ -272,4 +272,4 @@ namespace Ui {
 
 QT_END_NAMESPACE
 
-#endif // WPOINTMASSXAUHBZ_H
+#endif // UI_WPOINTMASS_H

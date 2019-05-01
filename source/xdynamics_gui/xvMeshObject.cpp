@@ -126,22 +126,17 @@ void xvMeshObject::draw(GLenum eMode)
 		}
 		glPushMatrix();
 		unsigned int idx = xvAnimationController::getFrame();
-		if (idx != 0)
+		bool isplaymode = (xvAnimationController::Play() || xvAnimationController::getFrame()) && xvObject::pmrs;
+		if (isplaymode)
 		{
-// 			if (model::rs->pointMassResults().find(nm) != model::rs->pointMassResults().end())
-// 			{
-// 				VEC3D p = model::rs->pointMassResults()[nm].at(idx).pos;
-// 				//	qDebug() << p.x << " " << p.y << " " << p.z;
-// 				EPD ep = model::rs->pointMassResults()[nm].at(idx).ep;
-// 				animationFrame(p, ep);// p.x, p.y, p.z);
-// 			}
-// 			else
-// 			{
-// 				glTranslated(pos0.x, pos0.y, pos0.z);
-// 				glRotated(ang0.x, 0, 0, 1);
-// 				glRotated(ang0.y, 1, 0, 0);
-// 				glRotated(ang0.z, 0, 0, 1);
-// 			}
+			double t = 180 / M_PI;
+			unsigned int idx = xvAnimationController::getFrame();
+			xPointMass::pointmass_result pmr = xvObject::pmrs[idx];
+			glTranslated(pmr.pos.x, pmr.pos.y, pmr.pos.z);
+			vector3d euler = EulerParameterToEulerAngle(pmr.ep);
+			glRotated(t*euler.x, 0, 0, 1);
+			glRotated(t*euler.y, 1, 0, 0);
+			glRotated(t*euler.z, 0, 0, 1);
 		}
 		else
 		{
