@@ -60,7 +60,7 @@ void coordinatePartitioning(xSparseD& lhs, int* uID)
 	index = 0;
 	for (unsigned int i = m.rows(); i < m.cols(); i++)
 		uID[index++] = v[i];
-
+	delete[] v;
 	// sort
 	int buf2, buf1, id = 0;
 
@@ -89,7 +89,12 @@ vector3d EulerParameterToEulerAngle(const euler_parameters& ep)
 	double m33 = ep.e0*ep.e0 - ep.e1*ep.e1 - ep.e2*ep.e2 + ep.e3*ep.e3;
 	double m31 = 2.0 * (ep.e1 * ep.e3 - ep.e0 * ep.e2);
 	double m32 = 2.0 * (ep.e2 * ep.e3 + ep.e0 * ep.e1);
-
+	if (m33 > 1.0)
+		m33 = 1.0;
+	if (ep.e1 * ep.e2 == 0.0)
+	{
+		return new_vector3d(xSign(ep.e3) * 2.0 * acos(ep.e0), 0.0, 0.0);
+	}
 	return new_vector3d(
 		atan2(m13, -m23),
 		atan2(sqrt(1 - m33 * m33), m33),
@@ -125,6 +130,8 @@ XDYNAMICS_API vector3i ToVector3I(vector3d& v3)
 		static_cast<int>(v3.z)
 	};
 }
+
+int xSign(double v) { return v >= 0 ? 1 : -1; }
 
 // Define vector3 operators
 vector3i operator+ (const vector3i &v1, const vector3i &v2) { return vector3i{ v1.x + v2.x, v1.y + v2.y, v1.z + v2.z }; }

@@ -793,7 +793,8 @@ __global__ void calculate_particle_particle_contact_count(
 						else{
 							for (unsigned int j = 0; j < old_count[id]; j++){
 								pair_data *pdata = old_pppd + (old_sid + j);
-								if (pdata->type == 1) pdata->enable = false;
+								if (pdata->j == k && pdata->type == 1) 
+									pdata->enable = false;
 							}
 						}
 					}
@@ -883,7 +884,8 @@ __global__ void calculate_particle_triangle_contact_count(
 							else{
 								for (unsigned int j = 0; j < old_count[id]; j++){
 									pair_data *pdata = old_pppd + (old_sid + j);
-									if (pdata->type == 2) pdata->enable = false;
+									if (pdata->j == k && pdata->type == 2) 
+										pdata->enable = false;
 								}
 							}
 						}
@@ -1105,6 +1107,8 @@ __global__ void new_particle_polygon_object_conatct_kernel(
 	int3 ctype = make_int3(0, 0, 0);
 	double3 previous_cpt = make_double3(0.0, 0.0, 0.0);
 	double3 previous_unit = make_double3(0.0, 0.0, 0.0);
+	//double3 mpos = pmi
+	unsigned int cur_cnt = 0;
 	for (int z = -1; z <= 1; z++){
 		for (int y = -1; y <= 1; y++){
 			for (int x = -1; x <= 1; x++){
@@ -1122,8 +1126,9 @@ __global__ void new_particle_polygon_object_conatct_kernel(
 							unsigned int pidx = dpi[k].id;
 							device_contact_property cmp = cp[pidx];
 							device_mesh_mass_info pmi = dpmi[pidx];
+							double3 mpos = make_double3(pmi.px, pmi.py, pmi.pz);
 							double3 cpt = closestPtPointTriangle(dpi[k], ipos, ir, t);
-							double3 po2cp = cpt - pmi.origin;
+							double3 po2cp = cpt - mpos;
 							cdist = ir - length(ipos - cpt);
 							Fn = make_double3(0.0, 0.0, 0.0);
 							if (cdist > 0)
@@ -1153,7 +1158,10 @@ __global__ void new_particle_polygon_object_conatct_kernel(
 								previous_cpt = cpt;
 								previous_unit = unit;
 								*(&(ctype.x) + t) += 1;
-								double3 dv = pmi.vel + cross(pmi.omega, po2cp) - (ivel + cross(iomega, ir * unit));
+								double3 mvel = make_double3(pmi.vx, pmi.vy, pmi.vz);
+								double3 momega = make_double3(pmi.ox, pmi.oy, pmi.oz);
+								double3 d1 = cross(momega, po2cp);
+								double3 dv = mvel + cross(momega, po2cp) - (ivel + cross(iomega, ir * unit));
 								device_force_constant c = getConstant(
 									1, ir, 0, im, 0, cmp.Ei, cmp.Ej,
 									cmp.pri, cmp.prj, cmp.Gi, cmp.Gj,
@@ -1166,6 +1174,7 @@ __global__ void new_particle_polygon_object_conatct_kernel(
 								sum_moment += M;
 								dpmi[pidx].force += -(Fn + Ft);
 								dpmi[pidx].moment += -cross(po2cp, Fn + Ft);
+								pairs[sid + cur_cnt++] = pair;
 							}
 						}
 					}
@@ -1272,8 +1281,9 @@ __global__ void updatePolygonObjectData_kernel(
 		return;
 	int s = id * 9;
 	int mid = dpi[id].id;
-	double3 pos = dpmi[mid].origin;
-	double4 ep = dpmi[mid].ep;
+	device_mesh_mass_info pmi = dpmi[mid];
+	double3 pos = make_double3(pmi.px, pmi.py, pmi.pz);// dpmi[mid].origin;
+	double4 ep = make_double4(pmi.e0, pmi.e1, pmi.e2, pmi.e3);// dpmi[mid].ep;
 	double4 sph = sphere[id];
 	double3 P = make_double3(vList[s + 0], vList[s + 1], vList[s + 2]);
 	double3 Q = make_double3(vList[s + 3], vList[s + 4], vList[s + 5]);

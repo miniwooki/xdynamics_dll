@@ -54,6 +54,11 @@ QVector<xCorner> xObject::get_sph_boundary_corners()
 	return QVector<xCorner>();
 }
 
+void xObject::initialize()
+{
+	count = 0;
+}
+
 void xObject::setObjectID(int _id)
 {
 	id = _id;

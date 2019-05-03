@@ -27,6 +27,18 @@ xDynamicsManager::~xDynamicsManager()
 	qDeleteAll(xsphs);
 	qDeleteAll(xoms);
 	qDeleteAll(xcms);
+	xmbds.clear();
+	xdems.clear();
+	xsphs.clear();
+	xoms.clear();
+	xcms.clear();
+	xmbd = NULL;
+	xdem = NULL;
+	xsph = NULL;
+	xom = NULL;
+	xcm = NULL;
+	xSimulation::initialize();
+	xObject::initialize();
 }
 
 bool xDynamicsManager::getSimulatorFromCommand(int argc, wchar_t* argv[])

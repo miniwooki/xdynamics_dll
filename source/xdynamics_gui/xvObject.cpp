@@ -1,42 +1,31 @@
 #include "xvObject.h"
 
 int xvObject::count = -1;
+vector3f xvObject::min_vertex = new_vector3f(FLT_MAX, FLT_MAX, FLT_MAX);
+vector3f xvObject::max_vertex = new_vector3f(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
 xvObject::xvObject()
-	: //outPos(NULL)
-//	, outRot(NULL)
-	 select_cube(NULL)
-//	, vot(VIEW_OBJECT)
+	: select_cube(NULL)
 	, drawingMode(GL_LINE)
 	, type(V_OBJECT)
 	, pmrs(NULL)
 	, blend_alpha(0.5f)
-	//, m_type(NO_MATERIAL)
 	, display(false)
 	, isSelected(false)
-// 	, ixx(0), iyy(0), izz(0)
-// 	, ixy(0), ixz(0), iyz(0)
-// 	, mass(0)
-// 	, vol(0)
 {
 	count++;
 	id = count;
-//	clr = colors[count];
-	pos = new_vector3f(0.0f, 0.0f, 0.0f);
-	ang = new_vector3f(0.0f, 0.0f, 0.0f);
+	local_min = new_vector3f(FLT_MAX, FLT_MAX, FLT_MAX);
+	local_max = new_vector3f(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 }
 
 xvObject::xvObject(Type tp, QString _name)
 	: name(_name)
-// 	, outPos(NULL)
-// 	, outRot(NULL)
 	, select_cube(NULL)
-//	, vot(VIEW_OBJECT)
 	, drawingMode(GL_LINE)
 	, type(tp)
 	, pmrs(NULL)
 	, blend_alpha(1.0f)
-//	, m_type(NO_MATERIAL)
 	, display(false)
 	, isSelected(false)
 {
@@ -44,11 +33,34 @@ xvObject::xvObject(Type tp, QString _name)
 	id = count;
 	pos = new_vector3f(0.0f, 0.0f, 0.0f);
 	ang = new_vector3f(0.0f, 0.0f, 0.0f);
+	local_min = new_vector3f(FLT_MAX, FLT_MAX, FLT_MAX);
+	local_max = new_vector3f(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 }
 
 xvObject::~xvObject()
 {
 	count--;
+}
+
+void xvObject::xVertex(float x, float y, float z)
+{
+	glVertex3f(x, y, z);
+	local_min.x = x < local_min.x ? x : local_min.x;
+	local_min.y = y < local_min.x ? y : local_min.y;
+	local_min.z = z < local_min.x ? z : local_min.z;
+	local_max.x = x > local_max.x ? x : local_max.x;
+	local_max.y = y > local_max.y ? y : local_max.y;
+	local_max.z = z > local_max.z ? z : local_max.z;
+}
+
+void xvObject::setGlobalMinMax(vector3f v)
+{
+	min_vertex.x = v.x < min_vertex.x ? v.x : min_vertex.x;
+	min_vertex.y = v.y < min_vertex.y ? v.y : min_vertex.y;
+	min_vertex.z = v.z < min_vertex.z ? v.z : min_vertex.z;
+	max_vertex.x = v.x > max_vertex.x ? v.x : max_vertex.x;
+	max_vertex.y = v.y > max_vertex.y ? v.y : max_vertex.y;
+	max_vertex.z = v.z > max_vertex.z ? v.z : max_vertex.z;
 }
 
 void xvObject::setName(QString n)

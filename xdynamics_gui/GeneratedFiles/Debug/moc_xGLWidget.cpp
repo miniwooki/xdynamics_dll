@@ -21,8 +21,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_xGLWidget_t {
-    QByteArrayData data[15];
-    char stringdata0[205];
+    QByteArrayData data[16];
+    char stringdata0[213];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -40,18 +40,19 @@ QT_MOC_LITERAL(5, 51, 16), // "zRotationChanged"
 QT_MOC_LITERAL(6, 68, 21), // "changedAnimationFrame"
 QT_MOC_LITERAL(7, 90, 23), // "signalGeometrySelection"
 QT_MOC_LITERAL(8, 114, 16), // "releaseOperation"
-QT_MOC_LITERAL(9, 131, 12), // "setXRotation"
-QT_MOC_LITERAL(10, 144, 12), // "setYRotation"
-QT_MOC_LITERAL(11, 157, 12), // "setZRotation"
-QT_MOC_LITERAL(12, 170, 15), // "ShowContextMenu"
-QT_MOC_LITERAL(13, 186, 3), // "pos"
-QT_MOC_LITERAL(14, 190, 14) // "setSketchSpace"
+QT_MOC_LITERAL(9, 131, 7), // "fitView"
+QT_MOC_LITERAL(10, 139, 12), // "setXRotation"
+QT_MOC_LITERAL(11, 152, 12), // "setYRotation"
+QT_MOC_LITERAL(12, 165, 12), // "setZRotation"
+QT_MOC_LITERAL(13, 178, 15), // "ShowContextMenu"
+QT_MOC_LITERAL(14, 194, 3), // "pos"
+QT_MOC_LITERAL(15, 198, 14) // "setSketchSpace"
 
     },
     "xGLWidget\0xRotationChanged\0\0angle\0"
     "yRotationChanged\0zRotationChanged\0"
     "changedAnimationFrame\0signalGeometrySelection\0"
-    "releaseOperation\0setXRotation\0"
+    "releaseOperation\0fitView\0setXRotation\0"
     "setYRotation\0setZRotation\0ShowContextMenu\0"
     "pos\0setSketchSpace"
 };
@@ -63,7 +64,7 @@ static const uint qt_meta_data_xGLWidget[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      11,   14, // methods
+      12,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -71,19 +72,20 @@ static const uint qt_meta_data_xGLWidget[] = {
        6,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    1,   69,    2, 0x06 /* Public */,
-       4,    1,   72,    2, 0x06 /* Public */,
-       5,    1,   75,    2, 0x06 /* Public */,
-       6,    0,   78,    2, 0x06 /* Public */,
-       7,    1,   79,    2, 0x06 /* Public */,
-       8,    0,   82,    2, 0x06 /* Public */,
+       1,    1,   74,    2, 0x06 /* Public */,
+       4,    1,   77,    2, 0x06 /* Public */,
+       5,    1,   80,    2, 0x06 /* Public */,
+       6,    0,   83,    2, 0x06 /* Public */,
+       7,    1,   84,    2, 0x06 /* Public */,
+       8,    0,   87,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       9,    1,   83,    2, 0x0a /* Public */,
-      10,    1,   86,    2, 0x0a /* Public */,
-      11,    1,   89,    2, 0x0a /* Public */,
-      12,    1,   92,    2, 0x0a /* Public */,
-      14,    0,   95,    2, 0x0a /* Public */,
+       9,    0,   88,    2, 0x0a /* Public */,
+      10,    1,   89,    2, 0x0a /* Public */,
+      11,    1,   92,    2, 0x0a /* Public */,
+      12,    1,   95,    2, 0x0a /* Public */,
+      13,    1,   98,    2, 0x0a /* Public */,
+      15,    0,  101,    2, 0x0a /* Public */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::Int,    3,
@@ -94,10 +96,11 @@ static const uint qt_meta_data_xGLWidget[] = {
     QMetaType::Void,
 
  // slots: parameters
+    QMetaType::Void,
     QMetaType::Void, QMetaType::Int,    3,
     QMetaType::Void, QMetaType::Int,    3,
     QMetaType::Void, QMetaType::Int,    3,
-    QMetaType::Void, QMetaType::QPoint,   13,
+    QMetaType::Void, QMetaType::QPoint,   14,
     QMetaType::Void,
 
        0        // eod
@@ -115,11 +118,12 @@ void xGLWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, v
         case 3: _t->changedAnimationFrame(); break;
         case 4: _t->signalGeometrySelection((*reinterpret_cast< QString(*)>(_a[1]))); break;
         case 5: _t->releaseOperation(); break;
-        case 6: _t->setXRotation((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 7: _t->setYRotation((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 8: _t->setZRotation((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 9: _t->ShowContextMenu((*reinterpret_cast< const QPoint(*)>(_a[1]))); break;
-        case 10: _t->setSketchSpace(); break;
+        case 6: _t->fitView(); break;
+        case 7: _t->setXRotation((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 8: _t->setYRotation((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 9: _t->setZRotation((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 10: _t->ShowContextMenu((*reinterpret_cast< const QPoint(*)>(_a[1]))); break;
+        case 11: _t->setSketchSpace(); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -194,13 +198,13 @@ int xGLWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 11)
+        if (_id < 12)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 11;
+        _id -= 12;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 11)
+        if (_id < 12)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 11;
+        _id -= 12;
     }
     return _id;
 }

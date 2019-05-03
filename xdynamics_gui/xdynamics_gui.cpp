@@ -7,10 +7,12 @@
 #include "xNewDialog.h"
 #include "xLineEditWidget.h"
 #include "xCommandLine.h"
+#include "xChartWindow.h"
 //#include "xPointMassWidget.h"
 #include <QtCore/QDir>
 #include <QtCore/QMimeData>
 #include <QtWidgets/QFileDialog>
+#include <QtWidgets/QShortcut>
 
 xdynamics_gui* xgui;
 wsimulation* wsim;
@@ -31,6 +33,7 @@ xdynamics_gui::xdynamics_gui(int _argc, char** _argv, QWidget *parent)
 	, pbar(NULL)
 	, xcomm(NULL)
 	, xcl(NULL)
+	, xchart(NULL)
 	, myAnimationBar(NULL)
 	//, simThread(NULL)
 	, isOnViewModel(false)
@@ -72,6 +75,7 @@ xdynamics_gui::xdynamics_gui(int _argc, char** _argv, QWidget *parent)
 	this->setWindowState(Qt::WindowState::WindowMaximized);
 	setupMainOperations();
 	setupObjectOperations();
+	setupShorcutOperations();
 	xnavi = new xModelNavigator(this);
 	addDockWidget(Qt::LeftDockWidgetArea, xnavi);
 	setAcceptDrops(true);
@@ -117,6 +121,7 @@ xdynamics_gui::~xdynamics_gui()
 	if (xdm) delete xdm; xdm = NULL;
 	if (xcomm) delete xcomm; xcomm = NULL;
 	if (xcl) delete xcl; xcl = NULL;
+	if (xchart) delete xchart; xchart = NULL;
 	xvAnimationController::releaseTimeMemory();
 }
 
@@ -214,6 +219,7 @@ bool xdynamics_gui::ReadViewModel(QString path)
 		delete[] _name;
 	}
 	qf.close();
+	xgl->fitView();
 	return true;
 }
 
@@ -295,6 +301,26 @@ void xdynamics_gui::xCube()
 	xcl->SetCurrentAction(caction);
 }
 
+void xdynamics_gui::xChart()
+{
+	caction = CHART;
+	if (!xchart)
+	{
+		xchart = new xChartWindow(this);
+		xchart->setChartData(xdm);
+		xchart->show();
+		return;
+	}
+	if (xchart->isVisible())
+		return;
+	else
+	{
+		delete xchart;
+		xchart = NULL;
+		xChart();
+	}
+}
+
 void xdynamics_gui::OpenFile(QString s)
 {
 	int begin = s.lastIndexOf('.');
@@ -331,8 +357,8 @@ void xdynamics_gui::OpenFile(QString s)
 		if (!isOnViewModel)
 		{
 			QString vf = ReadXLSFile(s);
-			if (!vf.isEmpty())
-				isOnViewModel = ReadViewModel(vf);
+ 			if (!vf.isEmpty())
+ 				isOnViewModel = ReadViewModel(vf);
 		}
 	}
 	else
@@ -399,6 +425,11 @@ void xdynamics_gui::setupObjectOperations()
 	connect(a, SIGNAL(triggered()), this, SLOT(xCylinder()));
 	myObjectActions.insert(CYLINDER, a);
 
+// 	a = new QAction(QIcon(":/Resources/icon/plot.png"), tr("&Chart"), this);
+// 	a->setStatusTip(tr("Chart window"));
+// 	connect(a, SIGNAL(triggered()), this, SLOT(xChart()));
+// 	myObjectActions.insert(CHART, a);
+
 // 	a = new QAction(QIcon(":/Resources/icon/save.png"), tr("&Save"), this);
 // 	a->setStatusTip(tr("Save project"));
 // 	connect(a, SIGNAL(triggered()), this, SLOT(xSave()));
@@ -447,6 +478,12 @@ void xdynamics_gui::setupBindingPointer()
 			}			
 		}
 	}
+}
+
+void xdynamics_gui::setupShorcutOperations()
+{
+	QShortcut *a = new QShortcut(QKeySequence("Ctrl+Q"), this);
+	connect(a, SIGNAL(activated()), this, SLOT(xStopSimulationThread()));
 }
 
 void xdynamics_gui::dragEnterEvent(QDragEnterEvent *event)
@@ -511,6 +548,11 @@ void xdynamics_gui::xRecieveProgress(int pt, QString ch)
 	else if (pt == -1 && !ch.isEmpty())
 	{
 		xcw->write(xCommandWindow::CMD_INFO, ch);
+	}
+	else if (pt == ERROR_DETECTED)
+	{
+		xcw->write(xCommandWindow::CMD_ERROR, ch);
+		//xExitSimulationThread();
 	}
 	else if (pt >= 0 && ch.isEmpty())
 	{
@@ -586,6 +628,8 @@ void xdynamics_gui::xGeometrySelection(QString n)
 						pm->setConnectedGeometryName(obj->Name());
 						if (pm->XPointMassResultPointer())
 							obj->bindPointMassResultsPointer(pm->XPointMassResultPointer());
+						wpm->LEGeometry->setText(obj->Name());
+						xcw->write(xCommandWindow::CMD_INFO, "The geometry(" + obj->Name() + ") is connected to point mass(" + pm->Name() + ").");
 					}
 				}
 			}
@@ -610,6 +654,12 @@ void xdynamics_gui::xInitializeWidgetStatement()
 void xdynamics_gui::xOnGeometrySelectionOfPointMass()
 {
 	ui.statusBar->setStatusTip(QString("Select the geometry for connecting the point mass"));
+}
+
+void xdynamics_gui::xStopSimulationThread()
+{
+	if (sThread)
+		sThread->setStopCondition();
 }
 
 void xdynamics_gui::deleteFileByEXT(QString ext)

@@ -46,6 +46,19 @@ xModel::~xModel()
 	if (ground) delete ground; ground = NULL;
 	xLog::releaseLogSystem();
 	//if (lg) delete lg; lg = NULL;
+	xModel::initialize();
+}
+
+void xModel::initialize()
+{
+	name = "Model1";
+	path = kor(getenv("USERPROFILE")) + "/Documents/xdynamics/";
+	ground = NULL;
+	angle = xModel::EULER_PARAMETERS;
+	gravity = new_vector3d(0.0, -9.80665, 0.0);
+	//resultStorage* model::rs = NULL;// new resultStorage;
+	//int model::count = -1;
+	unit = MKS;
 }
 
 int xModel::OneDOF()

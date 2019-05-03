@@ -31,6 +31,12 @@
     <Filter Include="Header Files\widget">
       <UniqueIdentifier>{a77cb45e-c3f5-412d-9223-3a269c37fe1c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\plot">
+      <UniqueIdentifier>{c5dfef23-b8d3-4bdf-b15d-983cef6abe65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\chart">
+      <UniqueIdentifier>{c43f461a-9455-4775-908b-8db95e6ff0b9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -96,6 +102,27 @@
     <ClCompile Include="..\source\xdynamics_gui\xPointMassWidget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xChartAxis.cpp">
+      <Filter>Source Files\chart</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xChartView.cpp">
+      <Filter>Source Files\chart</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xChartSpline.cpp">
+      <Filter>Source Files\chart</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xCallOut.cpp">
+      <Filter>Source Files\chart</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xChartControl.cpp">
+      <Filter>Source Files\chart</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xChartWindow.cpp">
+      <Filter>Source Files\chart</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xChartDatabase.cpp">
+      <Filter>Source Files\chart</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="xdynamics_gui.h">
@@ -127,6 +154,15 @@
     </QtMoc>
     <QtMoc Include="..\include\xdynamics_gui\xPointMassWidget.h">
       <Filter>Header Files\widget</Filter>
+    </QtMoc>
+    <QtMoc Include="..\include\xdynamics_gui\xChartControl.h">
+      <Filter>Header Files\plot</Filter>
+    </QtMoc>
+    <QtMoc Include="..\include\xdynamics_gui\xChartView.h">
+      <Filter>Header Files\plot</Filter>
+    </QtMoc>
+    <QtMoc Include="..\include\xdynamics_gui\xChartWindow.h">
+      <Filter>Header Files\plot</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
@@ -214,6 +250,18 @@
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_wpointmass.h">
       <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xdynamics_gui\xChartAxis.h">
+      <Filter>Header Files\plot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xdynamics_gui\xCallOut.h">
+      <Filter>Header Files\plot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xdynamics_gui\xChartSpline.h">
+      <Filter>Header Files\plot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xdynamics_gui\xChartDatabase.h">
+      <Filter>Header Files\plot</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

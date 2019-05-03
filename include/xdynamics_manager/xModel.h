@@ -23,6 +23,7 @@ public:
 	xModel(QString _name);
 	virtual ~xModel();
 
+	static void initialize();
 	static int OneDOF();
 	static xPointMass* Ground();
 	static void setModelName(const QString n);

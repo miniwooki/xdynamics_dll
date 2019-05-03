@@ -165,12 +165,12 @@ struct device_plane_info
 
 struct device_mesh_mass_info
 {
-	double3 origin;
-	double3 vel;
-	double3 omega;
-	double3 force;
-	double3 moment;
-	double4 ep;
+	double px, py, pz;// origin;
+	double vx, vy, vz;// double3 vel;
+	double ox, oy, oz;// double3 omega;
+	double3 force;// double3 force;
+	double3 moment;// mx, my, mz;// double3 moment;
+	double e0, e1, e2, e3;// double4 ep;
 };
 
 struct device_cylinder_info

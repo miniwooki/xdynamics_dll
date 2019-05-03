@@ -15,5 +15,6 @@
         <file>Resources/icon/ani_toEnd.png</file>
         <file>Resources/icon/cube.png</file>
         <file>Resources/icon/cylinder.png</file>
+        <file>Resources/icon/plot.png</file>
     </qresource>
 </RCC>

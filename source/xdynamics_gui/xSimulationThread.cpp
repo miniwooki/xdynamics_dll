@@ -113,7 +113,9 @@ void xSimulationThread::run()
 		xSimulation::setCurrentTime(ct);
 		if (!xds->xRunSimulationThread(ct, cstep))
 		{
-
+			QString err = xDynamicsError::getErrorString();
+			sendProgress(ERROR_DETECTED, err);
+			isStop = true;
 		}
 
 		if (!((cstep) % xSimulation::st))

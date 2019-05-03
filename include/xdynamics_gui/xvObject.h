@@ -31,54 +31,34 @@ public:
 	virtual ~xvObject();
 
  	Type ObjectType() { return type; }
+	void xVertex(float x, float y, float z);
+	static void setGlobalMinMax(vector3f v);
 	static int xvObjectCount() { return count; }
-// // 	void setInitialPosition( ip) { pos0 = ip; }
-// // 	void setInitialAngle(VEC3D ia) { ang0 = ia; }
-// //	void setCurrentPosition(VEC3D cp) { cpos = cp; }
-// //	void setCurrentAngle(VEC3D ca) { cang = ca; }
-// 	void animationFrame(VEC3D& p, EPD& ep);
-// 	void setResultData(unsigned int n);
-// 	void setMaterialType(material_type mt) { m_type = mt; }
-// 	void insertResultData(unsigned int i, VEC3D& p, EPD& r);
-// 	VEC3D InitialPosition() { return pos0; }
-// 	material_type MaterialType() { return m_type; }
  	int ID() { return id; }
  	QString& Name() { return name; }
 	QString ConnectedMassName() { return connected_mass_name; }
-// 	QString FilePath() { return file_path; }
-// 	import_shape_type ImportType() { return ist; }
 	void setName(QString n);// { nm = n; }
 	void setConnectedMassName(QString n);
 	void setAngle(float x, float y, float z);
 	void setPosition(float x, float y, float z);
 	void setBlendAlpha(float v) { blend_alpha = v; }
 	void bindPointMassResultsPointer(xPointMass::pointmass_result* _pmrs);
-// 	void setDisplay(bool _dis) { display = _dis; }
  	QColor& Color() { return clr; }
 	void setColor(QColor ct) { clr = ct; }
-// 	static void msgBox(QString ch, QMessageBox::Icon ic);
-// 	void copyCoordinate(GLuint _coord);
  	void setDrawingMode(GLenum dm) { drawingMode = dm; }
-	void setSelected(bool b);//; { isSelected = b; }
-// 	context_object_type ViewGeometryObjectType() { return vot; }
- 	virtual void draw(GLenum eMode) = 0;
-// 
-// 	void updateView(VEC3D& _pos, VEC3D& _ang);
+	void setSelected(bool b);
+	vector3f Position() { return pos; }
 
-// 	double vol;
-// 	double mass;
-// 	double ixx, iyy, izz;
-// 	double ixy, ixz, iyz;
+ 	virtual void draw(GLenum eMode) = 0;
+
+	static vector3f max_vertex;
+	static vector3f min_vertex;
 
 protected:
 	int id;
 	Type type;
 	bool isSelected;
 	xvObject* select_cube;
-// 	geometry_type g_type;
-// 	material_type m_type;
-// 	context_object_type vot;
-// 	import_shape_type ist;
 	QString name;			// object name
 	QString connected_mass_name;
 	QString file_path;
@@ -90,14 +70,9 @@ protected:
 	static int count;
 	vector3f pos;
 	vector3f ang;
-
+	vector3f local_min;
+	vector3f local_max;
 	xPointMass::pointmass_result* pmrs;
-// 	VEC3D pos0;
-// 	VEC3D ang0;
-// 	VEC3D cpos;
-// 	VEC3D cang;
-// 	VEC3D* outPos;
-// 	EPD* outRot;
 };
 
 #endif

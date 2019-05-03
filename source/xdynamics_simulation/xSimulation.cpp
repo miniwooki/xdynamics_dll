@@ -25,6 +25,23 @@ xSimulation::~xSimulation()
 
 }
 
+void xSimulation::initialize()
+{
+	init_dt = 0.0;
+	dt = 0.0001;
+	dev = xSimulation::CPU;
+	mbd_solver_type = xSimulation::MBD_SOLVER;
+	dem_solver_type = xSimulation::DEM_SOLVER;
+	sph_solver_type = xSimulation::SPH_SOLVER;
+
+	ctime = 0.0;
+	et = 1.0;
+	start_time = 0.0;
+	st = 100;
+	npart = 0;
+	nstep = 0;
+}
+
 bool xSimulation::Cpu()
 {
 	return dev == CPU;

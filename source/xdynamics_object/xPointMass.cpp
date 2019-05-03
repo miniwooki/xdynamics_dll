@@ -329,8 +329,8 @@ void xPointMass::setZeroAllForce()
 
 void xPointMass::SaveStepResult(unsigned int part, double time, xVectorD& q, xVectorD& qd, xVectorD& qdd)
 {
-	int i = id * xModel::OneDOF();
-	int _i = (id - 1) * xModel::OneDOF();
+	int i = xpmIndex() * xModel::OneDOF();
+	int _i = (xpmIndex() - 1) * xModel::OneDOF();
 	euler_parameters e = new_euler_parameters(q(i + 3), q(i + 4), q(i + 5), q(i + 6));
 	euler_parameters ed = new_euler_parameters(qd(i + 3), qd(i + 4), qd(i + 5), qd(i + 6));
 	euler_parameters edd = new_euler_parameters(qdd(_i + 3), qdd(_i + 4), qdd(_i + 5), qdd(_i + 6));

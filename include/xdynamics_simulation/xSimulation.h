@@ -16,6 +16,7 @@ public:
 	xSimulation();
 	~xSimulation();
 
+	static void initialize();
 	static bool Cpu();
 	static bool Gpu();
 	static void setCPUDevice();

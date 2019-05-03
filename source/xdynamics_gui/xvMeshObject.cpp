@@ -137,6 +137,7 @@ void xvMeshObject::draw(GLenum eMode)
 			glRotated(t*euler.x, 0, 0, 1);
 			glRotated(t*euler.y, 1, 0, 0);
 			glRotated(t*euler.z, 0, 0, 1);
+			//qDebug() << euler.x << " " << euler.y << " " << euler.z;
 		}
 		else
 		{

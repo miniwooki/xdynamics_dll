@@ -135,7 +135,7 @@ bool xvCylinder::define()
 		for (int i = 0; i < iter + 1; i++){
 			double rad = angle * i;
 			vector3d q = A * new_vector3d(h_len, sin(rad) * data.r_top, cos(rad) * data.r_top);
-			glVertex3d(q.x, q.y, q.z);
+			xVertex(q.x, q.y, q.z);
 		}
 	}
 	glEnd();
@@ -151,7 +151,7 @@ bool xvCylinder::define()
 		for (int i = 0; i < iter + 1; i++){
 			double rad = angle * i;
 			vector3d q = A * new_vector3d(-h_len, sin(-rad) * data.r_bottom, cos(-rad) * data.r_bottom);
-			glVertex3d(q.x, q.y, q.z);
+			xVertex(q.x, q.y, q.z);
 		}
 	}
 	glEnd();
@@ -163,12 +163,14 @@ bool xvCylinder::define()
 			double rad = angle * i;
 			vector3d q1 = A * new_vector3d(h_len, sin(rad) * data.r_top, cos(rad) * data.r_top);
 			vector3d q2 = A * new_vector3d(-h_len, sin(rad) * data.r_bottom, cos(rad) * data.r_bottom);
-			glVertex3d(q2.x, q2.y, q2.z);
-			glVertex3d(q1.x, q1.y, q1.z);
+			xVertex(q2.x, q2.y, q2.z);
+			xVertex(q1.x, q1.y, q1.z);
 		}
 	}
 	glEnd();
 // 	glPopMatrix();
 	glEndList();
+	xvObject::setGlobalMinMax(pos + local_min);
+	xvObject::setGlobalMinMax(pos + local_max);
 	return true;
 }

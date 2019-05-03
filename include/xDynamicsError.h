@@ -6,6 +6,8 @@
 #include "xdynamics_global.h"
 #include <cstring>
 
+#define ERROR_DETECTED -99
+
 class XDYNAMICS_API xDynamicsError
 {
 public:

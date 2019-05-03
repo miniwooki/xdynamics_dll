@@ -149,8 +149,14 @@ bool xDynamicsSimulator::xRunSimulationThread(double ct, unsigned int cstep)
 		if (checkXerror(xdem->OneStepSimulation(ct, cstep)))
 			return false;
 	if (xmbd)
+	{
 		if (checkXerror(xmbd->OneStepSimulation(ct, cstep)))
 			return false;
+		if (xdem)
+			xdem->updateObjectFromMBD();
+	}
+		
+//	return xDynamicsError::xdynamicsErrorDiscreteElementMethodModelInitialization;
 	return true;
 }
 

@@ -12,20 +12,9 @@
 #include "xvCube.h"
 #include "xvCylinder.h"
 #include "xvMeshObject.h"
-// #include "cube.h"
-// #include "vcube.h"
-// #include "plane.h"
-// #include "vplane.h"
-// #include "vpolygon.h"
-// #include "cylinder.h"
-// #include "vcylinder.h"
-// #include "particleManager.h"
-// #include "vparticles.h"
-// #include "polygonObject.h"
-// #include "geometryObjects.h"
 #include "xvAnimationController.h"
 #include "xModelNavigator.h"
-//#include "modelManager.h"
+#include <QShortcut>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -33,31 +22,6 @@
 #define METER 1000
 
 xGLWidget* ogl;
-// 
-// GLuint makeCubeObject(int* index, float* vertex)
-// {
-// 	GLuint list = glGenLists(1);
-// 	glNewList(list, GL_COMPILE);
-// 	glShadeModel(GL_SMOOTH);
-// 	//glColor3f(0.0f, 0.0f, 1.0f);
-// 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINES);
-// 	glBegin(GL_QUADS);
-// 	for (int i(0); i < 6; i++){
-// 		int *id = &index[i * 4];
-// 		glVertex3f(vertex[id[3] * 3 + 0], vertex[id[3] * 3 + 1], vertex[id[3] * 3 + 2]);
-// 		glVertex3f(vertex[id[2] * 3 + 0], vertex[id[2] * 3 + 1], vertex[id[2] * 3 + 2]);
-// 		glVertex3f(vertex[id[1] * 3 + 0], vertex[id[1] * 3 + 1], vertex[id[1] * 3 + 2]);
-// 		glVertex3f(vertex[id[0] * 3 + 0], vertex[id[0] * 3 + 1], vertex[id[0] * 3 + 2]);
-// 	}
-// 	glEnd();
-// 	glEndList();
-// 	return list;
-// }
-
-// GLfloat LightAmbient[] = { 0.1f, 0.1f, 0.1f, 1.0f };
-// GLfloat LightDiffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-// GLfloat LightPosition[] = { 10.0f, 10.0f, -10.0f, 1.0f };
-// GLfloat LightPosition2[] = { 10.0f, 10.0f, 10.0f, 1.0f };
 
 xGLWidget::xGLWidget(int argc, char** argv, QWidget *parent)
 	: QGLWidget(parent)
@@ -66,10 +30,7 @@ xGLWidget::xGLWidget(int argc, char** argv, QWidget *parent)
 	, selectedObject(NULL)
 	, zRotationFlag(false)
 	, isPressRightMouseButton(false)
-	//, Doc(_Doc)
 {
-	//eye[0] = 0; eye[1] = 0; eye[2] = 2;
-
 	ogl = this;
 	gridSize = 0.1f;
 	viewOption = 0;
@@ -84,9 +45,6 @@ xGLWidget::xGLWidget(int argc, char** argv, QWidget *parent)
 	trans_y = 0;
 	IconScale = 0.1;
 	isSetParticle = false;
-	// 	sketch = { 0, };
-	// 	sketch.space = 0.02;
-	//particle_ptr = NULL;
 	QTimer *timer = new QTimer(this);
 	connect(timer, SIGNAL(timeout()), this, SLOT(updateGL()));
 	setContextMenuPolicy(Qt::CustomContextMenu);
@@ -106,14 +64,14 @@ xGLWidget::xGLWidget(int argc, char** argv, QWidget *parent)
 		polygons[i] = 0;
 	}
 	numPolygons = 0;
-	//selectedIndex = -1;
 	votype = ALL_DISPLAY;
-	//glewInit();
-	//drawingMode = GL_LINE;
 	xvGlew::xvGlew(argc, argv);
 	setFocusPolicy(Qt::StrongFocus);
 	memset(minView, 0, sizeof(float) * 3);
 	memset(maxView, 0, sizeof(float) * 3);
+
+	QShortcut *a = new QShortcut(QKeySequence("Ctrl+F"), this);
+	connect(a, SIGNAL(activated()), this, SLOT(fitView()));
 }
 
 xGLWidget::~xGLWidget()
@@ -212,6 +170,9 @@ void xGLWidget::createCylinderGeometry(QString& _name, xCylinderObjectData& d)
 	vcy->makeCylinderGeometry(d);
 	v_objs[_name] = vcy;
 	v_wobjs[vcy->ID()] = (void*)vcy;
+
+	setMaxViewPosition(vcy->Position().x, vcy->Position().y, vcy->Position().z);
+	setMinViewPosition(vcy->Position().x, vcy->Position().y, vcy->Position().z);
 }
 
 xvParticle* xGLWidget::createParticles()
@@ -346,13 +307,13 @@ void xGLWidget::fitView()
 {
 	double ang[3] = { DEG2RAD * xRot / 16, DEG2RAD * yRot / 16, DEG2RAD * zRot / 16 };
 	double maxp[3] = { 0, }, minp[3] = { 0, };
-	local2global_bryant(ang[0], ang[1], ang[2], maxView[0], maxView[1], maxView[2], maxp);
-	local2global_bryant(ang[0], ang[1], ang[2], minView[0], minView[1], minView[2], minp);
+	local2global_bryant(ang[0], ang[1], ang[2], xvObject::max_vertex.x, xvObject::max_vertex.y, xvObject::max_vertex.z, maxp);
+	local2global_bryant(ang[0], ang[1], ang[2], xvObject::min_vertex.x, xvObject::min_vertex.y, xvObject::min_vertex.z, minp);
 	//VEC3D dp = maxp - minp;
 
-	trans_x = maxp[0] - minp[0];// dp.x;
-	trans_y = maxp[1] - minp[1];
-	trans_z = maxp[2] - minp[2]; -1.0;
+	trans_x = -0.5 * (maxp[0] + minp[0]);// dp.x;
+	trans_y = -0.5 * (maxp[1] + minp[1]);
+	trans_z = -0.5 * (maxp[2] + minp[2]) - 1.1;
 }
 
 void xGLWidget::renderText(double x, double y, double z, const QString& str, QColor& c)
@@ -746,7 +707,7 @@ void xGLWidget::wheelEvent(QWheelEvent *e)
 	QPoint  p = e->angleDelta();
 	float pzoom = trans_z;
 	p.y() > 0 ? trans_z -= 2.0f*moveScale : trans_z += 2.0f*moveScale;
-
+	qDebug() << "Translation view value : " << trans_z;
 	setFocusPolicy(Qt::StrongFocus);
 }
 
@@ -936,53 +897,6 @@ void xGLWidget::normalizeAngle(int *angle)
 		*angle -= 360 * 16;
 }
 
-void xGLWidget::openMbd(QString& file)
-{
-// 	QFile qf(file);
-// 	qf.open(QIODevice::ReadOnly);
-// 
-// 	unsigned int nout = 0;
-// 	unsigned int nm = 0;
-// 	unsigned int id = 0;
-// 	unsigned int cnt = 0;
-// 	unsigned int name_size = 0;
-// 	char ch;
-// 
-// 	//str.
-// 	double ct = 0.f;
-// 	VEC3D p, v, a;
-// 	EPD ep, ev, ea;
-// 	QMap<unsigned int, QString>::iterator it;
-// 	qf.read((char*)&nm, sizeof(unsigned int));
-// 	qf.read((char*)&nout, sizeof(unsigned int));
-// 	while (!qf.atEnd()){
-// 
-// 		qf.read((char*)&cnt, sizeof(unsigned int));
-// 		for (unsigned int i = 0; i < nm; i++){
-// 			QString str;
-// 			qf.read((char*)&name_size, sizeof(unsigned int));
-// 			for (unsigned int j = 0; j < name_size; j++){
-// 				qf.read(&ch, sizeof(char));
-// 				str.push_back(ch);
-// 			}
-// 			qf.read((char*)&id, sizeof(unsigned int));
-// 			qf.read((char*)&ct, sizeof(double));
-// 			qf.read((char*)&p, sizeof(VEC3D));
-// 			qf.read((char*)&ep, sizeof(EPD));
-// 			qf.read((char*)&v, sizeof(VEC3D));
-// 			qf.read((char*)&ev, sizeof(EPD));
-// 			qf.read((char*)&a, sizeof(VEC3D));
-// 			qf.read((char*)&ea, sizeof(EPD));
-// 
-// 			vobject* vobj = v_objs.find(str).value();
-// 			vobj->setResultData(nout);
-// 			vobj->insertResultData(cnt, p, ep);
-// 		}
-// 	}
-// 
-// 	vcontroller::setTotalFrame(nout);
-}
-
 void xGLWidget::ChangeDisplayOption(int oid)
 {
 	viewOption = oid;
@@ -996,77 +910,6 @@ xvObject* xGLWidget::Object(QString nm)
 		return NULL;
 	return v_objs[nm];
 }
-
-// void xGLWidget::makeCube(cube* c)
-// {
-// 	if (!c)
-// 		return;
-// 	vcube *vc = new vcube(c->Name());
-// 	//qDebug() << c->Name();
-// 	vc->makeCubeGeometry(c->Name(), c->RollType(), c->MaterialType(), c->min_point().To<float>(), c->cube_size().To<float>());
-// 	v_objs[c->Name()] = vc;
-// 	//qDebug() << vc;
-// 	v_wobjs[vc->ID()] = (void*)vc;
-// }
-// 
-// void xGLWidget::makePlane(plane* p)
-// {
-// 	if (!p)
-// 		return;
-// 	vplane *vpp = new vplane(p->Name());
-// 	vpp->makePlaneGeometry(p->XW(), p->W2(), p->W3(), p->W4());
-// 	v_objs[p->Name()] = vpp;
-// 	v_wobjs[vpp->ID()] = (void*)vpp;
-// 	//qDebug() << p->Name() << " is made";
-// }
-// 
-// void xGLWidget::makeCylinder(cylinder* cy)
-// {
-// 	if (!cy)
-// 		return;
-// }
-// 
-// void xGLWidget::makeLine()
-// {
-// 
-// }
-// 
-// vpolygon* xGLWidget::makePolygonObject(QString _nm, import_shape_type t, QString file, double x, double y, double z)
-// {
-// 	vpolygon* vpoly = new vpolygon(_nm);
-// 	vpoly->define(t, file, x, y, z);
-// 	v_objs[_nm] = vpoly;
-// 	v_wobjs[vpoly->ID()] = (void*)vpoly;
-// 	return vpoly;
-// }
-// 
-// void xGLWidget::makeParticle(double* pos, unsigned int n)
-// {
-// 	if (!vp)
-// 	{
-// 		vp = new vparticles;
-// 	}
-// 	if (vp->define(pos, n))
-// 		isSetParticle = true;
-// 	else
-// 	{
-// 		vp->resizeMemory(pos, n);
-// 	}
-// }
-// 
-// void xGLWidget::makeParticle_f(float* pos, unsigned int n)
-// {
-// 	if (!vp)
-// 	{
-// 		vp = new vparticles;
-// 	}
-// 	if (vp->define_f(pos, n))
-// 		isSetParticle = true;
-// 	else
-// 	{
-// 		vp->resizeMemory_f(pos, n);
-// 	}
-// }
 
 xvMarker* xGLWidget::makeMarker(QString n, double x, double y, double z, bool mcf)
 {
@@ -1090,8 +933,8 @@ xvMarker* xGLWidget::makeMarker(QString& _name, xPointMassData& d)
 	v_objs[_name] = vm;
 	v_wobjs[vm->ID()] = (void*)vm;
 
-// 	setMaxViewPosition(x, y, z);
-// 	setMinViewPosition(x, y, z);
+ 	setMaxViewPosition(d.px, d.py, d.pz);
+	setMinViewPosition(d.px, d.py, d.pz);
 	return vm;
 }
 

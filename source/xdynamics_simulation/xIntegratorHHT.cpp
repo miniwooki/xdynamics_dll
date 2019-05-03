@@ -172,6 +172,7 @@ int xIntegratorHHT::OneStepSimulation(double ct, unsigned int cstep)
 	PredictionStep(ct, cstep);
 	int ret = CorrectionStep(ct, cstep);
 	return ret;
+	//return xDynamicsError::xdynamicsErrorLinearEquationCalculation;
 }
 
 void xIntegratorHHT::PredictionStep(double ct, unsigned int cstep)

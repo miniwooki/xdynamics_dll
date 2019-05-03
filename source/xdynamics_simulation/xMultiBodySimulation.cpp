@@ -208,14 +208,14 @@ void xMultiBodySimulation::ConstructForceVector(xVectorD& v)
 	vector3d f;
 	vector4d m;
 	//xPointMass* xpm = xmbd->BeginPointMass();
-	unsigned int i = 0, j = 0;
+	unsigned int j = 0;
 	foreach(xForce* xf, xmbd->Forces())
 	{
 		xf->xCalculateForce(q, qd);
 	}
 	foreach(xPointMass* xpm, xmbd->Masses())
 	{
-		i = xpm->xpmIndex() * 7;
+	//	i = xpm->xpmIndex() * 7;
 		e = xpm->EulerParameters();// new_euler_parameters(q(i + 3), q(i + 4), q(i + 5), q(i + 6));
 		ev = xpm->DEulerParameters();// new_euler_parameters(qd(i + 3), qd(i + 4), qd(i + 5), qd(i + 6));
 		f = xpm->Mass() * xModel::gravity + xpm->ContactForce() + xpm->AxialForce() + xpm->HydroForce();
@@ -223,7 +223,7 @@ void xMultiBodySimulation::ConstructForceVector(xVectorD& v)
 		m += CalculateInertiaForce(ev, xpm->Inertia(), e) + xpm->EulerParameterMoment();
 		v(j + 0) = f.x; v(j + 1) = f.y; v(j + 2) = f.z;
 		v(j + 3) = m.x; v(j + 4) = m.y; v(j + 5) = m.z; v(j + 6) = m.w;
-		i += xModel::OneDOF();
+		//i += xModel::OneDOF();
 		j += xModel::OneDOF();
 	}
 

@@ -18,6 +18,7 @@ class xCommandLine;
 class xGLWidget;
 class wsimulation;
 class wpointmass;
+class xChartWindow;
 //class xSimulationThread;
 
 class xdynamics_gui : public QMainWindow
@@ -26,7 +27,7 @@ class xdynamics_gui : public QMainWindow
 
 public:
 	enum { NEW = 0, OPEN, SAVE };
-	enum { CUBE = 3, CYLINDER };
+	enum { CUBE = 3, CYLINDER, CHART };
 	
 	xdynamics_gui(int _argc, char** _argv, QWidget *parent = Q_NULLPTR);
 	~xdynamics_gui();
@@ -44,6 +45,7 @@ private slots:
 	void xOpen();
 	void xCylinder();
 	void xCube();
+	void xChart();
 	void xGetSimulationWidget(wsimulation*);
 	void xGetPointMassWidget(wpointmass*);
 	void xRunSimulationThread(double, unsigned int, double);
@@ -54,12 +56,14 @@ private slots:
 	void xReleaseOperation();
 	void xInitializeWidgetStatement();
 	void xOnGeometrySelectionOfPointMass();
+	void xStopSimulationThread();
 	
 private:
 	void setupMainOperations();
 	void setupObjectOperations();
 	void setupAnimationTool();
 	void setupBindingPointer();
+	void setupShorcutOperations();
 	//void setupAnimationOperations();
 	void deleteFileByEXT(QString ext);
 	void dragEnterEvent(QDragEnterEvent *event);
@@ -82,4 +86,5 @@ private:
 	xModelNavigator* xnavi;
 	QDockWidget* xcomm;
 	xCommandLine* xcl;
+	xChartWindow* xchart;
 };

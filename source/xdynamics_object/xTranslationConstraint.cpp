@@ -160,9 +160,9 @@ void xTranslationConstraint::GammaFunction(xVectorD& rhs, xVectorD& q, xVectorD&
 	matrix33d Ai = i_ptr->TransformationMatrix();// GlobalTransformationMatrix(ei);
 	matrix33d Aj = j_ptr->TransformationMatrix();// GlobalTransformationMatrix(ej);
 	vector3d dij = (rj + Aj * spj) - (ri + Ai * spi);
-	rhs(sr + 0) = mul * dot_1_gamma(ei, ej, hj, gi, dei, dej);
-	rhs(sr + 1) = mul * dot_1_gamma(ei, ej, hj, fi, dei, dej);
-	rhs(sr + 2) = mul * dot_2_gamma(ei, ej, gi, spi, spj, dij, drj, dri, dei, dej);
-	rhs(sr + 3) = mul * dot_2_gamma(ei, ej, fi, spi, spj, dij, drj, dri, dei, dej);
-	rhs(sr + 4) = mul * dot_1_gamma(ei, ej, fj, fi, dei, dej);
+	rhs(sr + 0) = mul * dot_1_gamma(ei, ej, fi, hj, dei, dej);
+	rhs(sr + 1) = mul * dot_1_gamma(ei, ej, gi, hj, dei, dej);
+	rhs(sr + 2) = mul * dot_2_gamma(ei, ej, fi, spi, spj, dij, drj, dri, dei, dej);
+	rhs(sr + 3) = mul * dot_2_gamma(ei, ej, gi, spi, spj, dij, drj, dri, dei, dej);
+	rhs(sr + 4) = mul * dot_1_gamma(ei, ej, fi, fj, dei, dej);
 }

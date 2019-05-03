@@ -47,6 +47,7 @@ void xvMarker::draw(GLenum eMode)
 			unsigned int idx = xvAnimationController::getFrame();
 			xPointMass::pointmass_result pmr = xvObject::pmrs[idx];
 			glTranslated(pmr.pos.x, pmr.pos.y, pmr.pos.z);
+			//xvObject::xTranslateMinMax(pmr.pos.x, pmr.pos.y, pmr.pos.z);
 			vector3d euler = EulerParameterToEulerAngle(pmr.ep);
 			glRotated(t*euler.x, 0, 0, 1);
 			glRotated(t*euler.y, 1, 0, 0);
@@ -75,18 +76,18 @@ bool xvMarker::define(float x, float y, float z, bool isdefine_text)
 	glColor3f(1.0f, 0.0f, 0.0f);
 	glBegin(GL_LINES);
 	{
-		glVertex3f(0.0f, 0.0f, 0.0f);
-		glVertex3f(icon_scale*1.0f, 0.0f, 0.0f);
+		xVertex(0.0f, 0.0f, 0.0f);
+		xVertex(icon_scale*1.0f, 0.0f, 0.0f);
 	}
 	glEnd();
 	glBegin(GL_TRIANGLE_FAN);
 	{
-		glVertex3f(icon_scale*1.5f, 0.0f, 0.0f);
+		xVertex(icon_scale*1.5f, 0.0f, 0.0f);
 		float angInc = (float)(45 * (M_PI / 180));
 		for (int i = 0; i < 9; i++)
 		{
 			float rad = angInc * i;
-			glVertex3f(icon_scale*1.0f, cos(rad)*icon_scale*0.15f, sin(rad)*icon_scale*0.15f);
+			xVertex(icon_scale*1.0f, cos(rad)*icon_scale*0.15f, sin(rad)*icon_scale*0.15f);
 		}
 	}
 	glEnd();
@@ -94,18 +95,18 @@ bool xvMarker::define(float x, float y, float z, bool isdefine_text)
 	glColor3f(0.0f, 1.0f, 0.0f);
 	glBegin(GL_LINES);
 	{
-		glVertex3f(0.0f, 0.0f, 0.0f);
-		glVertex3f(0.0f, icon_scale*1.0f, 0.0f);
+		xVertex(0.0f, 0.0f, 0.0f);
+		xVertex(0.0f, icon_scale*1.0f, 0.0f);
 	}
 	glEnd();
 	glBegin(GL_TRIANGLE_FAN);
 	{
-		glVertex3f(0.0f, icon_scale*1.5f, 0.0f);
+		xVertex(0.0f, icon_scale*1.5f, 0.0f);
 		float angInc = (float)(45 * (M_PI / 180));
 		for (int i = 0; i < 9; i++)
 		{
 			float rad = angInc * i;
-			glVertex3f(cos(rad)*icon_scale*0.15f, icon_scale*1.0f, sin(rad)*icon_scale*0.15f);
+			xVertex(cos(rad)*icon_scale*0.15f, icon_scale*1.0f, sin(rad)*icon_scale*0.15f);
 		}
 	}
 	glEnd();
@@ -113,24 +114,29 @@ bool xvMarker::define(float x, float y, float z, bool isdefine_text)
 	glColor3f(0.0f, 0.0f, 1.0f);
 	glBegin(GL_LINES);
 	{
-		glVertex3f(0.0f, 0.0f, 0.0f);
-		glVertex3f(0.0f, 0.0f, icon_scale*1.0f);
+		xVertex(0.0f, 0.0f, 0.0f);
+		xVertex(0.0f, 0.0f, icon_scale*1.0f);
 	}
 	glEnd();
 	glBegin(GL_TRIANGLE_FAN);
 	{
-		glVertex3f(0.0f, 0.0f, icon_scale*1.5f);
+		xVertex(0.0f, 0.0f, icon_scale*1.5f);
 		float angInc = (float)(45 * (M_PI / 180));
 		for (int i = 0; i < 9; i++)
 		{
 			float rad = angInc * i;
-			glVertex3f(cos(rad)*icon_scale*0.15f, sin(rad)*icon_scale*0.15f, icon_scale*1.0f);
+			xVertex(cos(rad)*icon_scale*0.15f, sin(rad)*icon_scale*0.15f, icon_scale*1.0f);
 		}
 	}
 	glEnd();
 
 	glEndList();
 	display = true;
+	if (!isdefine_text)
+	{
+		xvObject::setGlobalMinMax(pos);
+	//	xvObject::setGlobalMinMax(pos);
+	}	
 	return true;
 }
 

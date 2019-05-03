@@ -75,7 +75,7 @@ public:
 	int xRotation() const { return xRot; }
 	int yRotation() const { return yRot; }
 	int zRotation() const { return zRot; }
-	void fitView();
+	
 	void renderText(double x, double y, double z, const QString& str, QColor& c);
 	float& getZoom() { return trans_z; }
 	void setKeyState(bool s, int i) { keyID[i] = s; };
@@ -86,7 +86,6 @@ public:
 	void setViewObject(viewObjectType viewType) { votype = viewType; };
 	int getWindowHeight() { return wHeight; }
 	bool is_set_particle() { return isSetParticle; }
-	void openMbd(QString& fl);
 	void openResults(QStringList& fl);
 	void ChangeDisplayOption(int oid);
 	xvObject* Object(QString n);
@@ -102,6 +101,7 @@ public:
 	void sketchingMode();
 
 	public slots:
+	void fitView();
 	void setXRotation(int angle);
 	void setYRotation(int angle);
 	void setZRotation(int angle);

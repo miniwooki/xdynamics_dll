@@ -130,6 +130,6 @@ void xUniversalConstraint::GammaFunction(xVectorD& rhs, xVectorD& q, xVectorD& q
 	rhs(sr + 0) = v3.x;
 	rhs(sr + 1) = v3.y;
 	rhs(sr + 2) = v3.z;
-	rhs(sr + 3) = mul * dot_1_gamma(ei, ej, hj, fi, dei, dej);
+	rhs(sr + 3) = mul * dot_1_gamma(ei, ej, hi, hj, dei, dej);
 }
 

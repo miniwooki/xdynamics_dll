@@ -25,12 +25,12 @@ class XDYNAMICS_API xParticleMeshObjectsContact : public xContact
 
 	struct host_mesh_mass_info
 	{
-		vector3d pos;
-		vector3d vel;
-		vector3d omega;
-		vector3d force;
-		vector3d moment;
-		euler_parameters ep;
+		double px, py, pz;
+		double vx, vy, vz;
+		double ox, oy, oz;
+		double fx, fy, fz;
+		double mx, my, mz;
+		double e0, e1, e2, e3;
 	};
 
 public:
