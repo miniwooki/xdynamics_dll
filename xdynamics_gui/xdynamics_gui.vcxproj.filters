@@ -164,6 +164,9 @@
     <QtMoc Include="..\include\xdynamics_gui\xChartWindow.h">
       <Filter>Header Files\plot</Filter>
     </QtMoc>
+    <QtMoc Include="..\include\xdynamics_gui\xChartDatabase.h">
+      <Filter>Header Files\plot</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="xdynamics_gui.ui">
@@ -258,9 +261,6 @@
       <Filter>Header Files\plot</Filter>
     </ClInclude>
     <ClInclude Include="..\include\xdynamics_gui\xChartSpline.h">
-      <Filter>Header Files\plot</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\xdynamics_gui\xChartDatabase.h">
       <Filter>Header Files\plot</Filter>
     </ClInclude>
   </ItemGroup>

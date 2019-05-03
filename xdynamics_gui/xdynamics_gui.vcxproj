@@ -195,7 +195,7 @@
     <QtMoc Include="..\include\xdynamics_gui\xNewDialog.h" />
     <QtMoc Include="..\include\xdynamics_gui\xPointMassWidget.h" />
     <ClInclude Include="..\include\xdynamics_gui\xCallOut.h" />
-    <ClInclude Include="..\include\xdynamics_gui\xChartDatabase.h" />
+    <QtMoc Include="..\include\xdynamics_gui\xChartDatabase.h" />
     <ClInclude Include="..\include\xdynamics_gui\xChartSpline.h" />
     <QtMoc Include="..\include\xdynamics_gui\xChartView.h" />
     <ClInclude Include="..\include\xdynamics_gui\xCommandLine.h" />

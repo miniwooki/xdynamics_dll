@@ -64,7 +64,8 @@ xChartWindow::xChartWindow(QWidget* parent /* = NULL */)
 	actions[WAVE_HEIGHT]->setStatusTip(tr("Wave height"));
 	connect(actions[WAVE_HEIGHT], SIGNAL(triggered()), this, SLOT(click_waveHeight()));
 	connect(comm, SIGNAL(editingFinished()), this, SLOT(editingCommand()));
-	//connect(tree->plotItemComboBox(), SIGNAL(currentIndexChanged(int)), this, SLOT(changeComboBoxItem(int)));
+	connect(tree, SIGNAL(ClickedItem(int, QString)), this, SLOT(updateTargetItem(int, QString)));
+	connect(tree->plotItemComboBox(), SIGNAL(currentIndexChanged(int)), this, SLOT(changeComboBoxItem(int)));
 	mainToolBar->addAction(actions[WAVE_HEIGHT]);
 	isActivate = true;
 }
@@ -165,7 +166,7 @@ void xChartWindow::uploadingResults()
 // 	}
 }
 
-void xChartWindow::sensorItemPlot()
+void xChartWindow::joint_plot()
 {
 // 	QStringList sLists = tree->selectedLists();
 // 	QString plotItem = tree->plotItemComboBox()->currentText();
@@ -194,59 +195,60 @@ void xChartWindow::sensorItemPlot()
 // 	}
 }
 
-void xChartWindow::pointMassItemPlot()
+void xChartWindow::body_plot()
 {
-// 	int plotItem = tree->plotItemComboBox()->currentIndex();
+ 	int it = tree->plotItemComboBox()->currentIndex();
 // 	QString target = tree->plotTarget();
-// 	QString plotName = target + "_" + tree->plotItemComboBox()->currentText();
-// 	if (!curPlotName.isEmpty())
-// 		seriesMap[curPlotName]->hide();
-// 	curPlotName = plotName;
-// 	QLineSeries* series = seriesMap[plotName];
-// 	if (series)
-// 	{
-// 		series->show();
-// 		prop->setPlotProperty(plotName);
-// 		return;
-// 	}
-// 	series = createLineSeries(plotName);
-// 	double et = 0.0;
-// 	double max_v = 0.0;
-// 	double min_v = 0.0;
-// 	QString ytitle;
-// 	foreach(resultStorage::pointMassResultData pmr, model::rs->pointMassResults()[target])
-// 	{
-// 		double v = 0.0;
-// 		switch (plotItem)
-// 		{
-// 		case 0: v = pmr.pos.x; ytitle = "Position(m)"; break;
-// 		case 1: v = pmr.pos.y; ytitle = "Position(m)"; break;
-// 		case 2: v = pmr.pos.z; ytitle = "Position(m)"; break;
-// 		case 3: v = pmr.vel.x; ytitle = "Velocity(m/s)"; break;
-// 		case 4: v = pmr.vel.y; ytitle = "Velocity(m/s)"; break;
-// 		case 5: v = pmr.vel.z; ytitle = "Velocity(m/s)"; break;
-// 		case 6: v = pmr.omega.x; ytitle = "Ang. Velocity(rad/s)"; break;
-// 		case 7: v = pmr.omega.y; ytitle = "Ang. Velocity(rad/s)"; break;
-// 		case 8: v = pmr.omega.z; ytitle = "Ang. Velocity(rad/s)"; break;
-// 		case 9: v = pmr.acc.x; ytitle = "Acceleration(m/s^2)"; break;
-// 		case 10: v = pmr.acc.y; ytitle = "Acceleration(m/s^2)"; break;
-// 		case 11: v = pmr.acc.z; ytitle = "Acceleration(m/s^2)"; break;
-// 		case 12: v = pmr.alpha.x; ytitle = "Ang. Acceleration(rad/s^2)"; break;
-// 		case 13: v = pmr.alpha.y; ytitle = "Ang. Acceleration(rad/s^2)"; break;
-// 		case 14: v = pmr.alpha.z; ytitle = "Ang. Acceleration(rad/s^2)"; break;
-// 		}
-// 		series->append(pmr.time, v);
-// 		et = pmr.time;
-// 		if (max_v < v) max_v = v;
-// 		if (min_v > v) min_v = v;
-// 	}
-// 	double dy = (max_v - min_v) * 0.01;
-// 	prop->setPlotProperty(plotName, "Time(sec)", ytitle, 0, et, min_v - dy, max_v + dy);
+ 	QString plotName = select_item_name + "_" + tree->plotItemComboBox()->currentText();
+ 	if (!curPlotName.isEmpty())
+ 		seriesMap[curPlotName]->hide();
+ 	curPlotName = plotName;
+ 	QLineSeries* series = seriesMap[plotName];
+ 	if (series)
+ 	{
+ 		series->show();
+ 		prop->setPlotProperty(plotName);
+ 		return;
+	}
+ 	series = createLineSeries(plotName);
+ 	double et = 0.0;
+ 	double max_v = 0.0;
+ 	double min_v = 0.0;
+ 	QString ytitle;
+ 	foreach(xPointMass::pointmass_result *pmr, tree->MassResults())
+ 	{
+		double v = 0.0;
+		switch (it)
+		{
+		case 0: v = pmr->pos.x; ytitle = "Position(m)"; break;
+		case 1: v = pmr->pos.y; ytitle = "Position(m)"; break;
+		case 2: v = pmr->pos.z; ytitle = "Position(m)"; break;
+		case 3: v = pmr->vel.x; ytitle = "Velocity(m/s)"; break;
+		case 4: v = pmr->vel.y; ytitle = "Velocity(m/s)"; break;
+		case 5: v = pmr->vel.z; ytitle = "Velocity(m/s)"; break;
+		case 6: v = pmr->omega.x; ytitle = "Ang. Velocity(rad/s)"; break;
+		case 7: v = pmr->omega.y; ytitle = "Ang. Velocity(rad/s)"; break;
+		case 8: v = pmr->omega.z; ytitle = "Ang. Velocity(rad/s)"; break;
+		case 9: v = pmr->acc.x; ytitle = "Acceleration(m/s^2)"; break;
+		case 10: v = pmr->acc.y; ytitle = "Acceleration(m/s^2)"; break;
+		case 11: v = pmr->acc.z; ytitle = "Acceleration(m/s^2)"; break;
+		case 12: v = pmr->alpha.x; ytitle = "Ang. Acceleration(rad/s^2)"; break;
+		case 13: v = pmr->alpha.y; ytitle = "Ang. Acceleration(rad/s^2)"; break;
+		case 14: v = pmr->alpha.z; ytitle = "Ang. Acceleration(rad/s^2)"; break;
+		}
+		series->append(pmr->time, v);
+		et = pmr->time;
+		if (max_v < v) max_v = v;
+		if (min_v > v) min_v = v;
+ 	}
+ 	double dy = (max_v - min_v) * 0.01;
+ 	prop->setPlotProperty(plotName, "Time(sec)", ytitle, 0, et, min_v - dy, max_v + dy);
 // 	//	else if (plotItem == )
 }
 
-void xChartWindow::updatePlot()
-{
+//void xChartWindow::updatePlot(int root_id, QString selected_item)
+//{
+	
 // 	QLineSeries* series = seriesMap[curPlotName];
 // 	if (!series)
 // 		return;
@@ -286,6 +288,12 @@ void xChartWindow::updatePlot()
 // 	//prop->setPlotProperty(curPlotName, pcd.xt, pcd.yt, 0, et, min_v - dy, max_v + dy);
 // 
 // 	//vcht->Chart()->update();
+//}
+
+void xChartWindow::updateTargetItem(int id, QString n)
+{
+	select_item_index = id;
+	select_item_name = n;
 }
 
 void xChartWindow::click_waveHeight()
@@ -319,7 +327,15 @@ void xChartWindow::click_waveHeight()
 
 void xChartWindow::changeComboBoxItem(int idx)
 {
-
+	switch (idx)
+	{
+	case xChartDatabase::MASS_ROOT:
+		body_plot();
+		break;
+	case xChartDatabase::KCONSTRAINT_ROOT:
+		joint_plot();
+		break;
+	}
 // 	//QString target = sLists.at(0);
 // 	xChartDatabase::tRoot tp = tree->selectedType();
 // 	switch (tp)

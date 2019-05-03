@@ -425,10 +425,10 @@ void xdynamics_gui::setupObjectOperations()
 	connect(a, SIGNAL(triggered()), this, SLOT(xCylinder()));
 	myObjectActions.insert(CYLINDER, a);
 
-// 	a = new QAction(QIcon(":/Resources/icon/plot.png"), tr("&Chart"), this);
-// 	a->setStatusTip(tr("Chart window"));
-// 	connect(a, SIGNAL(triggered()), this, SLOT(xChart()));
-// 	myObjectActions.insert(CHART, a);
+	a = new QAction(QIcon(":/Resources/icon/plot.png"), tr("&Chart"), this);
+	a->setStatusTip(tr("Chart window"));
+	connect(a, SIGNAL(triggered()), this, SLOT(xChart()));
+	myObjectActions.insert(CHART, a);
 
 // 	a = new QAction(QIcon(":/Resources/icon/save.png"), tr("&Save"), this);
 // 	a->setStatusTip(tr("Save project"));

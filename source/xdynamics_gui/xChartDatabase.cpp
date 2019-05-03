@@ -41,9 +41,10 @@ xChartDatabase::xChartDatabase(QWidget* parent)
 	roots[CYLINDER_ROOT]->setIcon(0, QIcon(":/Resources/cylinder.png"));
 	roots[POLYGON_ROOT]->setIcon(0, QIcon(":/Resources/icPolygon.png"));
 	roots[MASS_ROOT]->setIcon(0, QIcon(":/Resources/mass.png"));*/
-	//plot_item = new QComboBox(this);
+	plot_item = new QComboBox(this);
 	connect(tree, &QTreeWidget::customContextMenuRequested, this, &xChartDatabase::contextMenu);
 	connect(tree, &QTreeWidget::itemClicked, this, &xChartDatabase::clickItem);
+	connect(plot_item, SIGNAL(currentIndexChanged(int)), this, SLOT(selectPlotItem(int)));
 
 	tree->setSelectionMode(QAbstractItemView::SelectionMode::ContiguousSelection);
 	setWidget(tree);
@@ -74,56 +75,66 @@ void xChartDatabase::clickItem(QTreeWidgetItem* item, int col)
 {
 	if (!item)
 		return;
-	QList<QTreeWidgetItem*> items = tree->selectedItems();
+	//QList<QTreeWidgetItem*> items = tree->selectedItems();
 	//cmdWindow::write(CMD_INFO, "The number of selected items : " + QString("%1").arg(items.size()));
-	if (items.size() > 1)
-	{
-		foreach(QTreeWidgetItem* it, items)
-		{
-			sLists.push_back(it->text(col));
-		}
-		return;
-	}
+// 	if (items.size() > 1)
+// 	{
+// 		foreach(QTreeWidgetItem* it, items)
+// 			sLists.push_back(it->text(col));
+// 		return;
+// 	}
 	QString tg = item->text(col);
-	if (target == tg)
-		return;
-	target = tg;
+// 	if (target == tg)
+// 		return;
+// 	target = tg;
 	QTreeWidgetItem* parent = item->parent();
 	if (!parent)
 	{
 		return;
 	}
 	QString sp = parent->text(0);
-	if (sp == "Part")
+	int idx = -1;
+	if (sp == "Body")
 	{
+		idx = (int)MASS_ROOT;
+		plot_item->addItems(get_point_mass_chart_list());
+	}
+	else if (sp == "Joint")
+	{
+		idx = (int)KCONSTRAINT_ROOT;
+		plot_item->addItems(get_joint_chart_list());
+	}
+	emit ClickedItem(idx, sp);
+// 	{
+// // 		tSelected = SENSOR_ROOT;
+// // 		sLists.push_back(target);
+// // 		plot_item->clear();
+// // 		sensor* s = sph_model::SPHModel()->Sensors()[target];
+// // 		switch (s->sensorType())
+// // 		{
+// // 		case sensor::WAVE_HEIGHT_SENSOR:
+// // 			plot_item->addItem("Wave height");
+// // 			break;
+// // 		}
+// 	}
+// 	else if (sp == "Mass")
+// 	{
+// // 		tSelected = PMASS_ROOT;
+// // 		plot_item->clear();
+// // 		//plot_item->addItem("PX");
+// // 		plot_item->addItems(getPMResultString());
+// 	}
+// 	else if (sp == "Reaction")
+// 	{
+// // 		tSelected = REACTION_ROOT;
+// // 		plot_item->clear();
+// // 		plot_item->addItems(getRFResultString());
+// 	}
 
-	}
-	else if (sp == "Sensor")
-	{
-// 		tSelected = SENSOR_ROOT;
-// 		sLists.push_back(target);
-// 		plot_item->clear();
-// 		sensor* s = sph_model::SPHModel()->Sensors()[target];
-// 		switch (s->sensorType())
-// 		{
-// 		case sensor::WAVE_HEIGHT_SENSOR:
-// 			plot_item->addItem("Wave height");
-// 			break;
-// 		}
-	}
-	else if (sp == "Mass")
-	{
-// 		tSelected = PMASS_ROOT;
-// 		plot_item->clear();
-// 		//plot_item->addItem("PX");
-// 		plot_item->addItems(getPMResultString());
-	}
-	else if (sp == "Reaction")
-	{
-// 		tSelected = REACTION_ROOT;
-// 		plot_item->clear();
-// 		plot_item->addItems(getRFResultString());
-	}
+}
+
+void xChartDatabase::selectPlotItem(int id)
+{
 
 }
 

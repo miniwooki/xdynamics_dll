@@ -37,15 +37,15 @@ public:
 	//void setResultStorage(resultStorage* _rs);
 	void setChartData(xDynamicsManager* xdm);
 	void uploadingResults();
-	void sensorItemPlot();
-	void pointMassItemPlot();
+	void joint_plot();
+	void body_plot();
 	void closeEvent(QCloseEvent *event);
 
 	static bool IsActivate() { return isActivate; }
 	static bool isActivate;
 
 	public slots:
-	void updatePlot();
+	void updateTargetItem(int, QString);
 
 	private slots:
 	void click_waveHeight();
@@ -68,6 +68,8 @@ private:
 	int xSize;
 	int ySize;
 	int openColumnCount;
+	int select_item_index;
+	QString select_item_name;
 	QString curPlotName;
 	xChartView *vcht;
 	xChartDatabase *tree;
