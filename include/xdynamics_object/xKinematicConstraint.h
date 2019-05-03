@@ -39,6 +39,7 @@ public:
 	void AllocResultMemory(unsigned int _s);
 	void setLocation(double x, double y, double z);
 	void SetupDataFromStructure(xPointMass* base, xPointMass* action, xJointData& d);
+	kinematicConstraint_result* XKinematicConstraintResultPointer();
 // 		double lx, double ly, double lz,
 // 		double spix, double spiy, double spiz, double fix, double fiy, double fiz, double gix, double giy, double giz,
 // 		double spjx, double spjy, double spjz, double fjx, double fjy, double fjz, double gjx, double gjy, double gjz);

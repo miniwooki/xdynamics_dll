@@ -44,7 +44,7 @@ xChartWindow::xChartWindow(QWidget* parent /* = NULL */)
 	//plot_item = new QComboBox(this);
 	setMinimumSize(640, 580);
 	resize(xSize, ySize);
-	layout->addWidget(tree->plotItemComboBox());
+	//layout->addWidget(tree->plotItemComboBox());
 	layout->addWidget(vcht);
 	setCentralWidget(vb);
 
@@ -64,7 +64,7 @@ xChartWindow::xChartWindow(QWidget* parent /* = NULL */)
 	actions[WAVE_HEIGHT]->setStatusTip(tr("Wave height"));
 	connect(actions[WAVE_HEIGHT], SIGNAL(triggered()), this, SLOT(click_waveHeight()));
 	connect(comm, SIGNAL(editingFinished()), this, SLOT(editingCommand()));
-	connect(tree->plotItemComboBox(), SIGNAL(currentIndexChanged(int)), this, SLOT(changeComboBoxItem(int)));
+	//connect(tree->plotItemComboBox(), SIGNAL(currentIndexChanged(int)), this, SLOT(changeComboBoxItem(int)));
 	mainToolBar->addAction(actions[WAVE_HEIGHT]);
 	isActivate = true;
 }
@@ -85,10 +85,13 @@ xChartWindow::~xChartWindow()
 
 void xChartWindow::setChartData(xDynamicsManager* xdm)
 {
-	if (xdm->XMBDModel())
+	if (xdm)
 	{
-		tree->upload_mbd_results(xdm->XMBDModel());
-	}
+		if (xdm->XMBDModel())
+		{
+			tree->upload_mbd_results(xdm->XMBDModel());
+		}
+	}	
 }
 
 void xChartWindow::closeEvent(QCloseEvent *event)
@@ -317,17 +320,17 @@ void xChartWindow::click_waveHeight()
 void xChartWindow::changeComboBoxItem(int idx)
 {
 
-	//QString target = sLists.at(0);
-	xChartDatabase::tRoot tp = tree->selectedType();
-	switch (tp)
-	{
-	case xChartDatabase::SENSOR_ROOT:
-		sensorItemPlot();
-		break;
-	case xChartDatabase::PMASS_ROOT:
-		pointMassItemPlot();
-		break;
-	}
+// 	//QString target = sLists.at(0);
+// 	xChartDatabase::tRoot tp = tree->selectedType();
+// 	switch (tp)
+// 	{
+// 	case xChartDatabase::SENSOR_ROOT:
+// 		sensorItemPlot();
+// 		break;
+// 	case xChartDatabase::PMASS_ROOT:
+// 		pointMassItemPlot();
+// 		break;
+// 	}
 }
 
 QLineSeries* xChartWindow::createLineSeries(QString n)

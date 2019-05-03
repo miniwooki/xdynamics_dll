@@ -11,6 +11,8 @@ xChartDatabase::xChartDatabase(QWidget* parent)
 	tree = new QTreeWidget;
 	tree->setColumnCount(1);
 	tree->setContextMenuPolicy(Qt::CustomContextMenu);
+	roots[MASS_ROOT] = new QTreeWidgetItem(tree);
+	roots[KCONSTRAINT_ROOT] = new QTreeWidgetItem(tree);
 // 	roots[PART_ROOT] = new QTreeWidgetItem(tree);
 // 	roots[SENSOR_ROOT] = new QTreeWidgetItem(tree);
 // 	roots[PMASS_ROOT] = new QTreeWidgetItem(tree);
@@ -20,6 +22,8 @@ xChartDatabase::xChartDatabase(QWidget* parent)
 // 	//roots[POLYGON_ROOT] = new QTreeWidgetItem(vtree);
 // 	//roots[MASS_ROOT] = new QTreeWidgetItem(vtree);
 // 
+	roots[MASS_ROOT]->setText(0, "Body");
+	roots[KCONSTRAINT_ROOT]->setText(0, "Joint");
 // 	roots[PART_ROOT]->setText(0, "Part");
 // 	roots[SENSOR_ROOT]->setText(0, "Sensor");
 // 	roots[PMASS_ROOT]->setText(0, "Mass");
@@ -163,5 +167,15 @@ QString xChartDatabase::plotTarget()
 
 void xChartDatabase::upload_mbd_results(xMultiBodyModel* xmbd)
 {
-
+	foreach(xPointMass* xpm, xmbd->Masses())
+	{
+		mass_results[xpm->Name()] = xpm->XPointMassResultPointer();
+		addChild(MASS_ROOT, xpm->Name());
+	}
+	foreach(xKinematicConstraint* xkc, xmbd->Joints())
+	{
+		constraint_results[xkc->Name()] = xkc->XKinematicConstraintResultPointer();
+		addChild(KCONSTRAINT_ROOT, xkc->Name());
+	}
+		
 }

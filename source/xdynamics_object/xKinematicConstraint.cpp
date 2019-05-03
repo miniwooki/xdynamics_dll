@@ -133,6 +133,11 @@ void xKinematicConstraint::SetupDataFromStructure(xPointMass* base, xPointMass* 
 	hj = cross(fj, gj);
 }
 
+xKinematicConstraint::kinematicConstraint_result* xKinematicConstraint::XKinematicConstraintResultPointer()
+{
+	return kcrs;
+}
+
 void xKinematicConstraint::ExportResults(std::fstream& of)
 {
 	std::ofstream ofs;

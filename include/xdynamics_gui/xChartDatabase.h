@@ -4,14 +4,12 @@
 #include <QDockWidget>
 #include <QTreeWidget>
 #include <QComboBox>
-
-class xMultiBodyModel;
-class xPointMass;
+#include "xdynamics_manager/xMultiBodyModel.h"
 
 class xChartDatabase : public QDockWidget
 {
 public:
-	enum tRoot { PART_ROOT = 0, SENSOR_ROOT, PMASS_ROOT, REACTION_ROOT };
+	enum tRoot { MASS_ROOT = 0, KCONSTRAINT_ROOT };
 	xChartDatabase(QWidget* parent);
 	~xChartDatabase();
 
@@ -30,7 +28,8 @@ public:
 private:
 	QTreeWidget *tree;
 	QMap<tRoot, QTreeWidgetItem*> roots;
-	//QMap<QString, xPointMass::pointmass_result*> mbd_results;
+	QMap<QString, xPointMass::pointmass_result*> mass_results;
+	QMap<QString, xKinematicConstraint::kinematicConstraint_result*> constraint_results;
 	QStringList sLists;
 	tRoot tSelected;
 	QComboBox *plot_item;
