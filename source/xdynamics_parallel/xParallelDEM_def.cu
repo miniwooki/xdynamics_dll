@@ -608,6 +608,7 @@ __device__ void DHSModel(
 		double3 sh = e / mag_e;
 		double s_dot = dot(dv, sh);
 		double ds = _ds + dcte.dt * (s_dot + dots);
+		//double3 rr = d
 		_ds = ds;
 		dots = s_dot;
 		//double ds = mag_e * dcte.dt;
