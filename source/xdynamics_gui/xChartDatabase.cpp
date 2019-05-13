@@ -75,6 +75,7 @@ void xChartDatabase::clickItem(QTreeWidgetItem* item, int col)
 {
 	if (!item)
 		return;
+	plot_item->clear();
 	//QList<QTreeWidgetItem*> items = tree->selectedItems();
 	//cmdWindow::write(CMD_INFO, "The number of selected items : " + QString("%1").arg(items.size()));
 // 	if (items.size() > 1)

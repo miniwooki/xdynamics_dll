@@ -15,6 +15,7 @@ xDynamicsSimulator::xDynamicsSimulator()
 	, xdm(NULL)
 	, xmbd(NULL)
 	, xdem(NULL)
+	, xsph(NULL)
 {
 
 }
@@ -24,6 +25,7 @@ xDynamicsSimulator::xDynamicsSimulator(xDynamicsManager* _xdm)
 	, xdm(_xdm)
 	, xmbd(NULL)
 	, xdem(NULL)
+	, xsph(NULL)
 {
 // 	if (xdm->XMBDModel())
 // 	{

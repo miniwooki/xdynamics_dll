@@ -32,6 +32,7 @@ public:
 	void ReadShapeObject(xObjectManager* xom, vector2i rc);
 	void ReadIntegrator(vector2i rc);
 	void ReadSimulationCondition(vector2i rc);
+	void ReadInputGravity(vector2i rc);
 	bool IsEmptyCell(int r, int c);
 
 	QString SetupSheet(int idx);

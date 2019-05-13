@@ -421,6 +421,11 @@ void xPointMass::setNewVelocityData(xVectorD& qd)
 	ev.e0 = qd(idx + 3); ev.e1 = qd(idx + 4); ev.e2 = qd(idx + 5); ev.e3 = qd(idx + 6);
 }
 
+// void xPointMass::translation(vector3d new_pos)
+// {
+// 	pos = new_pos;
+// }
+
 // void xPointMass::ExportResult2ASCII(std::ifstream& ifs)
 // {
 // 

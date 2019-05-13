@@ -279,7 +279,14 @@ void xXLSReader::ReadMass(xMultiBodyModel* xmbd, vector2i rc)
 			xObject *obj = xObjectManager::XOM()->XObject(name);
 			xPointMass* xpm = NULL;
 			xpm = xmbd->CreatePointMass(name);
-			xpm->SetDataFromStructure(xmbd->NumMass(), ReadPointMassData(name, rc.x++, rc.y));
+
+			xPointMassData xpmd = ReadPointMassData(name, rc.x++, rc.y);
+			if (xpm->Shape() == MESH_SHAPE)
+				dynamic_cast<xMeshObject*>(xpm)->translation(new_vector3d(xpmd.px, xpmd.py, xpmd.pz));
+			xpm->SetDataFromStructure(xmbd->NumMass(), xpmd);
+			
+			//xpm->translation(xpm->Position());
+			// obj->TranslationPosition(xpm->Position());
 			rc.y = init_col;
 		}
 	}
@@ -499,29 +506,12 @@ void xXLSReader::ReadShapeObject(xObjectManager* xom, vector2i rc)
 				std::string mf = uf::WideChar2String(sheet->readStr(rc.x, rc.y++));
 				xmo->DefineShapeFromFile(loc, mf);
 				xmo->splitTriangles(fsz);
-				if (xve)
-				{
-					std::fstream fs;
-					std::string file = xModel::makeFilePath(name + ".mesh");
-					fs.open(file, std::ios::out | std::ios::binary);
-					unsigned int ns = static_cast<unsigned int>(name.size()); 
-					fs.write((char*)&ns, sizeof(unsigned int));
-					fs.write((char*)name.c_str(), sizeof(char)*ns);
-					double *_vertex = xmo->VertexList();
-					double *_normal = xmo->NormalList();
-					fs.write((char*)&material, sizeof(int));
-					fs.write((char*)&loc, sizeof(double) * 3);
-					unsigned int nt = xmo->NumTriangle();
-					fs.write((char*)&nt, sizeof(unsigned int));
-					fs.write((char*)_vertex, sizeof(double) * xmo->NumTriangle() * 9);
-					fs.write((char*)_normal, sizeof(double) * xmo->NumTriangle() * 9);
-					fs.close();
-					int t = VMESH;
-					xve->Write((char*)&t, sizeof(int));
-					ns = (unsigned int)file.size();
-					xve->Write((char*)&ns, sizeof(unsigned int));
-					xve->Write((char*)file.c_str(), sizeof(char)*ns);
-				}
+				std::string file = xModel::makeFilePath(name + ".mesh");
+				int t = VMESH;
+				xve->Write((char*)&t, sizeof(int));
+				unsigned int ns = (unsigned int)file.size();
+				xve->Write((char*)&ns, sizeof(unsigned int));
+				xve->Write((char*)file.c_str(), sizeof(char)*ns);
 			}
 			rc.x++;
 			rc.y = init_col;
@@ -587,6 +577,17 @@ void xXLSReader::ReadSimulationCondition(vector2i rc)
 		xSimulation::setSaveStep(static_cast<unsigned int>(sheet->readNum(rc.x, rc.y++)));
 	if (!IsEmptyCell(rc.x, rc.y))
 		xSimulation::setEndTime(sheet->readNum(rc.x, rc.y++));
+}
+
+void xXLSReader::ReadInputGravity(vector2i rc)
+{
+	if (!IsEmptyCell(rc.x, rc.y))
+	{
+		std::wstring x;
+		double v3[3] = { 0, };
+		x = sheet->readStr(rc.x, rc.y); uf::xsplit(x, ",", 3, v3 + 0);
+		xModel::setGravity(v3[0], v3[1], v3[2]);
+	}
 }
 
 QString xXLSReader::SetupSheet(int idx)

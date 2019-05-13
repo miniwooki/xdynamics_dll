@@ -120,7 +120,8 @@ enum xXlsInputDataType
 	XLS_PARTICLE,
 	XLS_CONTACT,	
 	XLS_INTEGRATOR,
-	XLS_SIMULATION 
+	XLS_SIMULATION,
+	XLS_GRAVITY
 };
 
 enum xImportShapeType

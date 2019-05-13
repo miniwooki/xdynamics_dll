@@ -440,7 +440,7 @@ void xvParticle::setBufferMemories(unsigned int sz)
 	if (color_buffers)
 		delete[] color_buffers;
 	color_buffers = new float[sz * np * 4];
-	xvAnimationController::allocTimeMemory(sz);
+	
 }
 
 QString xvParticle::NameOfGroupData(QString& n)

@@ -690,7 +690,7 @@ void xdynamics_gui::xRunSimulationThread(double dt, unsigned int st, double et)
 	sThread->xInitialize(xdm, dt, st, et);
 	//xcw->write(xCommandWindow::CMD_INFO, QString("%1, %1, %1").arg(dt).arg(st).arg(et));
 	//xcw->write(xCommandWindow::CMD_INFO, "Thread Initialize Done.");
-
+	xvAnimationController::allocTimeMemory(xSimulation::npart);
 	if(xgl->vParticles())
 		xgl->vParticles()->setBufferMemories(xSimulation::npart);
 	connect(sThread, SIGNAL(finishedThread()), this, SLOT(xExitSimulationThread()));
@@ -700,6 +700,7 @@ void xdynamics_gui::xRunSimulationThread(double dt, unsigned int st, double et)
 	//xcw->write(xCommandWindow::CMD_INFO, "Thread Initialize Done.");
 	//unsigned int nstep = xSimulation::nstep;
 	pbar->setMaximum(xSimulation::nstep);
+
 	ui.statusBar->addWidget(pbar, 1);
 	setupBindingPointer();
 	sThread->start();

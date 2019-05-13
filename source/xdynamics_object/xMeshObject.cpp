@@ -141,20 +141,20 @@ int xMeshObject::DefineShapeFromFile(vector3d& loc, std::string f)
 	ntriangle = ntri;
 	com = com / ntriangle;
 	double J[6] = { 0, };
-	vector3d mov = loc - com;
+	vector3d mov = loc/* - com*/;
 	for (unsigned int i = 0; i < ntri; i++)
 	{
-		int s = i * 9;
-		vertexList[s + 0] += mov.x;
-		vertexList[s + 1] += mov.y;
-		vertexList[s + 2] += mov.z;
-		vertexList[s + 3] += mov.x;
-		vertexList[s + 4] += mov.y;
-		vertexList[s + 5] += mov.z;
-		vertexList[s + 6] += mov.x;
-		vertexList[s + 7] += mov.y;
-		vertexList[s + 8] += mov.z;
-		vector3d cm = spos[i] - pos;
+// 		int s = i * 9;
+// 		vertexList[s + 0] += mov.x;
+// 		vertexList[s + 1] += mov.y;
+// 		vertexList[s + 2] += mov.z;
+// 		vertexList[s + 3] += mov.x;
+// 		vertexList[s + 4] += mov.y;
+// 		vertexList[s + 5] += mov.z;
+// 		vertexList[s + 6] += mov.x;
+// 		vertexList[s + 7] += mov.y;
+// 		vertexList[s + 8] += mov.z;
+		vector3d cm = spos[i] - loc;
 		J[0] += cm.y * cm.y + cm.z * cm.z;
 		J[1] += cm.x * cm.x + cm.z * cm.z;
 		J[2] += cm.x * cm.x + cm.y * cm.y;
@@ -322,6 +322,8 @@ vector3d xMeshObject::MinPoint() const{ return min_point; }
 
 void xMeshObject::splitTriangles(double to)
 {
+	if (to == 0)
+		return;
 	vector3d p, q, r, n;
 
 	QList<triangle_info> temp_tri;
@@ -380,6 +382,51 @@ void xMeshObject::splitTriangles(double to)
 		normalList[s + 8] = t.n.z;
 		cnt++;
 	}
+}
+
+void xMeshObject::translation(vector3d p)
+{
+	vector3d mov = p - xPointMass::pos;
+	///*xPointMass*/::translation(p);
+	for (unsigned int i = 0; i < ntriangle; i++)
+	{
+		int s = i * 9;
+		vertexList[s + 0] += mov.x;
+		vertexList[s + 1] += mov.y;
+		vertexList[s + 2] += mov.z;
+		vertexList[s + 3] += mov.x;
+		vertexList[s + 4] += mov.y;
+		vertexList[s + 5] += mov.z;
+		vertexList[s + 6] += mov.x;
+		vertexList[s + 7] += mov.y;
+		vertexList[s + 8] += mov.z;
+		//vector3d cm = spos[i] - pos;
+// 		J[0] += cm.y * cm.y + cm.z * cm.z;
+// 		J[1] += cm.x * cm.x + cm.z * cm.z;
+// 		J[2] += cm.x * cm.x + cm.y * cm.y;
+// 		J[3] -= cm.x * cm.y;
+// 		J[4] -= cm.x * cm.z;
+// 		J[5] -= cm.y * cm.z;
+	}
+}
+
+std::string xMeshObject::exportMeshData(std::string path)
+{
+	std::fstream fs;
+	fs.open(path, std::ios::out | std::ios::binary);
+	unsigned int ns = static_cast<unsigned int>(name.size());
+	fs.write((char*)&ns, sizeof(unsigned int));
+	fs.write((char*)name.toStdString().c_str(), sizeof(char)*ns);
+	double *_vertex = this->VertexList();
+	double *_normal = this->NormalList();
+	fs.write((char*)&material, sizeof(int));
+	fs.write((char*)&pos, sizeof(double) * 3);
+	unsigned int nt = this->NumTriangle();
+	fs.write((char*)&nt, sizeof(unsigned int));
+	fs.write((char*)_vertex, sizeof(double) * this->NumTriangle() * 9);
+	fs.write((char*)_normal, sizeof(double) * this->NumTriangle() * 9);
+	fs.close();	
+	return path;
 }
 
 unsigned int xMeshObject::create_sph_particles(double ps, unsigned int nlayers, vector3d* p, xMaterialType* t)

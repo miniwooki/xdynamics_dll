@@ -105,6 +105,8 @@ xPointMass* xMultiBodyModel::CreatePointMass(std::string _name)
 	{
 		xpm = (dynamic_cast<xPointMass*>(xObjectManager::XOM()->XObject(_name)));
 		masses[name] = xpm;
+// 		if (xpm->Shape() == MESH_SHAPE)
+// 			dynamic_cast<xMeshObject*>(xObjectManager::XOM()->XObject(_name))->translation()
 		return xpm;
 	}
 	xpm = new xPointMass(_name);

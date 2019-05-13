@@ -107,6 +107,13 @@ void xModel::setGravity(double g, int d)
 	gravity = g * u;
 }
 
+void xModel::setGravity(double x, double y, double z)
+{
+	gravity.x = x;
+	gravity.y = y;
+	gravity.z = z;
+}
+
 void xModel::launchLogSystem(std::string lpath)
 {
 	xLog::launchLogSystem(lpath);

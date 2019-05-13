@@ -94,6 +94,7 @@ public:
 	void setNewData(xVectorD& q, xVectorD& qd);
 	void setNewPositionData(xVectorD& q);
 	void setNewVelocityData(xVectorD& qd);
+	//virtual void translation(vector3d new_pos);
 //	static void ExportResult2ASCII(std::ifstream& ifs);
 
 protected:

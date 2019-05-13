@@ -228,6 +228,7 @@ xDynamicsManager::solverType xDynamicsManager::OpenModelXLS(const wchar_t* n)
 			else if (tn == "KERNEL") xx[XLS_KERNEL] = d;
 			else if (tn == "INTEGRATOR") xx[XLS_INTEGRATOR] = d;
 			else if (tn == "SIMULATION") xx[XLS_SIMULATION] = d;
+			else if (tn == "GRAVITY") xx[XLS_GRAVITY] = d;
 		}
 		std::map<xXlsInputDataType, vector2i>::iterator bt = xx.begin();
 		std::map<xXlsInputDataType, vector2i>::iterator et = xx.end();
@@ -291,6 +292,7 @@ xDynamicsManager::solverType xDynamicsManager::OpenModelXLS(const wchar_t* n)
 				} break;
 			case XLS_INTEGRATOR: xls.ReadIntegrator(bt->second); break;
 			case XLS_SIMULATION: xls.ReadSimulationCondition(bt->second); break;
+			case XLS_GRAVITY: xls.ReadInputGravity(bt->second); break;
 			}
 		}
 // 		if (xsph)
@@ -308,7 +310,15 @@ xDynamicsManager::solverType xDynamicsManager::OpenModelXLS(const wchar_t* n)
 			int ns = pv_path.size(); xve.Write((char*)&ns, sizeof(int));
 			xve.Write((char*)pv_path.c_str(), sizeof(char)*pv_path.size());
 		}
-
+		foreach(xObject* xo, xom->XObjects())
+		{
+			if (xo->Shape() == MESH_SHAPE)
+			{
+				xMeshObject* xmo = dynamic_cast<xMeshObject*>(xo);
+				QString mname = xmo->Name() + ".mesh";
+				std::string file = xmo->exportMeshData(xModel::makeFilePath(mname.toStdString()));
+			}
+		}
  		xve.Close();
 	}
 	solverType stype= ONLY_MBD;

@@ -25,8 +25,8 @@ xKinematicConstraint::xKinematicConstraint(std::string _name, cType _type, std::
 {
 	//name = { 0, };
 	//memset(name, 0, sizeof(*this) - sizeof(name));
-	int mem_sz = sizeof(cType) + sizeof(vector3d) * 6;
-	memset(&type, 0, mem_sz);
+	int mem_sz = sizeof(vector3d) * 6;
+	memset(&location.x, 0, mem_sz);
 	name = QString::fromStdString(_name);// wsprintfW(name, TEXT("%s"), _name);
 	switch (_type)
 	{
