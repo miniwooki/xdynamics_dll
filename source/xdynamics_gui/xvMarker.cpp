@@ -45,7 +45,7 @@ void xvMarker::draw(GLenum eMode)
 		{
 			double t = 180 / M_PI;
 			unsigned int idx = xvAnimationController::getFrame();
-			xPointMass::pointmass_result pmr = xvObject::pmrs[idx];
+			xPointMass::pointmass_result pmr = xvObject::pmrs->at(idx);
 			glTranslated(pmr.pos.x, pmr.pos.y, pmr.pos.z);
 			//xvObject::xTranslateMinMax(pmr.pos.x, pmr.pos.y, pmr.pos.z);
 			vector3d euler = EulerParameterToEulerAngle(pmr.ep);

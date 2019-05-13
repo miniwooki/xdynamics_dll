@@ -114,7 +114,7 @@ void xUniversalConstraint::SaveStepResult(
 	}
 	kcr.time = ct;
 	kcr.location = ri + Ai * spi;
-	kcrs[part] = kcr;
+	kcrs.push_back(kcr);
 	nr_part++;
 }
 

@@ -9,7 +9,7 @@
 xPointMass::xPointMass(xShapeType _s)
 	: xObject(_s)
 	, nr_part(0)
-	, pmrs(NULL)
+	//, pmrs(NULL)
 	, initial_data(NULL)
 {
 	//memset(&id, 0, sizeof(*this));
@@ -20,7 +20,7 @@ xPointMass::xPointMass(xShapeType _s)
 xPointMass::xPointMass(std::string _name, xShapeType _s)
 	: xObject(_name, _s)
 	, nr_part(0)
-	, pmrs(NULL)
+	//, pmrs(NULL)
 	, initial_data(NULL)
 	, mass(0)
 {
@@ -35,7 +35,7 @@ xPointMass::xPointMass(std::string _name, xShapeType _s)
 
 xPointMass::xPointMass(const xPointMass& xpm)
 	: xObject(*this)
-	, pmrs(NULL)
+	//, pmrs(NULL)
 	, initial_data(NULL)
 	, mass(xpm.Mass())
 	, syme_inertia(xpm.SymetricInertia())
@@ -63,7 +63,7 @@ xPointMass::xPointMass(const xPointMass& xpm)
 
 xPointMass::~xPointMass()
 {
-	if (pmrs) delete[] pmrs; pmrs = NULL;
+	//if (pmrs) delete[] pmrs; pmrs = NULL;
 	if (initial_data) delete[] initial_data; initial_data = NULL;
 }
 
@@ -267,9 +267,9 @@ vector4d xPointMass::EulerParameterMoment() const
 	return em;
 }
 
-xPointMass::pointmass_result* xPointMass::XPointMassResultPointer()
+QVector<xPointMass::pointmass_result>* xPointMass::XPointMassResultPointer()
 {
-	return pmrs;
+	return &pmrs;
 }
 
 // Declaration operate functions
@@ -314,12 +314,12 @@ vector3d xPointMass::toGlobal(const vector3d& v)
 
 void xPointMass::AllocResultMomory(unsigned int _s)
 {
-	if (pmrs)
+	if (pmrs.size())
 	{
-		delete[] pmrs; 
-		pmrs = NULL;
+		pmrs.clear();// delete[] pmrs;
+		//pmrs = NULL;
 	}
-	pmrs = new pointmass_result[_s];
+	//pmrs = new pointmass_result[_s];
 }
 
 void xPointMass::setZeroAllForce()
@@ -336,7 +336,7 @@ void xPointMass::SaveStepResult(unsigned int part, double time, xVectorD& q, xVe
 	euler_parameters edd = new_euler_parameters(qdd(_i + 3), qdd(_i + 4), qdd(_i + 5), qdd(_i + 6));
 	vector3d aa = 2.0 * GMatrix(e) * edd;// m->getEP().G() * m->getEA();
 	vector3d av = 2.0 * GMatrix(e) * ed;// m->getEP().G() * m->getEV();
-	pmrs[part] =
+	pointmass_result pmr = 
 	{
 		time,
 		new_vector3d(q(i + 0), q(i + 1), q(i + 2)),
@@ -344,6 +344,7 @@ void xPointMass::SaveStepResult(unsigned int part, double time, xVectorD& q, xVe
 		new_vector3d(qdd(_i + 0), qdd(_i + 1), qdd(_i + 2)),
 		av, aa, af, am, cf, cm, hf, hm, e, ed, edd
 	};
+	pmrs.push_back(pmr);
 	nr_part++;
 }
 
@@ -358,7 +359,7 @@ void xPointMass::ExportResults(std::fstream& of)
 	ofs.write((char*)&identifier, sizeof(int));
 	ofs.write(&t, sizeof(char));
 	ofs.write((char*)&nr_part, sizeof(unsigned int));
-	ofs.write((char*)pmrs, sizeof(pointmass_result) * nr_part);
+	ofs.write((char*)pmrs.data(), sizeof(pointmass_result) * nr_part);
 
 	ofs.close();
 	xLog::log("Exported : " + _path.toStdString());

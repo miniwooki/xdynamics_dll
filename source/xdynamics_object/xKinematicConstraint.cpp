@@ -7,7 +7,7 @@ xKinematicConstraint::xKinematicConstraint()
 	, j_ptr(NULL)
 	, nConst(0)
 	, nr_part(0)
-	, kcrs(NULL)
+	//, kcrs(NULL)
 {
 	//name = { 0, };
 	//memset(name, 0, sizeof(*this));
@@ -21,7 +21,7 @@ xKinematicConstraint::xKinematicConstraint(std::string _name, cType _type, std::
 	, j_ptr(NULL)
 	, nConst(0)
 	, nr_part(0)
-	, kcrs(NULL)
+	//, kcrs(NULL)
 {
 	//name = { 0, };
 	//memset(name, 0, sizeof(*this) - sizeof(name));
@@ -43,7 +43,7 @@ xKinematicConstraint::xKinematicConstraint(std::string _name, cType _type, std::
 
 xKinematicConstraint::~xKinematicConstraint()
 {
-	if (kcrs) delete[] kcrs; kcrs = NULL;
+	//if (kcrs) delete[] kcrs; kcrs = NULL;
 }
 
 QString xKinematicConstraint::Name()
@@ -103,12 +103,12 @@ void xKinematicConstraint::setActionBodyIndex(int _j)
 
 void xKinematicConstraint::AllocResultMemory(unsigned int _s)
 {
-	if (kcrs)
+	if (kcrs.size())
 	{
-		delete[] kcrs;
-		kcrs = NULL;
+		kcrs.clear();/// delete[] kcrs;
+		//kcrs = NULL;
 	}
-	kcrs = new kinematicConstraint_result[_s];
+	//kcrs = new kinematicConstraint_result[_s];
 }
 
 void xKinematicConstraint::setLocation(double x, double y, double z)
@@ -133,9 +133,9 @@ void xKinematicConstraint::SetupDataFromStructure(xPointMass* base, xPointMass* 
 	hj = cross(fj, gj);
 }
 
-xKinematicConstraint::kinematicConstraint_result* xKinematicConstraint::XKinematicConstraintResultPointer()
+QVector<xKinematicConstraint::kinematicConstraint_result>* xKinematicConstraint::XKinematicConstraintResultPointer()
 {
-	return kcrs;
+	return &kcrs;
 }
 
 void xKinematicConstraint::ExportResults(std::fstream& of)
@@ -149,7 +149,7 @@ void xKinematicConstraint::ExportResults(std::fstream& of)
 	ofs.write((char*)&identifier, sizeof(int));
 	ofs.write(&t, sizeof(char));
 	ofs.write((char*)&nr_part, sizeof(unsigned int));
-	ofs.write((char*)kcrs, sizeof(kinematicConstraint_result) * nr_part);
+	ofs.write((char*)kcrs.data(), sizeof(kinematicConstraint_result) * nr_part);
 	// 	ofs << "time " << "px " << "py " << "pz " << "vx " << "vy " << "vz " << "ax " << "ay " << "az " 
 	// 		<< "avx " << "avy " << "avz " << "aax " << "aay " << "aaz " 
 	// 		<< "afx " << "afy " << "afz " << "amx " << "amy " << "amz " 

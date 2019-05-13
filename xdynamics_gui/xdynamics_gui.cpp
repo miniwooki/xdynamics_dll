@@ -192,10 +192,15 @@ bool xdynamics_gui::ReadViewModel(QString path)
 		}
 		else if (vot == xViewObjectType::VPARTICLE)
 		{
-			xgl->vParticles()->defineFromViewFile(name);
-			QStringList qsl = xgl->vParticles()->ParticleGroupData().keys();
-			xnavi->addChilds(xModelNavigator::PARTICLE_ROOT, qsl);
-			isExistParticle = true;
+			if (!xgl->vParticles())
+				xgl->createParticles();
+			if (xgl->vParticles())
+			{
+				xgl->vParticles()->defineFromViewFile(name);
+				QStringList qsl = xgl->vParticles()->ParticleGroupData().keys();
+				xnavi->addChilds(xModelNavigator::PARTICLE_ROOT, qsl);
+				isExistParticle = true;
+			}
 		}
 		else if (vot == xViewObjectType::VJOINT)
 		{
@@ -685,7 +690,9 @@ void xdynamics_gui::xRunSimulationThread(double dt, unsigned int st, double et)
 	sThread->xInitialize(xdm, dt, st, et);
 	//xcw->write(xCommandWindow::CMD_INFO, QString("%1, %1, %1").arg(dt).arg(st).arg(et));
 	//xcw->write(xCommandWindow::CMD_INFO, "Thread Initialize Done.");
-	xgl->vParticles()->setBufferMemories(xSimulation::npart);
+
+	if(xgl->vParticles())
+		xgl->vParticles()->setBufferMemories(xSimulation::npart);
 	connect(sThread, SIGNAL(finishedThread()), this, SLOT(xExitSimulationThread()));
 	connect(sThread, SIGNAL(sendProgress(int, QString)), this, SLOT(xRecieveProgress(int, QString)));
 	//xcw->write(xCommandWindow::CMD_INFO, "Thread Initialize Done.");

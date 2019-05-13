@@ -440,7 +440,7 @@ void xGLWidget::drawGroundCoordinate(GLenum eMode)
 
 xvParticle* xGLWidget::vParticles()
 {
-	return createParticles();
+	return vp;// createParticles();
 }
 
 // xvObject* xGLWidget::getVObjectFromName(QString name)

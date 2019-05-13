@@ -40,13 +40,6 @@ void xSmoothedParticleHydrodynamicsSimulation::clearMemory()
 		if (d_rho) cudaFree(d_rho); d_rho = NULL;
 		if (d_isFreeSurface) cudaFree(d_isFreeSurface); d_isFreeSurface = NULL;
 		if (d_ptype) cudaFree(d_ptype); ptype = NULL;
-		if (d_lhs) cudaFree(d_lhs); d_lhs = NULL;
-		if (d_rhs) cudaFree(d_rhs); d_rhs = NULL;
-		if (d_conj0) cudaFree(d_conj0); d_conj0 = NULL;
-		if (d_conj1) cudaFree(d_conj1); d_conj1 = NULL;
-		if (d_tmp0) cudaFree(d_tmp0); d_tmp0 = NULL;
-		if (d_tmp1) cudaFree(d_tmp1); d_tmp1 = NULL;
-		if (d_residual) cudaFree(d_residual); d_residual = NULL;
 		if (d_mass) cudaFree(d_mass); d_mass = NULL;
 	}
 }
@@ -103,6 +96,16 @@ int xSmoothedParticleHydrodynamicsSimulation::Initialize(xSmoothedParticleHydrod
 		setupCudaData();
 	}
 	return xDynamicsError::xdynamicsSuccess;
+}
+
+bool xSmoothedParticleHydrodynamicsSimulation::Initialized()
+{
+	return isInitialize;
+}
+
+QString xSmoothedParticleHydrodynamicsSimulation::SaveStepResult(unsigned int pt, double ct)
+{
+	return "";
 }
 
 void xSmoothedParticleHydrodynamicsSimulation::setupCudaData()

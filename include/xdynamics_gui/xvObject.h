@@ -12,7 +12,8 @@
 #include <QMessageBox>
 #include <QFile>
 #include <QDebug>
-#include <QMap>
+#include <QVector>
+
 
 //#include "model.h"
 #include "xvAnimationController.h"
@@ -42,7 +43,7 @@ public:
 	void setAngle(float x, float y, float z);
 	void setPosition(float x, float y, float z);
 	void setBlendAlpha(float v) { blend_alpha = v; }
-	void bindPointMassResultsPointer(xPointMass::pointmass_result* _pmrs);
+	void bindPointMassResultsPointer(QVector<xPointMass::pointmass_result>* _pmrs);
  	QColor& Color() { return clr; }
 	void setColor(QColor ct) { clr = ct; }
  	void setDrawingMode(GLenum dm) { drawingMode = dm; }
@@ -72,7 +73,7 @@ protected:
 	vector3f ang;
 	vector3f local_min;
 	vector3f local_max;
-	xPointMass::pointmass_result* pmrs;
+	QVector<xPointMass::pointmass_result>* pmrs;
 };
 
 #endif

@@ -99,7 +99,7 @@ void xSphericalConstraint::SaveStepResult(
 	}
 	kcr.time = ct;
 	kcr.location = ri + i_ptr->toGlobal(spi);// Ai * spi;
-	kcrs[part] = kcr;
+	kcrs.push_back(kcr);
 	nr_part++;
 }
 

@@ -209,6 +209,7 @@
     <ClCompile Include="..\..\source\xdynamics_object\xWendlandKernel.cpp" />
     <ClCompile Include="..\..\source\xdynamics_simulation\xDiscreteElementMethodSimulation.cpp" />
     <ClCompile Include="..\..\source\xdynamics_simulation\xDynamicSimulator.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_simulation\xIncompressibleSPH.cpp" />
     <ClCompile Include="..\..\source\xdynamics_simulation\xIntegratorHHT.cpp" />
     <ClCompile Include="..\..\source\xdynamics_simulation\xIntegratorRK4.cpp" />
     <ClCompile Include="..\..\source\xdynamics_simulation\xIntegratorVV.cpp" />
@@ -295,6 +296,7 @@
     <ClInclude Include="..\..\include\xdynamics_parallel\xParallelSPH_impl.cuh" />
     <ClInclude Include="..\..\include\xdynamics_simulation\xDiscreteElementMethodSimulation.h" />
     <ClInclude Include="..\..\include\xdynamics_simulation\xDynamicsSimulator.h" />
+    <ClInclude Include="..\..\include\xdynamics_simulation\xIncompressibleSPH.h" />
     <ClInclude Include="..\..\include\xdynamics_simulation\xIngegratorVV.h" />
     <ClInclude Include="..\..\include\xdynamics_simulation\xIntegratorHHT.h" />
     <ClInclude Include="..\..\include\xdynamics_simulation\xIntegratorRK4.h" />

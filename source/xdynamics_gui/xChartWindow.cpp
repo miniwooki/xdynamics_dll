@@ -44,7 +44,7 @@ xChartWindow::xChartWindow(QWidget* parent /* = NULL */)
 	//plot_item = new QComboBox(this);
 	setMinimumSize(640, 580);
 	resize(xSize, ySize);
-	//layout->addWidget(tree->plotItemComboBox());
+	layout->addWidget(tree->plotItemComboBox());
 	layout->addWidget(vcht);
 	setCentralWidget(vb);
 
@@ -168,6 +168,55 @@ void xChartWindow::uploadingResults()
 
 void xChartWindow::joint_plot()
 {
+	int it = tree->plotItemComboBox()->currentIndex();
+	// 	QString target = tree->plotTarget();
+	QString plotName = select_item_name + "_" + tree->plotItemComboBox()->currentText();
+	if (!curPlotName.isEmpty())
+		seriesMap[curPlotName]->hide();
+	curPlotName = plotName;
+	QLineSeries* series = seriesMap[plotName];
+	if (series)
+	{
+		series->show();
+		vcht->setCurrentLineSeries(series);
+		prop->setPlotProperty(plotName);
+		return;
+	}
+	series = createLineSeries(plotName);
+	vcht->setCurrentLineSeries(series);
+	double et = 0.0;
+	double max_v = -FLT_MAX;
+	double min_v = FLT_MAX;
+	QString ytitle;
+	QVector<xKinematicConstraint::kinematicConstraint_result>* pmr = tree->JointResults()[select_item_name];
+	foreach(xKinematicConstraint::kinematicConstraint_result r, *pmr)
+	{
+		double v = 0.0;
+		switch (it - 1)
+		{
+		case 0: v = r.location.x; ytitle = "Location(m)"; break;
+		case 1: v = r.location.y; ytitle = "Location(m)"; break;
+		case 2: v = r.location.z; ytitle = "Location(m)"; break;
+		case 3: v = r.iaforce.x; ytitle = "Force(N)"; break;
+		case 4: v = r.iaforce.y; ytitle = "Force(N)"; break;
+		case 5: v = r.iaforce.z; ytitle = "Force(N)"; break;
+		case 6: v = r.irforce.x; ytitle = "Torque(Nm)"; break;
+		case 7: v = r.irforce.y; ytitle = "Torque(Nm)"; break;
+		case 8: v = r.irforce.z; ytitle = "Torque(Nm)"; break;
+		case 9: v = r.jaforce.x; ytitle = "Force(N)"; break;
+		case 10: v = r.jaforce.y; ytitle = "Force(N)"; break;
+		case 11: v = r.jaforce.z; ytitle = "Force(N)"; break;
+		case 12: v = r.jrforce.x; ytitle = "Torque(Nm)"; break;
+		case 13: v = r.jrforce.y; ytitle = "Torque(Nm)"; break;
+		case 14: v = r.jrforce.z; ytitle = "Torque(Nm)"; break;
+		}
+		series->append(r.time, v);
+		et = r.time;
+		if (max_v < v) max_v = v;
+		if (min_v > v) min_v = v;
+	}
+	double dy = (max_v - min_v) * 0.01;
+	prop->setPlotProperty(plotName, "Time(sec)", ytitle, 0, et, min_v - dy, max_v + dy);
 // 	QStringList sLists = tree->selectedLists();
 // 	QString plotItem = tree->plotItemComboBox()->currentText();
 // 	QString plotName;
@@ -207,37 +256,40 @@ void xChartWindow::body_plot()
  	if (series)
  	{
  		series->show();
+		vcht->setCurrentLineSeries(series);
  		prop->setPlotProperty(plotName);
  		return;
 	}
  	series = createLineSeries(plotName);
+	vcht->setCurrentLineSeries(series);
  	double et = 0.0;
- 	double max_v = 0.0;
- 	double min_v = 0.0;
+ 	double max_v = -FLT_MAX;
+ 	double min_v = FLT_MAX;
  	QString ytitle;
- 	foreach(xPointMass::pointmass_result *pmr, tree->MassResults())
- 	{
+	QVector<xPointMass::pointmass_result>* pmr = tree->MassResults()[select_item_name];
+	foreach(xPointMass::pointmass_result r, *pmr)
+	{
 		double v = 0.0;
-		switch (it)
+		switch (it-1)
 		{
-		case 0: v = pmr->pos.x; ytitle = "Position(m)"; break;
-		case 1: v = pmr->pos.y; ytitle = "Position(m)"; break;
-		case 2: v = pmr->pos.z; ytitle = "Position(m)"; break;
-		case 3: v = pmr->vel.x; ytitle = "Velocity(m/s)"; break;
-		case 4: v = pmr->vel.y; ytitle = "Velocity(m/s)"; break;
-		case 5: v = pmr->vel.z; ytitle = "Velocity(m/s)"; break;
-		case 6: v = pmr->omega.x; ytitle = "Ang. Velocity(rad/s)"; break;
-		case 7: v = pmr->omega.y; ytitle = "Ang. Velocity(rad/s)"; break;
-		case 8: v = pmr->omega.z; ytitle = "Ang. Velocity(rad/s)"; break;
-		case 9: v = pmr->acc.x; ytitle = "Acceleration(m/s^2)"; break;
-		case 10: v = pmr->acc.y; ytitle = "Acceleration(m/s^2)"; break;
-		case 11: v = pmr->acc.z; ytitle = "Acceleration(m/s^2)"; break;
-		case 12: v = pmr->alpha.x; ytitle = "Ang. Acceleration(rad/s^2)"; break;
-		case 13: v = pmr->alpha.y; ytitle = "Ang. Acceleration(rad/s^2)"; break;
-		case 14: v = pmr->alpha.z; ytitle = "Ang. Acceleration(rad/s^2)"; break;
+		case 0: v = r.pos.x; ytitle = "Position(m)"; break;
+		case 1: v = r.pos.y; ytitle = "Position(m)"; break;
+		case 2: v = r.pos.z; ytitle = "Position(m)"; break;
+		case 3: v = r.vel.x; ytitle = "Velocity(m/s)"; break;
+		case 4: v = r.vel.y; ytitle = "Velocity(m/s)"; break;
+		case 5: v = r.vel.z; ytitle = "Velocity(m/s)"; break;
+		case 6: v = r.omega.x; ytitle = "Ang. Velocity(rad/s)"; break;
+		case 7: v = r.omega.y; ytitle = "Ang. Velocity(rad/s)"; break;
+		case 8: v = r.omega.z; ytitle = "Ang. Velocity(rad/s)"; break;
+		case 9: v = r.acc.x; ytitle = "Acceleration(m/s^2)"; break;
+		case 10: v = r.acc.y; ytitle = "Acceleration(m/s^2)"; break;
+		case 11: v = r.acc.z; ytitle = "Acceleration(m/s^2)"; break;
+		case 12: v = r.alpha.x; ytitle = "Ang. Acceleration(rad/s^2)"; break;
+		case 13: v = r.alpha.y; ytitle = "Ang. Acceleration(rad/s^2)"; break;
+		case 14: v = r.alpha.z; ytitle = "Ang. Acceleration(rad/s^2)"; break;
 		}
-		series->append(pmr->time, v);
-		et = pmr->time;
+		series->append(r.time, v);
+		et = r.time;
 		if (max_v < v) max_v = v;
 		if (min_v > v) min_v = v;
  	}
@@ -327,7 +379,7 @@ void xChartWindow::click_waveHeight()
 
 void xChartWindow::changeComboBoxItem(int idx)
 {
-	switch (idx)
+	switch (select_item_index)
 	{
 	case xChartDatabase::MASS_ROOT:
 		body_plot();

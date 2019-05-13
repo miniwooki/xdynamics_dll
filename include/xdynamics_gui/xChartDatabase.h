@@ -8,7 +8,7 @@
 
 inline QStringList get_point_mass_chart_list()
 {
-	QStringList stList;
+	QStringList stList; stList.push_back("None");
 	stList.push_back("PX"); stList.push_back("PY"); stList.push_back("PZ");
 	stList.push_back("VX"); stList.push_back("VY"); stList.push_back("VZ");
 	stList.push_back("RVX"); stList.push_back("RVY"); stList.push_back("RVZ");
@@ -19,9 +19,12 @@ inline QStringList get_point_mass_chart_list()
 
 inline QStringList get_joint_chart_list()
 {
-	QStringList stList;
-	stList.push_back("FX"); stList.push_back("FY"); stList.push_back("FZ");
-	stList.push_back("TX"); stList.push_back("TY"); stList.push_back("TZ");
+	QStringList stList; stList.push_back("None");
+	stList.push_back("LX"); stList.push_back("LY"); stList.push_back("LZ");
+	stList.push_back("IFX"); stList.push_back("IFY"); stList.push_back("IFZ");
+	stList.push_back("ITX"); stList.push_back("ITY"); stList.push_back("ITZ");
+	stList.push_back("JFX"); stList.push_back("JFY"); stList.push_back("JFZ");
+	stList.push_back("JTX"); stList.push_back("JTY"); stList.push_back("JTZ");
 	return stList;
 }
 
@@ -41,7 +44,8 @@ public:
 	QComboBox* plotItemComboBox();
 	QString plotTarget();
 	void upload_mbd_results(xMultiBodyModel* xmbd);
-	QMap<QString, xPointMass::pointmass_result*>& MassResults() { return mass_results; }
+	QMap<QString, QVector<xPointMass::pointmass_result>*>& MassResults() { return mass_results; }
+	QMap<QString, QVector<xKinematicConstraint::kinematicConstraint_result>*>& JointResults() { return constraint_results; }
 
 	private slots:
 	void contextMenu(const QPoint&);
@@ -51,8 +55,8 @@ public:
 private:
 	QTreeWidget *tree;
 	QMap<tRoot, QTreeWidgetItem*> roots;
-	QMap<QString, xPointMass::pointmass_result*> mass_results;
-	QMap<QString, xKinematicConstraint::kinematicConstraint_result*> constraint_results;
+	QMap<QString, QVector<xPointMass::pointmass_result>*> mass_results;
+	QMap<QString, QVector<xKinematicConstraint::kinematicConstraint_result>*> constraint_results;
 	QStringList sLists;
 	tRoot tSelected;
 	QComboBox *plot_item;

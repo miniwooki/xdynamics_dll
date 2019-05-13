@@ -11,7 +11,7 @@ public:
 	enum deviceType{ CPU = 0, GPU };
 	enum MBDSolverType{ MBD_SOLVER = 0, EXPLICIT_RK4 = 1, IMPLICIT_HHT = 2, KINEMATIC = 10 };
 	enum DEMSolverType{ DEM_SOLVER = 0, EXPLICIT_VV = 1 };
-	enum SPHSolverType{ SPH_SOLVER = 0, DEFAULT };
+	enum SPHSolverType{ SPH_SOLVER = 0, INCOMPRESSIBLESPH, WEAKELYSPH };
 	//enum integratorType{ };
 	xSimulation();
 	~xSimulation();

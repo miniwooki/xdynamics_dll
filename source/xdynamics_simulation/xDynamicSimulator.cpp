@@ -2,6 +2,7 @@
 #include "xdynamics_simulation/xIntegratorHHT.h"
 #include "xdynamics_simulation/xIntegratorRK4.h"
 #include "xdynamics_simulation/xIngegratorVV.h"
+#include "xdynamics_simulation/xIncompressibleSPH.h"
 #include "xdynamics_simulation/xKinematicAnalysis.h"
 #include "xdynamics_global.h"
 #include <QtCore/QTime>
@@ -53,7 +54,11 @@ xMultiBodySimulation* xDynamicsSimulator::setupMBDSimulation(xSimulation::MBDSol
 	return xmbd;
 }
 
-bool xDynamicsSimulator::xInitialize(bool exefromgui, double _dt, unsigned int _st, double _et, xMultiBodySimulation* _xmbd, xDiscreteElementMethodSimulation* _xdem)
+bool xDynamicsSimulator::xInitialize(
+	bool exefromgui, double _dt, unsigned int _st, double _et, 
+	xMultiBodySimulation* _xmbd, 
+	xDiscreteElementMethodSimulation* _xdem,
+	xSmoothedParticleHydrodynamicsSimulation* _xsph)
 {
  	if(_dt) xSimulation::dt = _dt;
  	if(_st) xSimulation::st = _st;
@@ -81,6 +86,15 @@ bool xDynamicsSimulator::xInitialize(bool exefromgui, double _dt, unsigned int _
 		case xSimulation::EXPLICIT_VV: xdem = new xIntegratorVV(); break;
 		}
 	}
+	if (_xsph) xsph = _xsph;
+	else
+	{
+		switch (xSimulation::sph_solver_type)
+		{
+		case xSimulation::INCOMPRESSIBLESPH: xsph = new xIncompressibleSPH(); break;
+		case xSimulation::WEAKELYSPH: break;
+		}
+	}
 	if (xmbd)
 	{
 
@@ -104,6 +118,15 @@ bool xDynamicsSimulator::xInitialize(bool exefromgui, double _dt, unsigned int _
 		}
 		//xdem->EnableSaveResultToMemory(exefromgui);
 	}
+	if (xsph)
+	{
+		if (xdm->XSPHModel() && !xsph->Initialized())
+		{
+			xLog::log("An uninitialized smoothed particle hydrodynamics model has been detected.");
+			if (!checkXerror(xsph->Initialize(xdm->XSPHModel())))
+				xLog::log("The initialization of smoothed particle hydrodynamics mode was succeeded.");
+		}
+	}
 // 	xuf::DeleteFileByEXT(xuf::xstring(xModel::path) + xuf::xstring(xModel::name), "bin");
 // 	xuf::DeleteFileByEXT(xuf::xstring(xModel::path) + xuf::xstring(xModel::name), "bpm");
 // 	xuf::DeleteFileByEXT(xuf::xstring(xModel::path) + xuf::xstring(xModel::name), "bkc");
@@ -117,6 +140,8 @@ bool xDynamicsSimulator::savePartData(double ct, unsigned int pt)
 		xmbd->SaveStepResult(pt, ct);
 	if (xdem)
 		xdem->SaveStepResult(pt, ct);
+	if (xsph)
+		xsph->SaveStepResult(pt, ct);
 	return true;
 }
 
@@ -145,6 +170,9 @@ void xDynamicsSimulator::exportPartData()
 
 bool xDynamicsSimulator::xRunSimulationThread(double ct, unsigned int cstep)
 {
+	if (xsph)
+		if (checkXerror(xsph->OneStepSimulation(ct, cstep)))
+			return false;
 	if (xdem)
 		if (checkXerror(xdem->OneStepSimulation(ct, cstep)))
 			return false;
@@ -190,6 +218,9 @@ bool xDynamicsSimulator::xRunSimulation()
 	//	std::cout << cstep << std::endl;
 		ct += xSimulation::dt;
 		xSimulation::setCurrentTime(ct);
+		if (xsph)
+			if (checkXerror(xsph->OneStepSimulation(ct, cstep)))
+				return false;
 		if (xdem)
 			if (checkXerror(xdem->OneStepSimulation(ct, cstep)))
 				return false;

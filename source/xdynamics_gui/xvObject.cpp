@@ -83,7 +83,7 @@ void xvObject::setPosition(float x, float y, float z)
 	pos.x = x; pos.y = y; pos.z = z;
 }
 
-void xvObject::bindPointMassResultsPointer(xPointMass::pointmass_result* _pmrs)
+void xvObject::bindPointMassResultsPointer(QVector<xPointMass::pointmass_result>* _pmrs)
 {
 	pmrs = _pmrs;
 }

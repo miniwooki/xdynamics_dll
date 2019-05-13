@@ -60,6 +60,7 @@ public:
 	void setMCHS(int count, QPointF* points);
 	void setMinMax(int ty, double minx, double maxx, double miny, double maxy);
 	void setAxisBySeries(int ty);
+	void setCurrentLineSeries(QLineSeries* s);
 	//void setAxisXY(int idx);
 
 	void changeSeriesValue(unsigned int x, unsigned int y, double v);
@@ -118,6 +119,7 @@ private:
 	xChartSpline *mchs;
 	QTableWidget *table;
 	xCallOut *m_tooltip;
+	QLineSeries* c_series;
 	QList<xCallOut *> m_callouts;
 	QMap<int, QPointF> minMax_Axis_x;
 	QMap<int, QPointF> minMax_Axis_y;

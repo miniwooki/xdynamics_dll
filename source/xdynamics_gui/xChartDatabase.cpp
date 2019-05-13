@@ -104,7 +104,8 @@ void xChartDatabase::clickItem(QTreeWidgetItem* item, int col)
 		idx = (int)KCONSTRAINT_ROOT;
 		plot_item->addItems(get_joint_chart_list());
 	}
-	emit ClickedItem(idx, sp);
+	emit ClickedItem(idx, tg);
+	plot_item->setCurrentIndex(0);
 // 	{
 // // 		tSelected = SENSOR_ROOT;
 // // 		sLists.push_back(target);

@@ -17,7 +17,7 @@ public:
 	virtual int Initialize(xSmoothedParticleHydrodynamicsModel* _xsph);
 	bool Initialized();
 	virtual int OneStepSimulation(double ct, unsigned int cstep) = 0;
-	QString SaveStepResult(std::fstream& of);
+	QString SaveStepResult(unsigned int pt, double ct);
 
 protected:
 	void clearMemory();
@@ -55,14 +55,6 @@ protected:
 	double *d_mass;
 	bool *d_isFreeSurface;
 	xMaterialType *d_ptype;
-
-	double* d_lhs;
-	double* d_rhs;
-	double* d_conj0;
-	double* d_conj1;
-	double* d_tmp0;
-	double* d_tmp1;
-	double* d_residual;
 };
 
 #endif

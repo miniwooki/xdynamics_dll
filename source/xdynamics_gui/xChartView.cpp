@@ -461,14 +461,23 @@ QScatterSeries* xChartView::createScatterSeries(int idx)
 
 void xChartView::mouseMoveEvent(QMouseEvent *event)
 {
-	if (cmode == xChartView::ONLY_DISPLAY_CHART)
-		return;
+// 	if (cmode == xChartView::ONLY_DISPLAY_CHART)
+// 		return;
 	//	QGraphicsView::mouseMoveEvent(event);
 	if (!(m_chart->series().size()))
 		return;
 	QPointF xy = event->pos();
 	QPointF p = m_chart->mapToValue(event->pos());
-
+	//unsigned int cnt = 0;
+	QPointF rpoint;
+	foreach(QPointF v, c_series->points())
+	{
+		if (p.x() < v.x())
+		{
+			rpoint = v;
+			break;
+		}
+	}
 	if (p.x() <= ax->max() && p.x() >= ax->min() && p.y() <= ay->max() && p.y() >= ay->min())
 	{
 		m_coordHoverX->setVisible(true);
@@ -477,10 +486,12 @@ void xChartView::mouseMoveEvent(QMouseEvent *event)
 		m_lineItemX->setVisible(true);
 		m_lineItemY->setVisible(true);
 
-		qreal x = m_chart->mapToPosition(p).x();
-		qreal y = m_chart->mapToPosition(p).y();
+		qreal x = m_chart->mapToPosition(rpoint).x();
+		qreal y = m_chart->mapToPosition(rpoint).y();
+// 		qreal x = m_chart->mapToPosition(p).x();
+// 		qreal y = m_chart->mapToPosition(p).y();
 
-		m_rectHovered->setRect(x, y - 31, 40, 30);
+		m_rectHovered->setRect(x, y - 31, 60, 30);
 
 		qreal rectX = m_rectHovered->rect().x();
 		qreal rectY = m_rectHovered->rect().y();
@@ -491,14 +502,18 @@ void xChartView::mouseMoveEvent(QMouseEvent *event)
 		m_coordHoverX->setPos(rectX + rectW / 4 - 3, rectY + 1);
 		m_coordHoverY->setPos(rectX + rectW / 4 - 3, rectY + rectH / 2 + 1);
 
-		QPointF xp = m_chart->mapToPosition(QPointF(p.x(), 0));
-		QPointF yp = m_chart->mapToPosition(QPointF(0, p.y()));
-		m_lineItemX->setLine(xp.x(), xy.y(), xy.x(), xp.y()/* - 27*/);
-		m_lineItemY->setLine(xp.x(), xy.y(), yp.x(), xy.y());
+		QPointF xp = m_chart->mapToPosition(QPointF(rpoint.x(), 0));
+		QPointF yp = m_chart->mapToPosition(QPointF(0, rpoint.y()));
+// 		QPointF xp = m_chart->mapToPosition(QPointF(p.x(), 0));
+// 		QPointF yp = m_chart->mapToPosition(QPointF(0, p.y()));
+		m_lineItemX->setLine(xp.x(), y, x, xp.y()/* - 27*/);
+		m_lineItemY->setLine(xp.x(), y, yp.x(), y);
 
 		/* Setting value to displayed with four digit max, float, 1 decimal */
-		m_coordHoverX->setText(QString("%1").arg(p.x(), 5, 'f', 5, '0'));
-		m_coordHoverY->setText(QString("%1").arg(p.y(), 5, 'f', 5, '0'));
+		m_coordHoverX->setText(QString("%1").arg(rpoint.x(), 5, 'f', 5, '0'));
+		m_coordHoverY->setText(QString("%1").arg(rpoint.y(), 5, 'f', 5, '0'));
+// 		m_coordHoverX->setText(QString("%1").arg(p.x(), 5, 'f', 5, '0'));
+// 		m_coordHoverY->setText(QString("%1").arg(p.y(), 5, 'f', 5, '0'));
 
 		if (onMousePress && checked_point_number >= 0 && cmode == REALTIME_EDIT_CHART)
 		{
@@ -627,6 +642,11 @@ void xChartView::setAxisBySeries(int ty)
 	QPointF x_range = minMax_Axis_x[ty];
 	QPointF y_range = minMax_Axis_y[ty];
 	setAxisRange(x_range.x(), x_range.y(), y_range.x(), y_range.y());
+}
+
+void xChartView::setCurrentLineSeries(QLineSeries* s)
+{
+	c_series = s;
 }
 
 // void xChartView::setAxisXY()

@@ -4,6 +4,7 @@
 //#include "xdynamics_decl.h"
 #include "xdynamics_object/xObject.h"
 #include <QtCore/QTextStream>
+#include <QtCore/QVector>
 
 class XDYNAMICS_API xPointMass : public xObject
 {
@@ -73,7 +74,7 @@ public:
 	vector3d HydroMoment() const;
 	vector4d EulerParameterMoment() const;
 
-	pointmass_result* XPointMassResultPointer();
+	QVector<pointmass_result>* XPointMassResultPointer();
 
 	// Declaration operate functions
 	void setupTransformationMatrix();
@@ -125,7 +126,7 @@ protected:
 
 	matrix33d A;			// transformation matrix
 
-	pointmass_result* pmrs;
+	QVector<pointmass_result> pmrs;
 
 private:
 	double* initial_data;

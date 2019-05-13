@@ -18,7 +18,8 @@ public:
 		xdynamicsErrorLinearEquationCalculation = 2,
 		xdynamicsErrorMultiBodyModelInitialization = 3,
 		xdynamicsErrorDiscreteElementMethodModelInitialization = 4,
-		xdynamicsErrorMultiBodyModelRedundantCondition = 5
+		xdynamicsErrorMultiBodyModelRedundantCondition = 5,
+		xdynamicsErrorIncompressibleSPHInitialization = 6
 	};
 	xDynamicsError();
 	~xDynamicsError();

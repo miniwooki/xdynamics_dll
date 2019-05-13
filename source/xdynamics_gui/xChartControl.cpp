@@ -146,6 +146,11 @@ void xChartControl::setPlotProperty(QString nm, QString xt, QString yt, double x
 	vcht->Chart()->axisX()->setTitleText(xt);
 	vcht->Chart()->axisY()->setTitleText(yt);
 	vcht->setAxisXRange(xmin, xmax);
+	if (ymax - ymin < 1e-9)
+	{
+		ymin = -1.0;
+		ymax = 1.0;
+	}
 	vcht->setAxisYRange(ymin, ymax);
 	xChartControlData pcd = { xt, yt, 5, 5, xmin, xmax, ymin, ymax };
 	pcds[nm] = pcd;
