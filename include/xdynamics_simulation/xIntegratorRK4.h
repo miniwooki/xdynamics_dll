@@ -28,7 +28,7 @@ private:
 	int* ccd;
 	xVectorD Prevforce;
 	xVectorD PrevPos;
-	xVectorD PrevVel;
+	xVectorD PrevVel;-9
 	xVectorD k1;
 	xVectorD k2;
 	xVectorD k3;
