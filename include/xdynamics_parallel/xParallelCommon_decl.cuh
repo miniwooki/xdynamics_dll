@@ -36,9 +36,16 @@ inline __device__ double dot(double3& v)
 	return v.x * v.x + v.y * v.y + v.z * v.z;
 }
 
+
+
 inline __device__ double3 operator*(double v1, double3 v2)
 {
 	return make_double3(v1 * v2.x, v1 * v2.y, v1 * v2.z);
+}
+
+inline __device__ double4 operator*(double v1, double4 v2)
+{
+	return make_double4(v1 * v2.x, v1 * v2.y, v1 * v2.z, v1 * v2.w);
 }
 
 inline __device__ double3 operator+(double3& v1, double3& v2)
@@ -46,11 +53,30 @@ inline __device__ double3 operator+(double3& v1, double3& v2)
 	return make_double3(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
 }
 
+inline __device__ double4 operator+(double4& v1, double4& v2)
+{
+	return make_double4(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z, v1.w + v2.w);
+}
+
+inline __device__ double4 normalize(double4& e)
+{
+	double div = sqrt(e.x * e.x + e.y * e.y + e.z * e.z + e.w * e.w);
+	return div * e;
+}
+
 inline __host__ __device__ void operator+=(double3& a, double3 b)
 {
 	a.x += b.x;
 	a.y += b.y;
 	a.z += b.z;
+}
+
+inline __host__ __device__ void operator+=(double4& a, double4 b)
+{
+	a.x += b.x;
+	a.y += b.y;
+	a.z += b.z;
+	a.w += b.w;
 }
 
 inline __device__ double3 operator/(double3& v1, double v2)
@@ -136,6 +162,10 @@ struct pair_data
 	unsigned int j;
 	double ds;
 	double dots;
+	double3 kr;// , kry, krz;
+	double3 ci;// , ciy, ciz;
+	double3 cj;// , cjy, cjx;
+	
 };
 
 struct device_triangle_info

@@ -145,7 +145,7 @@ xParticlePlanesContact* xContactManager::ContactParticlesPlanes()
 	return cpplane;
 }
 
-bool xContactManager::runCollision(double *pos, double *vel, double *omega, double *mass, double *force, double *moment, unsigned int *sorted_id, unsigned int *cell_start, unsigned int *cell_end, unsigned int np)
+bool xContactManager::runCollision(double *pos, double *vel, double* ep, double *omega, double *mass, double *force, double *moment, unsigned int *sorted_id, unsigned int *cell_start, unsigned int *cell_end, unsigned int np)
 {
 	if (xSimulation::Cpu())
 	{
@@ -163,7 +163,7 @@ bool xContactManager::runCollision(double *pos, double *vel, double *omega, doub
 	else if (xSimulation::Gpu())
 	{
 		deviceCollision(
-			pos, vel, omega,
+			pos, vel, ep, omega,
 			mass, force, moment,
 			sorted_id, cell_start, cell_end, np
 			);
@@ -248,7 +248,7 @@ void xContactManager::updateCollisionPair(vector4d* pos, unsigned int* sorted_id
 }
 
 void xContactManager::deviceCollision(
-	double *pos, double *vel, double *omega, 
+	double *pos, double *vel, double* ep, double *omega, 
 	double *mass, double *force, double *moment, 
 	unsigned int *sorted_id, unsigned int *cell_start, 
 	unsigned int *cell_end, unsigned int np)
@@ -267,7 +267,7 @@ void xContactManager::deviceCollision(
 	cu_copy_old_to_new_pair(d_old_pair_count, d_pair_count, d_old_pair_start, d_pair_start, d_old_pppd, d_pppd, nc, np);
 
 	cu_new_particle_particle_contact(
-		pos, vel, omega, mass, force, moment, 
+		pos, vel, ep, omega, mass, force, moment, 
 		d_old_pppd, d_pppd, 
 		d_old_pair_count, d_pair_count,
 		d_old_pair_start, d_pair_start, 

@@ -39,6 +39,7 @@ protected:
 	double *mass;
 	double *inertia;
 	double *pos;
+	double *ep;
 	double *vel;
 	double *acc;
 	double *avel;
@@ -49,6 +50,7 @@ protected:
 	double *dmass;
 	double *diner;
 	double *dpos;
+	double *dep;
 	double *dvel;
 	double *dacc;
 	double *davel;

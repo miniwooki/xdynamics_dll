@@ -52,7 +52,7 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 	allocationMemory();
 
 	memset(pos, 0, sizeof(double) * np * 4);
-	//memset(rot, 0, sizeof(double) * np * 4);
+	memset(ep, 0, sizeof(double) * np * 4);
 	memset(vel, 0, sizeof(double) * np * 3);
 	memset(acc, 0, sizeof(double) * np * 3);
 	memset(avel, 0, sizeof(double) * np * 4);
@@ -69,6 +69,7 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 		force[i * 3 + 0] = mass[i] * xModel::gravity.x;
 		force[i * 3 + 1] = mass[i] * xModel::gravity.y;
 		force[i * 3 + 2] = mass[i] * xModel::gravity.z;
+		ep[i * 4 + 0] = 1.0;
 		if (r > maxRadius)
 			maxRadius = r;
 	}
@@ -259,6 +260,7 @@ void xDiscreteElementMethodSimulation::clearMemory()
 	if (mass) delete[] mass; mass = NULL;
 	if (inertia) delete[] inertia; inertia = NULL;
 	if (pos) delete[] pos; pos = NULL;
+	if (ep) delete[] ep; ep = NULL;
 	//if (rot) delete[] rot; rot = NULL;
 	if (vel) delete[] vel; vel = NULL;
 	if (acc) delete[] acc; acc = NULL;
@@ -271,6 +273,7 @@ void xDiscreteElementMethodSimulation::clearMemory()
 		if (dmass) checkCudaErrors(cudaFree(dmass)); dmass = NULL;
 		if (diner) checkCudaErrors(cudaFree(diner)); diner = NULL;
 		if (dpos) checkCudaErrors(cudaFree(dpos)); dpos = NULL;
+		if (dep) checkCudaErrors(cudaFree(dep)); dep = NULL;
 		//if (drot) checkCudaErrors(cudaFree(drot)); drot = NULL;
 		if (dvel) checkCudaErrors(cudaFree(dvel)); dvel = NULL;
 		if (dacc) checkCudaErrors(cudaFree(dacc)); dacc = NULL;
@@ -287,6 +290,7 @@ void xDiscreteElementMethodSimulation::allocationMemory()
 	mass = new double[np];
 	inertia = new double[np];
 	pos = new double[np * 4];
+	ep = new double[np * 4];
 	//rot = new double[np * 4];
 	vel = new double[np * 3];
 	acc = new double[np * 3];

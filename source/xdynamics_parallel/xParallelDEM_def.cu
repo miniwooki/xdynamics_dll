@@ -165,24 +165,70 @@ void cu_dem_reorderDataAndFindCellStart(
 		np);
 }
 
-__global__ void vv_update_position_kernel(double4* pos, double3* vel, double3* acc, unsigned int np)
+__global__ void vv_update_position_kernel(
+	double4* pos, double3* vel, double3* acc, 
+	double4* ep, double4* ev, double4* ea, unsigned int np)
 {
 	unsigned int id = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
 	if (id >= np)
 		return;
 
 	double3 _p = dcte.dt * vel[id] + dcte.half2dt * acc[id];
+	double4 _e = dcte.dt * ev[id] + dcte.half2dt * ea[id];
+	_e = normalize(_e);
 	pos[id].x += _p.x;
 	pos[id].y += _p.y;
 	pos[id].z += _p.z;
+	ep[id] = _e;
+}
 
+__device__ double4 calculateInertiaForce(
+	double J, double v0, double v1, double v2, double v3,
+	double e0, double e1, double e2, double e3)
+{
+	double f0 = 8 * J*v1*(e0*v1 - e1*v0 - e2*v3 + e3*v2) + 8 * J*v2*(e0*v2 - e2*v0 + e1*v3 - e3*v1) + 8 * J*v3*(e0*v3 - e1*v2 + e2*v1 - e3*v0);
+	double f1 = 8 * J*v3*(e0*v2 - e2*v0 + e1*v3 - e3*v1) - 8 * J*v2*(e0*v3 - e1*v2 + e2*v1 - e3*v0) - 8 * J*v0*(e0*v1 - e1*v0 - e2*v3 + e3*v2);
+	double f2 = 8 * J*v1*(e0*v3 - e1*v2 + e2*v1 - e3*v0) - 8 * J*v0*(e0*v2 - e2*v0 + e1*v3 - e3*v1) - 8 * J*v3*(e0*v1 - e1*v0 - e2*v3 + e3*v2);
+	double f3 = 8 * J*v2*(e0*v1 - e1*v0 - e2*v3 + e3*v2) - 8 * J*v1*(e0*v2 - e2*v0 + e1*v3 - e3*v1) - 8 * J*v0*(e0*v3 - e1*v2 + e2*v1 - e3*v0);
+	double J4 = 4.0 * J;
+	double e0s = J4 * e0 * e0;
+	double e1s = J4 * e1 * e1;
+	double e2s = J4 * e2 * e2;
+	double e3s = J4 * e3 * e3;
+	double a00 = e1s + e2s + e3s;	double a01 = -J4 * e0 * e1;		double a02 = -J4 * e0 * e2;		double a03 = -J4 * e0 * e3;
+	double a10 = -J4 * e0 * e1;		double a11 = e0s + e2s + e3s;	double a12 = -J4 * e1 * e2;		double a13 = -J4 * e1 * e3;
+	double a20 = -J4 * e0 * e2;		double a21 = -J4 * e1 * e2;		double a22 = e0s + e1s + e3s;	double a23 = -J4 * e2 * e3;
+	double a30 = -J4 * e0 * e3;		double a31 = -J4 * e1 * e3;		double a32 = -J4 * e2 * e3;		double a33 = e0s + e1s + e2s;
+	double det = 1.0 / (a00*a11*a22*a33 - a00*a11*a23*a32 - a00*a12*a21*a33 + a00*a12*a23*a31 + a00*a13*a21*a32 - a00*a13*a22*a31 - a01*a10*a22*a33 + a01*a10*a23*a32 + a01*a12*a20*a33 - a01*a12*a23*a30 - a01*a13*a20*a32 + a01*a13*a22*a30 + a02*a10*a21*a33 - a02*a10*a23*a31 - a02*a11*a20*a33 + a02*a11*a23*a30 + a02*a13*a20*a31 - a02*a13*a21*a30 - a03*a10*a21*a32 + a03*a10*a22*a31 + a03*a11*a20*a32 - a03*a11*a22*a30 - a03*a12*a20*a31 + a03*a12*a21*a30);
+	double ia00 = (a11*a22*a33 - a11*a23*a32 - a11*a23*a32 + a12*a23*a31 + a13*a21*a32 - a13*a22*a31) * det;
+	double ia01 = -(a01*a22*a33 - a01*a23*a32 - a02*a21*a33 + a02*a23*a31 + a03*a21*a32 - a03*a22*a31) * det;
+	double ia02 = (a01*a12*a33 - a01*a13*a32 - a02*a11*a33 + a02*a13*a31 + a03*a11*a32 - a03*a12*a31) * det;
+	double ia03 = -(a01*a12*a23 - a01*a13*a22 - a02*a11*a23 + a02*a13*a21 + a03*a11*a22 - a03*a12*a21) * det;
+	double ia10 = -(a10*a22*a33 - a10*a23*a32 - a12*a20*a33 + a12*a23*a30 + a13*a20*a32 - a13*a22*a30) * det;
+	double ia11 = (a00*a22*a33 - a00*a23*a32 - a02*a20*a33 + a02*a23*a30 + a03*a20*a32 - a03*a22*a30) * det;
+	double ia12 = -(a00*a12*a33 - a00*a13*a32 - a02*a10*a33 + a02*a13*a30 + a03*a10*a32 - a03*a12*a30) * det;
+	double ia13 = (a00*a12*a23 - a00*a13*a22 - a02*a10*a23 + a02*a13*a20 + a03*a10*a22 - a03*a12*a20) * det;
+	double ia20 = (a10*a21*a33 - a10*a23*a31 - a11*a20*a33 + a11*a23*a30 + a13*a20*a31 - a13*a21*a30) * det;
+	double ia21 = -(a00*a21*a33 - a00*a23*a31 - a01*a20*a33 + a01*a23*a30 + a03*a20*a31 - a03*a21*a30) * det;
+	double ia22 = (a00*a11*a33 - a00*a13*a31 - a01*a10*a33 + a01*a13*a30 + a03*a10*a31 - a03*a11*a30) * det;
+	double ia23 = -(a00*a11*a23 - a00*a13*a21 - a01*a10*a23 + a01*a13*a20 + a03*a10*a21 - a03*a11*a20) * det;
+	double ia30 = -(a10*a21*a32 - a10*a22*a31 - a11*a20*a32 + a11*a22*a30 + a12*a20*a31 - a12*a21*a30) * det;
+	double ia31 = (a00*a21*a32 - a00*a22*a31 - a01*a20*a32 + a01*a22*a30 + a02*a20*a31 - a02*a21*a30) * det;
+	double ia32 = -(a00*a11*a32 - a00*a12*a31 - a01*a10*a32 + a01*a12*a30 + a02*a10*a31 - a02*a11*a30) * det;
+	double ia33 = (a00*a11*a22 - a00*a12*a21 - a01*a10*a22 + a01*a12*a20 + a02*a10*a21 - a02*a11*a20) * det;
+	return make_double4(
+		ia00 * f0 + ia01 * f1 + ia02 * f2 + ia03 * f3,
+		ia10 * f0 + ia11 * f1 + ia12 * f2 + ia13 * f3,
+		ia20 * f0 + ia21 * f1 + ia22 * f2 + ia23 * f3,
+		ia30 * f0 + ia31 * f1 + ia32 * f2 + ia33 * f3);
 }
 
 __global__ void vv_update_velocity_kernel(
 	double3* vel,
 	double3* acc,
-	double3* omega,
-	double3* alpha,
+	double4* ep,
+	double4* omega,
+	double4* alpha,
 	double3* force,
 	double3* moment,
 	double* mass,
@@ -195,19 +241,16 @@ __global__ void vv_update_velocity_kernel(
 	double m = mass[id];
 	double3 v = vel[id];
 	//double3 L = acc[id];
-	double3 av = omega[id];
+	double4 e = ep[id];
+	double4 av = omega[id];
 	//double3 aa = alpha[id];
 	double3 a = (1.0 / m) * force[id];
-	double3 in = (1.0 / iner[id]) * moment[id];
+	double4 in = calculateInertiaForce(iner[id], e.x, e.y, e.z, e.w, av.x, av.y, av.z, av.w);
+	//double3 in = (1.0 / iner[id]) * moment[id];
+
 	v += 0.5 * dcte.dt * (acc[id] + a);
 	av += 0.5 * dcte.dt * (alpha[id] + in);// aa;
-	//L = (1.0 / m) * force[id];
-	//aa = (1.0 / in) * moment[id];
-	//v += 0.5 * dcte.dt * L;
-	//av += 0.5 * dcte.dt * aa;
-	// 	if(id == 0){
-	// 		printf("Velocity --- > id = %d -> [%f.6, %f.6, %f.6]\n", id, v.x, v.y, v.z);
-	// 	}
+
 	force[id] = m * dcte.gravity;
 	moment[id] = make_double3(0.0, 0.0, 0.0);
 	vel[id] = v;
@@ -216,7 +259,7 @@ __global__ void vv_update_velocity_kernel(
 	alpha[id] = in;
 }
 
-void vv_update_position(double *pos, double *vel, double *acc, unsigned int np)
+void vv_update_position(double *pos, double *vel, double *acc, double *ep, double *ev, double *ea, unsigned int np)
 {
 	unsigned int numBlocks, numThreads;
 	computeGridSize(np, 512, numBlocks, numThreads);
@@ -224,18 +267,25 @@ void vv_update_position(double *pos, double *vel, double *acc, unsigned int np)
 		(double4 *)pos,
 		(double3 *)vel,
 		(double3 *)acc,
+		(double4 *)ep,
+		(double4 *)ev,
+		(double4 *)ea,
 		np);
 }
 
-void vv_update_velocity(double *vel, double *acc, double *omega, double *alpha, double *force, double *moment, double* mass, double* iner, unsigned int np)
+void vv_update_velocity(
+	double *vel, double *acc, double *ep, 
+	double *ev, double *ea, double *force, double *moment, 
+	double* mass, double* iner, unsigned int np)
 {
 	unsigned int numBlocks, numThreads;
 	computeGridSize(np, 512, numBlocks, numThreads);
 	vv_update_velocity_kernel << < numBlocks, numThreads >> >(
 		(double3 *)vel,
 		(double3 *)acc,
-		(double3 *)omega,
-		(double3 *)alpha,
+		(double4 *)ep,
+		(double4 *)ev,
+		(double4 *)ea,
 		(double3 *)force,
 		(double3 *)moment,
 		mass,
@@ -560,6 +610,32 @@ __device__ double cohesionForce(
 	return cf;
 }
 
+__device__ double3 toGlobal(double3& v, double4& ep)
+{
+	double3 r0 = make_double3(2.0 * (ep.x*ep.x + ep.y*ep.y - 0.5), 2.0 * (ep.y*ep.z - ep.x*ep.w), 2.0 * (ep.y*ep.w + ep.x*ep.z));
+	double3 r1 = make_double3(2.0 * (ep.y*ep.z + ep.x*ep.w), 2.0 * (ep.x*ep.x + ep.z*ep.z - 0.5), 2.0 * (ep.z*ep.w - ep.x*ep.y));
+	double3 r2 = make_double3(2.0 * (ep.y*ep.w - ep.x*ep.z), 2.0 * (ep.z*ep.w + ep.x*ep.y), 2.0 * (ep.x*ep.x + ep.w*ep.w - 0.5));
+	return make_double3
+		(
+		r0.x * v.x + r0.y * v.y + r0.z * v.z,
+		r1.x * v.x + r1.y * v.y + r1.z * v.z,
+		r2.x * v.x + r2.y * v.y + r2.z * v.z
+		);
+}
+
+__device__ double3 toLocal(double3& v, double4& ep)
+{
+	double3 r0 = make_double3(2.0 * (ep.x*ep.x + ep.y*ep.y - 0.5), 2.0 * (ep.y*ep.z - ep.x*ep.w), 2.0 * (ep.y*ep.w + ep.x*ep.z));
+	double3 r1 = make_double3(2.0 * (ep.y*ep.z + ep.x*ep.w), 2.0 * (ep.x*ep.x + ep.z*ep.z - 0.5), 2.0 * (ep.z*ep.w - ep.x*ep.y));
+	double3 r2 = make_double3(2.0 * (ep.y*ep.w - ep.x*ep.z), 2.0 * (ep.z*ep.w + ep.x*ep.y), 2.0 * (ep.x*ep.x + ep.w*ep.w - 0.5));
+	return make_double3
+		(
+		r0.x * v.x + r1.x * v.y + r2.x * v.z,
+		r0.y * v.x + r1.y * v.y + r2.y * v.z,
+		r0.z * v.x + r1.z * v.y + r2.z * v.z
+		);
+}
+
 __device__ void HMCModel(
 	device_force_constant c, double ir, double jr, double Ei, double Ej, double pri, double prj, double coh,
 	double rcon, double cdist, double3 iomega,
@@ -825,6 +901,14 @@ __device__ bool checkOverlab(int3 ctype, double3 p, double3 c, double3 u0, doubl
 	return b_over;
 }
 
+__device__ double3 ev2omega(double4& e, double4& ev)
+{
+	return make_double3(
+		ev.y*e.x - ev.x*e.y + ev.z*e.w - ev.w*e.z,
+		ev.z*e.x - ev.x*e.z - ev.y*e.w + ev.w*e.y,
+		ev.y*e.z - ev.x*e.w - ev.z*e.y + ev.w*e.x);
+}
+
 __global__ void calculate_particle_triangle_contact_count(
 	device_triangle_info* dpi, double4 *pos, pair_data* old_pppd,
 	unsigned int* old_count, unsigned int* count,
@@ -971,8 +1055,25 @@ __global__ void copy_old_to_new_pair(
 	}
 }
 
+__device__ double3 calculate_rolling_resistance(
+	double3& _kr, double3& xc1, double3& xc2, double3& pi, double3& pj, double3& xa, double3& n,
+	double Fn, double mu, double kt, double3& M)
+{
+	double3 dkr = 0.5 * (xc2 + xc1) - xa;
+	double3 khat = _kr + dkr;
+	double3 kr = khat - dot(khat, n) * n;
+	bool limit = length(kr) > 1.0 * mu * (Fn / kt);
+	if (limit)
+	{
+		kr = (1.0 * mu * Fn / kt) * (kr / length(kr));
+	}
+	double3 _M = cross(xa - pi, kt*kr);
+	M += _M;
+	return kr;
+}
+
 __global__ void new_particle_particle_contact_kernel(
-	double4* pos, double3* vel, double3* omega,
+	double4* pos, double4* ep, double3* vel, double4* ev,
 	double* mass, double3* force, double3* moment, pair_data *old_pairs, pair_data *pairs,
 	unsigned int* old_count, unsigned int* count, unsigned int* old_sidx, unsigned int* sidx, int2* type_count, device_contact_property* cp,
 	unsigned int* sorted_index, unsigned int* cstart, unsigned int* cend, unsigned int _np)
@@ -982,9 +1083,12 @@ __global__ void new_particle_particle_contact_kernel(
 	if (id >= np)
 		return;
 	double4 ipos = pos[id];
+	double3 pos3 = make_double3(ipos.x, ipos.y, ipos.z);
 	double4 jpos = make_double4(0, 0, 0, 0);
+	double4 epi = ep[id];
+	double4 epj = make_double4(0.0, 0.0, 0.0, 0.0);
 	double3 ivel = vel[id];
-	double3 iomega = omega[id];
+	double3 iomega = ev2omega(ep[id], ev[id]);// [id];
 	double3 jvel = make_double3(0.0, 0.0, 0.0);
 	double3 jomega = make_double3(0.0, 0.0, 0.0);
 	double3 sumF = make_double3(0.0, 0.0, 0.0);
@@ -992,7 +1096,7 @@ __global__ void new_particle_particle_contact_kernel(
 	double3 Ft = make_double3(0, 0, 0);
 	double3 Fn = make_double3(0, 0, 0);// [id] * dcte.gravity;
 	double3 M = make_double3(0, 0, 0);
-	int3 gridPos = calcGridPosD(make_double3(ipos.x, ipos.y, ipos.z));
+	int3 gridPos = calcGridPosD(pos3);
 	double ir = ipos.w; double jr = 0;
 	double im = mass[id]; double jm = 0.0;
 	int3 neighbour_pos = make_int3(0, 0, 0);
@@ -1024,13 +1128,19 @@ __global__ void new_particle_particle_contact_kernel(
 						if (id == k || k >= np)
 							continue;
 						jpos = pos[k];
+						epj = ep[k];
 						jr = jpos.w;
+						double3 pos3j = make_double3(jpos.x, jpos.y, jpos.z);
 						double3 rp = make_double3(jpos.x - ipos.x, jpos.y - ipos.y, jpos.z - ipos.z);
 						double dist = length(rp);
 						double cdist = (ir + jr) - dist;
 						if (cdist > 0)
 						{
-							pair = { true, 1, id, k, 0.0, 0.0 };
+							double3 unit = rp / dist;
+							double3 _c = pos3 - ir * unit;
+							double3 Xc0 = toLocal(_c, epi);
+							double3 Xc1 = toLocal(_c, epj);
+							pair = { true, 1, id, k, 0.0, 0.0, make_double3(0.0, 0.0, 0.0), Xc0, Xc1 };
 							for (unsigned int j = 0; j < old_cnt; j++)
 							{
 								pair_data* pd = old_pairs + (old_sid + j);
@@ -1041,10 +1151,10 @@ __global__ void new_particle_particle_contact_kernel(
 								}
 							}
 							jvel = vel[k];
-							jomega = omega[k];
+							jomega = ev2omega(ep[k], ev[k]);
 							jm = mass[k];
 							double rcon = ipos.w - 0.5 * cdist;
-							double3 unit = rp / dist;
+							
 							double3 rv = jvel + cross(jomega, -jpos.w * unit) - (ivel + cross(iomega, ipos.w * unit));
 							device_force_constant c = getConstant(
 								1, ipos.w, jpos.w, im, jm, cp->Ei, cp->Ej,
@@ -1054,6 +1164,9 @@ __global__ void new_particle_particle_contact_kernel(
 								c, ipos.w, jpos.w, cp->Ei, cp->Ej, cp->pri, cp->prj,
 								cp->coh, rcon, cdist, iomega, pair.ds, pair.dots,
 								rv, unit, Ft, Fn, M);
+							calculate_rolling_resistance(
+								pair.kr, toGlobal(pair.ci, epi), toGlobal(pair.cj, epj), pos3, 
+								pos3j, _c, unit, length(Fn), c.mu, c.ks, M);
 							sumF += Fn + Ft;
 							sumM += M;
 							pairs[sid + tcnt++] = pair;
@@ -1146,7 +1259,7 @@ __global__ void new_particle_polygon_object_conatct_kernel(
 									continue;
 								*(&(ctype.x) + t) += 1;
 								//previous_cpt = cpt;
-								pair = { true, 2, id, k, 0.0, 0.0 };
+								pair = { true, 2, id, k, 0.0, 0.0, Fn, Fn, Fn };
 								for (unsigned int j = 0; j < old_cnt; j++)
 								{
 									pair_data* pd = old_pairs + old_sid + j;
@@ -1222,7 +1335,7 @@ __global__ void new_particle_plane_contact(
 	unsigned int cur_cnt = 0;
 	for (unsigned int i = 0; i < nplanes; i++)
 	{
-		ppp = { false, 0, id, i + np, 0.0, 0.0 };
+		ppp = { false, 0, id, i + np, 0.0, 0.0, Fn, Fn, Fn };
 		for (unsigned int j = 0; j < old_cnt; j++)
 		{
 			pair_data* pair = old_pairs + old_sid + j;
@@ -1259,18 +1372,7 @@ __global__ void new_particle_plane_contact(
 	type_count[id].y = cur_cnt;
 }
 
-__device__ double3 toGlobal(double3& v, double4& ep)
-{
-	double3 r0 = make_double3(2.0 * (ep.x*ep.x + ep.y*ep.y - 0.5), 2.0 * (ep.y*ep.z - ep.x*ep.w), 2.0 * (ep.y*ep.w + ep.x*ep.z));
-	double3 r1 = make_double3(2.0 * (ep.y*ep.z + ep.x*ep.w), 2.0 * (ep.x*ep.x + ep.z*ep.z - 0.5), 2.0 * (ep.z*ep.w - ep.x*ep.y));
-	double3 r2 = make_double3(2.0 * (ep.y*ep.w - ep.x*ep.z), 2.0 * (ep.z*ep.w + ep.x*ep.y), 2.0 * (ep.x*ep.x + ep.w*ep.w - 0.5));
-	return make_double3
-		(
-		r0.x * v.x + r0.y * v.y + r0.z * v.z,
-		r1.x * v.x + r1.y * v.y + r1.z * v.z,
-		r2.x * v.x + r2.y * v.y + r2.z * v.z
-		);
-}
+
 
 __global__ void updatePolygonObjectData_kernel(
 	device_mesh_mass_info *dpmi, double* vList,
@@ -1411,7 +1513,7 @@ void cu_copy_old_to_new_pair(
 }
 
 void cu_new_particle_particle_contact(
-	double* pos, double* vel, double* omega, 
+	double* pos, double* ep, double* vel, double* ev, 
 	double* mass, double* force, double* moment,
 	pair_data* old_pairs, pair_data* pairs, 
 	unsigned int *old_pair_count, unsigned int* pair_count, 
@@ -1423,8 +1525,9 @@ void cu_new_particle_particle_contact(
 	computeGridSize(np, 512, numBlocks, numThreads);
 	new_particle_particle_contact_kernel << < numBlocks, numThreads >> >(
 		(double4 *)pos,
+		(double4 *)ep,
 		(double3 *)vel,
-		(double3 *)omega,
+		(double4 *)ev,
 		mass,
 		(double3 *)force,
 		(double3 *)moment,

@@ -23,48 +23,50 @@ int xIntegratorVV::OneStepSimulation(double ct, unsigned int cstep)
 // 	if (per_np && !((cstep - 1) % per_np) && np < md->ParticleManager()->Np())
 // 		md->ParticleManager()->OneByOneCreating() ? np += md->ParticleManager()->NextCreatingOne(np) : np += md->ParticleManager()->NextCreatingPerGroup();
 	//std::cout << "cstep : " << cstep << " ";
-	this->updatePosition(dpos, dvel, dacc, np);
+	this->updatePosition(dpos, dvel, dacc, dep, davel, daacc, np);
 	dtor->detection(dpos, (nPolySphere ? xcm->ContactParticlesMeshObjects()->SphereData() : NULL), np, nPolySphere);
 	if (xcm)
 	{
 		xcm->runCollision(
-			dpos, dvel, davel,
+			dpos, dvel, dep, davel,
 			dmass, dforce, dmoment,
 			dtor->sortedID(), dtor->cellStart(), dtor->cellEnd(), np);
 	}
-	this->updateVelocity(dvel, dacc, davel, daacc, dforce, dmoment, dmass, diner, np);
+	this->updateVelocity(dvel, dacc, dep, davel, daacc, dforce, dmoment, dmass, diner, np);
 	return 0;
 }
 
-void xIntegratorVV::updatePosition(double* dpos, double* dvel, double* dacc, unsigned int np)
+void xIntegratorVV::updatePosition(
+	double* dpos, double* dvel, double* dacc,
+	double* ep, double* ev, double* ea, unsigned int np)
 {
 	if (xSimulation::Gpu())
-		vv_update_position(dpos, dvel, dacc, np);
+		vv_update_position(dpos, dvel, dacc, ep, ev, ea, np);
 	else
 	{
-		vector4d* p = (vector4d*)dpos;
-	//	euler_parameters* r = (euler_parameters*)drot;
-		vector3d* v = (vector3d*)dvel;
-		vector3d* a = (vector3d*)dacc;
-	//	euler_parameters* rv = (euler_parameters*)davel;
-	//////	euler_parameters* ra = (euler_parameters*)daacc;
-		double sqt_dt = 0.5 * xSimulation::dt * xSimulation::dt;
-		for (unsigned int i = 0; i < np; i++){
-			vector3d old_p = new_vector3d(p[i].x, p[i].y, p[i].z);
-			vector3d new_p = old_p + xSimulation::dt * v[i] + sqt_dt * a[i];
-			p[i] = new_vector4d(new_p.x, new_p.y, new_p.z, p[i].w);
-			//r[i] = r[i] + xSimulation::dt * rv[i] + sqt_dt * ra[i];
-		}
+// 		vector4d* p = (vector4d*)dpos;
+// 	//	euler_parameters* r = (euler_parameters*)drot;
+// 		vector3d* v = (vector3d*)dvel;
+// 		vector3d* a = (vector3d*)dacc;
+// 	//	euler_parameters* rv = (euler_parameters*)davel;
+// 	//////	euler_parameters* ra = (euler_parameters*)daacc;
+// 		double sqt_dt = 0.5 * xSimulation::dt * xSimulation::dt;
+// 		for (unsigned int i = 0; i < np; i++){
+// 			vector3d old_p = new_vector3d(p[i].x, p[i].y, p[i].z);
+// 			vector3d new_p = old_p + xSimulation::dt * v[i] + sqt_dt * a[i];
+// 			p[i] = new_vector4d(new_p.x, new_p.y, new_p.z, p[i].w);
+// 			//r[i] = r[i] + xSimulation::dt * rv[i] + sqt_dt * ra[i];
+// 		}
 	}
 }
 
 void xIntegratorVV::updateVelocity(
-	double *dvel, double* dacc, double *domega, 
+	double *dvel, double* dacc, double* ep, double *domega, 
 	double* dalpha, double *dforce, double* dmoment, 
 	double *dmass, double* dinertia, unsigned int np)
 {
 	if (xSimulation::Gpu())
-		vv_update_velocity(dvel, dacc, domega, dalpha, dforce, dmoment, dmass, dinertia, np);
+		vv_update_velocity(dvel, dacc, ep, domega, dalpha, dforce, dmoment, dmass, dinertia, np);
 	else
 	{
 		double inv_m = 0;

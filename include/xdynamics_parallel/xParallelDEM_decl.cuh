@@ -95,8 +95,8 @@
 
 //void XDYNAMICS_API setSymbolicParameter(device_parameters *h_paras);
 void XDYNAMICS_API setDEMSymbolicParameter(device_dem_parameters* h_paras);
-void XDYNAMICS_API vv_update_position(double *pos, double *vel, double *acc, unsigned int np);
-void XDYNAMICS_API vv_update_velocity(double *vel, double *acc, double *omega, double *alpha, double *force, double *moment, double* mass, double* iner, unsigned int np);
+void XDYNAMICS_API vv_update_position(double *pos, double *vel, double *acc, double* ep, double* ev, double* ea, unsigned int np);
+void XDYNAMICS_API vv_update_velocity(double *vel, double *acc, double *ep, double *ev, double *ea, double *force, double *moment, double* mass, double* iner, unsigned int np);
 
 void XDYNAMICS_API cu_dem_calculateHashAndIndex(unsigned int* hash, unsigned int* index, double *pos, unsigned int np);
 void XDYNAMICS_API cu_dem_calculateHashAndIndexForPolygonSphere(
@@ -179,7 +179,7 @@ void XDYNAMICS_API cu_new_particle_polygon_object_contact(
 	device_contact_property *cp, unsigned int _np);
 
 void XDYNAMICS_API cu_new_particle_particle_contact(
-	double* pos, double* vel, double* omega, double* mass, double* force, double* moment, 
+	double* pos, double* vel, double* ep, double* omega, double* mass, double* force, double* moment, 
 	pair_data* old_pairs, pair_data* pairs, 
 	unsigned int* old_pair_count, unsigned int* pair_count, 
 	unsigned int *old_pair_start, unsigned int *pair_start, 

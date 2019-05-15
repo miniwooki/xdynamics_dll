@@ -14,12 +14,13 @@ public:
 	virtual int OneStepSimulation(double ct, unsigned int cstep);
 
 private:
-	void updatePosition(double* dpos, double* dvel, double* dacc, unsigned int np);
+	void updatePosition(double* dpos, double* dvel, double* dacc, 
+		double* ep, double* ev, double* ea, unsigned int np);
 	void updateVelocity(
-		double *dvel, double* dacc
-		, double *domega, double* dalpha
-		, double *dforce, double* dmoment
-		, double *dmass, double* dinertia, unsigned int np);
+		double *dvel, double* dacc, double* ep, 
+		double *domega, double* dalpha, 
+		double *dforce, double* dmoment, 
+		double *dmass, double* dinertia, unsigned int np);
 };
 
 #endif

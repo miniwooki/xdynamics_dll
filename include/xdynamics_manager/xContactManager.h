@@ -38,7 +38,7 @@ public:
 	xParticlePlanesContact* ContactParticlesPlanes();
 
 	bool runCollision(
-		double *pos, double *vel,
+		double *pos, double *vel, double* ep,
 		double *omega, double *mass,
 		double *force, double *moment,
 		unsigned int *sorted_id,
@@ -52,7 +52,7 @@ public:
 private:
 	void updateCollisionPair(vector4d* pos, unsigned int* sorted_id, unsigned int* cell_start, unsigned int* cell_end, unsigned int np);
 	void deviceCollision(
-		double *pos, double *vel,
+		double *pos, double *vel, double* ep,
 		double *omega, double *mass,
 		double *force, double *moment,
 		unsigned int *sorted_id,
