@@ -1286,7 +1286,7 @@ __global__ void new_particle_polygon_object_conatct_kernel(
 									continue;
 								*(&(ctype.x) + t) += 1;
 								//previous_cpt = cpt;
-								pair = { true, 2, id, k, 0.0, 0.0, Fn, Xc0, Fn };
+								pair = { true, 2, id, k, 0.0, 0.0, Fn, Xc0, cpt };
 								for (unsigned int j = 0; j < old_cnt; j++)
 								{
 									pair_data* pd = old_pairs + old_sid + j;
@@ -1308,7 +1308,7 @@ __global__ void new_particle_polygon_object_conatct_kernel(
 									cmp.pri, cmp.prj, cmp.Gi, cmp.Gj,
 									cmp.rest, cmp.fric, cmp.rfric, cmp.sratio);
 								double3 xc0 = ipos + toGlobal(pair.ci, epi);
-								double3 xc1 = ipos + toGlobal(Xc0, epi);
+								double3 xc1 = pair.cj;// ipos + toGlobal(Xc0, epi);
 								DHSModel(
 									c, ir, 0, cp->Ei, cp->Ej, cp->pri, cp->prj,
 									cp->coh, rcon, cdist, iomega, pair.ds, pair.dots,
@@ -1375,7 +1375,7 @@ __global__ void new_particle_plane_contact(
 		{
 			double3 cpt = ipos3 + ipos.w * unit;
 			double3 Xc0 = toLocal(cpt - ipos3, epi);
-			ppp = { false, 0, id, i + np, 0.0, 0.0, Fn, Xc0, Fn };
+			ppp = { false, 0, id, i + np, 0.0, 0.0, Fn, Xc0, cpt };
 			for (unsigned int j = 0; j < old_cnt; j++)
 			{
 				pair_data* pair = old_pairs + old_sid + j;
@@ -1395,7 +1395,7 @@ __global__ void new_particle_plane_contact(
 				cp->pri, cp->prj, cp->Gi, cp->Gj,
 				cp->rest, cp->fric, cp->rfric, cp->sratio);
 			double3 xc0 = ipos3 + toGlobal(ppp.ci, epi);
-			double3 xc1 = ipos3 + toGlobal(Xc0, epi);// make_double3(0.0, 0.0, 0.0);
+			double3 xc1 = ppp.cj;
 			//double3 dxc = toGlobal(ppp.ci - Xc0, epi);
 			DHSModel(
 				c, ipos.w, 0, 0, 0, 0, 0, cp->coh, rcon, cdist,
