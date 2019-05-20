@@ -31,11 +31,13 @@ public:
 	double Restitution() const;
 	double Friction() const;
 	double StiffnessRatio() const;
+	double RollingFactor() const;
 	void setContactForceModel(xContactForceModelType xcfmt);
 	void setCohesion(double d);
 	void setRestitution(double d);
 	void setFriction(double d);
 	void setStiffnessRatio(double d);
+	void setRollingFactor(double d);
 	//contactForce_type ForceMethod() const { return f_type; }
 	xMaterialPair MaterialPropertyPair() const;
 	xContactForceModelType ContactForceModel() const;
@@ -88,6 +90,8 @@ protected:
 	double restitution;
 	double stiffnessRatio;
 	double friction;
+	double rolling_factor;
 };
+
 
 #endif

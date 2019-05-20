@@ -65,7 +65,7 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 	for (unsigned int i = 0; i < np; i++)
 	{
 		double r = pos[i * 4 + 3];
-		//vel[0] = -0.1;
+		vel[0] = -0.1;
 		force[i * 3 + 0] = mass[i] * xModel::gravity.x;
 		force[i * 3 + 1] = mass[i] * xModel::gravity.y;
 		force[i * 3 + 2] = mass[i] * xModel::gravity.z;
@@ -94,7 +94,7 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 	if (xSimulation::Gpu())
 	{
 		checkCudaErrors(cudaMemcpy(dpos, pos, sizeof(double) * np * 4, cudaMemcpyHostToDevice));
-		//checkCudaErrors(cudaMemcpy(drot, rot, sizeof(double) * np * 4, cudaMemcpyHostToDevice));
+		checkCudaErrors(cudaMemcpy(dep, ep, sizeof(double) * np * 4, cudaMemcpyHostToDevice));
 		checkCudaErrors(cudaMemcpy(dvel, vel, sizeof(double) * np * 3, cudaMemcpyHostToDevice));
 		checkCudaErrors(cudaMemcpy(dacc, acc, sizeof(double) * np * 3, cudaMemcpyHostToDevice));
 		checkCudaErrors(cudaMemcpy(davel, avel, sizeof(double) * np * 4, cudaMemcpyHostToDevice));
@@ -140,6 +140,7 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 	else
 	{
 		dpos = pos;
+		dep = ep;
 		//drot = rot;
 		dvel = vel;
 		dacc = acc;
@@ -304,7 +305,7 @@ void xDiscreteElementMethodSimulation::allocationMemory()
 		checkCudaErrors(cudaMalloc((void**)&dmass, sizeof(double) * np));
 		checkCudaErrors(cudaMalloc((void**)&diner, sizeof(double) * np));
 		checkCudaErrors(cudaMalloc((void**)&dpos, sizeof(double) * np * 4));
-		//checkCudaErrors(cudaMalloc((void**)&drot, sizeof(double) * np * 4));
+		checkCudaErrors(cudaMalloc((void**)&dep, sizeof(double) * np * 4));
 		checkCudaErrors(cudaMalloc((void**)&dvel, sizeof(double) * np * 3));
 		checkCudaErrors(cudaMalloc((void**)&dacc, sizeof(double) * np * 3));
 		checkCudaErrors(cudaMalloc((void**)&davel, sizeof(double) * np * 4));

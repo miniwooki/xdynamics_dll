@@ -189,6 +189,7 @@ xContactParameterData xXLSReader::ReadContactData(std::string& _name, int r, int
 	d.rto = sheet->readNum(r, c++);
 	d.mu = sheet->readNum(r, c++);
 	d.coh = sheet->readNum(r, c++);
+	d.rf = sheet->readNum(r, c++);
 	return d;
 }
 

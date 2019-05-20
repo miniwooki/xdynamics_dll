@@ -174,7 +174,7 @@ void XDYNAMICS_API cu_new_particle_polygon_object_contact(
 	pair_data *old_pairs, pair_data *pairs,
 	unsigned int* old_count, unsigned int* count,
 	unsigned int* old_sidx, unsigned int* sidx, int* type_count,
-	double *pos, double *vel, double *omega, double *force, double *moment,
+	double *pos, double *vel, double* ep, double *omega, double *force, double *moment,
 	double* mass, unsigned int* sorted_index, unsigned int* cstart, unsigned int* cend,
 	device_contact_property *cp, unsigned int _np);
 
@@ -195,7 +195,7 @@ void XDYNAMICS_API cu_calculate_particle_plane_contact_count(
 unsigned int XDYNAMICS_API cu_sumation_contact_count(unsigned int* count, unsigned int np);
 
 void XDYNAMICS_API cu_copy_old_to_new_pair(unsigned int *old_count, unsigned int *new_count, unsigned int* old_sidx, unsigned int* new_sidx, pair_data* old_pppd, pair_data* new_pppd, unsigned int nc, unsigned int np);
-void XDYNAMICS_API cu_new_particle_plane_contact(device_plane_info *plane, double* pos, double* vel, double* omega, double* mass, double* force, double* moment, unsigned int* old_pair_count, unsigned int *count, unsigned int *old_sidx, unsigned int *sidx, int* type_count, pair_data *old_pairs, pair_data *pairs, device_contact_property *cp, unsigned int nplanes, unsigned int np);
+void XDYNAMICS_API cu_new_particle_plane_contact(device_plane_info *plane, double* pos, double* vel, double* ep, double* omega, double* mass, double* force, double* moment, unsigned int* old_pair_count, unsigned int *count, unsigned int *old_sidx, unsigned int *sidx, int* type_count, pair_data *old_pairs, pair_data *pairs, device_contact_property *cp, unsigned int nplanes, unsigned int np);
 #endif
 
 

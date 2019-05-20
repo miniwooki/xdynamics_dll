@@ -175,18 +175,34 @@ __global__ void vv_update_position_kernel(
 
 	double3 _p = dcte.dt * vel[id] + dcte.half2dt * acc[id];
 	double4 _e = dcte.dt * ev[id] + dcte.half2dt * ea[id];
-	_e = normalize(_e);
+	//_e = normalize(_e);
 	pos[id].x += _p.x;
 	pos[id].y += _p.y;
 	pos[id].z += _p.z;
-	ep[id] = _e;
+	ep[id] = normalize(ep[id] + _e);
+	
 }
 
-__device__ double4 calculateInertiaForce(
-	double J, double v0, double v1, double v2, double v3,
-	double e0, double e1, double e2, double e3)
+__device__ double3 calculate_w_ev(
+	double e0, double e1, double e2, double e3,
+	double v0, double v1, double v2, double v3)
 {
-	double f0 = 8 * J*v1*(e0*v1 - e1*v0 - e2*v3 + e3*v2) + 8 * J*v2*(e0*v2 - e2*v0 + e1*v3 - e3*v1) + 8 * J*v3*(e0*v3 - e1*v2 + e2*v1 - e3*v0);
+	return  2.0 * make_double3(
+		e0*v1 - e1*v0 + e2*v3 - e3*v2,
+		e0*v2 - e2*v0 - e1*v3 + e3*v1,
+		e0*v3 + e1*v2 - e2*v1 - e3*v0);
+}
+
+__device__ double4 calculate_ea_epa(
+	double e0, double e1, double e2, double e3,
+	double ax, double ay, double az, double vx, double vy, double vz)
+{
+	return make_double4(
+		0.5 * (-(ax*e1) - (ay*e2) - (az*e3)) - 0.25 * e0*((vx*vx) + (vy*vy) + (vz*vz))
+		, 0.5 * ((ax*e0) + (ay*e3) - (az*e2)) - 0.25 * e1*((vx*vx) + (vy*vy) + (vz*vz))
+		, 0.5 * ((ay*e0) - (ax*e3) + (az*e1)) - 0.25 * e2*((vx*vx) + (vy*vy) + (vz*vz))
+		, 0.5 * ((ax*e2) - (ay*e1) + (az*e0)) - 0.25 * e3*((vx*vx) + (vy*vy) + (vz*vz)));
+	/*double f0 = 8 * J*v1*(e0*v1 - e1*v0 - e2*v3 + e3*v2) + 8 * J*v2*(e0*v2 - e2*v0 + e1*v3 - e3*v1) + 8 * J*v3*(e0*v3 - e1*v2 + e2*v1 - e3*v0);
 	double f1 = 8 * J*v3*(e0*v2 - e2*v0 + e1*v3 - e3*v1) - 8 * J*v2*(e0*v3 - e1*v2 + e2*v1 - e3*v0) - 8 * J*v0*(e0*v1 - e1*v0 - e2*v3 + e3*v2);
 	double f2 = 8 * J*v1*(e0*v3 - e1*v2 + e2*v1 - e3*v0) - 8 * J*v0*(e0*v2 - e2*v0 + e1*v3 - e3*v1) - 8 * J*v3*(e0*v1 - e1*v0 - e2*v3 + e3*v2);
 	double f3 = 8 * J*v2*(e0*v1 - e1*v0 - e2*v3 + e3*v2) - 8 * J*v1*(e0*v2 - e2*v0 + e1*v3 - e3*v1) - 8 * J*v0*(e0*v3 - e1*v2 + e2*v1 - e3*v0);
@@ -220,8 +236,9 @@ __device__ double4 calculateInertiaForce(
 		ia00 * f0 + ia01 * f1 + ia02 * f2 + ia03 * f3,
 		ia10 * f0 + ia11 * f1 + ia12 * f2 + ia13 * f3,
 		ia20 * f0 + ia21 * f1 + ia22 * f2 + ia23 * f3,
-		ia30 * f0 + ia31 * f1 + ia32 * f2 + ia33 * f3);
+		ia30 * f0 + ia31 * f1 + ia32 * f2 + ia33 * f3);*/
 }
+
 
 __global__ void vv_update_velocity_kernel(
 	double3* vel,
@@ -245,18 +262,19 @@ __global__ void vv_update_velocity_kernel(
 	double4 av = omega[id];
 	//double3 aa = alpha[id];
 	double3 a = (1.0 / m) * force[id];
-	double4 in = calculateInertiaForce(iner[id], e.x, e.y, e.z, e.w, av.x, av.y, av.z, av.w);
-	//double3 in = (1.0 / iner[id]) * moment[id];
-
+	//double4 in = calculateInertiaForce(iner[id], e.x, e.y, e.z, e.w, av.x, av.y, av.z, av.w);
+	double3 w = calculate_w_ev(e.x, e.y, e.z, e.w, av.x, av.y, av.z, av.w);
+	double3 in = (1.0 / iner[id]) * moment[id];
+	double4 ea = calculate_ea_epa(e.x, e.y, e.z, e.w, in.x, in.y, in.z, w.x, w.y, w.z);
 	v += 0.5 * dcte.dt * (acc[id] + a);
-	av += 0.5 * dcte.dt * (alpha[id] + in);// aa;
+	av += 0.5 * dcte.dt * (alpha[id] + ea);// aa;
 
 	force[id] = m * dcte.gravity;
 	moment[id] = make_double3(0.0, 0.0, 0.0);
 	vel[id] = v;
 	omega[id] = av;
 	acc[id] = a;
-	alpha[id] = in;
+	alpha[id] = ea;
 }
 
 void vv_update_position(double *pos, double *vel, double *acc, double *ep, double *ev, double *ea, unsigned int np)
@@ -610,7 +628,7 @@ __device__ double cohesionForce(
 	return cf;
 }
 
-__device__ double3 toGlobal(double3& v, double4& ep)
+__device__ double3 toGlobal(double3 v, double4& ep)
 {
 	double3 r0 = make_double3(2.0 * (ep.x*ep.x + ep.y*ep.y - 0.5), 2.0 * (ep.y*ep.z - ep.x*ep.w), 2.0 * (ep.y*ep.w + ep.x*ep.z));
 	double3 r1 = make_double3(2.0 * (ep.y*ep.z + ep.x*ep.w), 2.0 * (ep.x*ep.x + ep.z*ep.z - 0.5), 2.0 * (ep.z*ep.w - ep.x*ep.y));
@@ -623,7 +641,7 @@ __device__ double3 toGlobal(double3& v, double4& ep)
 		);
 }
 
-__device__ double3 toLocal(double3& v, double4& ep)
+__device__ double3 toLocal(double3 v, double4& ep)
 {
 	double3 r0 = make_double3(2.0 * (ep.x*ep.x + ep.y*ep.y - 0.5), 2.0 * (ep.y*ep.z - ep.x*ep.w), 2.0 * (ep.y*ep.w + ep.x*ep.z));
 	double3 r1 = make_double3(2.0 * (ep.y*ep.z + ep.x*ep.w), 2.0 * (ep.x*ep.x + ep.z*ep.z - 0.5), 2.0 * (ep.z*ep.w - ep.x*ep.y));
@@ -671,24 +689,26 @@ __device__ void HMCModel(
 __device__ void DHSModel(
 	device_force_constant c, double ir, double jr, double Ei, double Ej, double pri, double prj, double coh,
 	double rcon, double cdist, double3 iomega, double& _ds, double& dots,
-	double3 dv, double3 unit, double3& Ft, double3& Fn, double3& M)
+	double3 dv, double3 unit, double3 kr_hat, double3& Ft, double3& Fn, double3& M)
 {
 	double fsn = -c.kn * pow(cdist, 1.5);
 	double fdn = c.vn * dot(dv, unit);
 	double fca = cohesionForce(ir, jr, Ei, Ej, pri, prj, coh, fsn);
 	Fn = (fsn + fca + fdn) * unit;
-	double3 e = dv - dot(dv, unit) * unit;
-	double mag_e = length(e);
-	if (mag_e)
+	//double3 e = dv - dot(dv, unit) * unit;
+	//double mag_e = length(e);
+	double k_mag = length(kr_hat);
+	if (k_mag)
 	{
-		double3 sh = e / mag_e;
-		double s_dot = dot(dv, sh);
-		double ds = _ds + dcte.dt * (s_dot + dots);
-		//double3 rr = d
-		_ds = ds;
-		dots = s_dot;
+		
+	//	double s_dot = dot(dv, sh);
+	//	double ds = _ds + dcte.dt * (s_dot + dots);
+		double3 kr = kr_hat - dot(kr_hat, unit) * unit;//double3 rr = d
+		double3 sh = kr / length(kr_hat);// e / mag_e;
+	//	_ds = ds;
+	//	dots = s_dot;
 		//double ds = mag_e * dcte.dt;
-		double ft0 = c.ks * ds + c.vs * (dot(dv, sh));
+		double ft0 = c.ks * length(kr) + c.vs * (dot(dv, sh));
 		double ft1 = c.mu * length(Fn);
 		Ft = min(ft0, ft1) * sh;
 		M = cross(ir * unit, Ft);
@@ -1056,16 +1076,16 @@ __global__ void copy_old_to_new_pair(
 }
 
 __device__ double3 calculate_rolling_resistance(
-	double3& _kr, double3& xc1, double3& xc2, double3& pi, double3& pj, double3& xa, double3& n,
+	double rf, double3& _kr, double3& xc1, double3& xc2, double3& pi, double3& xa, double3& n,
 	double Fn, double mu, double kt, double3& M)
 {
 	double3 dkr = 0.5 * (xc2 + xc1) - xa;
 	double3 khat = _kr + dkr;
 	double3 kr = khat - dot(khat, n) * n;
-	bool limit = length(kr) > 1.0 * mu * (Fn / kt);
+	bool limit = length(kr) > rf * mu * (Fn / kt);
 	if (limit)
 	{
-		kr = (1.0 * mu * Fn / kt) * (kr / length(kr));
+		kr = (rf * mu * Fn / kt) * (kr / length(kr));
 	}
 	double3 _M = cross(xa - pi, kt*kr);
 	M += _M;
@@ -1138,8 +1158,8 @@ __global__ void new_particle_particle_contact_kernel(
 						{
 							double3 unit = rp / dist;
 							double3 _c = pos3 - ir * unit;
-							double3 Xc0 = toLocal(_c, epi);
-							double3 Xc1 = toLocal(_c, epj);
+							double3 Xc0 = toLocal(_c - pos3, epi);
+							double3 Xc1 = toLocal(_c - pos3, epj);
 							pair = { true, 1, id, k, 0.0, 0.0, make_double3(0.0, 0.0, 0.0), Xc0, Xc1 };
 							for (unsigned int j = 0; j < old_cnt; j++)
 							{
@@ -1160,13 +1180,16 @@ __global__ void new_particle_particle_contact_kernel(
 								1, ipos.w, jpos.w, im, jm, cp->Ei, cp->Ej,
 								cp->pri, cp->prj, cp->Gi, cp->Gj,
 								cp->rest, cp->fric, cp->rfric, cp->sratio);
+							double3 xc1 = pos3 + toGlobal(pair.ci, epi);
+							double3 xc2 = pos3 + toGlobal(pair.cj, epj);
 							DHSModel(
 								c, ipos.w, jpos.w, cp->Ei, cp->Ej, cp->pri, cp->prj,
 								cp->coh, rcon, cdist, iomega, pair.ds, pair.dots,
-								rv, unit, Ft, Fn, M);
-							calculate_rolling_resistance(
-								pair.kr, toGlobal(pair.ci, epi), toGlobal(pair.cj, epj), pos3, 
-								pos3j, _c, unit, length(Fn), c.mu, c.ks, M);
+								rv, unit, xc2 - xc1, Ft, Fn, M);
+							//calculate_tangential_force()
+							pair.kr = calculate_rolling_resistance(
+								cp->rfactor, pair.kr, xc1, xc2, pos3,
+								_c, unit, length(Fn), c.mu, c.ks, M);
 							sumF += Fn + Ft;
 							sumM += M;
 							pairs[sid + tcnt++] = pair;
@@ -1184,7 +1207,7 @@ __global__ void new_particle_particle_contact_kernel(
 __global__ void new_particle_polygon_object_conatct_kernel(
 	device_triangle_info* dpi, device_mesh_mass_info* dpmi, pair_data* old_pairs, pair_data* pairs,
 	unsigned int* old_count, unsigned int* count, unsigned int* old_sidx, unsigned int* sidx, int2* type_count,
-	double4 *pos, double3 *vel, double3 *omega, double3 *force, double3 *moment,
+	double4 *pos, double3 *vel, double4* ep, double3 *omega, double3 *force, double3 *moment,
 	double* mass, unsigned int* sorted_index, unsigned int* cstart, unsigned int* cend,
 	device_contact_property *cp, unsigned int _np)
 {
@@ -1203,6 +1226,7 @@ __global__ void new_particle_polygon_object_conatct_kernel(
 	double3 ipos = make_double3(ipos4.x, ipos4.y, ipos4.z);
 	double3 ivel = vel[id];
 	double3 iomega = omega[id];
+	double4 epi = ep[id];
 	double3 unit = make_double3(0.0, 0.0, 0.0);
 	int3 gridPos = calcGridPosD(make_double3(ipos.x, ipos.y, ipos.z));
 	double ir = ipos4.w;
@@ -1221,6 +1245,7 @@ __global__ void new_particle_polygon_object_conatct_kernel(
 	int3 ctype = make_int3(0, 0, 0);
 	double3 previous_cpt = make_double3(0.0, 0.0, 0.0);
 	double3 previous_unit = make_double3(0.0, 0.0, 0.0);
+	double3 zero_double3 = make_double3(0.0, 0.0, 0.0);
 	//double3 mpos = pmi
 	unsigned int cur_cnt = 0;
 	for (int z = -1; z <= 1; z++){
@@ -1247,19 +1272,21 @@ __global__ void new_particle_polygon_object_conatct_kernel(
 							Fn = make_double3(0.0, 0.0, 0.0);
 							if (cdist > 0)
 							{
-								//double len_cpt = sqrt(dot(cpt, cpt));
-								//cpt = len_cpt ? cpt / sqrt(dot(cpt, cpt)) : cpt;
+	
 								device_triangle_info tri = dpi[k];
 								double3 qp = tri.Q - tri.P;
 								double3 rp = tri.R - tri.P;
 								double rcon = ir - 0.5 * cdist;
 								unit = -normalize(cross(qp, rp));// unit / length(cross(qp, rp));
+								//double3 _c = ipos + ir * unit;
+								double3 Xc0 = toLocal(cpt - ipos, epi);
+								//double3 Xc1 = toLocal(_c, epj);
 								bool overlab = checkOverlab(ctype, previous_cpt, cpt, previous_unit, unit);
 								if (overlab)
 									continue;
 								*(&(ctype.x) + t) += 1;
 								//previous_cpt = cpt;
-								pair = { true, 2, id, k, 0.0, 0.0, Fn, Fn, Fn };
+								pair = { true, 2, id, k, 0.0, 0.0, Fn, Xc0, Fn };
 								for (unsigned int j = 0; j < old_cnt; j++)
 								{
 									pair_data* pd = old_pairs + old_sid + j;
@@ -1280,10 +1307,13 @@ __global__ void new_particle_polygon_object_conatct_kernel(
 									1, ir, 0, im, 0, cmp.Ei, cmp.Ej,
 									cmp.pri, cmp.prj, cmp.Gi, cmp.Gj,
 									cmp.rest, cmp.fric, cmp.rfric, cmp.sratio);
+								double3 xc0 = ipos + toGlobal(pair.ci, epi);
+								double3 xc1 = ipos + toGlobal(Xc0, epi);
 								DHSModel(
 									c, ir, 0, cp->Ei, cp->Ej, cp->pri, cp->prj,
 									cp->coh, rcon, cdist, iomega, pair.ds, pair.dots,
-									dv, unit, Ft, Fn, M);
+									dv, unit, xc1 - xc0, Ft, Fn, M);
+								pair.kr = calculate_rolling_resistance(cp->rfactor, pair.kr, xc0, xc1, ipos, cpt, unit, length(Fn), c.mu, c.ks, M);
 								sum_force += Fn + Ft;
 								sum_moment += M;
 								dpmi[pidx].force += -(Fn + Ft);
@@ -1301,7 +1331,7 @@ __global__ void new_particle_polygon_object_conatct_kernel(
 }
 
 __global__ void new_particle_plane_contact(
-	device_plane_info *plane, double4* pos, double3* vel,
+	device_plane_info *plane, double4* pos, double3* vel, double4* ep,
 	double3* omega, double* mass, double3* force,
 	double3* moment, unsigned int* old_count, unsigned int *count,
 	unsigned int* old_sidx, unsigned int *sidx, int2 *type_count,
@@ -1324,6 +1354,7 @@ __global__ void new_particle_plane_contact(
 	double4 ipos = pos[id];
 	double3 ivel = vel[id];
 	double3 iomega = omega[id];
+	double4 epi = ep[id];
 	double m = mass[id];
 	double3 Fn = make_double3(0, 0, 0);
 	double3 Ft = make_double3(0, 0, 0);
@@ -1335,35 +1366,41 @@ __global__ void new_particle_plane_contact(
 	unsigned int cur_cnt = 0;
 	for (unsigned int i = 0; i < nplanes; i++)
 	{
-		ppp = { false, 0, id, i + np, 0.0, 0.0, Fn, Fn, Fn };
-		for (unsigned int j = 0; j < old_cnt; j++)
-		{
-			pair_data* pair = old_pairs + old_sid + j;
-			if (pair->enable && pair->j == i + np)
-			{
-				ppp = *pair;// pairs[sid + j]
-				break;
-			}
-		}
-
-		device_plane_info pl = plane[ppp.j - np];
+		device_plane_info pl = plane[i];
 		double3 unit = make_double3(0, 0, 0);
 		double3 dp = make_double3(ipos.x, ipos.y, ipos.z) - pl.xw;
 		double3 wp = make_double3(dot(dp, pl.u1), dot(dp, pl.u2), dot(dp, pl.uw));
 		double cdist = particle_plane_contact_detection(pl, ipos3, wp, unit, ipos.w);
 		if (cdist > 0)
 		{
+			double3 cpt = ipos3 + ipos.w * unit;
+			double3 Xc0 = toLocal(cpt - ipos3, epi);
+			ppp = { false, 0, id, i + np, 0.0, 0.0, Fn, Xc0, Fn };
+			for (unsigned int j = 0; j < old_cnt; j++)
+			{
+				pair_data* pair = old_pairs + old_sid + j;
+				if (pair->enable && pair->j == i + np)
+				{
+					ppp = *pair;// pairs[sid + j]
+					break;
+				}
+			}
 			ppp.enable = true;
 			ppp.type = 2;
 			double rcon = ipos.w - 0.5 * cdist;
+
 			double3 dv = -(ivel + cross(iomega, ipos.w * unit));
 			device_force_constant c = getConstant(
 				1, ipos.w, 0.0, m, 0.0, cp->Ei, cp->Ej,
 				cp->pri, cp->prj, cp->Gi, cp->Gj,
 				cp->rest, cp->fric, cp->rfric, cp->sratio);
+			double3 xc0 = ipos3 + toGlobal(ppp.ci, epi);
+			double3 xc1 = ipos3 + toGlobal(Xc0, epi);// make_double3(0.0, 0.0, 0.0);
+			//double3 dxc = toGlobal(ppp.ci - Xc0, epi);
 			DHSModel(
 				c, ipos.w, 0, 0, 0, 0, 0, cp->coh, rcon, cdist,
-				iomega, ppp.ds, ppp.dots, dv, unit, Ft, Fn, M);
+				iomega, ppp.ds, ppp.dots, dv, unit, xc1 - xc0, Ft, Fn, M);
+			ppp.kr = calculate_rolling_resistance(cp->rfactor, ppp.kr, xc0, xc1, ipos3, cpt, unit, length(Fn), c.mu, c.ks, M);
 			force[id] += Fn + Ft;// m_force + shear_force;
 			moment[id] += M;
 			pairs[sid + cur_cnt++] = ppp;
@@ -1543,7 +1580,7 @@ void cu_new_particle_particle_contact(
 }
 
 void cu_new_particle_plane_contact(
-	device_plane_info *plane, double* pos, double* vel,
+	device_plane_info *plane, double* pos, double* vel, double* ep,
 	double* omega, double* mass, double* force,	double* moment,
 	unsigned int *old_count, unsigned int *count, 
 	unsigned int *old_sidx, unsigned int *sidx, int* type_count,
@@ -1556,6 +1593,7 @@ void cu_new_particle_plane_contact(
 		plane,
 		(double4 *)pos,
 		(double3 *)vel,
+		(double4 *)ep,
 		(double3 *)omega,
 		mass,
 		(double3 *)force,
@@ -1574,7 +1612,7 @@ void cu_new_particle_polygon_object_contact(
 	pair_data *old_pairs, pair_data *pairs,
 	unsigned int* old_count, unsigned int* count,
 	unsigned int* old_sidx, unsigned int* sidx, int* type_count,
-	double *pos, double *vel, double *omega, double *force, double *moment,
+	double *pos, double *vel, double* ep, double *omega, double *force, double *moment,
 	double* mass, unsigned int* sorted_index, unsigned int* cstart, unsigned int* cend,
 	device_contact_property *cp, unsigned int np)
 {
@@ -1588,6 +1626,7 @@ void cu_new_particle_polygon_object_contact(
 		(int2 *)type_count,
 		(double4 *)pos,
 		(double3 *)vel,
+		(double4 *)ep,
 		(double3 *)omega,
 		(double3 *)force,
 		(double3 *)moment,

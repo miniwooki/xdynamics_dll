@@ -62,6 +62,7 @@ xContact* xContactManager::CreateContactPair(
 	c->setStiffnessRatio(d.rto);
 	c->setFriction(d.mu);
 	c->setCohesion(d.coh);
+	c->setRollingFactor(d.rf);
 	QString name = QString::fromStdString(n);
 	cots[name] = c;
 	//c->setContactParameters(rest, ratio, fric, cohesion);
@@ -267,7 +268,7 @@ void xContactManager::deviceCollision(
 	cu_copy_old_to_new_pair(d_old_pair_count, d_pair_count, d_old_pair_start, d_pair_start, d_old_pppd, d_pppd, nc, np);
 
 	cu_new_particle_particle_contact(
-		pos, vel, ep, omega, mass, force, moment, 
+		pos, ep, vel, omega, mass, force, moment, 
 		d_old_pppd, d_pppd, 
 		d_old_pair_count, d_pair_count,
 		d_old_pair_start, d_pair_start, 
@@ -277,7 +278,7 @@ void xContactManager::deviceCollision(
 	if (cpplane && cpplane->NumPlanes())
 	{
 		cu_new_particle_plane_contact(
-			cpplane->devicePlaneInfo(), pos, vel, omega,
+			cpplane->devicePlaneInfo(), pos, vel, ep, omega,
 			mass, force, moment,
 			d_old_pair_count, d_pair_count,
 			d_old_pair_start, d_pair_start, d_type_count,
@@ -292,7 +293,7 @@ void xContactManager::deviceCollision(
 		cu_new_particle_polygon_object_contact(
 			cpmeshes->deviceTrianglesInfo(), cpmeshes->devicePolygonObjectMassInfo(),
 			d_old_pppd, d_pppd, d_old_pair_count, d_pair_count, d_old_pair_start, d_pair_start,
-			d_type_count, pos, vel, omega, force, moment, mass,
+			d_type_count, pos, vel, ep, omega, force, moment, mass,
 			sorted_id, cell_start, cell_end, cpmeshes->DeviceContactProperty(), np);
 		cpmeshes->getMeshContactForce();
 	}

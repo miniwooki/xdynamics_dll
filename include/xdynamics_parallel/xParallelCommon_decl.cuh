@@ -60,7 +60,7 @@ inline __device__ double4 operator+(double4& v1, double4& v2)
 
 inline __device__ double4 normalize(double4& e)
 {
-	double div = sqrt(e.x * e.x + e.y * e.y + e.z * e.z + e.w * e.w);
+	double div = 1.0 / sqrt(e.x * e.x + e.y * e.y + e.z * e.z + e.w * e.w);
 	return div * e;
 }
 
@@ -224,6 +224,7 @@ struct device_contact_property
 	double rfric;
 	double coh;
 	double sratio;
+	double rfactor;
 };
 
 

@@ -186,7 +186,7 @@ typedef struct{ double p0x, p0y, p0z, p1x, p1y, p1z, p2x, p2y, p2z, p3x, p3y, p3
 typedef struct{ double p0x, p0y, p0z, p1x, p1y, p1z; }xCubeObjectData;
 typedef struct{ double dx, dy, dz, lx, ly, lz, minr, maxr; }xCubeParticleData;
 typedef struct{ unsigned int number; }xListParticleData;
-typedef struct{ double rest, rto, mu, coh; }xContactParameterData;
+typedef struct{ double rest, rto, mu, coh, rf; }xContactParameterData;
 typedef struct{ double mass, ixx, iyy, izz, ixy, ixz, iyz, px, py, pz, e0, e1, e2, e3, vx, vy, vz; }xPointMassData;
 typedef struct{ double lx, ly, lz, fix, fiy, fiz, gix, giy, giz, fjx, fjy, fjz, gjx, gjy, gjz; }xJointData;
 typedef struct{ double Ei, Ej, Pri, Prj, Gi, Gj; }xMaterialPair;

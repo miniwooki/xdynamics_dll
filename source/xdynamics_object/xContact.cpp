@@ -9,6 +9,7 @@ xContact::xContact()
 	, restitution(0)
 	, stiffnessRatio(0)
 	, friction(0)
+	, rolling_factor(0)
 {
 
 }
@@ -24,6 +25,7 @@ xContact::xContact(std::string _name, xContactPairType xcpt)
 	, restitution(0)
 	, stiffnessRatio(0)
 	, friction(0)
+	, rolling_factor(0)
 {
 
 }
@@ -40,6 +42,7 @@ xContact::xContact(const xContact& xc)
 	, stiffnessRatio(xc.StiffnessRatio())
 	, friction(xc.Friction())
 	, mpp(xc.MaterialPropertyPair())
+	, rolling_factor(xc.RollingFactor())
 {
 	if (xc.DeviceContactProperty())
 	{
@@ -100,6 +103,11 @@ void xContact::setSecondObject(xObject* o2)
 	jobj = o2;
 }
 
+double xContact::RollingFactor() const
+{
+	return rolling_factor;
+}
+
 xContactParameters xContact::getContactParameters(double ir, double jr, double im, double jm, double iE, double jE, double ip, double jp, double is, double js)
 {
 	xContactParameters cp;
@@ -126,6 +134,11 @@ xContactParameters xContact::getContactParameters(double ir, double jr, double i
 void xContact::setMaterialPair(xMaterialPair _mpp)
 {
 	mpp = _mpp;
+}
+
+void xContact::setRollingFactor(double d)
+{
+	rolling_factor = d;
 }
 
 double xContact::cohesionForce(double coh_r, double coh_e, double Fn)
@@ -185,7 +198,7 @@ void xContact::cudaMemoryAlloc(unsigned int np)
 	device_contact_property hcp = device_contact_property
 	{
 		mpp.Ei, mpp.Ej, mpp.Pri, mpp.Prj, mpp.Gi, mpp.Gj,
-		restitution, friction, 0.0, cohesion, stiffnessRatio
+		restitution, friction, 0.0, cohesion, stiffnessRatio, rolling_factor
 	};
 	checkCudaErrors(cudaMalloc((void**)&dcp, sizeof(device_contact_property)));
 	checkCudaErrors(cudaMemcpy(dcp, &hcp, sizeof(device_contact_property), cudaMemcpyHostToDevice));
