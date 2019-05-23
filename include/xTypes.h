@@ -191,7 +191,7 @@ typedef struct{ double mass, ixx, iyy, izz, ixy, ixz, iyz, px, py, pz, e0, e1, e
 typedef struct{ double lx, ly, lz, fix, fiy, fiz, gix, giy, giz, fjx, fjy, fjz, gjx, gjy, gjz; }xJointData;
 typedef struct{ double Ei, Ej, Pri, Prj, Gi, Gj; }xMaterialPair;
 typedef struct{ double coh_r, coh_e, kn, vn, ks, vs; }xContactParameters;
-typedef struct{ double restitution, friction, rolling_friction, cohesion, stiffness_ratio; }xContactMaterialParameters;
+typedef struct{ double restitution, friction, rolling_friction, cohesion, stiffness_ratio, rolling_resistance; }xContactMaterialParameters;
 typedef struct{ double spix, spiy, spiz, spjx, spjy, spjz, k, c, init_l; }xTSDAData;
 typedef struct{ int correction, dim, type; double factor; }xKernelFunctionData;
 typedef struct{ double p0x, p0y, p0z, p1x, p1y, p1z, nx, ny, nz; }xLineObjectData;

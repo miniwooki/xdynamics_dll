@@ -39,7 +39,7 @@ public:
 
 	bool runCollision(
 		double *pos, double *vel, double* ep,
-		double *omega, double *mass,
+		double *omega, double *mass, double* inertia,
 		double *force, double *moment,
 		unsigned int *sorted_id,
 		unsigned int *cell_start,
@@ -53,7 +53,7 @@ private:
 	void updateCollisionPair(vector4d* pos, unsigned int* sorted_id, unsigned int* cell_start, unsigned int* cell_end, unsigned int np);
 	void deviceCollision(
 		double *pos, double *vel, double* ep,
-		double *omega, double *mass,
+		double *omega, double *mass, double* inertia,
 		double *force, double *moment,
 		unsigned int *sorted_id,
 		unsigned int *cell_start,
@@ -84,7 +84,7 @@ private:
 	unsigned int *d_old_pair_start;
 	unsigned int *d_pair_start;
 	pair_data* d_pppd;
-
+	double* d_rfm;
 	QMap<QString, xContact*> cots;
 	QMap<QString, xParticleMeshObjectContact*> cpmesh;
 	xContactPairList* xcpl;

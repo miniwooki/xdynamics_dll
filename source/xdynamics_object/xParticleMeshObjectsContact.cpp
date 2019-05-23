@@ -71,6 +71,7 @@ unsigned int xParticleMeshObjectsContact::define(QMap<QString, xParticleMeshObje
 		cp.restitution = cpm->Restitution();
 		cp.stiffness_ratio = cpm->StiffnessRatio();
 		cp.friction = cpm->Friction();
+		cp.rolling_resistance = cpm->RollingFactor();
 		xmp = cpm->MaterialPropertyPair();
 		hcp[idx] = cp;
 		xmps[idx] = xmp;
@@ -293,7 +294,7 @@ void xParticleMeshObjectsContact::cudaMemoryAlloc(unsigned int np)
 	for (unsigned int i = 0; i < nPobjs; i++)
 	{
 		_hcp[i] = { xmps[i].Ei, xmps[i].Ej, xmps[i].Pri, xmps[i].Prj, xmps[i].Gi, xmps[i].Gj,
-			hcp[i].restitution, hcp[i].friction, hcp[i].rolling_friction, hcp[i].cohesion, hcp[i].stiffness_ratio };
+			hcp[i].restitution, hcp[i].friction, hcp[i].rolling_friction, hcp[i].cohesion, hcp[i].stiffness_ratio, hcp[i].rolling_resistance };
 	}
 	checkCudaErrors(cudaMalloc((void**)&dsphere, sizeof(double) * npolySphere * 4));
 	checkCudaErrors(cudaMalloc((void**)&dpi, sizeof(device_triangle_info) * npolySphere));

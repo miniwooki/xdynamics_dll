@@ -29,7 +29,7 @@ int xIntegratorVV::OneStepSimulation(double ct, unsigned int cstep)
 	{
 		xcm->runCollision(
 			dpos, dvel, dep, davel,
-			dmass, dforce, dmoment,
+			dmass, diner, dforce, dmoment,
 			dtor->sortedID(), dtor->cellStart(), dtor->cellEnd(), np);
 	}
 	this->updateVelocity(dvel, dacc, dep, davel, daacc, dforce, dmoment, dmass, diner, np);
@@ -41,7 +41,7 @@ void xIntegratorVV::updatePosition(
 	double* ep, double* ev, double* ea, unsigned int np)
 {
 	if (xSimulation::Gpu())
-		vv_update_position(dpos, dvel, dacc, ep, ev, ea, np);
+		vv_update_position(dpos, dvel, dacc,/* ep, ev, ea,*/ np);
 	else
 	{
 // 		vector4d* p = (vector4d*)dpos;
@@ -66,7 +66,7 @@ void xIntegratorVV::updateVelocity(
 	double *dmass, double* dinertia, unsigned int np)
 {
 	if (xSimulation::Gpu())
-		vv_update_velocity(dvel, dacc, ep, domega, dalpha, dforce, dmoment, dmass, dinertia, np);
+		vv_update_velocity(dvel, dacc,/* ep,*/ domega, dalpha, dforce, dmoment, dmass, dinertia, np);
 	else
 	{
 		double inv_m = 0;

@@ -95,8 +95,10 @@
 
 //void XDYNAMICS_API setSymbolicParameter(device_parameters *h_paras);
 void XDYNAMICS_API setDEMSymbolicParameter(device_dem_parameters* h_paras);
-void XDYNAMICS_API vv_update_position(double *pos, double *vel, double *acc, double* ep, double* ev, double* ea, unsigned int np);
-void XDYNAMICS_API vv_update_velocity(double *vel, double *acc, double *ep, double *ev, double *ea, double *force, double *moment, double* mass, double* iner, unsigned int np);
+void XDYNAMICS_API vv_update_position(double *pos, double *vel, double *acc, unsigned int np);
+void XDYNAMICS_API vv_update_velocity(
+	double *vel, double *acc, double *omega, double *alpha, 
+	double *force, double *moment, double* mass, double* iner, unsigned int np);
 
 void XDYNAMICS_API cu_dem_calculateHashAndIndex(unsigned int* hash, unsigned int* index, double *pos, unsigned int np);
 void XDYNAMICS_API cu_dem_calculateHashAndIndexForPolygonSphere(
@@ -171,16 +173,16 @@ void XDYNAMICS_API cu_calculate_particle_triangle_contact_count(
 
 void XDYNAMICS_API cu_new_particle_polygon_object_contact(
 	device_triangle_info* dpi, device_mesh_mass_info* dpmi,
-	pair_data *old_pairs, pair_data *pairs,
+	pair_data *old_pairs, pair_data *pairs, double* rfm,
 	unsigned int* old_count, unsigned int* count,
 	unsigned int* old_sidx, unsigned int* sidx, int* type_count,
-	double *pos, double *vel, double* ep, double *omega, double *force, double *moment,
+	double *pos, double *vel, double *omega, double *force, double *moment,
 	double* mass, unsigned int* sorted_index, unsigned int* cstart, unsigned int* cend,
 	device_contact_property *cp, unsigned int _np);
 
 void XDYNAMICS_API cu_new_particle_particle_contact(
-	double* pos, double* vel, double* ep, double* omega, double* mass, double* force, double* moment, 
-	pair_data* old_pairs, pair_data* pairs, 
+	double* pos, double* vel, double* omega, double* mass, double* force, double* moment, 
+	pair_data* old_pairs, pair_data* pairs, double* rfm,
 	unsigned int* old_pair_count, unsigned int* pair_count, 
 	unsigned int *old_pair_start, unsigned int *pair_start, 
 	int *type_count, device_contact_property* cp, 
@@ -195,7 +197,15 @@ void XDYNAMICS_API cu_calculate_particle_plane_contact_count(
 unsigned int XDYNAMICS_API cu_sumation_contact_count(unsigned int* count, unsigned int np);
 
 void XDYNAMICS_API cu_copy_old_to_new_pair(unsigned int *old_count, unsigned int *new_count, unsigned int* old_sidx, unsigned int* new_sidx, pair_data* old_pppd, pair_data* new_pppd, unsigned int nc, unsigned int np);
-void XDYNAMICS_API cu_new_particle_plane_contact(device_plane_info *plane, double* pos, double* vel, double* ep, double* omega, double* mass, double* force, double* moment, unsigned int* old_pair_count, unsigned int *count, unsigned int *old_sidx, unsigned int *sidx, int* type_count, pair_data *old_pairs, pair_data *pairs, device_contact_property *cp, unsigned int nplanes, unsigned int np);
+void XDYNAMICS_API cu_new_particle_plane_contact(
+	device_plane_info *plane, double* pos, double* vel, 
+	double* omega, double* mass, double* force, double* moment, 
+	unsigned int* old_pair_count, unsigned int *count, unsigned int *old_sidx, 
+	unsigned int *sidx, int* type_count, pair_data *old_pairs, pair_data *pairs, double* rfm,
+	device_contact_property *cp, unsigned int nplanes, unsigned int np);
+void XDYNAMICS_API cu_decide_rolling_friction_moment(
+	double* rfm, double *inertia, double* ev,
+	double* moment, unsigned int np);
 #endif
 
 

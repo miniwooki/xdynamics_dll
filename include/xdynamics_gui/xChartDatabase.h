@@ -28,12 +28,22 @@ inline QStringList get_joint_chart_list()
 	return stList;
 }
 
+inline QStringList get_particle_chart_list()
+{
+	QStringList stList; stList.push_back("None");
+	stList.push_back("PX"); stList.push_back("PY"); stList.push_back("PZ");
+	stList.push_back("VX"); stList.push_back("VY"); stList.push_back("VZ");
+	stList.push_back("RVX"); stList.push_back("RVY"); stList.push_back("RVZ");
+
+	return stList;
+}
+
 class xChartDatabase : public QDockWidget
 {
 	Q_OBJECT
 
 public:
-	enum tRoot { MASS_ROOT = 0, KCONSTRAINT_ROOT };
+	enum tRoot { MASS_ROOT = 0, KCONSTRAINT_ROOT, PARTICLE_ROOT };
 	xChartDatabase(QWidget* parent);
 	~xChartDatabase();
 

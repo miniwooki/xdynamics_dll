@@ -13,6 +13,7 @@ xChartDatabase::xChartDatabase(QWidget* parent)
 	tree->setContextMenuPolicy(Qt::CustomContextMenu);
 	roots[MASS_ROOT] = new QTreeWidgetItem(tree);
 	roots[KCONSTRAINT_ROOT] = new QTreeWidgetItem(tree);
+	roots[PARTICLE_ROOT] = new QTreeWidgetItem(tree);
 // 	roots[PART_ROOT] = new QTreeWidgetItem(tree);
 // 	roots[SENSOR_ROOT] = new QTreeWidgetItem(tree);
 // 	roots[PMASS_ROOT] = new QTreeWidgetItem(tree);
@@ -24,6 +25,7 @@ xChartDatabase::xChartDatabase(QWidget* parent)
 // 
 	roots[MASS_ROOT]->setText(0, "Body");
 	roots[KCONSTRAINT_ROOT]->setText(0, "Joint");
+	roots[PARTICLE_ROOT]->setText(0, "Particle");
 // 	roots[PART_ROOT]->setText(0, "Part");
 // 	roots[SENSOR_ROOT]->setText(0, "Sensor");
 // 	roots[PMASS_ROOT]->setText(0, "Mass");
@@ -104,6 +106,11 @@ void xChartDatabase::clickItem(QTreeWidgetItem* item, int col)
 	{
 		idx = (int)KCONSTRAINT_ROOT;
 		plot_item->addItems(get_joint_chart_list());
+	}
+	else if (sp == "Particle")
+	{
+		idx = (int)PARTICLE_ROOT;
+		plot_item->addItems(get_particle_chart_list());
 	}
 	emit ClickedItem(idx, tg);
 	plot_item->setCurrentIndex(0);

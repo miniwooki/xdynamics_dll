@@ -71,6 +71,13 @@ inline __host__ __device__ void operator+=(double3& a, double3 b)
 	a.z += b.z;
 }
 
+inline __host__ __device__ void operator-=(double3& a, double3 b)
+{
+	a.x -= b.x;
+	a.y -= b.y;
+	a.z -= b.z;
+}
+
 inline __host__ __device__ void operator+=(double4& a, double4 b)
 {
 	a.x += b.x;
@@ -162,10 +169,16 @@ struct pair_data
 	unsigned int j;
 	double ds;
 	double dots;
-	double3 kr;// , kry, krz;
-	double3 ci;// , ciy, ciz;
-	double3 cj;// , cjy, cjx;
+	//double3 kr;// , kry, krz;
+	//double3 ci;// , ciy, ciz;
+	//double3 cj;// , cjy, cjx;
 	
+};
+
+struct rolling_friction_moment
+{
+	double Tr;
+	double3 Tmax;
 };
 
 struct device_triangle_info
