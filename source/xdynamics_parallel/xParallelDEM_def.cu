@@ -560,11 +560,12 @@ __device__ double cohesionForce(
 	return cf;
 }
 
-__device__ void calculate_previous_rolling_resistance(double rf, double ir, double jr, double3 rc, double3 Fn, double3 Ft, double& Mr, double3& Tmax)
+__device__ double4 calculate_previous_rolling_resistance(double rf, double ir, double jr, double3 rc, double3 Fn, double3 Ft/*, double& Mr, double3& Tmax*/)
 {
-	Tmax += cross(rc, Fn + Ft);
+	double3 Tmax = /*Tmax +=*/ cross(rc, Fn + Ft);
 	double Rij = jr ? ir * jr / (ir + jr) : ir;
-	Mr += Rij * rf * length(Fn);
+	double Mr = Rij * rf * length(Fn);
+	return make_double4(Tmax.x, Tmax.y, Tmax.z, Mr);
 }
 
 __device__ void HMCModel(
@@ -998,8 +999,8 @@ __global__ void new_particle_particle_contact_kernel(
 	double3 Ft = make_double3(0, 0, 0);
 	double3 Fn = make_double3(0, 0, 0);// [id] * dcte.gravity;
 	double3 M = make_double3(0, 0, 0);
-	double3 Tmax = make_double3(0.0, 0.0, 0.0);
-	double Mr = 0.0;// make_double3(0.0, 0.0, 0.0);
+	//double3 Tmax = make_double3(0.0, 0.0, 0.0);
+	//double Mr = 0.0;// make_double3(0.0, 0.0, 0.0);
 	int3 gridPos = calcGridPosD(make_double3(ipos.x, ipos.y, ipos.z));
 	double ir = ipos.w; double jr = 0;
 	double im = mass[id]; double jm = 0.0;
@@ -1064,7 +1065,7 @@ __global__ void new_particle_particle_contact_kernel(
 								c, ipos.w, jpos.w, cp->Ei, cp->Ej, cp->pri, cp->prj,
 								cp->coh, rcon, cdist, iomega, pair.ds, pair.dots,
 								rv, unit, Ft, Fn, M);
-							calculate_previous_rolling_resistance(cp->rfactor, ir, jr, rc, Fn, Ft, Mr, Tmax);
+							/*rfm[id] += */calculate_previous_rolling_resistance(cp->rfactor, ir, jr, rc, Fn, Ft/*, Mr, Tmax*/);
 							sumF += Fn + Ft;
 							sumM += M;
 							pairs[sid + tcnt++] = pair;
@@ -1076,10 +1077,10 @@ __global__ void new_particle_particle_contact_kernel(
 	}
 	force[id] += sumF;
 	moment[id] += sumM;
-	rfm[id].x += Mr;//
-	rfm[id].y += Tmax.x;// += make_double4(Mr, Tmax.x, Tmax.y, Tmax.y);
-	rfm[id].z += Tmax.y;
-	rfm[id].w += Tmax.z;
+	//rfm[id].x += Mr;//
+	//rfm[id].y += Tmax.x;// += make_double4(Mr, Tmax.x, Tmax.y, Tmax.y);
+	//rfm[id].z += Tmax.y;
+	//rfm[id].w += Tmax.z;
 	//rfm[id] += make_double4(0.0,0.0,0.0,0.0);
 	type_count[id].x = tcnt;
 }
@@ -1126,8 +1127,8 @@ __global__ void new_particle_polygon_object_conatct_kernel(
 	double3 previous_unit = make_double3(0.0, 0.0, 0.0);
 	//double3 mpos = pmi
 	unsigned int cur_cnt = 0;
-	double3 Tmax = make_double3(0.0, 0.0, 0.0);
-	double Mr = 0.0;// make_double3(0.0, 0.0, 0.0);
+	//double3 Tmax = make_double3(0.0, 0.0, 0.0);
+	//double Mr = 0.0;// make_double3(0.0, 0.0, 0.0);
 	for (int z = -1; z <= 1; z++){
 		for (int y = -1; y <= 1; y++){
 			for (int x = -1; x <= 1; x++){
@@ -1190,7 +1191,7 @@ __global__ void new_particle_polygon_object_conatct_kernel(
 									c, ir, 0, cp->Ei, cp->Ej, cp->pri, cp->prj,
 									cp->coh, rcon, cdist, iomega, pair.ds, pair.dots,
 									dv, unit, Ft, Fn, M);
-								calculate_previous_rolling_resistance(cp->rfactor, ir, 0.0, rc, Fn, Ft, Mr, Tmax);
+								rfm[id] += calculate_previous_rolling_resistance(cp->rfactor, ir, 0.0, rc, Fn, Ft/*, Mr, Tmax*/);
 								sum_force += Fn + Ft;
 								sum_moment += M;
 								dpmi[pidx].force += -(Fn + Ft);
@@ -1203,7 +1204,7 @@ __global__ void new_particle_polygon_object_conatct_kernel(
 			}
 		}
 	}
-	rfm[id] += make_double4(Mr, Tmax.x, Tmax.y, Tmax.y);
+	//rfm[id] += make_double4(Mr, Tmax.x, Tmax.y, Tmax.y);
 	force[id] += sum_force;
 	moment[id] += sum_moment;
 }
@@ -1241,8 +1242,8 @@ __global__ void new_particle_plane_contact(
 	//	unsigned int cnt = count[id];
 	pair_data ppp;
 	unsigned int cur_cnt = 0;
-	double3 Tmax = make_double3(0.0, 0.0, 0.0);
-	double Mr = 0.0;// make_double3(0.0, 0.0, 0.0);
+	//double3 Tmax = make_double3(0.0, 0.0, 0.0);
+	//double Mr = 0.0;// make_double3(0.0, 0.0, 0.0);
 	for (unsigned int i = 0; i < nplanes; i++)
 	{
 		ppp = { false, 0, id, i + np, 0.0, 0.0 };
@@ -1275,16 +1276,16 @@ __global__ void new_particle_plane_contact(
 			DHSModel(
 				c, ipos.w, 0, 0, 0, 0, 0, cp->coh, rcon, cdist,
 				iomega, ppp.ds, ppp.dots, dv, unit, Ft, Fn, M);
-			calculate_previous_rolling_resistance(cp->rfactor, ipos.w, 0.0, rc, Fn, Ft, Mr, Tmax);
+			rfm[id] += calculate_previous_rolling_resistance(cp->rfactor, ipos.w, 0.0, rc, Fn, Ft/*, Mr, Tmax*/);
 			force[id] += Fn + Ft;// m_force + shear_force;
 			moment[id] += M;
 			pairs[sid + cur_cnt++] = ppp;
 		}
 	}
-	rfm[id].x += Mr;//
-	rfm[id].y += Tmax.x;// += make_double4(Mr, Tmax.x, Tmax.y, Tmax.y);
-	rfm[id].z += Tmax.y;
-	rfm[id].w += Tmax.z;
+	//rfm[id].x += Mr;//
+	//rfm[id].y += Tmax.x;// += make_double4(Mr, Tmax.x, Tmax.y, Tmax.y);
+	//rfm[id].z += Tmax.y;
+	//rfm[id].w += Tmax.z;
 	//rfm[id] += make_double4(0.0,0.0,0.0,0.0);
 	type_count[id].y = cur_cnt;
 }
@@ -1506,6 +1507,16 @@ void cu_new_particle_plane_contact(
 		cp,
 		nplanes,
 		np);
+
+	//double4* h_rfm = NULL;
+
+	//checkCudaErrors(cudaMalloc((void**)&h_rfm, sizeof(double4) * np));
+	//checkCudaErrors(cudaMemcpy(h_rfm, rfm, sizeof(double4) * np, cudaMemcpyDeviceToHost));
+	//for (unsigned int i = 0; i < np; i++)
+	//{
+	//	printf("[%08f, %08f, %08f, %08f]", h_rfm[i].x, h_rfm[i].y, h_rfm[i].z, h_rfm[i].w);
+	//}
+	//checkCudaErrors(cudaFree(h_rfm));
 }
 
 void cu_new_particle_polygon_object_contact(
@@ -1551,10 +1562,10 @@ __global__ void decide_rolling_friction_moment_kernel(
 
 	if (id >= np)
 		return;
-	double Tr = rfm[id].x;
+	double Tr = rfm[id].w;
 	if (!Tr)
 		return;
-	double3 Tmax = make_double3(rfm[id].y, rfm[id].z, rfm[id].w);
+	double3 Tmax = make_double3(rfm[id].x, rfm[id].y, rfm[id].z);
 
 	double J = inertia[id];
 	double3 iomega = ev[id];
