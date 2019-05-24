@@ -484,17 +484,17 @@ void xXLSReader::ReadShapeObject(xObjectManager* xom, vector2i rc)
 			if (form == xShapeType::CUBE_SHAPE)
 			{
 				xCubeObject* xco = xom->CreateCubeShapeObject(name, material);
-				xco->SetupDataFromStructure(ReadCubeObjectData(name, material, rc.x++, rc.y));
+				xco->SetupDataFromStructure(ReadCubeObjectData(name, material, rc.x, rc.y));
 			}
 			else if (form == xShapeType::LINE_SHAPE)
 			{
 				xLineObject* xlo = xom->CreateLineShapeObject(name, material);
-				xlo->SetupDataFromStructure(ReadLineObjectData(name, material, rc.x++, rc.y));
+				xlo->SetupDataFromStructure(ReadLineObjectData(name, material, rc.x, rc.y));
 			}
 			else if (form == xShapeType::PLANE_SHAPE)
 			{
 				xPlaneObject* xpo = xom->CreatePlaneShapeObject(name, material);
-				xpo->SetupDataFromStructure(ReadPlaneObjectData(name, material, rc.x++, rc.y));
+				xpo->SetupDataFromStructure(ReadPlaneObjectData(name, material, rc.x, rc.y));
 			}
 			else if (form == xShapeType::MESH_SHAPE)
 			{

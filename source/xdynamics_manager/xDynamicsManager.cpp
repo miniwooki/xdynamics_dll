@@ -250,6 +250,7 @@ xDynamicsManager::solverType xDynamicsManager::OpenModelXLS(const wchar_t* n)
 		xve.Open(full_path + ".vmd");
 		xls.setViewExporter(&xve);
 		//xls.CreateViewModelOutput(full_path + ".vmd");
+
 		for (; bt != et; bt++)
 		{
 			switch (bt->first)
