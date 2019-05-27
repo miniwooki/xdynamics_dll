@@ -291,8 +291,10 @@ void xDrivingConstraint::SaveStepResult(
 
 }
 
-void xDrivingConstraint::DerivateEquation(xVectorD& v, xVectorD& q, xVectorD& qd, unsigned int sr, double mul)
+void xDrivingConstraint::DerivateEquation(xVectorD& v, xVectorD& q, xVectorD& qd, int sr, double ct, double mul)
 {
+	if (ct < start_time)
+		return;
 	matrix33d TAi = Transpose(kconst->BaseBody()->TransformationMatrix());
 	matrix33d Aj = kconst->ActionBody()->TransformationMatrix();
 	vector3d fi = kconst->fi;

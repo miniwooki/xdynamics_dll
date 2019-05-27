@@ -1,6 +1,7 @@
 #include "xdynamics_manager/xModel.h"
 #include "xdynamics_object/xPointMass.h"
 //#include "boost/filesystem.hpp"
+#include <QtCore/QDebug>
 #include <windows.h>
 
 //using namespace boost::filesystem;
@@ -32,7 +33,8 @@ xModel::xModel()
 xModel::xModel(const QString _name)
 {
 	name = _name;
-	std::cout << _name.toStdString() << std::endl;
+	//qDebug() << kor(getenv("USERPROFILE"));
+//	std::cout << path.toStdString() << std::endl;
 	xUtilityFunctions::CreateDirectory(path.toStdWString().c_str());
 	if (!ground)
 	{
@@ -121,6 +123,6 @@ void xModel::launchLogSystem(std::string lpath)
 
 std::string xModel::makeFilePath(std::string file_name)
 {
-	std::string f = path.toStdString() + name.toStdString() + "/" + file_name;
+	std::string f = xUtilityFunctions::xstring(path) + xUtilityFunctions::xstring(name) + "/" + file_name;
 	return f;
 }

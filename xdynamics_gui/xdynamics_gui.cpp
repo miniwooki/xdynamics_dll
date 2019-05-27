@@ -153,7 +153,8 @@ bool xdynamics_gui::ReadViewModel(QString path)
 		char* _name = new char[255];
 		memset(_name, 0, sizeof(char) * 255);
 		qf.read((char*)_name, sizeof(char) * ns);
-		name.sprintf("%s", _name);
+		name = kor(_name);
+		qDebug() << name;
 		if (vot == xViewObjectType::VPLANE)
 		{
 			xPlaneObjectData d = { 0, };

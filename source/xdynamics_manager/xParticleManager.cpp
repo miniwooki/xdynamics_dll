@@ -194,6 +194,36 @@ xParticleObject* xParticleManager::CreateParticleFromList(
 // 	return xpo;
 // }
 
+void xParticleManager::ImportParticleDataFromPartResult(std::string path)
+{
+	std::fstream qf;
+	qf.open(path, std::ios::binary | std::ios::in);
+	unsigned int m_sid = 0;
+	unsigned int m_np = 0;
+	unsigned int t_np = 0;
+	double ct = 0.0;
+	vector4d* t_pos = NULL;
+	if (qf.is_open())
+	{
+		qf.read((char*)&ct, sizeof(double));
+		qf.read((char*)&t_np, sizeof(unsigned int));
+		t_pos = new vector4d[t_np];
+		qf.read((char*)t_pos, sizeof(vector4d) * t_np);
+		if (np != t_np)
+		{
+			return;
+		}
+		foreach(xParticleObject* xpo, xpcos)
+		{
+			m_sid = xpo->StartIndex();
+			m_np = xpo->NumParticle();
+			vector4d* pos = xpo->Position();
+			memcpy(pos, t_pos + m_sid, sizeof(vector4d) * m_np);
+		}
+	}
+	delete[] t_pos;
+}
+
 xParticleObject* xParticleManager::CreateCubeParticle(
 	std::string n, xMaterialType mt, unsigned int _np, xCubeParticleData& d)
 {

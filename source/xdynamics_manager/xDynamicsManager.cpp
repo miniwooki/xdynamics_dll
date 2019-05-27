@@ -7,7 +7,10 @@
 #include <QtCore/QFile>
 //#include <QtWidgets/QtWidgets>
 #include <QtCore/QStringList>
+#include <QtCore/QDebug>
 #include <map>
+
+typedef xUtilityFunctions uf;
 
 xDynamicsManager::xDynamicsManager()
 	: xModel("Model1")
@@ -208,6 +211,7 @@ xDynamicsManager::solverType xDynamicsManager::OpenModelXLS(const wchar_t* n)
 	if (xls.Load(n))
 	{
 		QString file_name = xUtilityFunctions::GetFileName(n);
+		qDebug() << file_name;
 		xModel::setModelName(file_name);
 		QString md = xls.SetupSheet(0);
 		std::map<xXlsInputDataType, vector2i> xx;
@@ -232,8 +236,9 @@ xDynamicsManager::solverType xDynamicsManager::OpenModelXLS(const wchar_t* n)
 		}
 		std::map<xXlsInputDataType, vector2i>::iterator bt = xx.begin();
 		std::map<xXlsInputDataType, vector2i>::iterator et = xx.end();
- 		std::string model_name = xModel::name.toStdString();
- 		std::string full_path = xModel::path.toStdString() + model_name + "/" + model_name;
+		std::string model_name = uf::xstring(xModel::name);// .toLocal8Bit().data();
+		std::string full_path = uf::xstring(xModel::path) + model_name + "/" + model_name;
+		std::cout << full_path << std::endl;
  		//xUtilityFunctions::DeleteFilesInDirectory(xUtilityFunctions::xstring(xModel::path) + model_name);
  		//xUtilityFunctions
 		QString dDir = QString::fromStdString(full_path);
@@ -317,7 +322,8 @@ xDynamicsManager::solverType xDynamicsManager::OpenModelXLS(const wchar_t* n)
 			{
 				xMeshObject* xmo = dynamic_cast<xMeshObject*>(xo);
 				QString mname = xmo->Name() + ".mesh";
-				std::string file = xmo->exportMeshData(xModel::makeFilePath(mname.toStdString()));
+				xmo->exportMeshData(xModel::makeFilePath(uf::xstring(mname)));
+				//qDebug() << file.c_str();
 			}
 		}
  		xve.Close();

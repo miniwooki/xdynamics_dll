@@ -413,10 +413,11 @@ void xMeshObject::translation(vector3d p)
 std::string xMeshObject::exportMeshData(std::string path)
 {
 	std::fstream fs;
+	//std::cout << path << std::endl;
 	fs.open(path, std::ios::out | std::ios::binary);
 	unsigned int ns = static_cast<unsigned int>(name.size());
 	fs.write((char*)&ns, sizeof(unsigned int));
-	fs.write((char*)name.toStdString().c_str(), sizeof(char)*ns);
+	fs.write((char*)xUtilityFunctions::xstring(name).c_str(), sizeof(char)*ns);
 	double *_vertex = this->VertexList();
 	double *_normal = this->NormalList();
 	fs.write((char*)&material, sizeof(int));

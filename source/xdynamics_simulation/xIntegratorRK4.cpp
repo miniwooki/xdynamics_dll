@@ -114,7 +114,7 @@ int xIntegratorRK4::OneStepSimulation(double ct, unsigned int cstep)
 	}
 	foreach(xDrivingConstraint* xdc, xmbd->Drivings())
 	{
-		xdc->DerivateEquation(pi_v_vd, q, qd, -1, -1.0);
+		xdc->DerivateEquation(pi_v_vd, q, qd, -1, ct, -1.0);
 	}
 	int	ret = LinearSolve(sdim, 1, jaco_v, sdim, pi_v_vd, sdim);
 	for (unsigned int i = 0; i < sdim; i++)

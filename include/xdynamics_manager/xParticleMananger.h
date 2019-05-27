@@ -19,6 +19,7 @@ public:
 	QMap<QString, xParticleObject*>& XParticleObjects();
 	xParticleObject* XParticleObject(QString& ws);
 	void ExportParticleDataForView(std::string path);
+	void ImportParticleDataFromPartResult(std::string path);
 // 	void setRealTimeCreating(bool b);
 // 	bool OneByOneCreating();
 	double* GetPositionResultPointer(unsigned int pt);
@@ -52,7 +53,6 @@ private:
 	double *r_vel;
 	xMaterialType *r_type;
 };
-
 
 
 #endif
