@@ -112,6 +112,10 @@ int xIntegratorRK4::OneStepSimulation(double ct, unsigned int cstep)
 		if (cid != -1) jaco_v(cjaco.ridx[i], cid) = cjaco.value[i];
 		else pi_v_vd(cjaco.ridx[i]) -= cjaco.value[i] * qd(cjaco.cidx[i] + xModel::OneDOF());
 	}
+	foreach(xDrivingConstraint* xdc, xmbd->Drivings())
+	{
+		xdc->DerivateEquation(pi_v_vd, q, qd, -1, -1.0);
+	}
 	int	ret = LinearSolve(sdim, 1, jaco_v, sdim, pi_v_vd, sdim);
 	for (unsigned int i = 0; i < sdim; i++)
 		qd(v[i] + xModel::OneDOF()) = pi_v_vd(i);

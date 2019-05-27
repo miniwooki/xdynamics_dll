@@ -31,6 +31,7 @@ public:
 	void ConstraintJacobian(xSparseD& lhs, xVectorD& q, xVectorD& qd, unsigned int sr, double ct);
 	void DerivateJacobian(xMatrixD& lhs, xVectorD& q, xVectorD& q_1, double* lm, unsigned int sr, double mul, double ct);
 	void SaveStepResult(unsigned int part, double ct, xVectorD& q, xVectorD& q_1, double* L, unsigned int sr);
+	void DerivateEquation(xVectorD& v, xVectorD& q, xVectorD& qd, unsigned int sr, double mul);
 
 private:
 	double RelativeAngle(double ct, vector3d& gi, vector3d& fi, vector3d& fj);

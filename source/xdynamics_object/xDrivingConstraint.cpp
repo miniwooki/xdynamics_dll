@@ -184,6 +184,7 @@ void xDrivingConstraint::ConstraintJacobian(xSparseD& lhs, xVectorD& q, xVectorD
 		if (j)
 			lhs.insert(sr, jc, zv, D2);
 	}
+	srow = sr;
 }
 
 void xDrivingConstraint::DerivateJacobian(xMatrixD& lhs, xVectorD& q, xVectorD& q_1, double* lm, unsigned int sr, double mul, double ct)
@@ -286,6 +287,35 @@ void xDrivingConstraint::SaveStepResult(
 	unsigned int part, double ct, xVectorD& q, xVectorD& qd, double* L, unsigned int sr)
 {
 
+}
+
+void xDrivingConstraint::DerivateEquation(xVectorD& v, xVectorD& q, xVectorD& qd, unsigned int sr, double mul)
+{
+	matrix33d TAi = Transpose(kconst->BaseBody()->TransformationMatrix());
+	matrix33d Aj = kconst->ActionBody()->TransformationMatrix();
+	vector3d fi = kconst->fi;
+	vector3d fj = kconst->fj;
+	vector3d gi = kconst->gi;
+	if (sr < 0)	sr = srow;
+	if (type == ROTATION_DRIVING)
+	{
+		double s;
+		double c;
+		s = dot(gi, TAi*Aj*fj);
+		c = dot(fi, TAi*Aj*fj);
+		if (abs(c) >= abs(s))
+		{
+			v(sr) = -mul * cons_v;
+		}
+		else if (abs(s) > abs(c))
+		{
+			v(sr) = mul * cons_v;
+		}
+	}
+	else if (type == TRANSLATION_DRIVING)
+	{
+		v(sr) = mul * cons_v;
+	}
 }
 
 double xDrivingConstraint::RelativeAngle(double ct, vector3d& gi, vector3d& fi, vector3d& fj)
