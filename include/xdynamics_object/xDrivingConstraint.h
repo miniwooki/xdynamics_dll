@@ -48,6 +48,7 @@ private:
 	//unsigned int scol;
 	//QString name;
 	unsigned int n;
+	unsigned int srow;
 	xKinematicConstraint* kconst;
 	//Type type;
 };

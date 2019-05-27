@@ -7,7 +7,7 @@ xKinematicConstraint::xKinematicConstraint()
 	, j_ptr(NULL)
 	, nConst(0)
 	, nr_part(0)
-	, srow(0)
+
 	//, kcrs(NULL)
 {
 	//name = { 0, };
@@ -22,7 +22,6 @@ xKinematicConstraint::xKinematicConstraint(std::string _name, cType _type, std::
 	, j_ptr(NULL)
 	, nConst(0)
 	, nr_part(0)
-	, srow(0)
 	//, kcrs(NULL)
 {
 	//name = { 0, };

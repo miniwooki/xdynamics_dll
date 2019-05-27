@@ -79,7 +79,7 @@ protected:
 	QVector<kinematicConstraint_result> kcrs;
 	unsigned int nConst;		// The number of constraint 
 	unsigned int nr_part;	
-	unsigned int srow;
+	
 	friend class xDrivingConstraint;
 	int i, j;
 	xPointMass *i_ptr;

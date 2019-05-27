@@ -10,6 +10,7 @@ xDrivingConstraint::xDrivingConstraint()
 	, theta(0.0)
 	, kconst(NULL)
 	, n(0)
+	, srow(0)
 {
 
 }
@@ -23,6 +24,7 @@ xDrivingConstraint::xDrivingConstraint(std::string _name, xKinematicConstraint* 
 	, theta(0.0)
 	, kconst(_kc)
 	, n(0)
+	, srow(0)
 {
 	if (kconst->Type() == xKinematicConstraint::REVOLUTE)
 		type = ROTATION_DRIVING;
@@ -301,8 +303,9 @@ void xDrivingConstraint::DerivateEquation(xVectorD& v, xVectorD& q, xVectorD& qd
 	{
 		double s;
 		double c;
-		s = dot(gi, TAi*Aj*fj);
-		c = dot(fi, TAi*Aj*fj);
+		vector3d af = TAi*(Aj*fj);
+		s = dot(gi, af);
+		c = dot(fi, af);
 		if (abs(c) >= abs(s))
 		{
 			v(sr) = -mul * cons_v;
