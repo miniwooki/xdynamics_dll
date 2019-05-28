@@ -1065,7 +1065,7 @@ __global__ void new_particle_particle_contact_kernel(
 								c, ipos.w, jpos.w, cp->Ei, cp->Ej, cp->pri, cp->prj,
 								cp->coh, rcon, cdist, iomega, pair.ds, pair.dots,
 								rv, unit, Ft, Fn, M);
-							/*rfm[id] += */calculate_previous_rolling_resistance(cp->rfactor, ir, jr, rc, Fn, Ft/*, Mr, Tmax*/);
+							rfm[id] += calculate_previous_rolling_resistance(cp->rfactor, ir, jr, rc, Fn, Ft/*, Mr, Tmax*/);
 							sumF += Fn + Ft;
 							sumM += M;
 							pairs[sid + tcnt++] = pair;

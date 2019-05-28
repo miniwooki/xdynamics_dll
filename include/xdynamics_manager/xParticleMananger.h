@@ -25,6 +25,7 @@ public:
 	double* GetVelocityResultPointer(unsigned int pt);
 // 	unsigned int RealTimeCreating();
 	void AllocParticleResultMemory(unsigned int npart, unsigned int np);
+	void SetCurrentParticlesFromPartResult(std::string path);
 	//static unsigned int GetNumLineParticles(double len, double r0, double r1 = 0);
 	static unsigned int GetNumCubeParticles(double dx, double dy, double dz, double min_radius, double max_radius);
 	static unsigned int GetNumPlaneParticles(double dx, unsigned int ny, double dy, double min_radius, double max_radius);
@@ -52,6 +53,7 @@ private:
 	double *r_vel;
 	xMaterialType *r_type;
 };
+
 
 
 

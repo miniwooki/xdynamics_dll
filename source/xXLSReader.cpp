@@ -364,6 +364,7 @@ void xXLSReader::ReadDEMParticle(xDiscreteElementMethodModel* xdem, vector2i rc)
 {
 	if (xdem->XParticleManager())
 	{
+		int init_col = rc.y;
 		while (1)
 		{
 			if (IsEmptyCell(rc.x, rc.y))
@@ -373,29 +374,13 @@ void xXLSReader::ReadDEMParticle(xDiscreteElementMethodModel* xdem, vector2i rc)
 			int material = static_cast<int>(sheet->readNum(rc.x, rc.y++));
 			if (form == CUBE_SHAPE)
 			{
-// 				if (material == static_cast<int>(FLUID))
-// 				{
-// 					
-// 				}
-// 				else
-// 				{
-				xCubeParticleData d = ReadCubeParticleData(name, rc.x++, rc.y);
+				xCubeParticleData d = ReadCubeParticleData(name, rc.x, rc.y);
 				unsigned int np = xdem->XParticleManager()->GetNumCubeParticles(d.dx, d.dy, d.dz, d.minr, d.maxr);
-				xdem->XParticleManager()->CreateCubeParticle(name.c_str(), (xMaterialType)material, np, d);
-//				}				
+				xdem->XParticleManager()->CreateCubeParticle(name.c_str(), (xMaterialType)material, np, d);			
 			}
 			else if (form == PLANE_SHAPE)
 			{
-// 				if (material == static_cast<int>(FLUID))
-// 				{
-// 					xSPHPlaneObjectData d = ReadSPHPlaneParticleData(name, rc.x++, rc.y);
-// 					//unsigned int np = xparticle->GetNumSPHPlaneParticles(d.dx, d.dy, d.ps);
-// 					xparticle->CreateSPHPlaneParticleObject(name.c_str(), material, d)->setShapeForm(form);
-// 				}
-// 				else
-// 				{
-// 
-// 				}
+
 			}
 
 			if (form == NO_SHAPE_AND_LIST)
@@ -422,6 +407,13 @@ void xXLSReader::ReadDEMParticle(xDiscreteElementMethodModel* xdem, vector2i rc)
 				xdem->XParticleManager()->CreateParticleFromList(name.c_str(), (xMaterialType)material, number, d);
 				delete[] d;
 			}
+			if (!IsEmptyCell(rc.x, rc.y))
+			{
+				std::string p_path = xUtilityFunctions::WideChar2String(sheet->readStr(rc.x, rc.y));
+				xdem->XParticleManager()->SetCurrentParticlesFromPartResult(p_path);
+			}
+			rc.x++;
+			rc.y = init_col;
 		}
 	}
 }
