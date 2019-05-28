@@ -1577,7 +1577,7 @@ __global__ void decide_rolling_friction_moment_kernel(
 			_Tr = _Tmax;
 		moment[id] += _Tr;
 	}
-	rfm[id] = make_double4(0.0, 0.0, 0.0, 0.0);
+	//rfm[id] = make_double4(0.0, 0.0, 0.0, 0.0);
 }
 
 void cu_decide_rolling_friction_moment(

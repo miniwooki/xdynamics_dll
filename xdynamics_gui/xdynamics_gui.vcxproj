@@ -28,7 +28,7 @@
     <ClCompile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_USE_MATH_DEFINES;UNICODE;_UNICODE;WIN32;WIN64;QT_DLL;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_OPENGL_LIB;QT_OPENGLEXTENSIONS_LIB;QT_WIDGETS_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles;.;$(USING_CUDA_SAMPLE_VERSION)\common\inc;.\GeneratedFiles\$(ConfigurationName);$(USING_QT_VERSION)\include\QtCore;$(USING_QT_VERSION)\include\QtGui;$(USING_QT_VERSION)\include\QtANGLE;$(USING_QT_VERSION)\include\QtOpenGL;$(USING_QT_VERSION)\include\QtOpenGLExtensions;$(USING_QT_VERSION)\include\QtWidgets;$(USING_IRRLICHT_VERSION)\include;$(XDYNAMICS_Q)\include\xdynamics_gui;$(XDYNAMICS_Q)\include;$(USING_QT_VERSION)\include\QtCharts;$(USING_QT_VERSION)\include;$(USING_CUDA_VERSION)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles;.;$(USING_CUDA_SAMPLE_VERSION)\common\inc;.\GeneratedFiles\$(ConfigurationName);$(USING_QT_VERSION)\include\QtCore;$(USING_QT_VERSION)\include\QtGui;$(USING_QT_VERSION)\include\QtANGLE;$(USING_QT_VERSION)\include\QtOpenGL;$(USING_QT_VERSION)\include\QtOpenGLExtensions;$(USING_QT_VERSION)\include\QtWidgets;$(USING_IRRLICHT_VERSION)\include;C:\xdynamics\include;C:\xdynamics\include\xdynamics_gui;$(USING_QT_VERSION)\include\QtCharts;$(USING_QT_VERSION)\include;$(USING_CUDA_VERSION)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|x64'">None</DebugInformationFormat>
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MultiThreadedDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</TreatWChar_tAsBuiltInType>
@@ -170,6 +170,40 @@
     <ClCompile Include="..\source\xdynamics_gui\xvParticle.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xvPlane.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xvShader.cpp" />
+    <ClCompile Include="GeneratedFiles\Debug\moc_xAnimationTool.cpp" />
+    <ClCompile Include="GeneratedFiles\Debug\moc_xChartControl.cpp" />
+    <ClCompile Include="GeneratedFiles\Debug\moc_xChartDatabase.cpp" />
+    <ClCompile Include="GeneratedFiles\Debug\moc_xChartView.cpp" />
+    <ClCompile Include="GeneratedFiles\Debug\moc_xChartWindow.cpp" />
+    <ClCompile Include="GeneratedFiles\Debug\moc_xCommandWindow.cpp" />
+    <ClCompile Include="GeneratedFiles\Debug\moc_xdynamics_gui.cpp" />
+    <ClCompile Include="GeneratedFiles\Debug\moc_xGLWidget.cpp" />
+    <ClCompile Include="GeneratedFiles\Debug\moc_xLineEditWidget.cpp" />
+    <ClCompile Include="GeneratedFiles\Debug\moc_xModelNavigator.cpp" />
+    <ClCompile Include="GeneratedFiles\Debug\moc_xNewDialog.cpp" />
+    <ClCompile Include="GeneratedFiles\Debug\moc_xPointMassWidget.cpp" />
+    <ClCompile Include="GeneratedFiles\Debug\moc_xSimulationThread.cpp" />
+    <ClCompile Include="GeneratedFiles\Debug\moc_xSimulationWidget.cpp" />
+    <ClCompile Include="GeneratedFiles\qrc_xdynamics_gui.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_xAnimationTool.cpp" />
+    <ClCompile Include="GeneratedFiles\Release\moc_xChartControl.cpp" />
+    <ClCompile Include="GeneratedFiles\Release\moc_xChartDatabase.cpp" />
+    <ClCompile Include="GeneratedFiles\Release\moc_xChartView.cpp" />
+    <ClCompile Include="GeneratedFiles\Release\moc_xChartWindow.cpp" />
+    <ClCompile Include="GeneratedFiles\Release\moc_xCommandWindow.cpp" />
+    <ClCompile Include="GeneratedFiles\Release\moc_xdynamics_gui.cpp" />
+    <ClCompile Include="GeneratedFiles\Release\moc_xGLWidget.cpp" />
+    <ClCompile Include="GeneratedFiles\Release\moc_xLineEditWidget.cpp" />
+    <ClCompile Include="GeneratedFiles\Release\moc_xModelNavigator.cpp" />
+    <ClCompile Include="GeneratedFiles\Release\moc_xNewDialog.cpp" />
+    <ClCompile Include="GeneratedFiles\Release\moc_xPointMassWidget.cpp" />
+    <ClCompile Include="GeneratedFiles\Release\moc_xSimulationThread.cpp" />
+    <ClCompile Include="GeneratedFiles\Release\moc_xSimulationWidget.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="xdynamics_gui.cpp" />
   </ItemGroup>
