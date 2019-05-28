@@ -37,12 +37,6 @@
     <Filter Include="Source Files\chart">
       <UniqueIdentifier>{c43f461a-9455-4775-908b-8db95e6ff0b9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Generated Files\debug">
-      <UniqueIdentifier>{315b08a0-457a-4438-8bf0-175315b9617c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Generated Files\release">
-      <UniqueIdentifier>{4674533b-e86e-4849-904d-f1c45fcd7f3d}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -128,93 +122,6 @@
     </ClCompile>
     <ClCompile Include="..\source\xdynamics_gui\xChartDatabase.cpp">
       <Filter>Source Files\chart</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_xAnimationTool.cpp">
-      <Filter>Generated Files\debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_xChartControl.cpp">
-      <Filter>Generated Files\debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_xChartDatabase.cpp">
-      <Filter>Generated Files\debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_xChartView.cpp">
-      <Filter>Generated Files\debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_xChartWindow.cpp">
-      <Filter>Generated Files\debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_xCommandWindow.cpp">
-      <Filter>Generated Files\debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_xdynamics_gui.cpp">
-      <Filter>Generated Files\debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_xGLWidget.cpp">
-      <Filter>Generated Files\debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_xLineEditWidget.cpp">
-      <Filter>Generated Files\debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_xModelNavigator.cpp">
-      <Filter>Generated Files\debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_xNewDialog.cpp">
-      <Filter>Generated Files\debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_xPointMassWidget.cpp">
-      <Filter>Generated Files\debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_xSimulationThread.cpp">
-      <Filter>Generated Files\debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_xSimulationWidget.cpp">
-      <Filter>Generated Files\debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_xAnimationTool.cpp">
-      <Filter>Generated Files\release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_xChartControl.cpp">
-      <Filter>Generated Files\release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_xChartDatabase.cpp">
-      <Filter>Generated Files\release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_xChartView.cpp">
-      <Filter>Generated Files\release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_xChartWindow.cpp">
-      <Filter>Generated Files\release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_xCommandWindow.cpp">
-      <Filter>Generated Files\release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_xdynamics_gui.cpp">
-      <Filter>Generated Files\release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_xGLWidget.cpp">
-      <Filter>Generated Files\release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_xLineEditWidget.cpp">
-      <Filter>Generated Files\release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_xModelNavigator.cpp">
-      <Filter>Generated Files\release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_xNewDialog.cpp">
-      <Filter>Generated Files\release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_xPointMassWidget.cpp">
-      <Filter>Generated Files\release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_xSimulationThread.cpp">
-      <Filter>Generated Files\release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_xSimulationWidget.cpp">
-      <Filter>Generated Files\release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\qrc_xdynamics_gui.cpp">
-      <Filter>Generated Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -401,7 +401,7 @@ vector3d xUtilityFunctions::CenterOfTriangle(vector3d& P, vector3d& Q, vector3d&
 
 std::string xUtilityFunctions::xstring(QString v)
 {
-	return std::string(v.toLocal8Bit().data());// toStdString();
+	return v.toStdString();
 }
 
 void xUtilityFunctions::DeleteFilesInDirectory(std::string path)

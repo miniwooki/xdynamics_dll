@@ -10,7 +10,6 @@ xDrivingConstraint::xDrivingConstraint()
 	, theta(0.0)
 	, kconst(NULL)
 	, n(0)
-	, srow(0)
 {
 
 }
@@ -24,7 +23,6 @@ xDrivingConstraint::xDrivingConstraint(std::string _name, xKinematicConstraint* 
 	, theta(0.0)
 	, kconst(_kc)
 	, n(0)
-	, srow(0)
 {
 	if (kconst->Type() == xKinematicConstraint::REVOLUTE)
 		type = ROTATION_DRIVING;
@@ -186,7 +184,6 @@ void xDrivingConstraint::ConstraintJacobian(xSparseD& lhs, xVectorD& q, xVectorD
 		if (j)
 			lhs.insert(sr, jc, zv, D2);
 	}
-	srow = sr;
 }
 
 void xDrivingConstraint::DerivateJacobian(xMatrixD& lhs, xVectorD& q, xVectorD& q_1, double* lm, unsigned int sr, double mul, double ct)
@@ -289,38 +286,6 @@ void xDrivingConstraint::SaveStepResult(
 	unsigned int part, double ct, xVectorD& q, xVectorD& qd, double* L, unsigned int sr)
 {
 
-}
-
-void xDrivingConstraint::DerivateEquation(xVectorD& v, xVectorD& q, xVectorD& qd, int sr, double ct, double mul)
-{
-	if (ct < start_time)
-		return;
-	matrix33d TAi = Transpose(kconst->BaseBody()->TransformationMatrix());
-	matrix33d Aj = kconst->ActionBody()->TransformationMatrix();
-	vector3d fi = kconst->fi;
-	vector3d fj = kconst->fj;
-	vector3d gi = kconst->gi;
-	if (sr < 0)	sr = srow;
-	if (type == ROTATION_DRIVING)
-	{
-		double s;
-		double c;
-		vector3d af = TAi*(Aj*fj);
-		s = dot(gi, af);
-		c = dot(fi, af);
-		if (abs(c) >= abs(s))
-		{
-			v(sr) = -mul * cons_v;
-		}
-		else if (abs(s) > abs(c))
-		{
-			v(sr) = mul * cons_v;
-		}
-	}
-	else if (type == TRANSLATION_DRIVING)
-	{
-		v(sr) = mul * cons_v;
-	}
 }
 
 double xDrivingConstraint::RelativeAngle(double ct, vector3d& gi, vector3d& fi, vector3d& fj)

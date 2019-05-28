@@ -79,7 +79,6 @@ protected:
 	QVector<kinematicConstraint_result> kcrs;
 	unsigned int nConst;		// The number of constraint 
 	unsigned int nr_part;	
-	
 	friend class xDrivingConstraint;
 	int i, j;
 	xPointMass *i_ptr;
@@ -92,6 +91,7 @@ protected:
 	vector3d fi, fj;			
 	vector3d hi, hj;
 	vector3d gi, gj;
+
 	//static xSparseD djaco;
 };
 

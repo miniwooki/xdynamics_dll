@@ -7,7 +7,6 @@ xKinematicConstraint::xKinematicConstraint()
 	, j_ptr(NULL)
 	, nConst(0)
 	, nr_part(0)
-
 	//, kcrs(NULL)
 {
 	//name = { 0, };
