@@ -1,6 +1,6 @@
 #include "xdynamics_algebra/xGridCell.h"
 #include "xdynamics_simulation/xSimulation.h"
-#include "xdynamics_parallel/xParallelCommon_decl.cuh"
+#include "xdynamics_parallel/xParallelDEM_decl.cuh"
 
 vector3d xGridCell::wo;				// world origin
 double xGridCell::cs = 0.0;			// cell size
@@ -74,11 +74,16 @@ void xGridCell::allocMemory(unsigned int n)
 void xGridCell::cuAllocMemory(unsigned int n)
 {
 	ng = gs.x * gs.y * gs.z;
-	checkCudaErrors(cudaMalloc((void**)&d_cell_id, sizeof(unsigned int)*n));
+	checkCudaErrors(cudaMalloc((void**)&d_cell_id, sizeof(unsigned int)*n));	
 	checkCudaErrors(cudaMalloc((void**)&d_body_id, sizeof(unsigned int)*n));
 	checkCudaErrors(cudaMalloc((void**)&d_sorted_id, sizeof(unsigned int)*n));
 	checkCudaErrors(cudaMalloc((void**)&d_cell_start, sizeof(unsigned int)*ng));
 	checkCudaErrors(cudaMalloc((void**)&d_cell_end, sizeof(unsigned int)*ng));
+	checkCudaErrors(cudaMemset(d_cell_id, 0, sizeof(unsigned int) * n));
+	checkCudaErrors(cudaMemset(d_body_id, 0, sizeof(unsigned int) * n));
+	checkCudaErrors(cudaMemset(d_sorted_id, 0, sizeof(unsigned int) * n));
+	checkCudaErrors(cudaMemset(d_cell_start, 0, sizeof(unsigned int) * ng));
+	checkCudaErrors(cudaMemset(d_cell_end, 0, sizeof(unsigned int) * ng));
 	nse = n;
 }
 

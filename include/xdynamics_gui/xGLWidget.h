@@ -89,6 +89,7 @@ public:
 	void openResults(QStringList& fl);
 	void ChangeDisplayOption(int oid);
 	xvObject* Object(QString n);
+	xvObject* Object(int id);
 	QMap<QString, xvObject*>& Objects() { return v_objs; }
 	xvParticle* vParticles();// { return vp; }
 // 	vobject* getVObjectFromName(QString name);

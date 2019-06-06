@@ -1,7 +1,7 @@
 #ifndef XPARALLELSPH_DECL_CUH
 #define XPARALLELSPH_DECL_CUH
 
-#include "xdynamics_parallel/xParallelCommon_decl.cuh"
+//#include "xdynamics_parallel/xParallelCommon_decl.cuh"
 ////#include <vector_types.h>
 ////#include <cuda_runtime.h>
 ////#include <helper_cuda.h>
@@ -60,10 +60,10 @@
 //	double r;
 //};
 //
-void setSPHSymbolicParameter(device_sph_parameters *h_paras);
-void XDYNAMICS_API cuBoundaryMoving(unsigned long long int sid, unsigned long long int pcount, double stime, double* pos, double* pos0, double* vel, double* auxVel, unsigned long long int np);
-void XDYNAMICS_API cu_sph_calculateHashAndIndex(unsigned int *hashes, unsigned int *cell_id, double *pos, unsigned int np);
-void XDYNAMICS_API cu_sph_reorderDataAndFindCellStart(unsigned int *hashes, unsigned int* cell_start, unsigned int np, unsigned int nc);
+//void setSPHSymbolicParameter(device_sph_parameters *h_paras);
+//void XDYNAMICS_API cuBoundaryMoving(unsigned long long int sid, unsigned long long int pcount, double stime, double* pos, double* pos0, double* vel, double* auxVel, unsigned long long int np);
+//void XDYNAMICS_API cu_sph_calculateHashAndIndex(unsigned int *hashes, unsigned int *cell_id, double *pos, unsigned int np);
+//void XDYNAMICS_API cu_sph_reorderDataAndFindCellStart(unsigned int *hashes, unsigned int* cell_start, unsigned int np, unsigned int nc);
 //void XDYNAMICS_API cuPredict_the_acceleration(double* pos, double* vel, double* acc, double* mass, double* rho, xMaterialType* type, bool* isf, double* corr, double* tbVisc, unsigned int* hashes, unsigned int* cell_start, unsigned int np, device_periodic_condition* dpc = NULL);
 //void XDYNAMICS_API cuPredict_the_temporal_velocity(double* vel, double* auxVel, double* acc, xMaterialType* type, unsigned int np);
 //void XDYNAMICS_API cuCalculation_free_surface(double* pos, double* press, double* mass, double* rho, bool* isf, double* ufs, bool* nearfs, double* d_div_r, xMaterialType* tp, unsigned int* hashes, unsigned int* cell_start, unsigned int np, device_periodic_condition* dpc = NULL);

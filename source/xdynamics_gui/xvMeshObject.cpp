@@ -132,7 +132,7 @@ void xvMeshObject::draw(GLenum eMode)
 			double t = 180 / M_PI;
 			unsigned int idx = xvAnimationController::getFrame();
 			xPointMass::pointmass_result pmr = xvObject::pmrs->at(idx);
-			glTranslated(pmr.pos.x - pos.x, pmr.pos.y - pos.y, pmr.pos.z - pos.z);
+			glTranslated(pmr.pos.x, pmr.pos.y, pmr.pos.z);
 			vector3d euler = EulerParameterToEulerAngle(pmr.ep);
 			glRotated(t*euler.x, 0, 0, 1);
 			glRotated(t*euler.y, 1, 0, 0);
@@ -141,7 +141,7 @@ void xvMeshObject::draw(GLenum eMode)
 		}
 		else
 		{
-			glTranslated(0,0,0/*pos.x, -pos.y, -pos.z*/);
+			glTranslated(pos.x, pos.y, pos.z);
 			glRotated(ang.x, 0, 0, 1);
 			glRotated(ang.y, 1, 0, 0);
 			glRotated(ang.z, 0, 0, 1);

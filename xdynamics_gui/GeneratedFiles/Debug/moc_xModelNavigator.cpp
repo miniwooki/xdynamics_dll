@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'xModelNavigator.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.10.0)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.12.3)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -12,7 +12,7 @@
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'xModelNavigator.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.10.0. It"
+#error "This file was generated using the moc from 5.12.3. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -49,7 +49,7 @@ QT_MOC_LITERAL(6, 71, 15) // "changeBlueColor"
 static const uint qt_meta_data_wview[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        5,   14, // methods
@@ -79,7 +79,7 @@ static const uint qt_meta_data_wview[] = {
 void wview::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        wview *_t = static_cast<wview *>(_o);
+        auto *_t = static_cast<wview *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->changeTransparency((*reinterpret_cast< int(*)>(_a[1]))); break;
@@ -92,10 +92,14 @@ void wview::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void 
     }
 }
 
-const QMetaObject wview::staticMetaObject = {
-    { &QWidget::staticMetaObject, qt_meta_stringdata_wview.data,
-      qt_meta_data_wview,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject wview::staticMetaObject = { {
+    &QWidget::staticMetaObject,
+    qt_meta_stringdata_wview.data,
+    qt_meta_data_wview,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *wview::metaObject() const
@@ -161,7 +165,7 @@ QT_MOC_LITERAL(8, 127, 16) // "QTreeWidgetItem*"
 static const uint qt_meta_data_xModelNavigator[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        4,   14, // methods
@@ -193,7 +197,7 @@ static const uint qt_meta_data_xModelNavigator[] = {
 void xModelNavigator::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        xModelNavigator *_t = static_cast<xModelNavigator *>(_o);
+        auto *_t = static_cast<xModelNavigator *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->definedSimulationWidget((*reinterpret_cast< wsimulation*(*)>(_a[1]))); break;
@@ -223,21 +227,21 @@ void xModelNavigator::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int 
     } else if (_c == QMetaObject::IndexOfMethod) {
         int *result = reinterpret_cast<int *>(_a[0]);
         {
-            typedef void (xModelNavigator::*_t)(wsimulation * );
+            using _t = void (xModelNavigator::*)(wsimulation * );
             if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&xModelNavigator::definedSimulationWidget)) {
                 *result = 0;
                 return;
             }
         }
         {
-            typedef void (xModelNavigator::*_t)(wpointmass * );
+            using _t = void (xModelNavigator::*)(wpointmass * );
             if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&xModelNavigator::definedPointMassWidget)) {
                 *result = 1;
                 return;
             }
         }
         {
-            typedef void (xModelNavigator::*_t)();
+            using _t = void (xModelNavigator::*)();
             if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&xModelNavigator::InitializeWidgetStatement)) {
                 *result = 2;
                 return;
@@ -246,10 +250,14 @@ void xModelNavigator::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int 
     }
 }
 
-const QMetaObject xModelNavigator::staticMetaObject = {
-    { &QDockWidget::staticMetaObject, qt_meta_stringdata_xModelNavigator.data,
-      qt_meta_data_xModelNavigator,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject xModelNavigator::staticMetaObject = { {
+    &QDockWidget::staticMetaObject,
+    qt_meta_stringdata_xModelNavigator.data,
+    qt_meta_data_xModelNavigator,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *xModelNavigator::metaObject() const

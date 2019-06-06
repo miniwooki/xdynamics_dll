@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'xdynamics_gui.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.10.0)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.12.3)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -12,7 +12,7 @@
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'xdynamics_gui.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.10.0. It"
+#error "This file was generated using the moc from 5.12.3. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -69,7 +69,7 @@ QT_MOC_LITERAL(20, 294, 21) // "xStopSimulationThread"
 static const uint qt_meta_data_xdynamics_gui[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
       17,   14, // methods
@@ -123,7 +123,7 @@ static const uint qt_meta_data_xdynamics_gui[] = {
 void xdynamics_gui::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        xdynamics_gui *_t = static_cast<xdynamics_gui *>(_o);
+        auto *_t = static_cast<xdynamics_gui *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->xNew(); break;
@@ -148,10 +148,14 @@ void xdynamics_gui::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _i
     }
 }
 
-const QMetaObject xdynamics_gui::staticMetaObject = {
-    { &QMainWindow::staticMetaObject, qt_meta_stringdata_xdynamics_gui.data,
-      qt_meta_data_xdynamics_gui,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject xdynamics_gui::staticMetaObject = { {
+    &QMainWindow::staticMetaObject,
+    qt_meta_stringdata_xdynamics_gui.data,
+    qt_meta_data_xdynamics_gui,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *xdynamics_gui::metaObject() const

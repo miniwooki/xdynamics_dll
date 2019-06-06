@@ -186,21 +186,22 @@ void xParticleMeshObjectsContact::updateMeshObjectData()
 		vector3d omega = 2.0 * GMatrix(ep) * ev;
 		hpmi[id] =
 		{
-			pos.x, pos.y, pos.z,			
+			pos.x, pos.y, pos.z,	
+			ep.e0, ep.e1, ep.e2, ep.e3,
 			vel.x, vel.y, vel.z,
 			omega.x, omega.y, omega.z,
 			0.0, 0.0, 0.0,
-			0.0, 0.0, 0.0,
-			ep.e0, ep.e1, ep.e2, ep.e3
+			0.0, 0.0, 0.0
+			
 		};
 	}
 	if (xSimulation::Gpu())
 	{
-		checkCudaErrors(cudaMemcpy(dpmi, hpmi, sizeof(double) * 19 * nPobjs, cudaMemcpyHostToDevice));
+		checkCudaErrors(cudaMemcpy(dpmi, hpmi, sizeof(device_mesh_mass_info) * nPobjs, cudaMemcpyHostToDevice));
 		foreach(xMeshObject* pobj, pair_ip)
 		{
 			ePolySphere += pobj->NumTriangle();
-			cu_update_meshObjectData(dpmi, dvList, dsphere, dpi, ePolySphere - bPolySphere);
+			//cu_update_meshObjectData(dpmi, dvList, dsphere, dpi, ePolySphere - bPolySphere);
 			bPolySphere += ePolySphere;
 		}
 	}

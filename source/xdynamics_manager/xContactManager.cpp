@@ -5,38 +5,50 @@
 #include <thrust/reduce.h>
 #include <thrust/execution_policy.h>
 #include <list>
-#include <QtCore/QDebug>
+//#include <QtCore/QDebug>
 
 xContactManager::xContactManager()
 	: cpp(NULL)
 	, ncontact(0)
 	, cpmeshes(NULL)
 	, cpplane(NULL)
-	, d_old_pair_count(NULL)
-	, d_pair_count(NULL)
-	, d_old_pair_start(NULL)
-	, d_pair_start(NULL)
-	, d_type_count(NULL)
-	, d_pppd(NULL)
-	, d_rfm(NULL)
+	, d_pair_count_pp(NULL)
+	, d_pair_count_ppl(NULL)
+	, d_pair_count_ptri(NULL)
+	, d_pair_id_pp(NULL)
+	, d_pair_id_ppl(NULL)
+	, d_pair_id_ptri(NULL)
+	, d_tsd_pp(NULL)
+	, d_tsd_ppl(NULL)
+	, d_tsd_ptri(NULL)
+	, d_Tmax(NULL)
+	, d_RRes(NULL)
+
 {
 
 }
 
 xContactManager::~xContactManager()
 {
-	qDeleteAll(cots);
+	//qDeleteAll(cots);
 	//if (cpp) delete cpp; cpp = NULL;
-	if (cpmeshes) delete cpmeshes; cpmeshes = NULL;
-	if (cpplane) delete cpplane; cpplane = NULL;
+	//if (cpmeshes) delete cpmeshes; cpmeshes = NULL;
+	//if (cpplane) delete cpplane; cpplane = NULL;
 
-	if (d_pair_count) checkCudaErrors(cudaFree(d_pair_count)); d_pair_count = NULL;
-	if (d_old_pair_start) checkCudaErrors(cudaFree(d_old_pair_start)); d_old_pair_start = NULL;
-	if (d_pair_start) checkCudaErrors(cudaFree(d_pair_start)); d_pair_start = NULL;
-	if (d_type_count) checkCudaErrors(cudaFree(d_type_count)); d_type_count = NULL;
-	if (d_pppd) checkCudaErrors(cudaFree(d_pppd)); d_pppd = NULL;
-	if (d_rfm) checkCudaErrors(cudaFree(d_rfm)); d_rfm = NULL;
+	if (d_pair_count_pp) checkCudaErrors(cudaFree(d_pair_count_pp)); d_pair_count_pp = NULL;
+	if (d_pair_count_ppl) checkCudaErrors(cudaFree(d_pair_count_ppl)); d_pair_count_ppl = NULL;
+	if (d_pair_count_ptri) checkCudaErrors(cudaFree(d_pair_count_ptri)); d_pair_count_ptri = NULL;
+	if (d_pair_id_pp) checkCudaErrors(cudaFree(d_pair_id_pp)); d_pair_id_pp = NULL;
+	if (d_pair_id_ppl) checkCudaErrors(cudaFree(d_pair_id_ppl)); d_pair_id_ppl = NULL;
+	if (d_pair_id_ptri) checkCudaErrors(cudaFree(d_pair_id_ptri)); d_pair_id_ptri = NULL;
+	if (d_tsd_pp) checkCudaErrors(cudaFree(d_tsd_pp)); d_tsd_pp = NULL;
+	if (d_tsd_ppl) checkCudaErrors(cudaFree(d_tsd_ppl)); d_tsd_ppl = NULL;
+	if (d_tsd_ptri) checkCudaErrors(cudaFree(d_tsd_ptri)); d_tsd_ptri = NULL;
+	if (d_Tmax) checkCudaErrors(cudaFree(d_Tmax)); d_Tmax = NULL;
+	if (d_RRes) checkCudaErrors(cudaFree(d_RRes)); d_RRes = NULL;
 }
+
+
 
 xContact* xContactManager::CreateContactPair(
 	std::string n, xContactForceModelType method, xObject* o1, xObject* o2, xContactParameterData& d)
@@ -149,15 +161,15 @@ xParticlePlanesContact* xContactManager::ContactParticlesPlanes()
 }
 
 bool xContactManager::runCollision(
-	double *pos, double *vel, double* ep, double *omega, 
-	double *mass, double* inertia, double *force, double *moment, 
-	unsigned int *sorted_id, unsigned int *cell_start, 
+	double *pos, double *vel, double *omega,
+	double *mass, double* inertia, double *force, double *moment,
+	unsigned int *sorted_id, unsigned int *cell_start,
 	unsigned int *cell_end, unsigned int np)
 {
 	if (xSimulation::Cpu())
 	{
 		hostCollision
-			(
+		(
 			(vector4d*)pos,
 			(vector3d*)vel,
 			(vector3d*)omega,
@@ -165,15 +177,15 @@ bool xContactManager::runCollision(
 			(vector3d*)force,
 			(vector3d*)moment,
 			sorted_id, cell_start, cell_end, np
-			);
+		);
 	}
 	else if (xSimulation::Gpu())
 	{
 		deviceCollision(
-			pos, vel, ep, omega,
+			pos, vel, omega,
 			mass, inertia, force, moment,
 			sorted_id, cell_start, cell_end, np
-			);
+		);
 	}
 	return true;
 }
@@ -184,12 +196,12 @@ void xContactManager::update()
 	{
 		cpmeshes->updateMeshObjectData();
 	}
-// 	if (cppoly)
-// 	{
-// 		model::isSinglePrecision ?
-// 			cppoly->updatePolygonObjectData_f() :
-// 			cppoly->updatePolygonObjectData();
-// 	}
+	// 	if (cppoly)
+	// 	{
+	// 		model::isSinglePrecision ?
+	// 			cppoly->updatePolygonObjectData_f() :
+	// 			cppoly->updatePolygonObjectData();
+	// 	}
 }
 
 void xContactManager::allocPairList(unsigned int np)
@@ -201,18 +213,36 @@ void xContactManager::allocPairList(unsigned int np)
 	}
 	else
 	{
-		checkCudaErrors(cudaMalloc((void**)&d_pair_count, sizeof(unsigned int) * np));
-		checkCudaErrors(cudaMalloc((void**)&d_old_pair_count, sizeof(unsigned int) * np));
-		checkCudaErrors(cudaMalloc((void**)&d_pair_start, sizeof(unsigned int) * np));
-		checkCudaErrors(cudaMalloc((void**)&d_old_pair_start, sizeof(unsigned int) * np));
-		checkCudaErrors(cudaMalloc((void**)&d_type_count, sizeof(int) * np * 2));
-		checkCudaErrors(cudaMalloc((void**)&d_rfm, sizeof(double) * np * 4));
-		checkCudaErrors(cudaMemset(d_pair_count, 0, sizeof(unsigned int) * np));
-		checkCudaErrors(cudaMemset(d_old_pair_count, 0, sizeof(unsigned int) * np));
-		checkCudaErrors(cudaMemset(d_pair_start, 0, sizeof(unsigned int) * np));
-		checkCudaErrors(cudaMemset(d_old_pair_start, 0, sizeof(unsigned int) * np));
-		checkCudaErrors(cudaMemset(d_type_count, 0, sizeof(int) * np * 2));
-		checkCudaErrors(cudaMemset(d_rfm, 0, sizeof(double) * np * 4));
+		checkCudaErrors(cudaMalloc((void**)&d_pair_count_pp, sizeof(unsigned int) * np));
+		checkCudaErrors(cudaMalloc((void**)&d_pair_count_ppl, sizeof(unsigned int) * np));
+		// 		checkCudaErrors(cudaMalloc((void**)&d_pair_count_ptri, sizeof(unsigned int) * np));
+		checkCudaErrors(cudaMalloc((void**)&d_pair_id_pp, sizeof(unsigned int) * np * 6));
+		checkCudaErrors(cudaMalloc((void**)&d_pair_id_ppl, sizeof(unsigned int) * np * 3));
+		// 		checkCudaErrors(cudaMalloc((void**)&d_pair_id_ptri, sizeof(unsigned int) * np * 3));
+		checkCudaErrors(cudaMalloc((void**)&d_tsd_pp, sizeof(double2) * np * 6));
+		checkCudaErrors(cudaMalloc((void**)&d_tsd_ppl, sizeof(double2) * np * 3));
+		// 		checkCudaErrors(cudaMalloc((void**)&d_tsd_ptri, sizeof(double2) * np * 3));
+		// 		//checkCudaErrors(cudaMalloc((void**)&d_old_pair_count, sizeof(unsigned int) * np));
+		// 		//checkCudaErrors(cudaMalloc((void**)&d_pair_start, sizeof(unsigned int) * np));
+		// 		//checkCudaErrors(cudaMalloc((void**)&d_old_pair_start, sizeof(unsigned int) * np));
+		// 		//checkCudaErrors(cudaMalloc((void**)&d_type_count, sizeof(int) * np * 2));
+		checkCudaErrors(cudaMalloc((void**)&d_Tmax, sizeof(double3) * np));
+		checkCudaErrors(cudaMalloc((void**)&d_RRes, sizeof(double) * np));
+		checkCudaErrors(cudaMemset(d_pair_count_pp, 0, sizeof(unsigned int) * np));
+		checkCudaErrors(cudaMemset(d_pair_count_ppl, 0, sizeof(unsigned int) * np));
+		// 		checkCudaErrors(cudaMemset(d_pair_count_ptri, 0, sizeof(unsigned int) * np));
+		checkCudaErrors(cudaMemset(d_pair_id_pp, 0, sizeof(unsigned int) * np * 6));
+		checkCudaErrors(cudaMemset(d_pair_id_ppl, 0, sizeof(unsigned int) * np * 3));
+		// 		checkCudaErrors(cudaMemset(d_pair_id_ptri, 0, sizeof(unsigned int) * np * 3));
+		checkCudaErrors(cudaMemset(d_tsd_pp, 0, sizeof(double2) * np * 6));
+		checkCudaErrors(cudaMemset(d_tsd_ppl, 0, sizeof(double2) * np * 3));
+		// 		checkCudaErrors(cudaMemset(d_tsd_ptri, 0, sizeof(double2) * np * 3));
+		// 		//checkCudaErrors(cudaMalloc((void**)&d_old_pair_count, sizeof(unsigned int) * np));
+		// 		//checkCudaErrors(cudaMalloc((void**)&d_pair_start, sizeof(unsigned int) * np));
+		// 		//checkCudaErrors(cudaMalloc((void**)&d_old_pair_start, sizeof(unsigned int) * np));
+		// 		//checkCudaErrors(cudaMalloc((void**)&d_type_count, sizeof(int) * np * 2));
+		checkCudaErrors(cudaMemset(d_Tmax, 0, sizeof(double3) * np));
+		checkCudaErrors(cudaMemset(d_RRes, 0, sizeof(double) * np));
 	}
 }
 
@@ -224,15 +254,15 @@ void xContactManager::updateCollisionPair(vector4d* pos, unsigned int* sorted_id
 		double r = pos[i].w;
 		cpplane->updateCollisionPair(xcpl[i], r, p);
 		vector3i gp = xGridCell::getCellNumber(p.x, p.y, p.z);
-		for (int z = -1; z <= 1; z++){
-			for (int y = -1; y <= 1; y++){
-				for (int x = -1; x <= 1; x++){
+		for (int z = -1; z <= 1; z++) {
+			for (int y = -1; y <= 1; y++) {
+				for (int x = -1; x <= 1; x++) {
 					vector3i neigh = new_vector3i(gp.x + x, gp.y + y, gp.z + z);
 					unsigned int hash = xGridCell::getHash(neigh);
 					unsigned int sid = cell_start[hash];
-					if (sid != 0xffffffff){
+					if (sid != 0xffffffff) {
 						unsigned int eid = cell_end[hash];
-						for (unsigned int j = sid; j < eid; j++){
+						for (unsigned int j = sid; j < eid; j++) {
 							unsigned int k = sorted_id[j];
 							if (i != k && k < np)
 							{
@@ -256,58 +286,90 @@ void xContactManager::updateCollisionPair(vector4d* pos, unsigned int* sorted_id
 }
 
 void xContactManager::deviceCollision(
-	double *pos, double *vel, double* ep, double *omega, 
-	double *mass, double* inertia, double *force, double *moment, 
-	unsigned int *sorted_id, unsigned int *cell_start, 
+	double *pos, double *vel, double *omega,
+	double *mass, double* inertia, double *force, double *moment,
+	unsigned int *sorted_id, unsigned int *cell_start,
 	unsigned int *cell_end, unsigned int np)
 {
-	checkCudaErrors(cudaMemcpy(d_old_pair_count, d_pair_count, sizeof(unsigned int) * np, cudaMemcpyDeviceToDevice));
-	unsigned int nc = deviceContactCount(pos, vel, omega, mass, force, moment, sorted_id, cell_start, cell_end, np);
-	//std::cout << "ncontact : " << nc << std::endl;
-	if (!nc) return;
-	checkCudaErrors(cudaMemcpy(d_old_pair_start, d_pair_start, sizeof(unsigned int) * np, cudaMemcpyDeviceToDevice));
-	pair_data* d_old_pppd;
-	checkCudaErrors(cudaMalloc((void**)&d_old_pppd, sizeof(pair_data) * ncontact));
-	checkCudaErrors(cudaMemcpy(d_old_pppd, d_pppd, sizeof(pair_data) * ncontact, cudaMemcpyDeviceToDevice));
-	if (d_pppd)
-		checkCudaErrors(cudaFree(d_pppd));
-	checkCudaErrors(cudaMalloc((void**)&d_pppd, sizeof(pair_data) * nc));
-	cu_copy_old_to_new_pair(d_old_pair_count, d_pair_count, d_old_pair_start, d_pair_start, d_old_pppd, d_pppd, nc, np);
-	checkCudaErrors(cudaMemset(d_rfm, 0, sizeof(double4) * np));
-	cu_new_particle_particle_contact(
-		pos, /*ep,*/ vel, omega, mass, /*inertia,*/ force, moment, 
-		d_old_pppd, d_pppd, d_rfm,/* d_rfm,*/
-		d_old_pair_count, d_pair_count,
-		d_old_pair_start, d_pair_start, 
-		d_type_count, cpp->DeviceContactProperty(), 
-		sorted_id, cell_start, cell_end, np);
-
-	if (cpplane && cpplane->NumPlanes())
-	{
-		cu_new_particle_plane_contact(
-			cpplane->devicePlaneInfo(), pos, vel,/* ep,*/ omega,
-			mass, /*inertia,*/ force, moment,
-			d_old_pair_count, d_pair_count,
-			d_old_pair_start, d_pair_start, d_type_count,
-			d_old_pppd, d_pppd, d_rfm, cpplane->DeviceContactProperty(),
-			cpplane->NumContact(), np);
-	}
+	// 	checkCudaErrors(cudaMemcpy(d_old_pair_count, d_pair_count, sizeof(unsigned int) * np, cudaMemcpyDeviceToDevice));
+	// 	unsigned int nc = deviceContactCount(pos, vel, omega, mass, force, moment, sorted_id, cell_start, cell_end, np);
+	// 	std::cout << "ncontact : " << nc << std::endl;
+	// 	if (!nc) return;
+	// 	checkCudaErrors(cudaMemcpy(d_old_pair_start, d_pair_start, sizeof(unsigned int) * np, cudaMemcpyDeviceToDevice));
+	// 	pair_data* d_old_pppd = NULL;
+	// // 	if (ncontact)
+	// // 	{
+	//  		checkCudaErrors(cudaMalloc((void**)&d_old_pppd, sizeof(pair_data) * ncontact));
+	// 		checkCudaErrors(cudaMemcpy(d_old_pppd, d_pppd, sizeof(pair_data) * ncontact, cudaMemcpyDeviceToDevice));
+	// //	}
+	// 	
+	// 	if (d_pppd)
+	// 		checkCudaErrors(cudaFree(d_pppd));
+	// 	checkCudaErrors(cudaMalloc((void**)&d_pppd, sizeof(pair_data) * nc));
+	// // 	if (ncontact)
+	// // 	{
+	// 		cu_copy_old_to_new_pair(d_old_pair_count, d_pair_count, d_old_pair_start, d_pair_start, d_old_pppd, d_pppd, nc, np);
+	// 	//}
+	// 	
+	//	checkCudaErrors(cudaMemset(d_rfm, 0, sizeof(double4) * np));
+	// 	double* hmoment = new double[np * 3];
+	// 	cudaMemcpy(hmoment, force, sizeof(double) * np * 3, cudaMemcpyDeviceToHost);
+	// 	std::fstream fs;
+	// 	fs.open("C:/xdynamics/moment.txt", std::ios::out);
+	// 	for (unsigned int i = 0; i < np; i++)
+	// 	{
+	// 		fs << hmoment[i * 3 + 0] << " " << hmoment[i * 3 + 1] << " " << hmoment[i * 3 + 2] << std::endl;
+	// 	}
+	// 	fs.close();
+	// 	delete[] hmoment;
+	cu_calculate_p2p(1, pos, vel, omega, force, moment, mass,
+		d_Tmax, d_RRes, d_pair_count_pp, d_pair_id_pp, d_tsd_pp, sorted_id,
+		cell_start, cell_end, cpp->DeviceContactProperty(), np);
+	// 	cu_particle_particle_contact(
+	// 		pos, /*ep,*/ vel, omega, mass, /*inertia,*/ force, moment, 
+	// 		d_pair_count_pp, d_pair_id_pp, d_tsd_pp,
+	// 		d_Tmax, d_RRes, cpp->DeviceContactProperty(), 
+	// 		sorted_id, cell_start, cell_end, np);
+	cu_plane_contact_force(1, cpplane->devicePlaneInfo(), pos, vel,
+		omega, force, moment, mass,
+		d_Tmax, d_RRes, d_pair_count_ppl, d_pair_id_ppl, d_tsd_ppl,
+		np, cpplane->DeviceContactProperty());
+	// 	if (cpplane && cpplane->NumPlanes())
+	// 	{
+	// 		cu_particle_plane_contact(
+	// 			cpplane->devicePlaneInfo(), pos, vel,/* ep,*/ omega,
+	// 			mass, d_Tmax, d_RRes, force, moment,
+	// 			d_pair_count_ppl, d_pair_id_ppl, d_tsd_ppl, cpplane->DeviceContactProperty(),
+	// 			cpplane->NumContact(), np);
+	// 	}
+	// 		double *dhmoment = new double[np * 2];
+	// 		cudaMemcpy(dhmoment, d_pair_count_pp, sizeof(unsigned int) * np, cudaMemcpyDeviceToHost);
+	// 		fs.open("C:/xdynamics/moment.txt", std::ios::out);
+	// 		for (unsigned int i = 0; i < np; i++)
+	// 		{
+	// 			fs << dhmoment[i] << std::endl;// " " << hmoment[i * 3 + 1] << " " << hmoment[i * 3 + 2] << std::endl;
+	// 		}
+	// 		fs.close();
+	// 		delete[] dhmoment; 
 
 	if (cpmeshes && cpmeshes->NumContactObjects())
 	{
-		cpmeshes->updateMeshMassData();
-	//	qDebug() << "new_polygon_contact";
-		cu_new_particle_polygon_object_contact(
-			cpmeshes->deviceTrianglesInfo(), cpmeshes->devicePolygonObjectMassInfo(),
-			d_old_pppd, d_pppd, d_rfm, d_old_pair_count, d_pair_count, d_old_pair_start, d_pair_start,
-			d_type_count, pos, vel,/* ep,*/ omega, force, moment, mass, /*inertia,*/
-			sorted_id, cell_start, cell_end, cpmeshes->DeviceContactProperty(), np);
-		cpmeshes->getMeshContactForce();
+		//	cpmeshes->updateMeshMassData();
+		////	qDebug() << "new_polygon_contact";
+		//	cu_new_particle_polygon_object_contact(
+		//		cpmeshes->deviceTrianglesInfo(), cpmeshes->devicePolygonObjectMassInfo(),
+		//		d_old_pppd, d_pppd, d_rfm, d_old_pair_count, d_pair_count, d_old_pair_start, d_pair_start,
+		//		d_type_count, pos, vel,/* ep,*/ omega, force, moment, mass, /*inertia,*/
+		//		sorted_id, cell_start, cell_end, cpmeshes->DeviceContactProperty(), np);
+		//	cpmeshes->getMeshContactForce();
 	}
-	cu_decide_rolling_friction_moment(d_rfm, inertia, omega, moment, np);
-	ncontact = nc;
+	//cu_decide_rolling_friction_moment(d_rfm, inertia, omega, moment, np);
+	//if (d_old_pppd)
+	//checkCudaErrors(cudaFree(d_old_pppd));
+	//ncontact = nc;
 	//std::cout << "finish_cm" << endl;
-	checkCudaErrors(cudaFree(d_old_pppd));
+
+
 }
 
 void xContactManager::hostCollision(vector4d *pos, vector3d *vel, vector3d *omega, double *mass, vector3d *force, vector3d *moment, unsigned int *sorted_id, unsigned int *cell_start, unsigned int *cell_end, unsigned int np)
@@ -328,104 +390,104 @@ void xContactManager::hostCollision(vector4d *pos, vector3d *vel, vector3d *omeg
 		force[i] += F;
 		moment[i] += M;
 	}
-// 		foreach(xPairData* d, pairs->PlanePair())
-// 		{
-// 
-// 		}
-// 		
-// 		foreach(xContact* c, cots)
-// 		{
-// // 			if (c->IgnoreTime() && (simulation::ctime > c->IgnoreTime()))
-// // 				continue;
-// 			if (c->IsEnabled())
-// 				c->collision(r, m, p, v, o, F, M);
-// 		}
-// 		vector3i gp = xGridCell::getCellNumber(p.x, p.y, p.z);
-// 		for (int z = -1; z <= 1; z++){
-// 			for (int y = -1; y <= 1; y++){
-// 				for (int x = -1; x <= 1; x++){
-// 					vector3i neigh = new_vector3i(gp.x + x, gp.y + y, gp.z + z);
-// 					unsigned int hash = xGridCell::getHash(neigh);
-// 					unsigned int sid = cell_start[hash];
-// 					if (sid != 0xffffffff){
-// 						unsigned int eid = cell_end[hash];
-// 						for (unsigned int j = sid; j < eid; j++){
-// 							unsigned int k = sorted_id[j];
-// 							if (i != k && k < np)
-// 							{
-// 								vector3d jp = new_vector3d(pos[k].x, pos[k].y, pos[k].z);
-// 								vector3d jv = vel[k];
-// 								vector3d jo = omega[k];
-// 								double jr = pos[k].w;
-// 								double jm = mass[k];
-// 								cpp->cppCollision(
-// 									r, jr,
-// 									m, jm,
-// 									p, jp,
-// 									v, jv,
-// 									o, jo,
-// 									F, M);
-// 							}
-// 							else if (k >= np)
-// 							{
-// // 								if (!cppoly->cppolyCollision(k - np, r, m, p, v, o, F, M))
-// // 								{
-// // 
-// // 								}
-// 							}
-// 						}
-// 					}
-// 				}
-// 			}
-// 		}
-// 		force[i] += F;
-// 		moment[i] += M;
-// 	}
+	// 		foreach(xPairData* d, pairs->PlanePair())
+	// 		{
+	// 
+	// 		}
+	// 		
+	// 		foreach(xContact* c, cots)
+	// 		{
+	// // 			if (c->IgnoreTime() && (simulation::ctime > c->IgnoreTime()))
+	// // 				continue;
+	// 			if (c->IsEnabled())
+	// 				c->collision(r, m, p, v, o, F, M);
+	// 		}
+	// 		vector3i gp = xGridCell::getCellNumber(p.x, p.y, p.z);
+	// 		for (int z = -1; z <= 1; z++){
+	// 			for (int y = -1; y <= 1; y++){
+	// 				for (int x = -1; x <= 1; x++){
+	// 					vector3i neigh = new_vector3i(gp.x + x, gp.y + y, gp.z + z);
+	// 					unsigned int hash = xGridCell::getHash(neigh);
+	// 					unsigned int sid = cell_start[hash];
+	// 					if (sid != 0xffffffff){
+	// 						unsigned int eid = cell_end[hash];
+	// 						for (unsigned int j = sid; j < eid; j++){
+	// 							unsigned int k = sorted_id[j];
+	// 							if (i != k && k < np)
+	// 							{
+	// 								vector3d jp = new_vector3d(pos[k].x, pos[k].y, pos[k].z);
+	// 								vector3d jv = vel[k];
+	// 								vector3d jo = omega[k];
+	// 								double jr = pos[k].w;
+	// 								double jm = mass[k];
+	// 								cpp->cppCollision(
+	// 									r, jr,
+	// 									m, jm,
+	// 									p, jp,
+	// 									v, jv,
+	// 									o, jo,
+	// 									F, M);
+	// 							}
+	// 							else if (k >= np)
+	// 							{
+	// // 								if (!cppoly->cppolyCollision(k - np, r, m, p, v, o, F, M))
+	// // 								{
+	// // 
+	// // 								}
+	// 							}
+	// 						}
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 		force[i] += F;
+	// 		moment[i] += M;
+	// 	}
 }
 
 unsigned int xContactManager::deviceContactCount(
-	double *pos, double *vel, double *omega, 
-	double *mass, double *force, double *moment, 
-	unsigned int *sorted_id, unsigned int *cell_start, 
+	double *pos, double *vel, double *omega,
+	double *mass, double *force, double *moment,
+	unsigned int *sorted_id, unsigned int *cell_start,
 	unsigned int *cell_end, unsigned int np)
 {
-	cu_calculate_particle_particle_contact_count(
-		pos,
-		d_pppd,
-		d_old_pair_count,
-		d_pair_count,
-		d_pair_start,
-		sorted_id,
-		cell_start,
-		cell_end,
-		np);
-	if (cpmeshes && cpmeshes->NumContactObjects())
-	{
-		cu_calculate_particle_triangle_contact_count(
-			cpmeshes->deviceTrianglesInfo(),
-			pos,
-			d_pppd,
-			d_old_pair_count,
-			d_pair_count,
-			d_pair_start,
-			sorted_id,
-			cell_start,
-			cell_end,
-			np);
-	}
-	
-	if (cpplane && cpplane->NumPlanes())
-	{
-		cu_calculate_particle_plane_contact_count(
-			cpplane->devicePlaneInfo(),
-			d_pppd,
-			d_old_pair_count,
-			d_pair_count,
-			d_pair_start,
-			pos,
-			cpplane->NumPlanes(),
-			np);
-	}
-
-	return cu_sumation_contact_count(d_pair_count, np);
+	// 	cu_calculate_particle_particle_contact_count(
+	// 		pos,
+	// 		d_pppd,
+	// 		d_old_pair_count,
+	// 		d_pair_count,
+	// 		d_pair_start,
+	// 		sorted_id,
+	// 		cell_start,
+	// 		cell_end,
+	// 		np);
+	// 	if (cpmeshes && cpmeshes->NumContactObjects())
+	// 	{
+	// 		cu_calculate_particle_triangle_contact_count(
+	// 			cpmeshes->deviceTrianglesInfo(),
+	// 			pos,
+	// 			d_pppd,
+	// 			d_old_pair_count,
+	// 			d_pair_count,
+	// 			d_pair_start,
+	// 			sorted_id,
+	// 			cell_start,
+	// 			cell_end,
+	// 			np);
+	// 	}
+	// 	
+	// 	if (cpplane && cpplane->NumPlanes())
+	// 	{
+	// 		cu_calculate_particle_plane_contact_count(
+	// 			cpplane->devicePlaneInfo(),
+	// 			d_pppd,
+	// 			d_old_pair_count,
+	// 			d_pair_count,
+	// 			d_pair_start,
+	// 			pos,
+	// 			cpplane->NumPlanes(),
+	// 			np);
+	// 	}
+	// 	std::cout << "before cu_sumation_contact_count " << std::endl;
+	return 0; //cu_sumation_contact_count(d_pair_count, np);
 }

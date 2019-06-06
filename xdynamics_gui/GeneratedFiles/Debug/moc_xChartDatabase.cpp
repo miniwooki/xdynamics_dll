@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'xChartDatabase.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.10.0)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.12.3)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -12,7 +12,7 @@
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'xChartDatabase.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.10.0. It"
+#error "This file was generated using the moc from 5.12.3. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -48,7 +48,7 @@ QT_MOC_LITERAL(6, 67, 14) // "selectPlotItem"
 static const uint qt_meta_data_xChartDatabase[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        4,   14, // methods
@@ -80,7 +80,7 @@ static const uint qt_meta_data_xChartDatabase[] = {
 void xChartDatabase::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        xChartDatabase *_t = static_cast<xChartDatabase *>(_o);
+        auto *_t = static_cast<xChartDatabase *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->ClickedItem((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2]))); break;
@@ -92,7 +92,7 @@ void xChartDatabase::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _
     } else if (_c == QMetaObject::IndexOfMethod) {
         int *result = reinterpret_cast<int *>(_a[0]);
         {
-            typedef void (xChartDatabase::*_t)(int , QString );
+            using _t = void (xChartDatabase::*)(int , QString );
             if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&xChartDatabase::ClickedItem)) {
                 *result = 0;
                 return;
@@ -101,10 +101,14 @@ void xChartDatabase::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _
     }
 }
 
-const QMetaObject xChartDatabase::staticMetaObject = {
-    { &QDockWidget::staticMetaObject, qt_meta_stringdata_xChartDatabase.data,
-      qt_meta_data_xChartDatabase,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject xChartDatabase::staticMetaObject = { {
+    &QDockWidget::staticMetaObject,
+    qt_meta_stringdata_xChartDatabase.data,
+    qt_meta_data_xChartDatabase,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *xChartDatabase::metaObject() const

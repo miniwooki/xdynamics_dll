@@ -5,6 +5,7 @@
 // #include "multibodyDynamics.h"
 
 #include <QThread>
+#include <QMutex>
 
 class xDynamicsSimulator;
 class xDynamicsManager;

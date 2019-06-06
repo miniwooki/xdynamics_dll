@@ -29,8 +29,8 @@ public:
 
 private:
 	double maxRadii;
-	xObject* p;
-	xObject* po;
+	xParticleObject* p;
+	xMeshObject* po;
 };
 
 

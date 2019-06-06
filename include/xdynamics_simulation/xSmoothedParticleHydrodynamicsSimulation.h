@@ -6,7 +6,7 @@
 #include "xdynamics_algebra/xSmoothCell.h"
 #include "xdynamics_object/xKernelFunction.h"
 #include "xdynamics_manager/xSmoothedParticleHydrodynamicsModel.h"
-#include "xdynamics_parallel/xParallelCommon_decl.cuh"
+#include "xdynamics_parallel/xParallelDEM_decl.cuh"
 
 class XDYNAMICS_API xSmoothedParticleHydrodynamicsSimulation : public xSimulation
 {

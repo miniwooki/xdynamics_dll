@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'wview.ui'
 **
-** Created by: Qt User Interface Compiler version 5.10.0
+** Created by: Qt User Interface Compiler version 5.12.3
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,13 +10,10 @@
 #define UI_WVIEW_H
 
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QGroupBox>
-#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
@@ -51,7 +48,7 @@ public:
     void setupUi(QWidget *wview)
     {
         if (wview->objectName().isEmpty())
-            wview->setObjectName(QStringLiteral("wview"));
+            wview->setObjectName(QString::fromUtf8("wview"));
         wview->resize(230, 200);
         QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
@@ -62,29 +59,29 @@ public:
         wview->setMaximumSize(QSize(230, 200));
         gridLayout = new QGridLayout(wview);
         gridLayout->setSpacing(0);
-        gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         gridLayout->setContentsMargins(0, 0, 0, 0);
         frame = new QFrame(wview);
-        frame->setObjectName(QStringLiteral("frame"));
+        frame->setObjectName(QString::fromUtf8("frame"));
         frame->setFrameShape(QFrame::StyledPanel);
         frame->setFrameShadow(QFrame::Raised);
         gridLayout_2 = new QGridLayout(frame);
         gridLayout_2->setSpacing(0);
-        gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
+        gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
         gridLayout_2->setContentsMargins(0, 0, 0, 0);
         GBTransparency = new QGroupBox(frame);
-        GBTransparency->setObjectName(QStringLiteral("GBTransparency"));
+        GBTransparency->setObjectName(QString::fromUtf8("GBTransparency"));
         gridLayout_4 = new QGridLayout(GBTransparency);
-        gridLayout_4->setObjectName(QStringLiteral("gridLayout_4"));
+        gridLayout_4->setObjectName(QString::fromUtf8("gridLayout_4"));
         HSTransparency = new QSlider(GBTransparency);
-        HSTransparency->setObjectName(QStringLiteral("HSTransparency"));
+        HSTransparency->setObjectName(QString::fromUtf8("HSTransparency"));
         HSTransparency->setOrientation(Qt::Horizontal);
         HSTransparency->setTickPosition(QSlider::TicksBelow);
 
         gridLayout_4->addWidget(HSTransparency, 0, 0, 1, 1);
 
         LETransparency = new QLineEdit(GBTransparency);
-        LETransparency->setObjectName(QStringLiteral("LETransparency"));
+        LETransparency->setObjectName(QString::fromUtf8("LETransparency"));
         LETransparency->setMinimumSize(QSize(40, 20));
         LETransparency->setMaximumSize(QSize(40, 20));
 
@@ -94,66 +91,66 @@ public:
         gridLayout_2->addWidget(GBTransparency, 0, 0, 1, 1);
 
         GBColor = new QGroupBox(frame);
-        GBColor->setObjectName(QStringLiteral("GBColor"));
+        GBColor->setObjectName(QString::fromUtf8("GBColor"));
         gridLayout_3 = new QGridLayout(GBColor);
-        gridLayout_3->setObjectName(QStringLiteral("gridLayout_3"));
+        gridLayout_3->setObjectName(QString::fromUtf8("gridLayout_3"));
         gridLayout_3->setContentsMargins(5, 5, 5, 5);
         label = new QLabel(GBColor);
-        label->setObjectName(QStringLiteral("label"));
+        label->setObjectName(QString::fromUtf8("label"));
 
         gridLayout_3->addWidget(label, 0, 0, 1, 1);
 
         HSRed = new QSlider(GBColor);
-        HSRed->setObjectName(QStringLiteral("HSRed"));
+        HSRed->setObjectName(QString::fromUtf8("HSRed"));
         HSRed->setOrientation(Qt::Horizontal);
 
         gridLayout_3->addWidget(HSRed, 0, 1, 1, 1);
 
         LERed = new QLineEdit(GBColor);
-        LERed->setObjectName(QStringLiteral("LERed"));
+        LERed->setObjectName(QString::fromUtf8("LERed"));
         LERed->setMinimumSize(QSize(40, 20));
         LERed->setMaximumSize(QSize(40, 20));
 
         gridLayout_3->addWidget(LERed, 0, 2, 1, 1);
 
         label_2 = new QLabel(GBColor);
-        label_2->setObjectName(QStringLiteral("label_2"));
+        label_2->setObjectName(QString::fromUtf8("label_2"));
 
         gridLayout_3->addWidget(label_2, 1, 0, 1, 1);
 
         HSGreen = new QSlider(GBColor);
-        HSGreen->setObjectName(QStringLiteral("HSGreen"));
+        HSGreen->setObjectName(QString::fromUtf8("HSGreen"));
         HSGreen->setOrientation(Qt::Horizontal);
 
         gridLayout_3->addWidget(HSGreen, 1, 1, 1, 1);
 
         LEGreen = new QLineEdit(GBColor);
-        LEGreen->setObjectName(QStringLiteral("LEGreen"));
+        LEGreen->setObjectName(QString::fromUtf8("LEGreen"));
         LEGreen->setMinimumSize(QSize(40, 20));
         LEGreen->setMaximumSize(QSize(40, 20));
 
         gridLayout_3->addWidget(LEGreen, 1, 2, 1, 1);
 
         label_3 = new QLabel(GBColor);
-        label_3->setObjectName(QStringLiteral("label_3"));
+        label_3->setObjectName(QString::fromUtf8("label_3"));
 
         gridLayout_3->addWidget(label_3, 2, 0, 1, 1);
 
         HSBlue = new QSlider(GBColor);
-        HSBlue->setObjectName(QStringLiteral("HSBlue"));
+        HSBlue->setObjectName(QString::fromUtf8("HSBlue"));
         HSBlue->setOrientation(Qt::Horizontal);
 
         gridLayout_3->addWidget(HSBlue, 2, 1, 1, 1);
 
         LEBlue = new QLineEdit(GBColor);
-        LEBlue->setObjectName(QStringLiteral("LEBlue"));
+        LEBlue->setObjectName(QString::fromUtf8("LEBlue"));
         LEBlue->setMinimumSize(QSize(40, 20));
         LEBlue->setMaximumSize(QSize(40, 20));
 
         gridLayout_3->addWidget(LEBlue, 2, 2, 1, 1);
 
         PBPalette = new QPushButton(GBColor);
-        PBPalette->setObjectName(QStringLiteral("PBPalette"));
+        PBPalette->setObjectName(QString::fromUtf8("PBPalette"));
         PBPalette->setMinimumSize(QSize(0, 28));
         PBPalette->setMaximumSize(QSize(16777215, 28));
 

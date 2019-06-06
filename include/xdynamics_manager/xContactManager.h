@@ -38,7 +38,7 @@ public:
 	xParticlePlanesContact* ContactParticlesPlanes();
 
 	bool runCollision(
-		double *pos, double *vel, double* ep,
+		double *pos, double *vel,
 		double *omega, double *mass, double* inertia,
 		double *force, double *moment,
 		unsigned int *sorted_id,
@@ -52,7 +52,7 @@ public:
 private:
 	void updateCollisionPair(vector4d* pos, unsigned int* sorted_id, unsigned int* cell_start, unsigned int* cell_end, unsigned int np);
 	void deviceCollision(
-		double *pos, double *vel, double* ep,
+		double *pos, double *vel,
 		double *omega, double *mass, double* inertia,
 		double *force, double *moment,
 		unsigned int *sorted_id,
@@ -78,13 +78,22 @@ private:
 		unsigned int np);
 
 	unsigned int ncontact;
-	int *d_type_count;
-	unsigned int *d_old_pair_count;
-	unsigned int *d_pair_count;
-	unsigned int *d_old_pair_start;
-	unsigned int *d_pair_start;
-	pair_data* d_pppd;
-	double* d_rfm;
+	//int *d_type_count;
+	//unsigned int *d_old_pair_count;
+	unsigned int *d_pair_count_pp;
+	unsigned int *d_pair_count_ppl;
+	unsigned int *d_pair_count_ptri;
+	unsigned int *d_pair_id_pp;
+	unsigned int *d_pair_id_ppl;
+	unsigned int *d_pair_id_ptri;
+	double *d_tsd_pp;
+	double *d_tsd_ppl;
+	double *d_tsd_ptri;
+// 	unsigned int *d_old_pair_start;
+// 	unsigned int *d_pair_start;
+//	pair_data* d_pppd;
+	double* d_Tmax;
+	double* d_RRes;
 	QMap<QString, xContact*> cots;
 	QMap<QString, xParticleMeshObjectContact*> cpmesh;
 	xContactPairList* xcpl;

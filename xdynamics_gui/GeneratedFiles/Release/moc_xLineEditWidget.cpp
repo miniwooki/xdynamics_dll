@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'xLineEditWidget.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.10.0)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.12.3)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -12,7 +12,7 @@
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'xLineEditWidget.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.10.0. It"
+#error "This file was generated using the moc from 5.12.3. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -43,7 +43,7 @@ QT_MOC_LITERAL(2, 35, 0) // ""
 static const uint qt_meta_data_xLineEditWidget[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        1,   14, // methods
@@ -65,7 +65,7 @@ static const uint qt_meta_data_xLineEditWidget[] = {
 void xLineEditWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        xLineEditWidget *_t = static_cast<xLineEditWidget *>(_o);
+        auto *_t = static_cast<xLineEditWidget *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->up_arrow_key_press(); break;
@@ -74,7 +74,7 @@ void xLineEditWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int 
     } else if (_c == QMetaObject::IndexOfMethod) {
         int *result = reinterpret_cast<int *>(_a[0]);
         {
-            typedef void (xLineEditWidget::*_t)();
+            using _t = void (xLineEditWidget::*)();
             if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&xLineEditWidget::up_arrow_key_press)) {
                 *result = 0;
                 return;
@@ -84,10 +84,14 @@ void xLineEditWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int 
     Q_UNUSED(_a);
 }
 
-const QMetaObject xLineEditWidget::staticMetaObject = {
-    { &QLineEdit::staticMetaObject, qt_meta_stringdata_xLineEditWidget.data,
-      qt_meta_data_xLineEditWidget,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject xLineEditWidget::staticMetaObject = { {
+    &QLineEdit::staticMetaObject,
+    qt_meta_stringdata_xLineEditWidget.data,
+    qt_meta_data_xLineEditWidget,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *xLineEditWidget::metaObject() const

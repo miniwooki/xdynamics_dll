@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'xGLWidget.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.10.0)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.12.3)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -12,7 +12,7 @@
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'xGLWidget.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.10.0. It"
+#error "This file was generated using the moc from 5.12.3. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -61,7 +61,7 @@ QT_MOC_LITERAL(15, 198, 14) // "setSketchSpace"
 static const uint qt_meta_data_xGLWidget[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
       12,   14, // methods
@@ -109,7 +109,7 @@ static const uint qt_meta_data_xGLWidget[] = {
 void xGLWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        xGLWidget *_t = static_cast<xGLWidget *>(_o);
+        auto *_t = static_cast<xGLWidget *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->xRotationChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
@@ -129,42 +129,42 @@ void xGLWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, v
     } else if (_c == QMetaObject::IndexOfMethod) {
         int *result = reinterpret_cast<int *>(_a[0]);
         {
-            typedef void (xGLWidget::*_t)(int );
+            using _t = void (xGLWidget::*)(int );
             if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&xGLWidget::xRotationChanged)) {
                 *result = 0;
                 return;
             }
         }
         {
-            typedef void (xGLWidget::*_t)(int );
+            using _t = void (xGLWidget::*)(int );
             if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&xGLWidget::yRotationChanged)) {
                 *result = 1;
                 return;
             }
         }
         {
-            typedef void (xGLWidget::*_t)(int );
+            using _t = void (xGLWidget::*)(int );
             if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&xGLWidget::zRotationChanged)) {
                 *result = 2;
                 return;
             }
         }
         {
-            typedef void (xGLWidget::*_t)();
+            using _t = void (xGLWidget::*)();
             if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&xGLWidget::changedAnimationFrame)) {
                 *result = 3;
                 return;
             }
         }
         {
-            typedef void (xGLWidget::*_t)(QString );
+            using _t = void (xGLWidget::*)(QString );
             if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&xGLWidget::signalGeometrySelection)) {
                 *result = 4;
                 return;
             }
         }
         {
-            typedef void (xGLWidget::*_t)();
+            using _t = void (xGLWidget::*)();
             if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&xGLWidget::releaseOperation)) {
                 *result = 5;
                 return;
@@ -173,10 +173,14 @@ void xGLWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, v
     }
 }
 
-const QMetaObject xGLWidget::staticMetaObject = {
-    { &QGLWidget::staticMetaObject, qt_meta_stringdata_xGLWidget.data,
-      qt_meta_data_xGLWidget,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject xGLWidget::staticMetaObject = { {
+    &QGLWidget::staticMetaObject,
+    qt_meta_stringdata_xGLWidget.data,
+    qt_meta_data_xGLWidget,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *xGLWidget::metaObject() const

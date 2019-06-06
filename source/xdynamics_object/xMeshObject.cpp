@@ -9,6 +9,7 @@ xMeshObject::xMeshObject()
 	, ntriangle(0)
 	, maxRadii(0)
 	, filePath("")
+	, fit_size(0)
 	, max_point(new_vector3d(0, 0, 0))
 	, min_point(new_vector3d(0, 0, 0))
 {
@@ -21,6 +22,7 @@ xMeshObject::xMeshObject(std::string _name)
 	, maxRadii(0)
 	, ntriangle(0)
 	, filePath("")
+	, fit_size(0)
 	, max_point(new_vector3d(0, 0, 0))
 	, min_point(new_vector3d(0, 0, 0))
 {
@@ -168,6 +170,7 @@ int xMeshObject::DefineShapeFromFile(vector3d& loc, std::string f)
 	vol = _vol;
 	xPointMass::mass = this->Density() * vol;
 	xPointMass::pos = loc;
+	ChangeVertexGlobal2Local();
 	delete[] spos;
 	return 0;// xDynamicsError::xdynamicsSuccess;
 	//nvtriangle = ntriangle;
@@ -384,22 +387,39 @@ void xMeshObject::splitTriangles(double to)
 	}
 }
 
-void xMeshObject::translation(vector3d p)
+void xMeshObject::setRefinementSize(double rs)
 {
-	vector3d mov = p - xPointMass::pos;
+	fit_size = rs;
+}
+
+double xMeshObject::RefinementSize()
+{
+	return fit_size;
+}
+
+void xMeshObject::ChangeVertexGlobal2Local()
+{
+	//vector3d mov = p - xPointMass::pos;
 	///*xPointMass*/::translation(p);
+	vector3d p, q, r;
 	for (unsigned int i = 0; i < ntriangle; i++)
 	{
 		int s = i * 9;
-		vertexList[s + 0] += mov.x;
-		vertexList[s + 1] += mov.y;
-		vertexList[s + 2] += mov.z;
-		vertexList[s + 3] += mov.x;
-		vertexList[s + 4] += mov.y;
-		vertexList[s + 5] += mov.z;
-		vertexList[s + 6] += mov.x;
-		vertexList[s + 7] += mov.y;
-		vertexList[s + 8] += mov.z;
+		p = new_vector3d(vertexList[s + 0], vertexList[s + 1], vertexList[s + 2]);
+		q = new_vector3d(vertexList[s + 3], vertexList[s + 4], vertexList[s + 5]);
+		r = new_vector3d(vertexList[s + 6], vertexList[s + 7], vertexList[s + 8]);
+		p = this->toLocal(p - pos);
+		q = this->toLocal(q - pos);
+		r = this->toLocal(r - pos);
+ 		vertexList[s + 0] = p.x;
+ 		vertexList[s + 1] = p.y;
+ 		vertexList[s + 2] = p.z;
+ 		vertexList[s + 3] = q.x;
+ 		vertexList[s + 4] = q.y;
+ 		vertexList[s + 5] = q.z;
+ 		vertexList[s + 6] = r.x;
+ 		vertexList[s + 7] = r.y;
+ 		vertexList[s + 8] = r.z;
 		//vector3d cm = spos[i] - pos;
 // 		J[0] += cm.y * cm.y + cm.z * cm.z;
 // 		J[1] += cm.x * cm.x + cm.z * cm.z;

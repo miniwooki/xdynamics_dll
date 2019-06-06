@@ -50,22 +50,22 @@ int wmain(int argc, wchar_t* argv[])
 		}
 		else
 		{
-			std::wstring check_command = argv[1];
-			if (check_command == L"-result")
-			{
-				xResultManager *xrm = new xResultManager;
-				if (argc > 2)
-				{
-					std::wstring check_model = argv[2];
-					xrm->xRun(xModel::path.toStdWString(), check_model);
-				}
-				else
-				{
-					xrm->xRun(xModel::path.toStdWString(), xModel::name.toStdWString());
-				}
-				//xdm.xRunResultWorld(argv[2]);
-			}
-			return 0;
+			//std::wstring check_command = argv[1];
+			//if (check_command == L"-result")
+			//{
+			//	xResultManager *xrm = new xResultManager;
+			//	if (argc > 2)
+			//	{
+			//		std::wstring check_model = argv[2];
+			//		xrm->xRun(xModel::path.toStdWString(), check_model);
+			//	}
+			//	else
+			//	{
+			//		xrm->xRun(xModel::path.toStdWString(), xModel::name.toStdWString());
+			//	}
+			//	//xdm.xRunResultWorld(argv[2]);
+			//}
+			//return 0;
 		}
 // 		delete xds;
 // 		return 0;

@@ -455,18 +455,6 @@
     <ClInclude Include="..\..\include\xdynamics_object\xLineObject.h">
       <Filter>헤더 파일\xdynamics_object\shapeObject</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\xdynamics_parallel\xParallelSPH_decl.cuh">
-      <Filter>헤더 파일\xParallel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\xdynamics_parallel\xParallelSPH_impl.cuh">
-      <Filter>헤더 파일\xParallel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\xdynamics_parallel\xParallelCommon_decl.cuh">
-      <Filter>헤더 파일\xParallel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\xdynamics_parallel\xParallelContactDetection_decl.cuh">
-      <Filter>헤더 파일\xParallel</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\xdynamics_algebra\xSmoothCell.h">
       <Filter>헤더 파일\xdynamics_algebra</Filter>
     </ClInclude>
@@ -476,15 +464,6 @@
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\..\source\xdynamics_parallel\xParallelDEM_def.cu">
-      <Filter>소스 파일\xdynamics_parallel</Filter>
-    </CudaCompile>
-    <CudaCompile Include="..\..\source\xdynamics_parallel\xParallelSPH_def.cu">
-      <Filter>소스 파일\xdynamics_parallel</Filter>
-    </CudaCompile>
-    <CudaCompile Include="..\..\source\xdynamics_parallel\xParallelCommon_def.cu">
-      <Filter>소스 파일\xdynamics_parallel</Filter>
-    </CudaCompile>
-    <CudaCompile Include="..\..\source\xdynamics_parallel\xParallelContactDetection_def.cu">
       <Filter>소스 파일\xdynamics_parallel</Filter>
     </CudaCompile>
   </ItemGroup>

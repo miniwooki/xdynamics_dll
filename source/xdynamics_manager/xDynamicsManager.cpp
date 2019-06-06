@@ -311,15 +311,15 @@ xDynamicsManager::solverType xDynamicsManager::OpenModelXLS(const wchar_t* n)
 			int ns = pv_path.size(); xve.Write((char*)&ns, sizeof(int));
 			xve.Write((char*)pv_path.c_str(), sizeof(char)*pv_path.size());
 		}
-		foreach(xObject* xo, xom->XObjects())
-		{
-			if (xo->Shape() == MESH_SHAPE)
-			{
-				xMeshObject* xmo = dynamic_cast<xMeshObject*>(xo);
-				QString mname = xmo->Name() + ".mesh";
-				std::string file = xmo->exportMeshData(xModel::makeFilePath(mname.toStdString()));
-			}
-		}
+// 		foreach(xObject* xo, xom->XObjects())
+// 		{
+// 			if (xo->Shape() == MESH_SHAPE)
+// 			{
+// 				xMeshObject* xmo = dynamic_cast<xMeshObject*>(xo);
+// 				QString mname = xmo->Name() + ".mesh";
+// 				std::string file = xmo->exportMeshData(xModel::makeFilePath(mname.toStdString()));
+// 			}
+// 		}
  		xve.Close();
 	}
 	solverType stype= ONLY_MBD;

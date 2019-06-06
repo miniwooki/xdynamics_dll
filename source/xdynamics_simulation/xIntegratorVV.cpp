@@ -28,7 +28,7 @@ int xIntegratorVV::OneStepSimulation(double ct, unsigned int cstep)
 	if (xcm)
 	{
 		xcm->runCollision(
-			dpos, dvel, dep, davel,
+			dpos, dvel, davel,
 			dmass, diner, dforce, dmoment,
 			dtor->sortedID(), dtor->cellStart(), dtor->cellEnd(), np);
 	}

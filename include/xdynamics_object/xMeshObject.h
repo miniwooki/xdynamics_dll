@@ -29,7 +29,9 @@ public:
 	vector3d MaxPoint() const;
 	vector3d MinPoint() const;
 	void splitTriangles(double to);
-	void translation(vector3d p);
+	void setRefinementSize(double rs);
+	double RefinementSize();
+	void ChangeVertexGlobal2Local();
 	std::string exportMeshData(std::string path);
 	virtual unsigned int create_sph_particles(double ps, unsigned int nlayers, vector3d* p = NULL, xMaterialType* t = NULL);
 	virtual QVector<xCorner> get_sph_boundary_corners();
@@ -46,7 +48,7 @@ private:
 	vector3d max_point;
 	vector3d min_point;
 	//unsigned int *indexList;
-
+	double fit_size;
 	QString filePath;
 };
 

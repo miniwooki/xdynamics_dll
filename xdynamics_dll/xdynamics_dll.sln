@@ -1,11 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.645
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xdynamics_dll", "xdynamics_dll\xdynamics_dll.vcxproj", "{27E4D486-530E-4F77-A6CA-07554FC14BD2}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xdynamics_test", "xdynamics_test\xdynamics_test.vcxproj", "{C311FAFA-8E46-4674-BBF2-4E6A670A7323}"
+	ProjectSection(ProjectDependencies) = postProject
+		{27E4D486-530E-4F77-A6CA-07554FC14BD2} = {27E4D486-530E-4F77-A6CA-07554FC14BD2}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xdynamics_gui", "..\xdynamics_gui\xdynamics_gui.vcxproj", "{B12702AD-ABFB-343A-A199-8E24837244A3}"
 EndProject
@@ -56,5 +59,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EF042418-5E27-46AA-8CD2-BF484D43C401}
 	EndGlobalSection
 EndGlobal

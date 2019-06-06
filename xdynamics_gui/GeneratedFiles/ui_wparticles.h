@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'wparticles.ui'
 **
-** Created by: Qt User Interface Compiler version 5.10.0
+** Created by: Qt User Interface Compiler version 5.12.3
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,13 +10,10 @@
 #define UI_WPARTICLES_H
 
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QGroupBox>
-#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QWidget>
@@ -48,88 +45,88 @@ public:
     void setupUi(QWidget *wparticles)
     {
         if (wparticles->objectName().isEmpty())
-            wparticles->setObjectName(QStringLiteral("wparticles"));
+            wparticles->setObjectName(QString::fromUtf8("wparticles"));
         wparticles->resize(279, 160);
         wparticles->setMinimumSize(QSize(0, 160));
         wparticles->setMaximumSize(QSize(16777215, 160));
         gridLayout = new QGridLayout(wparticles);
-        gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         gridLayout->setContentsMargins(0, 0, 0, 0);
         frame = new QFrame(wparticles);
-        frame->setObjectName(QStringLiteral("frame"));
+        frame->setObjectName(QString::fromUtf8("frame"));
         frame->setFrameShape(QFrame::StyledPanel);
         frame->setFrameShadow(QFrame::Raised);
         gridLayout_2 = new QGridLayout(frame);
-        gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
+        gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
         gridLayout_2->setContentsMargins(0, 0, 0, 0);
         GBWParticles = new QGroupBox(frame);
-        GBWParticles->setObjectName(QStringLiteral("GBWParticles"));
+        GBWParticles->setObjectName(QString::fromUtf8("GBWParticles"));
         gridLayout_4 = new QGridLayout(GBWParticles);
-        gridLayout_4->setObjectName(QStringLiteral("gridLayout_4"));
+        gridLayout_4->setObjectName(QString::fromUtf8("gridLayout_4"));
         gridLayout_3 = new QGridLayout();
-        gridLayout_3->setObjectName(QStringLiteral("gridLayout_3"));
+        gridLayout_3->setObjectName(QString::fromUtf8("gridLayout_3"));
         LName = new QLabel(GBWParticles);
-        LName->setObjectName(QStringLiteral("LName"));
+        LName->setObjectName(QString::fromUtf8("LName"));
 
         gridLayout_3->addWidget(LName, 0, 0, 1, 1);
 
         LEName = new QLineEdit(GBWParticles);
-        LEName->setObjectName(QStringLiteral("LEName"));
+        LEName->setObjectName(QString::fromUtf8("LEName"));
         LEName->setReadOnly(true);
 
         gridLayout_3->addWidget(LEName, 0, 1, 1, 3);
 
         LMaterial = new QLabel(GBWParticles);
-        LMaterial->setObjectName(QStringLiteral("LMaterial"));
+        LMaterial->setObjectName(QString::fromUtf8("LMaterial"));
 
         gridLayout_3->addWidget(LMaterial, 1, 0, 1, 1);
 
         LEMaterial = new QLineEdit(GBWParticles);
-        LEMaterial->setObjectName(QStringLiteral("LEMaterial"));
+        LEMaterial->setObjectName(QString::fromUtf8("LEMaterial"));
         LEMaterial->setReadOnly(true);
 
         gridLayout_3->addWidget(LEMaterial, 1, 1, 1, 3);
 
         LNumThis = new QLabel(GBWParticles);
-        LNumThis->setObjectName(QStringLiteral("LNumThis"));
+        LNumThis->setObjectName(QString::fromUtf8("LNumThis"));
 
         gridLayout_3->addWidget(LNumThis, 2, 0, 1, 1);
 
         LENumThis = new QLineEdit(GBWParticles);
-        LENumThis->setObjectName(QStringLiteral("LENumThis"));
+        LENumThis->setObjectName(QString::fromUtf8("LENumThis"));
         LENumThis->setReadOnly(true);
 
         gridLayout_3->addWidget(LENumThis, 2, 1, 1, 1);
 
         LNumTotal = new QLabel(GBWParticles);
-        LNumTotal->setObjectName(QStringLiteral("LNumTotal"));
+        LNumTotal->setObjectName(QString::fromUtf8("LNumTotal"));
 
         gridLayout_3->addWidget(LNumTotal, 2, 2, 1, 1);
 
         LENumTotal = new QLineEdit(GBWParticles);
-        LENumTotal->setObjectName(QStringLiteral("LENumTotal"));
+        LENumTotal->setObjectName(QString::fromUtf8("LENumTotal"));
         LENumTotal->setReadOnly(true);
 
         gridLayout_3->addWidget(LENumTotal, 2, 3, 1, 1);
 
         LMinRadius = new QLabel(GBWParticles);
-        LMinRadius->setObjectName(QStringLiteral("LMinRadius"));
+        LMinRadius->setObjectName(QString::fromUtf8("LMinRadius"));
 
         gridLayout_3->addWidget(LMinRadius, 3, 0, 1, 1);
 
         LEMinRadius = new QLineEdit(GBWParticles);
-        LEMinRadius->setObjectName(QStringLiteral("LEMinRadius"));
+        LEMinRadius->setObjectName(QString::fromUtf8("LEMinRadius"));
         LEMinRadius->setReadOnly(true);
 
         gridLayout_3->addWidget(LEMinRadius, 3, 1, 1, 3);
 
         LMaxRadius = new QLabel(GBWParticles);
-        LMaxRadius->setObjectName(QStringLiteral("LMaxRadius"));
+        LMaxRadius->setObjectName(QString::fromUtf8("LMaxRadius"));
 
         gridLayout_3->addWidget(LMaxRadius, 4, 0, 1, 1);
 
         LEMaxRadius = new QLineEdit(GBWParticles);
-        LEMaxRadius->setObjectName(QStringLiteral("LEMaxRadius"));
+        LEMaxRadius->setObjectName(QString::fromUtf8("LEMaxRadius"));
         LEMaxRadius->setReadOnly(true);
 
         gridLayout_3->addWidget(LEMaxRadius, 4, 1, 1, 3);

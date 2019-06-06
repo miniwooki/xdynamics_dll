@@ -1,6 +1,6 @@
 #include "xdynamics_object/xParticleMeshObjectContact.h"
 #include "xdynamics_object/xParticleObject.h"
-#include "xdynamics_object/xCubeObject.h"
+#include "xdynamics_object/xMeshObject.h"
 
 xParticleMeshObjectContact::xParticleMeshObjectContact()
 	: xContact()
@@ -24,6 +24,7 @@ xParticleMeshObjectContact::xParticleMeshObjectContact(std::string _name, xObjec
 		po = dynamic_cast<xMeshObject*>(o2);
 		p = dynamic_cast<xParticleObject*>(o1);
 	}
+	po->splitTriangles(po->RefinementSize());
 }
 
 xParticleMeshObjectContact::~xParticleMeshObjectContact()

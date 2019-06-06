@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'xdynamics_gui.ui'
 **
-** Created by: Qt User Interface Compiler version 5.10.0
+** Created by: Qt User Interface Compiler version 5.12.3
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,11 +10,8 @@
 #define UI_XDYNAMICS_GUI_H
 
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QGridLayout>
-#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QScrollArea>
@@ -38,20 +35,20 @@ public:
     void setupUi(QMainWindow *xdynamics_gui_mw)
     {
         if (xdynamics_gui_mw->objectName().isEmpty())
-            xdynamics_gui_mw->setObjectName(QStringLiteral("xdynamics_gui_mw"));
+            xdynamics_gui_mw->setObjectName(QString::fromUtf8("xdynamics_gui_mw"));
         xdynamics_gui_mw->resize(600, 400);
         centralWidget = new QWidget(xdynamics_gui_mw);
-        centralWidget->setObjectName(QStringLiteral("centralWidget"));
+        centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         gridLayout = new QGridLayout(centralWidget);
         gridLayout->setSpacing(6);
         gridLayout->setContentsMargins(11, 11, 11, 11);
-        gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         gridLayout->setContentsMargins(0, 0, 0, 0);
         xIrrchlitArea = new QScrollArea(centralWidget);
-        xIrrchlitArea->setObjectName(QStringLiteral("xIrrchlitArea"));
+        xIrrchlitArea->setObjectName(QString::fromUtf8("xIrrchlitArea"));
         xIrrchlitArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
-        scrollAreaWidgetContents->setObjectName(QStringLiteral("scrollAreaWidgetContents"));
+        scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
         scrollAreaWidgetContents->setGeometry(QRect(0, 0, 598, 345));
         xIrrchlitArea->setWidget(scrollAreaWidgetContents);
 
@@ -59,14 +56,14 @@ public:
 
         xdynamics_gui_mw->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(xdynamics_gui_mw);
-        menuBar->setObjectName(QStringLiteral("menuBar"));
+        menuBar->setObjectName(QString::fromUtf8("menuBar"));
         menuBar->setGeometry(QRect(0, 0, 600, 21));
         xdynamics_gui_mw->setMenuBar(menuBar);
         mainToolBar = new QToolBar(xdynamics_gui_mw);
-        mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
+        mainToolBar->setObjectName(QString::fromUtf8("mainToolBar"));
         xdynamics_gui_mw->addToolBar(Qt::TopToolBarArea, mainToolBar);
         statusBar = new QStatusBar(xdynamics_gui_mw);
-        statusBar->setObjectName(QStringLiteral("statusBar"));
+        statusBar->setObjectName(QString::fromUtf8("statusBar"));
         xdynamics_gui_mw->setStatusBar(statusBar);
 
         retranslateUi(xdynamics_gui_mw);

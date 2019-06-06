@@ -282,9 +282,10 @@ void xXLSReader::ReadMass(xMultiBodyModel* xmbd, vector2i rc)
 			xpm = xmbd->CreatePointMass(name);
 
 			xPointMassData xpmd = ReadPointMassData(name, rc.x++, rc.y);
-			if (xpm->Shape() == MESH_SHAPE)
-				dynamic_cast<xMeshObject*>(xpm)->translation(new_vector3d(xpmd.px, xpmd.py, xpmd.pz));
 			xpm->SetDataFromStructure(xmbd->NumMass(), xpmd);
+// 			if (xpm->Shape() == MESH_SHAPE)
+// 				dynamic_cast<xMeshObject*>(xpm)->translation(new_vector3d(xpmd.px, xpmd.py, xpmd.pz));
+			
 			
 			//xpm->translation(xpm->Position());
 			// obj->TranslationPosition(xpm->Position());
@@ -496,15 +497,17 @@ void xXLSReader::ReadShapeObject(xObjectManager* xom, vector2i rc)
 				double fsz = 0.0;
 				x = sheet->readStr(rc.x, rc.y++); uf::xsplit(x, ",", 3, &(loc.x) + 0);
 				fsz = sheet->readNum(rc.x, rc.y++);
+				xmo->setRefinementSize(fsz);
 				std::string mf = uf::WideChar2String(sheet->readStr(rc.x, rc.y++));
 				xmo->DefineShapeFromFile(loc, mf);
-				xmo->splitTriangles(fsz);
 				std::string file = xModel::makeFilePath(name + ".mesh");
 				int t = VMESH;
 				xve->Write((char*)&t, sizeof(int));
 				unsigned int ns = (unsigned int)file.size();
 				xve->Write((char*)&ns, sizeof(unsigned int));
 				xve->Write((char*)file.c_str(), sizeof(char)*ns);
+				xmo->exportMeshData(file);
+				//xmo->splitTriangles(fsz);
 			}
 			rc.x++;
 			rc.y = init_col;

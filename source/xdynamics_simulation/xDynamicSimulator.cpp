@@ -217,7 +217,7 @@ bool xDynamicsSimulator::xRunSimulation()
 	{
 		cstep++;
 		eachStep++;
-	//	std::cout << cstep << std::endl;
+		std::cout << cstep << std::endl;
 		ct += xSimulation::dt;
 		xSimulation::setCurrentTime(ct);
 		if (xsph)

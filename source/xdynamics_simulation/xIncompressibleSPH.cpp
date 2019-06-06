@@ -40,11 +40,11 @@ int xIncompressibleSPH::OneStepSimulation(double ct, unsigned int cstep)
 
 void xIncompressibleSPH::setupCudaDataISPH()
 {
-	cudaMemoryAlloc((void**)&d_lhs, sizeof(double) * np);
-	cudaMemoryAlloc((void**)&d_rhs, sizeof(double) * np);
-	cudaMemoryAlloc((void**)&d_conj0, sizeof(double) * np);
-	cudaMemoryAlloc((void**)&d_conj1, sizeof(double) * np);
-	cudaMemoryAlloc((void**)&d_tmp0, sizeof(double) * np);
-	cudaMemoryAlloc((void**)&d_tmp1, sizeof(double) * np);
-	cudaMemoryAlloc((void**)&d_residual, sizeof(double) * np);
+// 	cudaMemoryAlloc((void**)&d_lhs, sizeof(double) * np);
+// 	cudaMemoryAlloc((void**)&d_rhs, sizeof(double) * np);
+// 	cudaMemoryAlloc((void**)&d_conj0, sizeof(double) * np);
+// 	cudaMemoryAlloc((void**)&d_conj1, sizeof(double) * np);
+// 	cudaMemoryAlloc((void**)&d_tmp0, sizeof(double) * np);
+// 	cudaMemoryAlloc((void**)&d_tmp1, sizeof(double) * np);
+// 	cudaMemoryAlloc((void**)&d_residual, sizeof(double) * np);
 }

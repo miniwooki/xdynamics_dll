@@ -65,7 +65,7 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 	for (unsigned int i = 0; i < np; i++)
 	{
 		double r = pos[i * 4 + 3];
-		vel[0] = -0.1;
+		//vel[0] = -0.1;
 		force[i * 3 + 0] = mass[i] * xModel::gravity.x;
 		force[i * 3 + 1] = mass[i] * xModel::gravity.y;
 		force[i * 3 + 2] = mass[i] * xModel::gravity.z;
@@ -94,7 +94,7 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 	if (xSimulation::Gpu())
 	{
 		checkCudaErrors(cudaMemcpy(dpos, pos, sizeof(double) * np * 4, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(dep, ep, sizeof(double) * np * 4, cudaMemcpyHostToDevice));
+		//checkCudaErrors(cudaMemcpy(dep, ep, sizeof(double) * np * 4, cudaMemcpyHostToDevice));
 		checkCudaErrors(cudaMemcpy(dvel, vel, sizeof(double) * np * 3, cudaMemcpyHostToDevice));
 		checkCudaErrors(cudaMemcpy(dacc, acc, sizeof(double) * np * 3, cudaMemcpyHostToDevice));
 		checkCudaErrors(cudaMemcpy(davel, avel, sizeof(double) * np * 3, cudaMemcpyHostToDevice));
@@ -103,6 +103,7 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 		checkCudaErrors(cudaMemcpy(dmoment, moment, sizeof(double) * np * 3, cudaMemcpyHostToDevice));
 		checkCudaErrors(cudaMemcpy(dmass, mass, sizeof(double) * np, cudaMemcpyHostToDevice));
 		checkCudaErrors(cudaMemcpy(diner, inertia, sizeof(double) * np, cudaMemcpyHostToDevice));
+		
 		if (xcm)
 		{
 			
@@ -121,6 +122,7 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 		dp.np = np;
 		dp.rollingCondition = false;// xmd->RollingCondition();
 		dp.nsphere = 0;
+		dp.nplane = xcm->ContactParticlesPlanes()->NumPlanes();
 		dp.ncell = dtor->nCell();
 		dp.grid_size.x = xGridCell::gs.x;
 		dp.grid_size.y = xGridCell::gs.y;
@@ -140,7 +142,7 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 	else
 	{
 		dpos = pos;
-		dep = ep;
+		//dep = ep;
 		//drot = rot;
 		dvel = vel;
 		dacc = acc;

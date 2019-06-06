@@ -547,7 +547,8 @@ void xGLWidget::processHits(unsigned int uHits, unsigned int *pBuffer)
 		uiName = *ptr;
 		ptr += 3;
 		int idx = *ptr;
-		xvObject* _vobj = static_cast<xvObject*>(v_wobjs[idx]);
+		xvObject* _vobj = Object(idx);;// <xvObject*>(v_wobjs[idx]);
+		if (!_vobj) continue;
 		selectedObjects[_vobj->Name()] = _vobj;
 		//selectedIndice.push_back(*ptr);// selectedIndice[i] = *ptr;
 
@@ -909,6 +910,15 @@ xvObject* xGLWidget::Object(QString nm)
 	if (it == l.end())
 		return NULL;
 	return v_objs[nm];
+}
+
+xvObject* xGLWidget::Object(int id)
+{
+	QList<int> l = v_wobjs.keys();
+	QList<int>::const_iterator it = qFind(l, id);
+	if (it == l.end())
+		return NULL;
+	return static_cast<xvObject*>(v_wobjs[id]);
 }
 
 xvMarker* xGLWidget::makeMarker(QString n, double x, double y, double z, bool mcf)

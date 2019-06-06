@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'wsimulation.ui'
 **
-** Created by: Qt User Interface Compiler version 5.10.0
+** Created by: Qt User Interface Compiler version 5.12.3
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,13 +10,10 @@
 #define UI_WSIMULATION_H
 
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QGroupBox>
-#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
@@ -54,7 +51,7 @@ public:
     void setupUi(QWidget *wsimulation)
     {
         if (wsimulation->objectName().isEmpty())
-            wsimulation->setObjectName(QStringLiteral("wsimulation"));
+            wsimulation->setObjectName(QString::fromUtf8("wsimulation"));
         wsimulation->resize(264, 190);
         QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
@@ -65,58 +62,58 @@ public:
         wsimulation->setMaximumSize(QSize(16777215, 192));
         gridLayout = new QGridLayout(wsimulation);
         gridLayout->setSpacing(0);
-        gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         gridLayout->setContentsMargins(0, 0, 0, 0);
         frame = new QFrame(wsimulation);
-        frame->setObjectName(QStringLiteral("frame"));
+        frame->setObjectName(QString::fromUtf8("frame"));
         frame->setFrameShape(QFrame::StyledPanel);
         frame->setFrameShadow(QFrame::Raised);
         gridLayout_4 = new QGridLayout(frame);
         gridLayout_4->setSpacing(0);
-        gridLayout_4->setObjectName(QStringLiteral("gridLayout_4"));
+        gridLayout_4->setObjectName(QString::fromUtf8("gridLayout_4"));
         gridLayout_4->setContentsMargins(0, 0, 0, 0);
         verticalLayout = new QVBoxLayout();
-        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         GBSimulationCondition = new QGroupBox(frame);
-        GBSimulationCondition->setObjectName(QStringLiteral("GBSimulationCondition"));
+        GBSimulationCondition->setObjectName(QString::fromUtf8("GBSimulationCondition"));
         sizePolicy.setHeightForWidth(GBSimulationCondition->sizePolicy().hasHeightForWidth());
         GBSimulationCondition->setSizePolicy(sizePolicy);
         GBSimulationCondition->setMinimumSize(QSize(0, 102));
         GBSimulationCondition->setMaximumSize(QSize(16777215, 102));
         gridLayout_5 = new QGridLayout(GBSimulationCondition);
-        gridLayout_5->setObjectName(QStringLiteral("gridLayout_5"));
+        gridLayout_5->setObjectName(QString::fromUtf8("gridLayout_5"));
         gridLayout_5->setVerticalSpacing(6);
         gridLayout_5->setContentsMargins(6, 6, 6, 6);
         gridLayout_3 = new QGridLayout();
-        gridLayout_3->setObjectName(QStringLiteral("gridLayout_3"));
+        gridLayout_3->setObjectName(QString::fromUtf8("gridLayout_3"));
         gridLayout_3->setVerticalSpacing(6);
         LTimeStep = new QLabel(GBSimulationCondition);
-        LTimeStep->setObjectName(QStringLiteral("LTimeStep"));
+        LTimeStep->setObjectName(QString::fromUtf8("LTimeStep"));
 
         gridLayout_3->addWidget(LTimeStep, 0, 0, 1, 1);
 
         LETimeStep = new QLineEdit(GBSimulationCondition);
-        LETimeStep->setObjectName(QStringLiteral("LETimeStep"));
+        LETimeStep->setObjectName(QString::fromUtf8("LETimeStep"));
 
         gridLayout_3->addWidget(LETimeStep, 0, 1, 1, 1);
 
         LSaveStep = new QLabel(GBSimulationCondition);
-        LSaveStep->setObjectName(QStringLiteral("LSaveStep"));
+        LSaveStep->setObjectName(QString::fromUtf8("LSaveStep"));
 
         gridLayout_3->addWidget(LSaveStep, 1, 0, 1, 1);
 
         LESaveStep = new QLineEdit(GBSimulationCondition);
-        LESaveStep->setObjectName(QStringLiteral("LESaveStep"));
+        LESaveStep->setObjectName(QString::fromUtf8("LESaveStep"));
 
         gridLayout_3->addWidget(LESaveStep, 1, 1, 1, 1);
 
         LEndTime = new QLabel(GBSimulationCondition);
-        LEndTime->setObjectName(QStringLiteral("LEndTime"));
+        LEndTime->setObjectName(QString::fromUtf8("LEndTime"));
 
         gridLayout_3->addWidget(LEndTime, 2, 0, 1, 1);
 
         LEEndTime = new QLineEdit(GBSimulationCondition);
-        LEEndTime->setObjectName(QStringLiteral("LEEndTime"));
+        LEEndTime->setObjectName(QString::fromUtf8("LEEndTime"));
 
         gridLayout_3->addWidget(LEEndTime, 2, 1, 1, 1);
 
@@ -124,7 +121,7 @@ public:
         gridLayout_5->addLayout(gridLayout_3, 0, 0, 1, 1);
 
         PBSolve = new QPushButton(GBSimulationCondition);
-        PBSolve->setObjectName(QStringLiteral("PBSolve"));
+        PBSolve->setObjectName(QString::fromUtf8("PBSolve"));
         PBSolve->setMinimumSize(QSize(50, 76));
         PBSolve->setMaximumSize(QSize(50, 76));
 
@@ -134,39 +131,39 @@ public:
         verticalLayout->addWidget(GBSimulationCondition);
 
         GBSimulationInformation = new QGroupBox(frame);
-        GBSimulationInformation->setObjectName(QStringLiteral("GBSimulationInformation"));
+        GBSimulationInformation->setObjectName(QString::fromUtf8("GBSimulationInformation"));
         sizePolicy.setHeightForWidth(GBSimulationInformation->sizePolicy().hasHeightForWidth());
         GBSimulationInformation->setSizePolicy(sizePolicy);
         GBSimulationInformation->setMinimumSize(QSize(0, 80));
         GBSimulationInformation->setMaximumSize(QSize(16777215, 75));
         gridLayout_6 = new QGridLayout(GBSimulationInformation);
-        gridLayout_6->setObjectName(QStringLiteral("gridLayout_6"));
+        gridLayout_6->setObjectName(QString::fromUtf8("gridLayout_6"));
         gridLayout_2 = new QGridLayout();
-        gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
+        gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
         gridLayout_2->setVerticalSpacing(6);
         LNumSteps = new QLabel(GBSimulationInformation);
-        LNumSteps->setObjectName(QStringLiteral("LNumSteps"));
+        LNumSteps->setObjectName(QString::fromUtf8("LNumSteps"));
         LNumSteps->setMinimumSize(QSize(0, 20));
         LNumSteps->setMaximumSize(QSize(16777215, 20));
 
         gridLayout_2->addWidget(LNumSteps, 0, 0, 1, 1);
 
         LENumSteps = new QLineEdit(GBSimulationInformation);
-        LENumSteps->setObjectName(QStringLiteral("LENumSteps"));
+        LENumSteps->setObjectName(QString::fromUtf8("LENumSteps"));
         LENumSteps->setMinimumSize(QSize(0, 20));
         LENumSteps->setMaximumSize(QSize(16777215, 20));
 
         gridLayout_2->addWidget(LENumSteps, 0, 1, 1, 1);
 
         LNunParts = new QLabel(GBSimulationInformation);
-        LNunParts->setObjectName(QStringLiteral("LNunParts"));
+        LNunParts->setObjectName(QString::fromUtf8("LNunParts"));
         LNunParts->setMinimumSize(QSize(0, 20));
         LNunParts->setMaximumSize(QSize(16777215, 20));
 
         gridLayout_2->addWidget(LNunParts, 1, 0, 1, 1);
 
         LENumParts = new QLineEdit(GBSimulationInformation);
-        LENumParts->setObjectName(QStringLiteral("LENumParts"));
+        LENumParts->setObjectName(QString::fromUtf8("LENumParts"));
         LENumParts->setMinimumSize(QSize(0, 20));
         LENumParts->setMaximumSize(QSize(16777215, 20));
         LENumParts->setReadOnly(true);
@@ -177,7 +174,7 @@ public:
         gridLayout_6->addLayout(gridLayout_2, 0, 0, 1, 1);
 
         PBSetting = new QPushButton(GBSimulationInformation);
-        PBSetting->setObjectName(QStringLiteral("PBSetting"));
+        PBSetting->setObjectName(QString::fromUtf8("PBSetting"));
         PBSetting->setMinimumSize(QSize(50, 45));
         PBSetting->setMaximumSize(QSize(50, 45));
 

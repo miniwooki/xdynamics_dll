@@ -10,7 +10,10 @@
 *.pdb
 *.idp
 *.idb
+*.db
 *.suo
+*.v12.suo
+*.ipch
 *.opensdf
 
 # Files for the ART/Dalvik VM

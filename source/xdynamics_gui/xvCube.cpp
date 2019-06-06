@@ -59,8 +59,6 @@ bool xvCube::makeCubeGeometry(xCubeObjectData& d)
 void xvCube::draw(GLenum eMode)
 {
 	if (display){
-		//glEnable(GL_BLEND);
-		//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 		glPolygonMode(GL_FRONT_AND_BACK, drawingMode);
 		glPushMatrix();
 		//glDisable(GL_LIGHTING);

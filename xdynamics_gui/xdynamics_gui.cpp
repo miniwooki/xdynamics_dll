@@ -184,7 +184,11 @@ bool xdynamics_gui::ReadViewModel(QString path)
 					{
 						xPointMass* xpm = xdm->XMBDModel()->XMass(name.toStdString());
 						if (xpm)
+						{
 							xpm->setConnectedGeometryName(xvo->Name());
+							vector3d p = xpm->Position();
+							xvo->setPosition(static_cast<float>(p.x), static_cast<float>(p.y), static_cast<float>(p.z));
+						}
 					}
 				}
 			}
