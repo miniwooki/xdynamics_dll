@@ -10,7 +10,9 @@
 typedef unsigned int uint;
 //#include <helper_functions.h>
 //#include <helper_cuda.h>
-
+#define MAX_P2P_COUNT  8
+#define MAX_P2PL_COUNT 3
+#define MAX_P2MS_COUNT 3
 //__constant__ device_parameters cte;
 //double3 toDouble3(VEC3D& v3) { return double3(v3.x, v3.y, v3.z); }
 //inline double3 change_cuda_double3(VEC3D& v3) { return make_double3(v3.x, v3.y, v3.z); }
@@ -150,9 +152,11 @@ void XDYNAMICS_API cu_cube_contact_force(
 
 // Function for contact between particle and polygonObject
 void XDYNAMICS_API cu_particle_polygonObject_collision(
-	const int tcm, device_triangle_info* dpi, double* dsph, device_mesh_mass_info* dpmi,
+	const int tcm, device_triangle_info* dpi, device_mesh_mass_info* dpmi,
 	double* pos, double* vel, double* omega,
 	double* force, double* moment, double* mass,
+	double* tmax, double* rres,
+	unsigned int* pair_count, unsigned int *pair_id, double* tsd,
 	unsigned int* sidx, unsigned int* cstart, unsigned int* cend, device_contact_property *cp,
 	unsigned int np/*, double3* mpos, double3* mf, double3* mm, double3& _mf, double3& _mm*/);
 

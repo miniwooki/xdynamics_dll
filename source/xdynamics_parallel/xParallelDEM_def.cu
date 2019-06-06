@@ -214,6 +214,8 @@ void cu_particle_polygonObject_collision(
 	const int tcm, device_triangle_info* dpi, double* dsph, device_mesh_mass_info* dpmi,
 	double* pos, double* vel, double* omega,
 	double* force, double* moment, double* mass,
+	double* tmax, double* rres,
+	unsigned int* pair_count, unsigned int *pair_id, double* tsd,
 	unsigned int* sorted_index, unsigned int* cstart, unsigned int* cend, device_contact_property *cp,
 	unsigned int np)
 {
@@ -225,6 +227,8 @@ void cu_particle_polygonObject_collision(
 			dpi, (double4 *)dsph, dpmi,
 			(double4 *)pos, (double3 *)vel, (double3 *)omega,
 			(double3 *)force, (double3 *)moment, mass,
+			(double3 *)tmax, rres,
+			pair_count, pair_id, (double2 *)tsd
 			sorted_index, cstart, cend, cp, np);
 		break;
 	}
