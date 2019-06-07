@@ -57,6 +57,7 @@ private:
 	Book* book;
 	Sheet* sheet;
 	xViewExporter* xve;
+	QString connect_file;
 };
 
 #endif

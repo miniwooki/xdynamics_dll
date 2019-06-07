@@ -30,10 +30,10 @@ xContactManager::xContactManager()
 
 xContactManager::~xContactManager()
 {
-	//qDeleteAll(cots);
-	//if (cpp) delete cpp; cpp = NULL;
-	//if (cpmeshes) delete cpmeshes; cpmeshes = NULL;
-	//if (cpplane) delete cpplane; cpplane = NULL;
+	qDeleteAll(cots);
+// 	if (cpp) delete cpp; cpp = NULL;
+ 	if (cpmeshes) delete cpmeshes; cpmeshes = NULL;
+ 	if (cpplane) delete cpplane; cpplane = NULL;
 
 	if (d_pair_count_pp) checkCudaErrors(cudaFree(d_pair_count_pp)); d_pair_count_pp = NULL;
 	if (d_pair_count_ppl) checkCudaErrors(cudaFree(d_pair_count_ppl)); d_pair_count_ppl = NULL;
@@ -215,13 +215,13 @@ void xContactManager::allocPairList(unsigned int np)
 	{
 		checkCudaErrors(cudaMalloc((void**)&d_pair_count_pp, sizeof(unsigned int) * np));
 		checkCudaErrors(cudaMalloc((void**)&d_pair_count_ppl, sizeof(unsigned int) * np));
-		 		checkCudaErrors(cudaMalloc((void**)&d_pair_count_ptri, sizeof(unsigned int) * np));
+		checkCudaErrors(cudaMalloc((void**)&d_pair_count_ptri, sizeof(unsigned int) * np));
 		checkCudaErrors(cudaMalloc((void**)&d_pair_id_pp, sizeof(unsigned int) * np * MAX_P2P_COUNT));
 		checkCudaErrors(cudaMalloc((void**)&d_pair_id_ppl, sizeof(unsigned int) * np * MAX_P2PL_COUNT));
-		 		checkCudaErrors(cudaMalloc((void**)&d_pair_id_ptri, sizeof(unsigned int) * np * MAX_P2MS_COUNT));
+		checkCudaErrors(cudaMalloc((void**)&d_pair_id_ptri, sizeof(unsigned int) * np * MAX_P2MS_COUNT));
 		checkCudaErrors(cudaMalloc((void**)&d_tsd_pp, sizeof(double2) * np * MAX_P2P_COUNT));
 		checkCudaErrors(cudaMalloc((void**)&d_tsd_ppl, sizeof(double2) * np * MAX_P2PL_COUNT));
-		 		checkCudaErrors(cudaMalloc((void**)&d_tsd_ptri, sizeof(double2) * np * MAX_P2MS_COUNT));
+		checkCudaErrors(cudaMalloc((void**)&d_tsd_ptri, sizeof(double2) * np * MAX_P2MS_COUNT));
 		// 		//checkCudaErrors(cudaMalloc((void**)&d_old_pair_count, sizeof(unsigned int) * np));
 		// 		//checkCudaErrors(cudaMalloc((void**)&d_pair_start, sizeof(unsigned int) * np));
 		// 		//checkCudaErrors(cudaMalloc((void**)&d_old_pair_start, sizeof(unsigned int) * np));
@@ -291,90 +291,30 @@ void xContactManager::deviceCollision(
 	unsigned int *sorted_id, unsigned int *cell_start,
 	unsigned int *cell_end, unsigned int np)
 {
-	// 	checkCudaErrors(cudaMemcpy(d_old_pair_count, d_pair_count, sizeof(unsigned int) * np, cudaMemcpyDeviceToDevice));
-	// 	unsigned int nc = deviceContactCount(pos, vel, omega, mass, force, moment, sorted_id, cell_start, cell_end, np);
-	// 	std::cout << "ncontact : " << nc << std::endl;
-	// 	if (!nc) return;
-	// 	checkCudaErrors(cudaMemcpy(d_old_pair_start, d_pair_start, sizeof(unsigned int) * np, cudaMemcpyDeviceToDevice));
-	// 	pair_data* d_old_pppd = NULL;
-	// // 	if (ncontact)
-	// // 	{
-	//  		checkCudaErrors(cudaMalloc((void**)&d_old_pppd, sizeof(pair_data) * ncontact));
-	// 		checkCudaErrors(cudaMemcpy(d_old_pppd, d_pppd, sizeof(pair_data) * ncontact, cudaMemcpyDeviceToDevice));
-	// //	}
-	// 	
-	// 	if (d_pppd)
-	// 		checkCudaErrors(cudaFree(d_pppd));
-	// 	checkCudaErrors(cudaMalloc((void**)&d_pppd, sizeof(pair_data) * nc));
-	// // 	if (ncontact)
-	// // 	{
-	// 		cu_copy_old_to_new_pair(d_old_pair_count, d_pair_count, d_old_pair_start, d_pair_start, d_old_pppd, d_pppd, nc, np);
-	// 	//}
-	// 	
-	//	checkCudaErrors(cudaMemset(d_rfm, 0, sizeof(double4) * np));
-	// 	double* hmoment = new double[np * 3];
-	// 	cudaMemcpy(hmoment, force, sizeof(double) * np * 3, cudaMemcpyDeviceToHost);
-	// 	std::fstream fs;
-	// 	fs.open("C:/xdynamics/moment.txt", std::ios::out);
-	// 	for (unsigned int i = 0; i < np; i++)
-	// 	{
-	// 		fs << hmoment[i * 3 + 0] << " " << hmoment[i * 3 + 1] << " " << hmoment[i * 3 + 2] << std::endl;
-	// 	}
-	// 	fs.close();
-	// 	delete[] hmoment;
 	cu_calculate_p2p(1, pos, vel, omega, force, moment, mass,
 		d_Tmax, d_RRes, d_pair_count_pp, d_pair_id_pp, d_tsd_pp, sorted_id,
 		cell_start, cell_end, cpp->DeviceContactProperty(), np);
-	// 	cu_particle_particle_contact(
-	// 		pos, /*ep,*/ vel, omega, mass, /*inertia,*/ force, moment, 
-	// 		d_pair_count_pp, d_pair_id_pp, d_tsd_pp,
-	// 		d_Tmax, d_RRes, cpp->DeviceContactProperty(), 
-	// 		sorted_id, cell_start, cell_end, np);
-	cu_plane_contact_force(1, cpplane->devicePlaneInfo(), pos, vel,
-		omega, force, moment, mass,
-		d_Tmax, d_RRes, d_pair_count_ppl, d_pair_id_ppl, d_tsd_ppl,
-		np, cpplane->DeviceContactProperty());
 
-	cu_particle_polygonObject_collision(1, cpmeshes->deviceTrianglesInfo(), cpmeshes->devicePolygonObjectMassInfo(),
-		pos, vel, omega, force, moment, mass, 
-		d_Tmax, d_RRes, d_pair_count_ptri, d_pair_id_ptri, d_tsd_ptri, 
-		sorted_id, cell_start, cell_end, cpmeshes->DeviceContactProperty(), np);
-	// 	if (cpplane && cpplane->NumPlanes())
-	// 	{
-	// 		cu_particle_plane_contact(
-	// 			cpplane->devicePlaneInfo(), pos, vel,/* ep,*/ omega,
-	// 			mass, d_Tmax, d_RRes, force, moment,
-	// 			d_pair_count_ppl, d_pair_id_ppl, d_tsd_ppl, cpplane->DeviceContactProperty(),
-	// 			cpplane->NumContact(), np);
-	// 	}
-	// 		double *dhmoment = new double[np * 2];
-	// 		cudaMemcpy(dhmoment, d_pair_count_pp, sizeof(unsigned int) * np, cudaMemcpyDeviceToHost);
-	// 		fs.open("C:/xdynamics/moment.txt", std::ios::out);
-	// 		for (unsigned int i = 0; i < np; i++)
-	// 		{
-	// 			fs << dhmoment[i] << std::endl;// " " << hmoment[i * 3 + 1] << " " << hmoment[i * 3 + 2] << std::endl;
-	// 		}
-	// 		fs.close();
-	// 		delete[] dhmoment; 
-
-	if (cpmeshes && cpmeshes->NumContactObjects())
+	if (cpplane && cpplane->NumContact())
 	{
-		//	cpmeshes->updateMeshMassData();
-		////	qDebug() << "new_polygon_contact";
-		//	cu_new_particle_polygon_object_contact(
-		//		cpmeshes->deviceTrianglesInfo(), cpmeshes->devicePolygonObjectMassInfo(),
-		//		d_old_pppd, d_pppd, d_rfm, d_old_pair_count, d_pair_count, d_old_pair_start, d_pair_start,
-		//		d_type_count, pos, vel,/* ep,*/ omega, force, moment, mass, /*inertia,*/
-		//		sorted_id, cell_start, cell_end, cpmeshes->DeviceContactProperty(), np);
-		//	cpmeshes->getMeshContactForce();
+		cu_plane_contact_force(1, cpplane->devicePlaneInfo(), pos, vel,
+			omega, force, moment, mass,
+			d_Tmax, d_RRes, d_pair_count_ppl, d_pair_id_ppl, d_tsd_ppl,
+			np, cpplane->DeviceContactProperty());
 	}
-	//cu_decide_rolling_friction_moment(d_rfm, inertia, omega, moment, np);
-	//if (d_old_pppd)
-	//checkCudaErrors(cudaFree(d_old_pppd));
-	//ncontact = nc;
-	//std::cout << "finish_cm" << endl;
-
-
+	if (cpmeshes)
+	{
+		if (cpmeshes->NumContactObjects())
+		{
+			cpmeshes->updateMeshMassData();
+			cu_particle_polygonObject_collision(1, cpmeshes->deviceTrianglesInfo(), cpmeshes->devicePolygonObjectMassInfo(),
+				pos, vel, omega, force, moment, mass,
+				d_Tmax, d_RRes, d_pair_count_ptri, d_pair_id_ptri, d_tsd_ptri,
+				sorted_id, cell_start, cell_end, cpmeshes->DeviceContactProperty(), np);
+			cpmeshes->getMeshContactForce();
+		}
+	}
+	cu_decide_rolling_friction_moment(d_Tmax, d_RRes, inertia, omega, moment, np);
 }
 
 void xContactManager::hostCollision(vector4d *pos, vector3d *vel, vector3d *omega, double *mass, vector3d *force, vector3d *moment, unsigned int *sorted_id, unsigned int *cell_start, unsigned int *cell_end, unsigned int np)

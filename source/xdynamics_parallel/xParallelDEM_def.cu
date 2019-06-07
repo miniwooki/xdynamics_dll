@@ -211,7 +211,7 @@ void cu_cylinder_hertzian_contact_force(
 }
 
 void cu_particle_polygonObject_collision(
-	const int tcm, device_triangle_info* dpi, double* dsph, device_mesh_mass_info* dpmi,
+	const int tcm, device_triangle_info* dpi, device_mesh_mass_info* dpmi,
 	double* pos, double* vel, double* omega,
 	double* force, double* moment, double* mass,
 	double* tmax, double* rres,
@@ -224,14 +224,31 @@ void cu_particle_polygonObject_collision(
 	{
 	case 1:
 		particle_polygonObject_collision_kernel<1> << < numBlocks, numThreads >> > (
-			dpi, (double4 *)dsph, dpmi,
+			dpi, dpmi,
 			(double4 *)pos, (double3 *)vel, (double3 *)omega,
 			(double3 *)force, (double3 *)moment, mass,
 			(double3 *)tmax, rres,
-			pair_count, pair_id, (double2 *)tsd
+			pair_count, pair_id, (double2 *)tsd,
 			sorted_index, cstart, cend, cp, np);
 		break;
 	}
+}
+
+void cu_decide_rolling_friction_moment(
+	double* tmax,
+	double* rres,
+	double* inertia,
+	double* omega,
+	double* moment,
+	unsigned int np)
+{
+	computeGridSize(np, 512, numBlocks, numThreads);
+	decide_rolling_friction_moment_kernel << <numBlocks, numThreads >> > (
+		(double3 *)tmax,
+		rres,
+		inertia,
+		(double3 *)omega,
+		(double3 *)moment);
 }
 
 double3 reductionD3(double3* in, unsigned int np)

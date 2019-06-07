@@ -261,7 +261,7 @@ bool xXLSReader::Load(const wchar_t* n)
 	book = xlCreateBook();
 	if (book)
 	{
-		
+		connect_file = QString::fromStdWString(n);
 		return book->load(n);
 	}
 	return false;
@@ -389,22 +389,21 @@ void xXLSReader::ReadDEMParticle(xDiscreteElementMethodModel* xdem, vector2i rc)
 				//xListParticleData d = ReadListParticleData(name, rc.x++, rc.y);
 				unsigned int number = static_cast<int>(sheet->readNum(rc.x, rc.y++));
 				std::wstring x;
-				x = sheet->readStr(rc.x++, rc.y); 
-				vector2i _rc;
-				uf::xsplit(x, ",", 2, &_rc.x);
+				std::string fpath = xUtilityFunctions::WideChar2String(sheet->readStr(rc.x, rc.y++));
 				vector4d* d = new vector4d[number];
-				_rc.x -= 1; _rc.y -= 1;
-				int start_column = _rc.y;
-				for (unsigned int i = 0; i < number; i++)
+				std::fstream fs;
+				fs.open(fpath.c_str(), std::ios::in);
+				if (fs.is_open())
 				{
-					if (IsEmptyCell(_rc.x, _rc.y))
-						break;
-					d[i].x = sheet->readNum(_rc.x, _rc.y++);
-					d[i].y = sheet->readNum(_rc.x, _rc.y++);
-					d[i].z = sheet->readNum(_rc.x, _rc.y++);
-					d[i].w = sheet->readNum(_rc.x++, _rc.y);
-					_rc.y = start_column;
+					for (unsigned int i = 0; i < number; i++)
+						fs >> d[i].x >> d[i].y >> d[i].z >> d[i].w;
 				}
+				else
+				{
+					std::cout << fpath << " not open" << std::endl;
+				}
+				
+				fs.close();
 				xdem->XParticleManager()->CreateParticleFromList(name.c_str(), (xMaterialType)material, number, d);
 				delete[] d;
 			}

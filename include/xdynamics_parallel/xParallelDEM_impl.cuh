@@ -516,7 +516,7 @@ __global__ void calculate_p2p_kernel(
 	force[id] += sumF;
 	moment[id] += sumM;
 	if (new_count - sid > MAX_P2P_COUNT)
-		printf("The total of contact with other particle is over(%d).", new_count - sid);
+		printf("The total of contact with other particle is over(%d)\n.", new_count - sid);
 	
 	pair_count[id] = new_count - sid;
 	tmax[id] = tma;
@@ -657,7 +657,7 @@ __global__ void plane_contact_force_kernel(
 			for (unsigned int i = 0; i < old_count; i++)
 			{
 				//unsigned int oid = i;
-				if (p_pair_id[i] == cte.np + k)
+				if (p_pair_id[i] == k)
 				{
 					sd = p_tsd[i];
 					break;
@@ -688,14 +688,14 @@ __global__ void plane_contact_force_kernel(
 			sumF += Fn + Ft;
 			sumM += M;
 			tsd[new_count] = sd;
-			pair_id[new_count] = cte.np + k;
+			pair_id[new_count] = k;
 			new_count++;
 		}
 	}
 	force[id] += sumF;
 	moment[id] += sumM;
 	if (new_count - sid > 3)
-		printf("The total of contact with plane is over(%d).", new_count - sid);
+		printf("The total of contact with plane is over(%d)\n.", new_count - sid);
 	pair_count[id] = new_count - sid;
 	//f("idx %d : %d\n", id, new_count - sid);
 	tmax[id] += tma;
@@ -921,7 +921,8 @@ __global__ void reduce6(T *g_idata, T *g_odata, unsigned int n)
 __device__ double3 closestPtPointTriangle(
 	device_triangle_info& dpi,
 	double3& p,
-	double pr)
+	double pr,
+	int& ct)
 {
 	double3 a = dpi.P;
 	double3 b = dpi.Q;
@@ -929,57 +930,39 @@ __device__ double3 closestPtPointTriangle(
 	double3 ab = b - a;
 	double3 ac = c - a;
 	double3 ap = p - a;
-
+	double3 bp = p - b;
+	double3 cp = p - c;
 	double d1 = dot(ab, ap);
 	double d2 = dot(ac, ap);
-	if (d1 <= 0.0 && d2 <= 0.0) {
-		//	*wc = 0;
-		return a;
-	}
-
-	double3 bp = p - b;
 	double d3 = dot(ab, bp);
 	double d4 = dot(ac, bp);
-	if (d3 >= 0.0 && d4 <= d3) {
-		//	*wc = 0;
-		return b;
-	}
-	double vc = d1 * d4 - d3 * d2;
-	if (vc <= 0.0 && d1 >= 0.0 && d3 <= 0.0) {
-		//	*wc = 1;
-		double v = d1 / (d1 - d3);
-		return a + v * ab;
-	}
-
-	double3 cp = p - c;
 	double d5 = dot(ab, cp);
 	double d6 = dot(ac, cp);
-	if (d6 >= 0.0 && d5 <= d6) {
-		//	*wc = 0;
-		return c;
-	}
-
-	double vb = d5 * d2 - d1 * d6;
-	if (vb <= 0.0 && d2 >= 0.0 && d6 <= 0.0) {
-		//	*wc = 1;
-		double w = d2 / (d2 - d6);
-		return a + w * ac; // barycentric coordinates (1-w, 0, w)
-	}
-
-	// Check if P in edge region of BC, if so return projection of P onto BC
 	double va = d3 * d6 - d5 * d4;
-	if (va <= 0.0 && (d4 - d3) >= 0.0 && (d5 - d6) >= 0.0) {
-		//	*wc = 1;
-		double w = (d4 - d3) / ((d4 - d3) + (d5 - d6));
-		return b + w * (c - b); // barycentric coordinates (0, 1-w, w)
-	}
-	//*wc = 2;
-	// P inside face region. Compute Q through its barycentric coordinates (u, v, w)
-	double denom = 1.0 / (va + vb + vc);
-	double v = vb * denom;
-	double w = vc * denom;
+	double vb = d5 * d2 - d1 * d6;
+	double vc = d1 * d4 - d3 * d2;
 
-	return a + v * ab + w * ac; // = u*a + v*b + w*c, u = va * denom = 1.0f - v - w
+	
+	if (d1 <= 0.0 && d2 <= 0.0){ ct = 0; return a; }
+	if (d3 >= 0.0 && d4 <= d3) { ct = 0; return b; }
+	if (d6 >= 0.0 && d5 <= d6) { ct = 0; return c; }
+
+	if (vc <= 0.0 && d1 >= 0.0 && d3 <= 0.0){ ct = 1; return a + (d1 / (d1 - d3)) * ab; }
+	if (vb <= 0.0 && d2 >= 0.0 && d6 <= 0.0){ ct = 1; return a + (d2 / (d2 - d6)) * ac; }
+	if (va <= 0.0 && (d4 - d3) >= 0.0 && (d5 - d6) >= 0.0){ ct = 1;	return b + ((d4 - d3) / ((d4 - d3) + (d5 - d6))) * (c - b); }
+	//ct = 2;
+	// P inside face region. Comu0te Q through its barycentric coordinates (u, v, w)
+	/*double denom = 1.0 / (va + vb + vc);
+	double v = vb * denom;
+	double w = vc * denom;*/
+	double denom = 1.0 / (va + vb + vc);
+	double3 v = vb * denom * ab;
+	double3 w = vc * denom * ac;
+	double3 _cpt = a + v + w;
+	//double _dist = pr - length(p - _cpt);
+	ct = 2;
+	//if (_dist > 0) return _cpt;
+	return _cpt; // = u*a + v*b + w*c, u = va * denom = 1.0f - v - w
 }
 
 __device__ bool checkConcave(device_triangle_info* dpi, unsigned int* tid, unsigned int kid, double4* dsph, unsigned int cnt)
@@ -1024,7 +1007,7 @@ __device__ bool checkOverlab(int3 ctype, double3 p, double3 c, double3 u0, doubl
 
 template<int TCM>
 __global__ void particle_polygonObject_collision_kernel(
-	device_triangle_info* dpi, double4* dsph, device_mesh_mass_info* dpmi,
+	device_triangle_info* dpi, device_mesh_mass_info* dpmi,
 	double4 *pos, double3 *vel, double3 *omega, double3 *force, double3 *moment,
 	double* mass, double3* tmax, double* rres,
 	unsigned int* pair_count, unsigned int* pair_id, double2* tsd, 
@@ -1051,8 +1034,6 @@ __global__ void particle_polygonObject_collision_kernel(
 	double3 iomega = make_double3(omega[id].x, omega[id].y, omega[id].z);
 	double3 unit = make_double3(0.0, 0.0, 0.0);
 	int3 gridPos = calcGridPos(make_double3(ipos.x, ipos.y, ipos.z));
-	//double3 cpt = make_double3(0.0, 0.0, 0.0);
-	//double3 mp = make_double3(mpos->x, mpos->y, mpos->z);
 	double ir = pos[id].w;
 	double3 M = make_double3(0, 0, 0);
 	int3 neighbour_pos = make_int3(0, 0, 0);
@@ -1068,6 +1049,7 @@ __global__ void particle_polygonObject_collision_kernel(
 	double3 previous_unit = make_double3(0.0, 0.0, 0.0);
 	unsigned int start_index = 0;
 	unsigned int end_index = 0;
+	int3 ctype = make_int3(0, 0, 0);
 	for (int z = -1; z <= 1; z++) {
 		for (int y = -1; y <= 1; y++) {
 			for (int x = -1; x <= 1; x++) {
@@ -1081,15 +1063,13 @@ __global__ void particle_polygonObject_collision_kernel(
 						if (k >= cte.np)
 						{
 							k -= cte.np;
-							//printf("%d", k);
-							
+							int t = -1;
 							unsigned int pidx = dpi[k].id;
 							device_contact_property cmp = cp[pidx];
 							device_mesh_mass_info pmi = dpmi[pidx];
-							double3 cpt = closestPtPointTriangle(dpi[k], ipos, ir);
+							double3 cpt = closestPtPointTriangle(dpi[k], ipos, ir, t);
 							double3 po2cp = cpt - pmi.origin;
-							/*double3 distVec = ipos - cpt;*/
-							dist = ir - length(ipos - cpt);
+							double dist = ir - length(ipos - cpt);
 							Fn = make_double3(0.0, 0.0, 0.0);
 							if (cdist > 0)
 							{
@@ -1097,27 +1077,23 @@ __global__ void particle_polygonObject_collision_kernel(
 								double3 qp = tri.Q - tri.P;
 								double3 rp = tri.R - tri.P;
 								double rcon = ir - 0.5 * cdist;
-								unit = -normalize(cross(qp, rp));// unit / length(cross(qp, rp));
+								unit = -cross(qp, rp);
+								unit = unit / length(unit);
 								bool overlab = checkOverlab(ctype, previous_cpt, cpt, previous_unit, unit);
 								if (overlab)
 									continue;
 								double2 sd = make_double2(0.0, 0.0);
 								for (unsigned int i = 0; i < old_count; i++)
 								{
-									if (p_pair_id[i] == cte.np + k)
+									if (p_pair_id[i] == k)
 									{
 										sd = p_tsd[i];
 										break;
 									}
 								}
+								*(&(ctype.x) + t) += 1;
 								previous_cpt = cpt;
 								previous_unit = unit;
-								//double2 ds = make_double2(0.0, 0.0);
-								//double3 qp = dpi[k].Q - dpi[k].P;
-								//double3 rp = dpi[k].R - dpi[k].P;
-								//double rcon = ir - 0.5 * cdist;
-								//unit = -cross(qp, rp);// -dpi[k].N;
-								//unit = unit / length(unit);
 								double3 rc = ir * unit;
 								double3 dv = pmi.vel + cross(pmi.omega, po2cp) - (ivel + cross(iomega, rc));
 								device_force_constant c = getConstant(
@@ -1133,21 +1109,18 @@ __global__ void particle_polygonObject_collision_kernel(
 									break;
 								case 1:
 									DHSModel(
-										c, ir, 0, 0, 0, 0, 0, 0, rcon, cdist, iomega, ds.x, ds.y,
+										c, ir, 0, 0, 0, 0, 0, 0, rcon, cdist, iomega, sd.x, sd.y,
 										dv, unit, Ft, Fn, M);
 									break;
 								}
 								calculate_previous_rolling_resistance(
-									cmp.rfactor, r, 0, rc, Fn, Ft, res, tma);
-								//double3 sum_f = Fn;
+									cmp.rfactor, ir, 0, rc, Fn, Ft, res, tma);
 								sum_force += Fn + Ft;
 								sum_moment += M;
-								//force[id] += Fn + Ft;
-								//moment[id] += make_double3(M.x, M.y, M.z);
 								dpmi[pidx].force += -(Fn + Ft);// +make_double3(1.0, 5.0, 9.0);
 								dpmi[pidx].moment += -cross(po2cp, Fn + Ft);
 								tsd[new_count] = sd;
-								pair_id[new_count] = cte.np + k;
+								pair_id[new_count] = k;
 								new_count++;
 							}
 						}
@@ -1159,7 +1132,7 @@ __global__ void particle_polygonObject_collision_kernel(
 	force[id] += sum_force;
 	moment[id] += sum_moment;
 	if (new_count - sid > MAX_P2MS_COUNT)
-		printf("The total of contact with triangle is over(%d).", new_count - sid);
+		printf("The total of contact with triangle is over(%d)\n.", new_count - sid);
 	pair_count[id] = new_count - sid;
 	tmax[id] += tma;
 	rres[id] += res;
@@ -1170,13 +1143,10 @@ __global__ void decide_rolling_friction_moment_kernel(
 	double* rres,
 	double* inertia,
 	double3 *ev,
-	double3 *moment,
-	unsigned int _np)
+	double3 *moment)
 {
 	unsigned int id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
-	unsigned int np = _np;
-
-	if (id >= np)
+	if (id >= cte.np)
 		return;
 	double Tr = rres[id];
 	if (!Tr)
@@ -1194,21 +1164,6 @@ __global__ void decide_rolling_friction_moment_kernel(
 		moment[id] += _Tr;
 	}
 	//rfm[id] = make_double4(0.0, 0.0, 0.0, 0.0);
-}
-
-void cu_decide_rolling_friction_moment(
-	double* tmax, double* rres, double *inertia, double* ev,
-	double* moment, unsigned int np)
-{
-	unsigned int numBlocks, numThreads;
-	computeGridSize(np, 512, numBlocks, numThreads);
-	decide_rolling_friction_moment_kernel << <numBlocks, numThreads >> > (
-		(double3 *)tmax,
-		rres,
-		inertia,
-		(double3 *)ev,
-		(double3 *)moment,
-		np);
 }
 
 //__device__ double3 toGlobal(double4& ep, double3& s)

@@ -10,7 +10,7 @@
 typedef unsigned int uint;
 //#include <helper_functions.h>
 //#include <helper_cuda.h>
-#define MAX_P2P_COUNT  8
+#define MAX_P2P_COUNT  10
 #define MAX_P2PL_COUNT 3
 #define MAX_P2MS_COUNT 3
 //__constant__ device_parameters cte;
@@ -167,6 +167,14 @@ void XDYNAMICS_API cu_cylinder_hertzian_contact_force(
 	double* force, double* moment, double* mass,
 	unsigned int np, device_contact_property* cp,
 	double3* mpos, double3* mf, double3* mm, double3& _mf, double3& _mm);
+
+void XDYNAMICS_API cu_decide_rolling_friction_moment(
+	double* tmax,
+	double* rres,
+	double* inertia,
+	double* omega,
+	double* moment,
+	unsigned int np);
 
 double3 XDYNAMICS_API reductionD3(double3* in, unsigned int np);
 void XDYNAMICS_API cu_updatePolygonObjectData(

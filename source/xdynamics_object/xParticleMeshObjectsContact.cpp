@@ -256,22 +256,22 @@ void xParticleMeshObjectsContact::updateMeshMassData()
 		hpmi[id] =
 		{
 			pos.x, pos.y, pos.z,
+			ep.e0, ep.e1, ep.e2, ep.e3,
 			vel.x, vel.y, vel.z,
 			omega.x, omega.y, omega.z,
 			0.0, 0.0, 0.0,
-			0.0, 0.0, 0.0,
-			ep.e0, ep.e1, ep.e2, ep.e3
+			0.0, 0.0, 0.0
 		};
 	}
 	if (dpmi)
 	{
-		checkCudaErrors(cudaMemcpy(dpmi, hpmi, sizeof(double) * 19 * nPobjs, cudaMemcpyHostToDevice));
+		checkCudaErrors(cudaMemcpy(dpmi, hpmi, sizeof(device_mesh_mass_info) * nPobjs, cudaMemcpyHostToDevice));
 	}
 }
 
 void xParticleMeshObjectsContact::getMeshContactForce()
 {
-	checkCudaErrors(cudaMemcpy(hpmi, dpmi, sizeof(double) * 19 * nPobjs, cudaMemcpyDeviceToHost));
+	checkCudaErrors(cudaMemcpy(hpmi, dpmi, sizeof(device_mesh_mass_info) * nPobjs, cudaMemcpyDeviceToHost));
 	QMapIterator<unsigned int, xMeshObject*> xmo(pair_ip);
 	while (xmo.hasNext())
 	{
