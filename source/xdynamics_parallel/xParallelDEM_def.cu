@@ -32,7 +32,7 @@ void computeGridSize(unsigned n, unsigned blockSize, unsigned &numBlocks, unsign
 
 void vv_update_position(double *pos, double *vel, double *acc, unsigned int np)
 {
-	computeGridSize(np, 512, numBlocks, numThreads);
+	computeGridSize(np, 256, numBlocks, numThreads);
 	vv_update_position_kernel << < numBlocks, numThreads >> > (
 		(double4 *)pos,
 		(double3 *)vel,
@@ -42,7 +42,7 @@ void vv_update_position(double *pos, double *vel, double *acc, unsigned int np)
 
 void vv_update_velocity(double *vel, double *acc, double *omega, double *alpha, double *force, double *moment, double* mass, double* iner, unsigned int np)
 {
-	computeGridSize(np, 512, numBlocks, numThreads);
+	computeGridSize(np, 256, numBlocks, numThreads);
 	vv_update_velocity_kernel << < numBlocks, numThreads >> > (
 		(double3 *)vel,
 		(double3 *)acc,
@@ -61,7 +61,7 @@ void cu_calculateHashAndIndex(
 	double *pos,
 	unsigned int np)
 {
-	computeGridSize(np, 512, numBlocks, numThreads);
+	computeGridSize(np, 256, numBlocks, numThreads);
 	calculateHashAndIndex_kernel << < numBlocks, numThreads >> > (hash, index, (double4 *)pos, np);
 }
 
@@ -72,7 +72,7 @@ void cu_calculateHashAndIndexForPolygonSphere(
 	unsigned int nsphere,
 	double *sphere)
 {
-	computeGridSize(nsphere, 512, numBlocks, numThreads);
+	computeGridSize(nsphere, 256, numBlocks, numThreads);
 	calculateHashAndIndexForPolygonSphere_kernel << <numBlocks, numThreads >> > (hash, index, sid, nsphere, (double4 *)sphere);
 }
 
@@ -89,11 +89,13 @@ void cu_reorderDataAndFindCellStart(
 {
 	//std::cout << "step 1" << std::endl;
 	//unsigned int tnp = np;// +nsphere;
+	//std::cout << "begin sortbykey" << std::endl;
 	thrust::sort_by_key(thrust::device_ptr<unsigned>(hash),
 		thrust::device_ptr<unsigned>(hash + np),
 		thrust::device_ptr<unsigned>(index));
+	//std::cout << "end sortbykey" << std::endl;
 	//std::cout << "step 2" << std::endl;
-	computeGridSize(np, 512, numBlocks, numThreads);
+	computeGridSize(np, 256, numBlocks, numThreads);
 	checkCudaErrors(cudaMemset(cstart, 0xffffffff, ncell * sizeof(unsigned int)));
 	checkCudaErrors(cudaMemset(cend, 0, ncell * sizeof(unsigned int)));
 	unsigned smemSize = sizeof(unsigned int)*(numThreads + 1);
@@ -195,7 +197,7 @@ void cu_cylinder_hertzian_contact_force(
 	double* mass, unsigned int np, device_contact_property *cp,
 	double3* mpos, double3* mf, double3* mm, double3& _mf, double3& _mm)
 {
-	computeGridSize(np, 512, numBlocks, numThreads);
+	computeGridSize(np, 256, numBlocks, numThreads);
 	switch (tcm)
 	{
 	case 0: cylinder_hertzian_contact_force_kernel<0> << < numBlocks, numThreads >> > (
@@ -219,7 +221,7 @@ void cu_particle_polygonObject_collision(
 	unsigned int* sorted_index, unsigned int* cstart, unsigned int* cend, device_contact_property *cp,
 	unsigned int np)
 {
-	computeGridSize(np, 512, numBlocks, numThreads);
+	computeGridSize(np, 256, numBlocks, numThreads);
 	switch (tcm)
 	{
 	case 1:
@@ -242,7 +244,7 @@ void cu_decide_rolling_friction_moment(
 	double* moment,
 	unsigned int np)
 {
-	computeGridSize(np, 512, numBlocks, numThreads);
+	computeGridSize(np, 256, numBlocks, numThreads);
 	decide_rolling_friction_moment_kernel << <numBlocks, numThreads >> > (
 		(double3 *)tmax,
 		rres,
@@ -254,13 +256,13 @@ void cu_decide_rolling_friction_moment(
 double3 reductionD3(double3* in, unsigned int np)
 {
 	double3 rt = make_double3(0.0, 0.0, 0.0);
-	computeGridSize(np, 512, numBlocks, numThreads);
+	computeGridSize(np, 256, numBlocks, numThreads);
 	double3* d_out;
 	double3* h_out = new double3[numBlocks];
 	checkCudaErrors(cudaMalloc((void**)&d_out, sizeof(double3) * numBlocks));
 	checkCudaErrors(cudaMemset(d_out, 0, sizeof(double3) * numBlocks));
 	//unsigned smemSize = sizeof(double3)*(512);
-	reduce6<double3, 512> << < numBlocks, numThreads/*, smemSize*/ >> > (in, d_out, np);
+	reduce6<double3, 256> << < numBlocks, numThreads/*, smemSize*/ >> > (in, d_out, np);
 	checkCudaErrors(cudaMemcpy(h_out, d_out, sizeof(double3) * numBlocks, cudaMemcpyDeviceToHost));
 	for (unsigned int i = 0; i < numBlocks; i++) {
 		rt.x += h_out[i].x;
@@ -270,4 +272,18 @@ double3 reductionD3(double3* in, unsigned int np)
 	delete[] h_out;
 	checkCudaErrors(cudaFree(d_out));
 	return rt;
+}
+
+void cu_update_meshObjectData(
+	double *vList, double* sph, device_triangle_info* poly,
+	device_mesh_mass_info* dpmi, double* ep, unsigned int ntriangle)
+{
+	computeGridSize(ntriangle, 256, numBlocks, numThreads);
+	updateMeshObjectData_kernel << <numBlocks, numThreads >> > (
+		dpmi,
+		(double4 *)ep,
+		vList,
+		(double4 *)sph,
+		poly,
+		ntriangle);
 }

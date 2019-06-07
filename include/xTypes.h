@@ -226,6 +226,17 @@ typedef struct
 
 typedef struct  
 {
+	xShapeType type;
+	unsigned int count;
+	unsigned int id;
+	double delta_s;
+	double dot_s;
+	double gab, nx, ny, nz;
+	double cpx, cpy, cpz;
+}xTrianglePairData;
+
+typedef struct  
+{
 	double px, py, pz;
 	double nx, ny, nz;
 	double tx, ty, tz;

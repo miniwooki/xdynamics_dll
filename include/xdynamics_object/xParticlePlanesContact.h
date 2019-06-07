@@ -37,7 +37,8 @@ public:
 	void allocHostMemory(unsigned int n);
 	bool cpplCollision(
 		xContactPairList* pairs, double r, double m,
-		vector3d& p, vector3d& v, vector3d& o, vector3d& F, vector3d& M);
+		vector3d& p, vector3d& v, vector3d& o, 
+		double &R, vector3d& T, vector3d& F, vector3d& M);
 	unsigned int NumContact();// { return ncontact; }
 //	void setNumContact(unsigned int c) { ncontact = c; }
 	//void updateMeshObjectData(xVectorD& q, xVectorD& qd);

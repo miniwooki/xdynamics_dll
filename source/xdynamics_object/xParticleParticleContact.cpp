@@ -79,11 +79,11 @@ void xParticleParticleContact::deviceContactCount(double* pos, unsigned int *sor
 
 void xParticleParticleContact::cppCollision(
 	xContactPairList* pairs, unsigned int i, vector4d *pos, vector3d *vel, 
-	vector3d *omega, double *mass, vector3d& F, vector3d& M)
+	vector3d *omega, double *mass, double &res, vector3d &tmax, vector3d& F, vector3d& M)
 {
 	foreach(xPairData* d, pairs->ParticlePair())
 	{
-		vector3d m_f, m_m;
+		vector3d m_fn, m_m, m_ft;
 		unsigned int j = d->id;
 		double rcon = pos[i].w - 0.5 * d->gab;
 		vector3d u = new_vector3d(d->nx, d->ny, d->nz);
@@ -97,10 +97,10 @@ void xParticleParticleContact::cppCollision(
 			mpp.Gi, mpp.Gj);
 		switch (force_model)
 		{
-		case DHS: DHSModel(c, d->gab, d->delta_s, d->dot_s, cp, rv, u, m_f, m_m); break;
+		case DHS: DHSModel(c, d->gab, d->delta_s, d->dot_s, cp, rv, u, m_fn, m_ft, m_m); break;
 		}
-
-		F += m_f/* + Ft*/;
+		RollingResistanceForce(rolling_factor, pos[i].w, pos[j].w, cp, m_fn, m_ft, res, tmax);
+		F += m_fn + m_ft;
 		M += m_m;
 	}
 }
@@ -114,15 +114,16 @@ void xParticleParticleContact::updateCollisionPair(unsigned int id, xContactPair
 	unsigned int rid = 0;
 	if (cdist > 0){
 		vector3d u = rp / dist;
-		xPairData *pd = new xPairData;
-		*pd = { PARTICLES, 0, id, 0, 0, cdist, u.x, u.y, u.z };
-		xcpl.insertParticleContactPair(pd);
+		if (xcpl.IsNewParticleContactPair(id))
+		{
+			xPairData *pd = new xPairData;
+			*pd = { PARTICLES, 0, id, 0, 0, cdist, u.x, u.y, u.z };
+			xcpl.insertParticleContactPair(pd);
+		}		
 	}
 	else
 	{
-		xPairData *pd = xcpl.ParticlePair(id);
-		if (pd)
-			xcpl.deleteParticlePairData(id);
+		xcpl.deleteParticlePairData(id);
 	}
 }
 

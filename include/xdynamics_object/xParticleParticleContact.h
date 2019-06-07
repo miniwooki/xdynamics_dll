@@ -14,12 +14,7 @@ public:
 	void cppCollision(
 		xContactPairList* pairs, unsigned int i,
 		vector4d *pos, vector3d *vel,
-		vector3d *omega, double *mass,
-// 		double ir, double jr,
-// 		double im, double jm,
-// 		vector3d& ip, vector3d& jp,
-// 		vector3d& iv, vector3d& jv,
-// 		vector3d& io, vector3d& jo,
+		vector3d *omega, double *mass, double &res, vector3d &tmax,
 		vector3d& F, vector3d& M);
 	void updateCollisionPair(unsigned int id, xContactPairList& xcpl, double ri, double rj, vector3d& posi, vector3d& posj);
 	virtual void cuda_collision(

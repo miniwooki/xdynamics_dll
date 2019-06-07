@@ -25,6 +25,7 @@ int xIntegratorVV::OneStepSimulation(double ct, unsigned int cstep)
 	//std::cout << "cstep : " << cstep << " ";
 	this->updatePosition(dpos, dvel, dacc, dep, davel, daacc, np);
 	dtor->detection(dpos, (nPolySphere ? xcm->ContactParticlesMeshObjects()->SphereData() : NULL), np, nPolySphere);
+//	std::cout << "after detection " << std::endl;
 	if (xcm)
 	{
 		xcm->runCollision(
@@ -44,19 +45,15 @@ void xIntegratorVV::updatePosition(
 		vv_update_position(dpos, dvel, dacc,/* ep, ev, ea,*/ np);
 	else
 	{
-// 		vector4d* p = (vector4d*)dpos;
-// 	//	euler_parameters* r = (euler_parameters*)drot;
-// 		vector3d* v = (vector3d*)dvel;
-// 		vector3d* a = (vector3d*)dacc;
-// 	//	euler_parameters* rv = (euler_parameters*)davel;
-// 	//////	euler_parameters* ra = (euler_parameters*)daacc;
-// 		double sqt_dt = 0.5 * xSimulation::dt * xSimulation::dt;
-// 		for (unsigned int i = 0; i < np; i++){
-// 			vector3d old_p = new_vector3d(p[i].x, p[i].y, p[i].z);
-// 			vector3d new_p = old_p + xSimulation::dt * v[i] + sqt_dt * a[i];
-// 			p[i] = new_vector4d(new_p.x, new_p.y, new_p.z, p[i].w);
-// 			//r[i] = r[i] + xSimulation::dt * rv[i] + sqt_dt * ra[i];
-// 		}
+		vector4d* p = (vector4d*)dpos;
+		vector3d* v = (vector3d*)dvel;
+		vector3d* a = (vector3d*)dacc;
+		double sqt_dt = 0.5 * xSimulation::dt * xSimulation::dt;
+		for (unsigned int i = 0; i < np; i++) {
+			vector3d old_p = new_vector3d(p[i].x, p[i].y, p[i].z);
+			vector3d new_p = old_p + xSimulation::dt * v[i] + sqt_dt * a[i];
+			p[i] = new_vector4d(new_p.x, new_p.y, new_p.z, p[i].w);
+		}
 	}
 }
 

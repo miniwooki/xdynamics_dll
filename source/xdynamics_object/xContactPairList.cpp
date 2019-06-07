@@ -27,19 +27,54 @@ void xContactPairList::insertPlaneContactPair(xPairData* pd)
 
 void xContactPairList::insertParticleContactPair(xPairData* pd)
 {
-	//particle_pair[pd.id] = pd;
+	particle_pair[pd->id] = pd;
+}
+
+void xContactPairList::insertTriangleContactPair(xTrianglePairData* pd)
+{
+	triangle_pair[pd->id] = pd;
 }
 
 void xContactPairList::deletePlanePairData(unsigned int i)
 {
-	xPairData* pd = plane_pair.take(i);
-	delete pd;
+	if (plane_pair.find(i) != plane_pair.end())
+	{
+		xPairData* pd = plane_pair.take(i);
+		delete pd;
+	}	
 }
 
 void xContactPairList::deleteParticlePairData(unsigned int i)
 {
-	xPairData* pd = particle_pair.take(i);
-	delete pd;
+	if (particle_pair.find(i) != particle_pair.end())
+	{
+		xPairData* pd = particle_pair.take(i);
+		delete pd;
+	}	
+}
+
+void xContactPairList::deleteTrianglePairData(unsigned int i)
+{
+	if (triangle_pair.find(i) != triangle_pair.end())
+	{
+		xTrianglePairData* pd = triangle_pair.take(i);
+		delete pd;
+	}		
+}
+
+bool xContactPairList::IsNewPlaneContactPair(unsigned int i)
+{
+	return plane_pair.find(i) == plane_pair.end();
+}
+
+bool xContactPairList::IsNewParticleContactPair(unsigned int i)
+{
+	return particle_pair.find(i) == particle_pair.end();
+}
+
+bool xContactPairList::IsNewTriangleContactPair(unsigned int i)
+{
+	return triangle_pair.find(i) == triangle_pair.end();
 }
 
 QMap<unsigned int, xPairData*>& xContactPairList::PlanePair()
@@ -61,6 +96,16 @@ QMap<unsigned int, xPairData*>& xContactPairList::ParticlePair()
 }
 
 xPairData* xContactPairList::ParticlePair(unsigned int i)
+{
+	return NULL;
+}
+
+QMap<unsigned int, xTrianglePairData*>& xContactPairList::TrianglePair()
+{
+	return triangle_pair;
+}
+
+xTrianglePairData* xContactPairList::TrianglePair(unsigned int i)
 {
 	return NULL;
 }

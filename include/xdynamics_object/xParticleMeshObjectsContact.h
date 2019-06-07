@@ -30,7 +30,6 @@ class XDYNAMICS_API xParticleMeshObjectsContact : public xContact
 		double ox, oy, oz;
 		double fx, fy, fz;
 		double mx, my, mz;
-		double e0, e1, e2, e3;
 	};
 
 public:
@@ -42,15 +41,18 @@ public:
 	vector4d* HostSphereData() { return hsphere; }
 	unsigned int define(QMap<QString, xParticleMeshObjectContact*>& cppos);
 	bool cppolyCollision(
-		unsigned int idx, double r, double m,
-		vector3d& p, vector3d& v, vector3d& o, vector3d& F, vector3d& M);
+		xContactPairList* pairs, double r, double m,
+		vector3d& p, vector3d& v, vector3d& o,
+		double &res, vector3d &tmax, vector3d& F, vector3d& M);
 	unsigned int NumContact() { return ncontact; }
 	unsigned int NumContactObjects() { return nPobjs; }
 	void setNumContact(unsigned int c) { ncontact = c; }
 	void updateMeshObjectData();
 	void updateMeshMassData();
 	void getMeshContactForce();
-	void updateCollisionPair(unsigned int id, xContactPairList& xcpl, double r, vector3d pos);
+	bool updateCollisionPair(
+		unsigned int id, xContactPairList& xcpl, double r, 
+		vector3d pos, vector3d& ocpt, vector3d& ounit, vector3i& ctype);
 	virtual void cudaMemoryAlloc(unsigned int np);
 	virtual void cuda_collision(
 		double *pos, double *vel, double *omega,
@@ -61,8 +63,9 @@ public:
 	device_mesh_mass_info* devicePolygonObjectMassInfo();
 
 private:
-	vector3d particle_polygon_contact_detection(host_mesh_info& dpi, vector3d& p, double r/*, polygonContactType& _pct*/);
-
+	vector3d particle_polygon_contact_detection(
+		host_mesh_info& dpi, vector3d& p, double r, int& t);
+	bool checkOverlab(vector3i ctype, vector3d p, vector3d c, vector3d u0, vector3d u1);
 	unsigned int ncontact;
 	//polygonContactType *pct;
 	double maxRadius;
@@ -80,6 +83,7 @@ private:
 	device_triangle_info* dpi;
 	QMap<unsigned int, xMeshObject*> pair_ip;
 	host_mesh_mass_info *hpmi;
+	double* dep;
 	device_mesh_mass_info *dpmi;
 };
 

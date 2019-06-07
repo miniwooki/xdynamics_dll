@@ -122,7 +122,10 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 		dp.np = np;
 		dp.rollingCondition = false;// xmd->RollingCondition();
 		dp.nsphere = 0;
-		dp.nplane = xcm->ContactParticlesPlanes()->NumPlanes();
+		if (xcm->ContactParticlesPlanes())
+			dp.nplane = xcm->ContactParticlesPlanes()->NumPlanes();
+		else
+			dp.nplane = 0;
 		dp.ncell = dtor->nCell();
 		dp.grid_size.x = xGridCell::gs.x;
 		dp.grid_size.y = xGridCell::gs.y;

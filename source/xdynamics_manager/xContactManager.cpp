@@ -23,6 +23,8 @@ xContactManager::xContactManager()
 	, d_tsd_ptri(NULL)
 	, d_Tmax(NULL)
 	, d_RRes(NULL)
+	, Tmax(NULL)
+	, RRes(NULL)
 
 {
 
@@ -34,6 +36,8 @@ xContactManager::~xContactManager()
 // 	if (cpp) delete cpp; cpp = NULL;
  	if (cpmeshes) delete cpmeshes; cpmeshes = NULL;
  	if (cpplane) delete cpplane; cpplane = NULL;
+	if (Tmax) delete[] Tmax; Tmax = NULL;
+	if (RRes) delete[] RRes; RRes = NULL;
 
 	if (d_pair_count_pp) checkCudaErrors(cudaFree(d_pair_count_pp)); d_pair_count_pp = NULL;
 	if (d_pair_count_ppl) checkCudaErrors(cudaFree(d_pair_count_ppl)); d_pair_count_ppl = NULL;
@@ -192,7 +196,7 @@ bool xContactManager::runCollision(
 
 void xContactManager::update()
 {
-	if (cpmeshes && ncontact)
+	if (cpmeshes)
 	{
 		cpmeshes->updateMeshObjectData();
 	}
@@ -210,6 +214,8 @@ void xContactManager::allocPairList(unsigned int np)
 	{
 		if (!xcpl)
 			xcpl = new xContactPairList[np];
+		Tmax = new vector3d[np];
+		RRes = new double[np];
 	}
 	else
 	{
@@ -250,10 +256,14 @@ void xContactManager::updateCollisionPair(vector4d* pos, unsigned int* sorted_id
 {
 	for (unsigned int i = 0; i < np; i++)
 	{
+		unsigned int count = 0;
 		vector3d p = new_vector3d(pos[i].x, pos[i].y, pos[i].z);
 		double r = pos[i].w;
 		cpplane->updateCollisionPair(xcpl[i], r, p);
 		vector3i gp = xGridCell::getCellNumber(p.x, p.y, p.z);
+		vector3d old_cpt = new_vector3d(0.0, 0.0, 0.0);
+		vector3d old_unit = new_vector3d(0.0, 0.0, 0.0);
+		vector3i ctype = new_vector3i(0, 0, 0);
 		for (int z = -1; z <= 1; z++) {
 			for (int y = -1; y <= 1; y++) {
 				for (int x = -1; x <= 1; x++) {
@@ -272,16 +282,16 @@ void xContactManager::updateCollisionPair(vector4d* pos, unsigned int* sorted_id
 							}
 							else if (k >= np)
 							{
-								// 								if (!cppoly->cppolyCollision(k - np, r, m, p, v, o, F, M))
-								// 								{
-								// 
-								// 								}
+								if (cpmeshes->updateCollisionPair(k - np, xcpl[i], r, p, old_cpt, old_unit, ctype))
+									count++;
 							}
 						}
 					}
 				}
 			}
 		}
+		if (count > 1)
+			std::cout << "mesh contact overlab occured." << std::endl;
 	}
 }
 
@@ -295,12 +305,15 @@ void xContactManager::deviceCollision(
 		d_Tmax, d_RRes, d_pair_count_pp, d_pair_id_pp, d_tsd_pp, sorted_id,
 		cell_start, cell_end, cpp->DeviceContactProperty(), np);
 
-	if (cpplane && cpplane->NumContact())
+	if (cpplane)
 	{
-		cu_plane_contact_force(1, cpplane->devicePlaneInfo(), pos, vel,
-			omega, force, moment, mass,
-			d_Tmax, d_RRes, d_pair_count_ppl, d_pair_id_ppl, d_tsd_ppl,
-			np, cpplane->DeviceContactProperty());
+		if (cpplane->NumContact())
+		{
+			cu_plane_contact_force(1, cpplane->devicePlaneInfo(), pos, vel,
+				omega, force, moment, mass,
+				d_Tmax, d_RRes, d_pair_count_ppl, d_pair_id_ppl, d_tsd_ppl,
+				np, cpplane->DeviceContactProperty());
+		}
 	}
 	if (cpmeshes)
 	{
@@ -324,14 +337,17 @@ void xContactManager::hostCollision(vector4d *pos, vector3d *vel, vector3d *omeg
 	{
 		vector3d F = new_vector3d(0.0, 0.0, 0.0);
 		vector3d M = new_vector3d(0.0, 0.0, 0.0);
+		double R = 0;
+		vector3d T = new_vector3d(0.0, 0.0, 0.0);
 		xContactPairList* pairs = &xcpl[i];
 		vector3d p = new_vector3d(pos[i].x, pos[i].y, pos[i].z);
 		vector3d v = vel[i];
 		vector3d o = omega[i];
 		double m = mass[i];
 		double r = pos[i].w;
-		cpplane->cpplCollision(pairs, r, m, p, v, o, F, M);
-		cpp->cppCollision(pairs, i, pos, vel, omega, mass, F, M);
+		cpplane->cpplCollision(pairs, r, m, p, v, o, R, T, F, M);
+		cpp->cppCollision(pairs, i, pos, vel, omega, mass, R, T, F, M);
+		cpmeshes->cppolyCollision(pairs, r, m, p, v, o, R, T, F, M);
 		force[i] += F;
 		moment[i] += M;
 	}

@@ -110,14 +110,7 @@ __global__ void vv_update_velocity_kernel(
 	double3 a = (1.0 / m) * force[id];
 	double3 in = (1.0 / iner[id]) * moment[id];
 	v += 0.5 * cte.dt * (acc[id] + a);
-	av += 0.5 * cte.dt * (alpha[id] + in);// aa;
-										  //L = (1.0 / m) * force[id];
-										  //aa = (1.0 / in) * moment[id];
-										  //v += 0.5 * cte.dt * L;
-										  //av += 0.5 * cte.dt * aa;
-										  // 	if(id == 0){
-										  // 		printf("Velocity --- > id = %d -> [%f.6, %f.6, %f.6]\n", id, v.x, v.y, v.z);
-										  // 	}
+	av += 0.5 * cte.dt * (alpha[id] + in);
 	force[id] = m * cte.gravity;
 	moment[id] = make_double3(0.0, 0.0, 0.0);
 	vel[id] = v;
@@ -1019,7 +1012,7 @@ __global__ void particle_polygonObject_collision_kernel(
 	if (id >= cte.np)
 		return;
 	unsigned int p_pair_id[MAX_P2MS_COUNT];
-	double2 p_tsd[3];
+	double2 p_tsd[MAX_P2MS_COUNT];
 	unsigned int sid = id * MAX_P2MS_COUNT;
 	for (unsigned int i = 0; i < MAX_P2MS_COUNT; i++)
 	{
@@ -1027,7 +1020,7 @@ __global__ void particle_polygonObject_collision_kernel(
 		p_tsd[i] = tsd[sid + i];
 	}
 	unsigned int old_count = pair_count[id];
-	double cdist = 0.0;
+//	double cdist = 0.0;
 	double im = mass[id];
 	double3 ipos = make_double3(pos[id].x, pos[id].y, pos[id].z);
 	double3 ivel = make_double3(vel[id].x, vel[id].y, vel[id].z);
@@ -1069,10 +1062,12 @@ __global__ void particle_polygonObject_collision_kernel(
 							device_mesh_mass_info pmi = dpmi[pidx];
 							double3 cpt = closestPtPointTriangle(dpi[k], ipos, ir, t);
 							double3 po2cp = cpt - pmi.origin;
-							double dist = ir - length(ipos - cpt);
+							double cdist = ir - length(ipos - cpt);
 							Fn = make_double3(0.0, 0.0, 0.0);
+							
 							if (cdist > 0)
 							{
+								
 								device_triangle_info tri = dpi[k];
 								double3 qp = tri.Q - tri.P;
 								double3 rp = tri.R - tri.P;
@@ -1080,6 +1075,7 @@ __global__ void particle_polygonObject_collision_kernel(
 								unit = -cross(qp, rp);
 								unit = unit / length(unit);
 								bool overlab = checkOverlab(ctype, previous_cpt, cpt, previous_unit, unit);
+								//printf("is overlab : %d", overlab);
 								if (overlab)
 									continue;
 								double2 sd = make_double2(0.0, 0.0);
@@ -1092,8 +1088,11 @@ __global__ void particle_polygonObject_collision_kernel(
 									}
 								}
 								*(&(ctype.x) + t) += 1;
+								//printf("index : %d - %f\n", k, dist);
+								//printf("ctype : [%d, %d, %d]\n", ctype.x, ctype.y, ctype.z);
 								previous_cpt = cpt;
 								previous_unit = unit;
+								//printf("ctype : [%f, %f, %f]\n", unit.x, unit.y, unit.z);
 								double3 rc = ir * unit;
 								double3 dv = pmi.vel + cross(pmi.omega, po2cp) - (ivel + cross(iomega, rc));
 								device_force_constant c = getConstant(
@@ -1219,8 +1218,8 @@ __device__ double3 toGlobal(double3& v, double4& ep)
 	);
 }
 
-__global__ void updatePolygonObjectData_kernel(
-	device_mesh_mass_info *dpmi, double* vList,
+__global__ void updateMeshObjectData_kernel(
+	device_mesh_mass_info *dpmi, double4* mep, double* vList,
 	double4* sphere, device_triangle_info* dpi, unsigned int ntriangle)
 {
 	unsigned id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
@@ -1229,15 +1228,22 @@ __global__ void updatePolygonObjectData_kernel(
 		return;
 	int s = id * 9;
 	int mid = dpi[id].id;
+//	printf("idx(%d) : mid = %d\n", id, mid);
 	double3 pos = dpmi[mid].origin;
-	double4 ep = dpmi[mid].ep;
+	double4 ep = mep[mid];// dpmi[mid].ep;
 	double4 sph = sphere[id];
 	double3 P = make_double3(vList[s + 0], vList[s + 1], vList[s + 2]);
 	double3 Q = make_double3(vList[s + 3], vList[s + 4], vList[s + 5]);
 	double3 R = make_double3(vList[s + 6], vList[s + 7], vList[s + 8]);
 	P = pos + toGlobal(P, ep);
-	Q = pos + toGlobal(Q, ep);
+	Q = pos + toGlobal(Q, ep);	
 	R = pos + toGlobal(R, ep);
+	//printf("idx(%d) : ep = [%f, %f, %f, %f]\n", id, ep.x, ep.y, ep.z, ep.w);
+	//printf("idx(%d) : P = [%f, %f, %f]\n", id, P.x, P.y, P.z);
+	//printf("idx(%d) : Q = [%f, %f, %f]\n", id, Q.x, Q.y, Q.z);
+	//printf("idx(%d) : R = [%f, %f, %f]\n", id, R.x, R.y, R.z);
+
+	
 	double3 V = Q - P;
 	double3 W = R - P;
 	double3 N = cross(V, W);

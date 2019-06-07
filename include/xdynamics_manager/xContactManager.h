@@ -94,6 +94,8 @@ private:
 //	pair_data* d_pppd;
 	double* d_Tmax;
 	double* d_RRes;
+	vector3d* Tmax;
+	double* RRes;
 	QMap<QString, xContact*> cots;
 	QMap<QString, xParticleMeshObjectContact*> cpmesh;
 	xContactPairList* xcpl;

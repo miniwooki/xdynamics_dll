@@ -155,9 +155,9 @@ double xContact::cohesionForce(double coh_r, double coh_e, double Fn)
 
 void xContact::DHSModel(
 	xContactParameters& c, double cdist, double& ds, double& dots, 
-	vector3d& cp, vector3d& dv, vector3d& unit, vector3d& F, vector3d& M)
+	vector3d& cp, vector3d& dv, vector3d& unit, vector3d& Fn, vector3d& Ft, vector3d& M)
 {
-	vector3d Fn, Ft;
+	//vector3d Fn, Ft;
 	double fsn = (-c.kn * pow(cdist, 1.5));
 	double fca = cohesionForce(c.coh_r, c.coh_e, fsn);
 	double fsd = c.vn * dot(dv, unit);
@@ -175,7 +175,16 @@ void xContact::DHSModel(
 		Ft = min(ft1, ft2) * s_hat;
 		M = cross(cp, Ft);
 	}
-	F = Fn + Ft;
+	//F = Fn + Ft;
+}
+
+void xContact::RollingResistanceForce(
+	double rf, double ir, double jr, vector3d rc,
+	vector3d Fn, vector3d Ft, double& Mr, vector3d& Tmax)
+{
+	Tmax += cross(rc, Fn + Ft);
+	double Rij = jr ? ir * jr / (ir + jr) : ir;
+	Mr += Rij * rf * length(Fn);
 }
 
 bool xContact::IsEnabled() { return is_enabled; }

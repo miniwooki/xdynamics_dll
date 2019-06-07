@@ -10,7 +10,7 @@
 typedef unsigned int uint;
 //#include <helper_functions.h>
 //#include <helper_cuda.h>
-#define MAX_P2P_COUNT  10
+#define MAX_P2P_COUNT  12
 #define MAX_P2PL_COUNT 3
 #define MAX_P2MS_COUNT 3
 //__constant__ device_parameters cte;
@@ -65,7 +65,6 @@ struct device_plane_info
 struct device_mesh_mass_info
 {
 	double3 origin;
-	double4 ep;
 	double3 vel;
 	double3 omega;
 	double3 force;
@@ -177,9 +176,9 @@ void XDYNAMICS_API cu_decide_rolling_friction_moment(
 	unsigned int np);
 
 double3 XDYNAMICS_API reductionD3(double3* in, unsigned int np);
-void XDYNAMICS_API cu_updatePolygonObjectData(
+void XDYNAMICS_API cu_update_meshObjectData(
 	double *vList, double* sph, device_triangle_info* poly,
-	device_mesh_mass_info* dpmi, unsigned int np);
+	device_mesh_mass_info* dpmi, double* ep, unsigned int np);
 
 #endif
 
