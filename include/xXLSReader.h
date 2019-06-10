@@ -26,7 +26,7 @@ public:
 	void ReadJoint(xMultiBodyModel* xmbd, vector2i rc);
 	void ReadForce(xMultiBodyModel* xmbd, vector2i rc);
 	void ReadKernel(xSmoothedParticleHydrodynamicsModel* xsph, vector2i rc);
-	void ReadDEMParticle(xDiscreteElementMethodModel* xdem, vector2i rc);
+	void ReadDEMParticle(xDiscreteElementMethodModel* xdem, xObjectManager* xom, vector2i rc);
 	void ReadSPHParticle(xSmoothedParticleHydrodynamicsModel* xsph, vector2i rc);
 	void ReadContact(xContactManager* xcm, vector2i rc);
 	void ReadShapeObject(xObjectManager* xom, vector2i rc);

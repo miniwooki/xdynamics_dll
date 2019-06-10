@@ -9,6 +9,8 @@ xParticleObject::xParticleObject()
 	, min_radius(0)
 	, max_radius(0)
 	, pos(NULL)
+	, relative_loc(NULL)
+	, each(1)
 {
 
 }
@@ -20,6 +22,8 @@ xParticleObject::xParticleObject(std::string _name)
 	, min_radius(0)
 	, max_radius(0)
 	, pos(NULL)
+	, relative_loc(NULL)
+	, each(1)
 {
 	xObject::id = xpo_count;
 	xpo_count++;
@@ -34,6 +38,11 @@ xParticleObject::~xParticleObject()
 void xParticleObject::setStartIndex(unsigned int _sid)
 {
 	sid = _sid;
+}
+
+void xParticleObject::setEachCount(unsigned int ec)
+{
+	each = ec;
 }
 
 vector4d* xParticleObject::AllocMemory(unsigned int _np)
@@ -59,6 +68,11 @@ unsigned int xParticleObject::NumParticle() const
 	return np;
 }
 
+unsigned int xParticleObject::EachCount() const
+{
+	return each;
+}
+
 double xParticleObject::MinRadius() const
 {
 	return min_radius;
@@ -77,6 +91,11 @@ xShapeType xParticleObject::ShapeForm() const
 vector4d* xParticleObject::Position() const
 {
 	return pos;
+}
+
+vector3d * xParticleObject::RelativeLocation() const
+{
+	return relative_loc;
 }
 
 unsigned int xParticleObject::create_sph_particles(double ps, unsigned int nlayers, vector3d* p, xMaterialType* t)
@@ -102,4 +121,9 @@ void xParticleObject::setMaxRadius(double _mr)
 void xParticleObject::setShapeForm(xShapeType xst)
 {
 	form = xst;
+}
+
+void xParticleObject::setRelativeLocation(vector3d * rl)
+{
+	relative_loc = rl;
 }

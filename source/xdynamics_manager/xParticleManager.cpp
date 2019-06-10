@@ -6,6 +6,12 @@ xParticleManager::xParticleManager()
 	: np(0)
 	, r_pos(NULL)
 	, r_vel(NULL)
+	, cluster_index(NULL)
+	, cluster_count(NULL)
+	, cluster_begin(NULL)
+	, cluster_set_location(NULL)
+	, n_cluster_object(0)
+	, n_cluster_each(0)
 // 	, is_realtime_creating(false)
 // 	, one_by_one(false)
 {
@@ -16,12 +22,20 @@ xParticleManager::~xParticleManager()
 {
 	if (r_pos) delete[] r_pos; r_pos = NULL;
 	if (r_vel) delete[] r_vel; r_vel = NULL;
+	if (cluster_index) delete[] cluster_index; cluster_index = NULL;
+	if (cluster_count) delete[] cluster_count; cluster_count = NULL;
+	if (cluster_begin) delete[] cluster_begin; cluster_begin = NULL;
+	if (cluster_set_location) delete[] cluster_set_location; cluster_set_location = NULL;
 }
-
 
 unsigned int xParticleManager::NumParticle()
 {
 	return np;
+}
+
+unsigned int xParticleManager::NumClusterSet()
+{
+	return n_cluster_object;
 }
 
 double* xParticleManager::GetPositionResultPointer(unsigned int pt)
@@ -286,6 +300,42 @@ xParticleObject* xParticleManager::CreateCubeParticle(
 	return xpo;
 }
 
+xParticleObject * xParticleManager::CreateClusterParticle(std::string n, xMaterialType mt, unsigned int _np, xClusterObject * xo)
+{
+	unsigned int neach = xo->NumElement();
+	unsigned int rnp = _np * neach;
+	double rad = xo->ElementRadius();
+	QString name = QString::fromStdString(n);
+	xParticleObject* xpo = new xParticleObject(n);
+	vector4d* pos = xpo->AllocMemory(rnp);
+	xpo->setStartIndex(np);
+	xpo->setMaterialType(mt);
+	np += rnp;
+	xMaterial xm = GetMaterialConstant(mt);
+	xpo->setDensity(xm.density);
+	xpo->setYoungs(xm.youngs);
+	xpo->setPoisson(xm.poisson);
+	xpo->setMinRadius(rad);
+	xpo->setMaxRadius(rad);
+	xpo->setEachCount(neach);
+	vector3d* rloc = xo->RelativeLocation();
+	xpo->setRelativeLocation(xo->RelativeLocation());
+	for (unsigned int i = 0; i < _np; i++)
+	{
+		vector3d cm = new_vector3d(0.0, 0.01, 0.0);
+		for (unsigned int j = 0; j < neach; j++)
+		{
+			vector3d m_pos = cm + rloc[j];
+			pos[i * neach + j] = new_vector4d(m_pos.x, m_pos.y, m_pos.z, rad);
+		}
+	}
+	xpcos[name] = xpo;
+	xObjectManager::XOM()->addObject(xpo);
+	n_cluster_each += neach;
+	n_cluster_object++;
+	return xpo;
+}
+
 QMap<QString, xParticleObject*>& xParticleManager::XParticleObjects()
 {
 	return xpcos;
@@ -349,5 +399,34 @@ void xParticleManager::AllocParticleResultMemory(unsigned int npart, unsigned in
 	r_vel = new double[n * 3];
 	memset(r_pos, 0, sizeof(double) * n * 4);
 	memset(r_vel, 0, sizeof(double) * n * 3);
+}
+
+void xParticleManager::SetClusterInformation()
+{
+	if (n_cluster_object)
+	{
+		cluster_index = new unsigned int[np];
+		cluster_count = new unsigned int[n_cluster_object];
+		cluster_begin = new unsigned int[n_cluster_object * 2];
+		cluster_set_location = new double[n_cluster_each];
+	}
+	unsigned int idx = 0;
+	unsigned int sum_each = 0;
+	foreach(xParticleObject* po, xpcos)
+	{
+		if (po->Shape() == CLUSTER_SHAPE)
+		{
+			cluster_count[idx] = po->EachCount();
+			cluster_begin[idx + 0] = po->StartIndex();
+			cluster_begin[idx + 1] = sum_each;
+			memcpy(cluster_set_location + sum_each, po->RelativeLocation(), sizeof(vector3d) * po->EachCount());
+			for (unsigned int i = po->StartIndex(); i < po->NumParticle(); i++)
+			{
+				cluster_index[i] = idx;
+			}
+			idx++;
+			sum_each += po->EachCount();
+		}
+	}
 }
 

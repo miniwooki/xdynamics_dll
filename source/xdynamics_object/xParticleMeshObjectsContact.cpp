@@ -106,6 +106,8 @@ unsigned int xParticleMeshObjectsContact::define(QMap<QString, xParticleMeshObje
 		idx++;
 	}
 	maxRadius = maxRadii;
+	if (xSimulation::Cpu())
+		dsphere = (double *)hsphere;
 	return npolySphere;
 }
 
@@ -129,9 +131,9 @@ bool xParticleMeshObjectsContact::cppolyCollision(
 		xContactParameters c = getContactParameters(
 			r, 0.0,
 			m, 0.0,
-			xmps[d->id].Ei, xmps[d->id].Ej,
-			xmps[d->id].Pri, xmps[d->id].Prj,
-			xmps[d->id].Gi, xmps[d->id].Gj);
+			xmps[j].Ei, xmps[j].Ej,
+			xmps[j].Pri, xmps[j].Prj,
+			xmps[j].Gi, xmps[j].Gj);
 		switch (force_model)
 		{
 		case DHS: DHSModel(c, d->gab, d->delta_s, d->dot_s, rc, rv, u, m_fn, m_ft, m_m); break;
@@ -340,11 +342,13 @@ bool xParticleMeshObjectsContact::updateCollisionPair(
 		vector3d unit = -cross(qp, rp);
 		unit = unit / length(unit);
 		bool overlab = checkOverlab(ctype, ocpt, cpt, ounit, unit);
-		if (!overlab)
+		
+		if (overlab)
 			return false;
-		*(&(ctype.x) + t) += 1;
+
 		ocpt = cpt;
 		ounit = unit;
+		*(&(ctype.x) + t) += 1;
 		if (xcpl.IsNewTriangleContactPair(id))
 		{
 			xTrianglePairData* pd = new xTrianglePairData;
@@ -480,10 +484,12 @@ vector3d xParticleMeshObjectsContact::particle_polygon_contact_detection(
 bool xParticleMeshObjectsContact::checkOverlab(vector3i ctype, vector3d p, vector3d c, vector3d u0, vector3d u1)
 {
 	bool b_over = false;
-	if (p.x >= u1.x - 1e-9 && p.x <= u1.x + 1e-9)
-		if (p.y >= u1.y - 1e-9 && p.y <= u1.y + 1e-9)
-			if (p.z >= u1.z - 1e-9 && p.z <= u1.z + 1e-9)
-				b_over = true;
+	if (p.x >= c.x - 1e-9 && p.x <= c.x + 1e-9)
+		b_over = true;
+	if (p.y >= c.y - 1e-9 && p.y <= c.y + 1e-9)
+		b_over = true;
+	if (p.z >= c.z - 1e-9 && p.z <= c.z + 1e-9)
+		b_over = true;
 
 	if (/*(ctype.y || ctype.z) &&*/ !b_over)
 	{
@@ -491,6 +497,10 @@ bool xParticleMeshObjectsContact::checkOverlab(vector3i ctype, vector3d p, vecto
 			if (u0.y >= u1.y - 1e-9 && u0.y <= u1.y + 1e-9)
 				if (u0.z >= u1.z - 1e-9 && u0.z <= u1.z + 1e-9)
 					b_over = true;
+	}
+	if (!b_over)
+	{
+		
 	}
 	return b_over;
 }

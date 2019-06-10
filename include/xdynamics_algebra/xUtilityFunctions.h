@@ -37,6 +37,7 @@ public:
 	static QString FileExtension(const wchar_t* f);
 	static QString GetFileName(const wchar_t* p);
 	static void CreateDirectory(const wchar_t* _path);
+	static vector3d QuaternionRotation(vector4d& q, vector3d& v);
 	static double SignedVolumeOfTriangle(vector3d& v1, vector3d& v2, vector3d& v3);
 	static vector3d CenterOfTriangle(vector3d& P, vector3d& Q, vector3d& R);
 };

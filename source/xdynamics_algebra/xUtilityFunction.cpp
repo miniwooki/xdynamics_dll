@@ -44,6 +44,14 @@ void xUtilityFunctions::CreateDirectory(const wchar_t* _path)
 // 	}
 }
 
+vector3d xUtilityFunctions::QuaternionRotation(vector4d & q, vector3d & v)
+{
+	vector3d _q = new_vector3d(q.y, q.z, q.w);
+	vector3d t = 2.0 * cross(_q, v);
+	vector3d p_hat = v + q.x * t + cross(_q, t);
+	return p_hat;
+}
+
 std::string xUtilityFunctions::xstring(std::wstring v)
 {
 	return QString::fromStdWString(v).toStdString();

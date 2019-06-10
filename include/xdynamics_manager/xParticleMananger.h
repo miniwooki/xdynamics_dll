@@ -5,6 +5,7 @@
 #include "xModel.h"
 
 class xParticleObject;
+class xClusterObject;
 class xObject;
 
 class XDYNAMICS_API xParticleManager
@@ -14,6 +15,7 @@ public:
 	~xParticleManager();
 
 	unsigned int NumParticle();
+	unsigned int NumClusterSet();
 	bool CopyPosition(double *pos, unsigned int inp);
 	bool SetMassAndInertia(double *mass, double *inertia);
 	QMap<QString, xParticleObject*>& XParticleObjects();
@@ -26,6 +28,7 @@ public:
 // 	unsigned int RealTimeCreating();
 	void AllocParticleResultMemory(unsigned int npart, unsigned int np);
 	void SetCurrentParticlesFromPartResult(std::string path);
+	void SetClusterInformation();
 	//static unsigned int GetNumLineParticles(double len, double r0, double r1 = 0);
 	static unsigned int GetNumCubeParticles(double dx, double dy, double dz, double min_radius, double max_radius);
 	static unsigned int GetNumPlaneParticles(double dx, unsigned int ny, double dy, double min_radius, double max_radius);
@@ -34,6 +37,7 @@ public:
 
 	xParticleObject* CreateParticleFromList(std::string n, xMaterialType mt, unsigned int _np, vector4d* d);
 	xParticleObject* CreateCubeParticle(std::string n, xMaterialType mt, unsigned int _np, xCubeParticleData& d);
+	xParticleObject* CreateClusterParticle(std::string n, xMaterialType mt, unsigned int _np, xClusterObject* xo);
 //	xParticleObject* CreateSPHParticles(xObject* xobj, double ps, unsigned int nlayer);
 //	xParticleObject* CreateBoundaryParticles(xObject* xobj, double lx, double ly, double lz, double ps);
 	//xParticleObject* CreateSPHLineParticle(std::string n, xMa)
@@ -43,6 +47,8 @@ private:
 	//void create_sph_particles_with_plane_shape(double dx, double dy, double lx, double ly, double lz, double ps);
 // 	bool is_realtime_creating;
 // 	bool one_by_one;
+	unsigned int n_cluster_object;
+	unsigned int n_cluster_each;
 	unsigned int np;
 	//unsigned int num_xpo;
 	//unsigned int per_np;
@@ -51,6 +57,10 @@ private:
 
 	double *r_pos;
 	double *r_vel;
+	unsigned int *cluster_index;
+	unsigned int *cluster_count;
+	unsigned int *cluster_begin;
+	double* cluster_set_location;
 	xMaterialType *r_type;
 };
 

@@ -194,7 +194,9 @@ bool xParticlePlanesContact::cpplCollision(
 {
 	foreach(xPairData* d, pairs->PlanePair())
 	{
-		vector3d m_fn, m_m, m_ft;
+		vector3d m_fn = new_vector3d(0.0, 0.0, 0.0);
+		vector3d m_m = new_vector3d(0.0, 0.0, 0.0);
+		vector3d m_ft = new_vector3d(0.0, 0.0, 0.0);
 		double rcon = r - 0.5 * d->gab;
 		vector3d u = new_vector3d(d->nx, d->ny, d->nz);
 		vector3d cp = rcon * u;

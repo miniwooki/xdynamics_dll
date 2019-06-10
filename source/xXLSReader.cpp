@@ -361,7 +361,7 @@ void xXLSReader::ReadKernel(xSmoothedParticleHydrodynamicsModel* xsph, vector2i 
 	xsph->setKernelFunctionData(d);
 }
 
-void xXLSReader::ReadDEMParticle(xDiscreteElementMethodModel* xdem, vector2i rc)
+void xXLSReader::ReadDEMParticle(xDiscreteElementMethodModel* xdem, xObjectManager* xom, vector2i rc)
 {
 	if (xdem->XParticleManager())
 	{
@@ -372,7 +372,9 @@ void xXLSReader::ReadDEMParticle(xDiscreteElementMethodModel* xdem, vector2i rc)
 				break;
 			std::string name = xUtilityFunctions::WideChar2String(sheet->readStr(rc.x, rc.y++));
 			xShapeType form = static_cast<xShapeType>(static_cast<int>(sheet->readNum(rc.x, rc.y++)));
-			int material = static_cast<int>(sheet->readNum(rc.x, rc.y++));
+			int material = -1;
+			if (form != FROM_SHAPE)
+				material = static_cast<int>(sheet->readNum(rc.x, rc.y++));
 			if (form == CUBE_SHAPE)
 			{
 				xCubeParticleData d = ReadCubeParticleData(name, rc.x, rc.y);
@@ -383,8 +385,23 @@ void xXLSReader::ReadDEMParticle(xDiscreteElementMethodModel* xdem, vector2i rc)
 			{
 
 			}
-
-			if (form == NO_SHAPE_AND_LIST)
+			else if (form == FROM_SHAPE)
+			{
+				std::string obj;
+				std::wstring limit;
+				obj = xUtilityFunctions::xstring(sheet->readStr(rc.x, rc.y++));
+				xObject* xo = xom->XObject(obj);
+				limit = sheet->readStr(rc.x, rc.y++);
+				if (limit == L"number")
+				{
+					unsigned int num = sheet->readNum(rc.x, rc.y++);
+					switch (xo->Shape())
+					{
+					case CLUSTER_SHAPE: xdem->XParticleManager()->CreateClusterParticle(name.c_str(), xo->Material(), num, dynamic_cast<xClusterObject*>(xo)); break;
+					}
+				}
+			}
+			else if (form == NO_SHAPE_AND_LIST)
 			{
 				//xListParticleData d = ReadListParticleData(name, rc.x++, rc.y);
 				unsigned int number = static_cast<int>(sheet->readNum(rc.x, rc.y++));
@@ -487,6 +504,26 @@ void xXLSReader::ReadShapeObject(xObjectManager* xom, vector2i rc)
 			{
 				xPlaneObject* xpo = xom->CreatePlaneShapeObject(name, material);
 				xpo->SetupDataFromStructure(ReadPlaneObjectData(name, material, rc.x, rc.y));
+			}
+			else if (form == xShapeType::CLUSTER_SHAPE)
+			{
+				xClusterObject* xcs = xom->CreateClusterShapeObject(name, material);
+				unsigned int num = sheet->readNum(rc.x, rc.y++);
+				double rad = sheet->readNum(rc.x, rc.y++);
+				std::wstring sdata;
+				int loc[2] = { 0, };
+				sdata = sheet->readStr(rc.x, rc.y); uf::xsplit(sdata, ",", 2, loc);
+				vector3d *d = new vector3d[num];
+				loc[0] -= 1; loc[1] -= 1;
+				for (unsigned int i = 0; i < num; i++)
+				{
+					double v[3] = { 0, };
+					sdata = sheet->readStr(loc[0], loc[1]++);
+					uf::xsplit(sdata, ",", 3, v);
+					d[i] = new_vector3d(v[0], v[1], v[2]);
+				}
+				xcs->setClusterSet(num, rad, d);
+				delete[] d;
 			}
 			else if (form == xShapeType::MESH_SHAPE)
 			{

@@ -259,7 +259,8 @@ void xContactManager::updateCollisionPair(vector4d* pos, unsigned int* sorted_id
 		unsigned int count = 0;
 		vector3d p = new_vector3d(pos[i].x, pos[i].y, pos[i].z);
 		double r = pos[i].w;
-		cpplane->updateCollisionPair(xcpl[i], r, p);
+		if(cpplane)
+			cpplane->updateCollisionPair(xcpl[i], r, p);
 		vector3i gp = xGridCell::getCellNumber(p.x, p.y, p.z);
 		vector3d old_cpt = new_vector3d(0.0, 0.0, 0.0);
 		vector3d old_unit = new_vector3d(0.0, 0.0, 0.0);

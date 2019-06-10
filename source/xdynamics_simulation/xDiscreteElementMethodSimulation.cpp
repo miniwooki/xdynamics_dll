@@ -47,6 +47,8 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 		xcm->allocPairList(np);
 		if (nPolySphere)
 			maxRadius = xcm->ContactParticlesMeshObjects()->MaxRadiusOfPolySphere();
+		if (xdem->XParticleManager()->NumClusterSet())
+			xdem->XParticleManager()->SetClusterInformation();
 	}
 
 	allocationMemory();
@@ -65,7 +67,7 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 	for (unsigned int i = 0; i < np; i++)
 	{
 		double r = pos[i * 4 + 3];
-		//vel[0] = -0.1;
+	//	vel[0] = -0.1;
 		force[i * 3 + 0] = mass[i] * xModel::gravity.x;
 		force[i * 3 + 1] = mass[i] * xModel::gravity.y;
 		force[i * 3 + 2] = mass[i] * xModel::gravity.z;
@@ -263,6 +265,7 @@ void xDiscreteElementMethodSimulation::updateObjectFromMBD()
 // 		8 * (-ev.z*j*GvP0 + ev.y*j*GvP1 + ev.x*j*GvP2)
 // 	};
 // }
+
 
 void xDiscreteElementMethodSimulation::clearMemory()
 {

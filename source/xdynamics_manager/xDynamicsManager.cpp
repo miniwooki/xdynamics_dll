@@ -282,7 +282,7 @@ xDynamicsManager::solverType xDynamicsManager::OpenModelXLS(const wchar_t* n)
 					else
 					{
 						CreateModel(model_name, DEM);
-						xls.ReadDEMParticle(xdem, bt->second);
+						xls.ReadDEMParticle(xdem, xom, bt->second);
 					}					
 				}break;
 			case XLS_CONTACT:

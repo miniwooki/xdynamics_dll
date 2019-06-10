@@ -983,9 +983,9 @@ __device__ bool checkConcave(device_triangle_info* dpi, unsigned int* tid, unsig
 __device__ bool checkOverlab(int3 ctype, double3 p, double3 c, double3 u0, double3 u1)
 {
 	bool b_over = false;
-	if (p.x >= u1.x - 1e-9 && p.x <= u1.x + 1e-9)
-		if (p.y >= u1.y - 1e-9 && p.y <= u1.y + 1e-9)
-			if (p.z >= u1.z - 1e-9 && p.z <= u1.z + 1e-9)
+	if (p.x >= c.x - 1e-9 && p.x <= c.x + 1e-9)
+		if (p.y >= c.y - 1e-9 && p.y <= c.y + 1e-9)
+			if (p.z >= c.z - 1e-9 && p.z <= c.z + 1e-9)
 				b_over = true;
 
 	if (/*(ctype.y || ctype.z) &&*/ !b_over)

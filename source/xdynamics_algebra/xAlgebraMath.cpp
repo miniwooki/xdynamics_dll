@@ -502,8 +502,14 @@ double length(const vector3i &v) { return sqrt(dot(v, v)); }
 double length(const vector3ui &v) { return sqrt(dot(v, v)); }
 double length(const vector3f &v) { return sqrt(dot(v, v)); }
 double length(const vector3d &v) { return sqrt(dot(v, v)); }
+double length(const vector4d &v){ return sqrt(dot(v, v)); }
 
 vector3d normalize(const vector3d& v)
+{
+	return v / length(v);
+}
+
+vector4d normalize(const vector4d & v)
 {
 	return v / length(v);
 }
@@ -543,6 +549,11 @@ vector4d new_vector4d(double x, double y, double z, double w) { return vector4d{
 
 euler_parameters new_euler_parameters(double e0, double e1, double e2, double e3) { return euler_parameters{ e0, e1, e2, e3 }; }
 
+euler_parameters new_euler_parameters(vector4d &e)
+{
+	return new_euler_parameters(e.x, e.y, e.z, e.w);
+}
+
 // matrixd new_matrix(unsigned int nr, unsigned int nc)
 // {
 // // 	matrixd m;
@@ -577,6 +588,15 @@ matrix34d LMatrix(const euler_parameters& e)
 		-e.e1, e.e0, -e.e3, e.e2,
 		-e.e2, e.e3, e.e0, -e.e1,
 		-e.e3, -e.e2, e.e1, e.e0
+	};
+}
+
+matrix34d LMatrix(const vector4d & e)
+{
+	return matrix34d{
+		-e.y, e.x, -e.w, e.z,
+		-e.z, e.w, e.x, -e.y,
+		-e.w, -e.z, e.y, e.x
 	};
 }
 
@@ -684,6 +704,22 @@ vector3d ToGlobal(const euler_parameters& e, const vector3d& v3)
 // 	tv.y = A.a10*v.x + A.a11*v.y + A.a12*v.z;
 // 	tv.z = A.a20*v.x + A.a21*v.y + A.a22*v.z;
 	return tv;
+}
+
+vector3d ToLocal(const euler_parameters & e, const vector3d & v3)
+{
+	vector3d tv;
+	tv = Transpose(GlobalTransformationMatrix(e)) * v3;
+	return tv;
+}
+
+matrix33d Tilde(const vector3d & v)
+{
+	matrix33d m;
+	m.a00 = 0.0; m.a01 = -v.z; m.a02 = v.y;
+	m.a10 = v.z; m.a11 = 0.0; m.a12 = -v.x;
+	m.a20 = -v.y; m.a21 = v.x; m.a22 = 0.0;
+	return m;
 }
 
 matrix33d Transpose(const matrix33d& m3x3)

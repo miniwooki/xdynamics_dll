@@ -11,19 +11,23 @@ public:
 	virtual ~xParticleObject();
 
 	void setStartIndex(unsigned int sid);
+	void setEachCount(unsigned int ec);
 	void setMinRadius(double _mr);
 	void setMaxRadius(double _mr);
 	void setShapeForm(xShapeType xst);
+	void setRelativeLocation(vector3d* rl);
 
 	vector4d* AllocMemory(unsigned int _np);
 
 	void CopyPosition(double* _pos);
 	unsigned int StartIndex() const;
 	unsigned int NumParticle() const;
+	unsigned int EachCount() const;
 	double MinRadius() const;
 	double MaxRadius() const;
 	xShapeType ShapeForm() const;
 	vector4d* Position() const;
+	vector3d* RelativeLocation() const;
 
 	virtual unsigned int create_sph_particles(double ps, unsigned int nlayers, vector3d* p = NULL, xMaterialType* t = NULL);
 	virtual QVector<xCorner> get_sph_boundary_corners();
@@ -42,10 +46,12 @@ private:
 	xShapeType form;
 	unsigned int sid;
 	unsigned int np;
+	unsigned int each;
 	double min_radius;
 	double max_radius;
 
 	vector4d* pos;
+	vector3d *relative_loc;
 };
 
 #endif

@@ -93,18 +93,20 @@ enum xContactPairType
 };
 
 enum xShapeType
-{ 
+{
 	NO_SHAPE = 0,
 	CUBE_SHAPE = 2,
-	PLANE_SHAPE = 3, 
-	LINE_SHAPE = 5, 
+	PLANE_SHAPE = 3,
+	LINE_SHAPE = 5,
 	SPHERE_SHAPE = 7,
-	MESH_SHAPE = 19, 
-	PARTICLES = 13, 
+	MESH_SHAPE = 19,
+	PARTICLES = 13,
 	RECTANGLE_SHAPE = 17,
-	CIRCLE_SHAPE = 23, 
+	CIRCLE_SHAPE = 23,
 	CYLINDER_SHAPE = 27,
+	CLUSTER_SHAPE = 28,
 	NO_SHAPE_AND_LIST = 99,
+	FROM_SHAPE = 999,
 	OBJECT = 100 
 };
 enum xContactForceModelType
@@ -252,6 +254,13 @@ typedef struct
 	xCorner c3;
 	bool inner;
 }xOverlapCorner;
+//
+//typedef struct
+//{
+//	unsigned int id;
+//	unsigned int nelement;
+//	
+//}cluster_information;
 
 inline xContactPairType getContactPair(xShapeType t1, xShapeType t2)
 {

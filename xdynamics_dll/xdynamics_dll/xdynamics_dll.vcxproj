@@ -186,6 +186,7 @@
     <ClCompile Include="..\..\source\xdynamics_manager\xParticleManager.cpp" />
     <ClCompile Include="..\..\source\xdynamics_manager\xResultManager.cpp" />
     <ClCompile Include="..\..\source\xdynamics_manager\xSmoothedParticleHydrodynamicsModel.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xClusterObject.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xContact.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xContactPairList.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xCubeObject.cpp" />
@@ -266,6 +267,7 @@
     <ClInclude Include="..\..\include\xdynamics_manager\xResultManager.h" />
     <ClInclude Include="..\..\include\xdynamics_manager\xResultStorage.h" />
     <ClInclude Include="..\..\include\xdynamics_manager\xSmoothedParticleHydrodynamicsModel.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xClusterObject.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xConatct.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xContactPairList.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xCubeObject.h" />

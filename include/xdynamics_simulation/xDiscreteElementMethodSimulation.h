@@ -36,9 +36,11 @@ protected:
 	xDiscreteElementMethodModel* xdem;
 	xGridCell* dtor;
 	xContactManager* xcm;
+	bool *isCluster;
 	double *mass;
 	double *inertia;
 	double *pos;
+	double *cpos;
 	double *ep;
 	double *vel;
 	double *acc;
@@ -50,6 +52,7 @@ protected:
 	double *dmass;
 	double *diner;
 	double *dpos;
+	double *dcpos;
 	double *dep;
 	double *dvel;
 	double *dacc;
