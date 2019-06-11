@@ -156,13 +156,13 @@ void cu_plane_contact_force(
 		plan, (double4 *)pos, (double3 *)vel, (double3 *)omega,
 		(double3 *)force, (double3 *)moment, cp, mass,
 		(double3 *)tmax, rres,
-		pair_count, pair_id, (double2 *)tsd);
+		pair_count, pair_id, (double2 *)tsd, np);
 		break;
 	case 1: plane_contact_force_kernel<1> << < numBlocks, numThreads >> > (
 		plan, (double4 *)pos, (double3 *)vel, (double3 *)omega,
 		(double3 *)force, (double3 *)moment, cp, mass,
 		(double3 *)tmax, rres,
-		pair_count, pair_id, (double2 *)tsd);
+		pair_count, pair_id, (double2 *)tsd, np);
 		break;
 	}
 }
@@ -250,7 +250,8 @@ void cu_decide_rolling_friction_moment(
 		rres,
 		inertia,
 		(double3 *)omega,
-		(double3 *)moment);
+		(double3 *)moment,
+		np);
 }
 
 double3 reductionD3(double3* in, unsigned int np)

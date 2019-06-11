@@ -27,11 +27,11 @@ public:
 
 protected:
 	void clearMemory();
-	void allocationMemory();
+	void allocationMemory(unsigned int np, unsigned int rnp);
 	bool isInitilize;		// initialize 
 	bool isSaveMemory;
 	unsigned int np;
-	unsigned int per_np;
+	unsigned int ns;
 	unsigned int nPolySphere;
 	unsigned int nClusterSphere;
 	unsigned int nSingleSphere;

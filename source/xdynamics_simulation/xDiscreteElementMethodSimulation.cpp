@@ -26,9 +26,9 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 	double maxRadius = 0;
 	xParticleManager* xpm = xdem->XParticleManager();
 	np = xpm->NumParticleWithCluster();
-	unsigned int rnp = xpm->NumParticle();
+	ns = xpm->NumParticle();
 	nSingleSphere = xpm->nSingleSphere();
-	nClusterSphere = rnp - xpm->nSingleSphere();
+	nClusterSphere = ns - xpm->nSingleSphere();
 	xcm = _xcm;
 // 	if (xpm->RealTimeCreating()/* && !xpm->ChangedParticleModel()*/)
 // 	{
@@ -47,27 +47,27 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 	{
 		nPolySphere = xcm->setupParticlesMeshObjectsContact();
 		xcm->setupParticlesPlanesContact();
-		xcm->allocPairList(rnp);
+		xcm->allocPairList(ns);
 		if (nPolySphere)
 			maxRadius = xcm->ContactParticlesMeshObjects()->MaxRadiusOfPolySphere();
 		if (xdem->XParticleManager()->NumClusterSet())
 			xdem->XParticleManager()->SetClusterInformation();
 	}
 
-	allocationMemory();
+	allocationMemory(np, ns);
 
-	memset(pos, 0, sizeof(double) * rnp * 4);
+	memset(pos, 0, sizeof(double) * ns * 4);
 	memset(ep, 0, sizeof(double) * np * 4);
 	memset(vel, 0, sizeof(double) * np * 3);
 	memset(acc, 0, sizeof(double) * np * 3);
 	memset(avel, 0, sizeof(double) * np * 3);
 	memset(aacc, 0, sizeof(double) * np * 3);
-	memset(force, 0, sizeof(double) * rnp * 3);
-	memset(moment, 0, sizeof(double) * rnp * 3);
+	memset(force, 0, sizeof(double) * ns * 3);
+	memset(moment, 0, sizeof(double) * ns * 3);
 
-	xpm->CopyPosition(pos, rnp);
+	xpm->CopyPosition(pos, ns);
 	xpm->SetMassAndInertia(mass, inertia);
-	for (unsigned int i = 0; i < rnp; i++)
+	for (unsigned int i = 0; i < ns; i++)
 	{
 		double r = pos[i * 4 + 3];
 		if (r > maxRadius)
@@ -92,7 +92,7 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 		dtor->setWorldOrigin(new_vector3d(-1.0, -1.0, -1.0));
 		dtor->setGridSize(new_vector3ui(128, 128, 128));
 		dtor->setCellSize(maxRadius * 2.0);
-		dtor->initialize(rnp + nPolySphere);
+		dtor->initialize(ns + nPolySphere);
 	}
 	// 	switch (md->IntegrationType())
 	// 	{
@@ -164,8 +164,6 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 		dmass = mass;
 		diner = inertia;
 	}
-	if (per_np)
-		np = 0;
 	if (isSaveMemory)
 		xdem->XParticleManager()->AllocParticleResultMemory(xSimulation::npart, np);
 	//dynamic_cast<neighborhood_cell*>(dtor)->reorderElements(pos, (double*)cm->HostSphereData(), np, nPolySphere);
@@ -187,18 +185,18 @@ QString xDiscreteElementMethodSimulation::SaveStepResult(unsigned int pt, double
 		rv = xdem->XParticleManager()->GetVelocityResultPointer(pt);
 		if (xSimulation::Gpu())
 		{
-			checkCudaErrors(cudaMemcpy(rp, dpos, sizeof(double) * np * 4, cudaMemcpyDeviceToHost));
+			checkCudaErrors(cudaMemcpy(rp, dpos, sizeof(double) * ns * 4, cudaMemcpyDeviceToHost));
 			checkCudaErrors(cudaMemcpy(rv, dvel, sizeof(double) * np * 3, cudaMemcpyDeviceToHost));
 		}
 		else
 		{
-			memcpy(rp, dpos, sizeof(double) * np * 4);
+			memcpy(rp, dpos, sizeof(double) * ns * 4);
 			memcpy(rv, dvel, sizeof(double) * np * 3);
 		}
 	}
 	if (xSimulation::Gpu())
 	{
-		checkCudaErrors(cudaMemcpy(pos, dpos, sizeof(double) * np * 4, cudaMemcpyDeviceToHost));
+		checkCudaErrors(cudaMemcpy(pos, dpos, sizeof(double) * ns * 4, cudaMemcpyDeviceToHost));
 		checkCudaErrors(cudaMemcpy(vel, dvel, sizeof(double) * np * 3, cudaMemcpyDeviceToHost));
 		//checkCudaErrors(cudaMemcpy(ep, dep, sizeof(double) * np * 4, cudaMemcpyDeviceToHost));
 		checkCudaErrors(cudaMemcpy(avel, davel, sizeof(double) * np * 3, cudaMemcpyDeviceToHost));
@@ -213,11 +211,11 @@ QString xDiscreteElementMethodSimulation::SaveStepResult(unsigned int pt, double
 	if (qf.is_open())
 	{
 		qf.write((char*)&ct, sizeof(double));
-		qf.write((char*)&np, sizeof(unsigned int));
-		qf.write((char*)pos, sizeof(double) * np * 4);
-		qf.write((char*)vel, sizeof(double) * np * 3);
+		qf.write((char*)&ns, sizeof(unsigned int));
+		qf.write((char*)pos, sizeof(double) * ns * 4);
+		qf.write((char*)vel, sizeof(double) * ns * 3);
 		//qf.write((char*)ep, sizeof(double) * np * 4);
-		qf.write((char*)avel, sizeof(double) * np * 3);
+		qf.write((char*)avel, sizeof(double) * ns * 3);
 	}
 	qf.close();
 	/*qf.open(QIODevice::WriteOnly);*/
@@ -304,32 +302,32 @@ void xDiscreteElementMethodSimulation::clearMemory()
 	}
 }
 
-void xDiscreteElementMethodSimulation::allocationMemory()
+void xDiscreteElementMethodSimulation::allocationMemory(unsigned int np, unsigned int rnp)
 {
 	clearMemory();
 	mass = new double[np];
 	inertia = new double[np];
-	pos = new double[np * 4];
+	pos = new double[rnp * 4];
 	ep = new double[np * 4];
 	//rot = new double[np * 4];
 	vel = new double[np * 3];
 	acc = new double[np * 3];
 	avel = new double[np * 3];
 	aacc = new double[np * 3];
-	force = new double[np * 3];
-	moment = new double[np * 3];
+	force = new double[rnp * 3];
+	moment = new double[rnp * 3];
 
 	if (xSimulation::Gpu())
 	{
 		checkCudaErrors(cudaMalloc((void**)&dmass, sizeof(double) * np));
 		checkCudaErrors(cudaMalloc((void**)&diner, sizeof(double) * np));
-		checkCudaErrors(cudaMalloc((void**)&dpos, sizeof(double) * np * 4));
+		checkCudaErrors(cudaMalloc((void**)&dpos, sizeof(double) * rnp * 4));
 		checkCudaErrors(cudaMalloc((void**)&dep, sizeof(double) * np * 4));
 		checkCudaErrors(cudaMalloc((void**)&dvel, sizeof(double) * np * 3));
 		checkCudaErrors(cudaMalloc((void**)&dacc, sizeof(double) * np * 3));
 		checkCudaErrors(cudaMalloc((void**)&davel, sizeof(double) * np * 3));
 		checkCudaErrors(cudaMalloc((void**)&daacc, sizeof(double) * np * 3));
-		checkCudaErrors(cudaMalloc((void**)&dforce, sizeof(double) * np * 3));
-		checkCudaErrors(cudaMalloc((void**)&dmoment, sizeof(double) * np * 3));
+		checkCudaErrors(cudaMalloc((void**)&dforce, sizeof(double) * rnp * 3));
+		checkCudaErrors(cudaMalloc((void**)&dmoment, sizeof(double) * rnp * 3));
 	}
 }

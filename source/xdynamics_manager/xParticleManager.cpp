@@ -1,6 +1,7 @@
 #include "xdynamics_manager/xParticleMananger.h"
-#include "xdynamics_object/xParticleObject.h"
+//#include "xdynamics_object/xParticleObject.h"
 #include "xdynamics_manager/xObjectManager.h"
+#include <QtCore/QRandomGenerator>
 
 xParticleManager::xParticleManager()
 	: np(0)
@@ -106,6 +107,21 @@ unsigned int* xParticleManager::ClusterIndex()
 	return cluster_index;
 }
 
+unsigned int * xParticleManager::ClusterCount()
+{
+	return return cluster_count;
+}
+
+unsigned int * xParticleManager::ClusterBegin()
+{
+	return cluster_begin;
+}
+
+double * xParticleManager::ClusterRelativeLocation()
+{
+	return cluster_set_location;
+}
+
 unsigned int xParticleManager::GetNumCubeParticles(
 	double dx, double dy, double dz, double min_radius, double max_radius)
 {
@@ -130,21 +146,26 @@ unsigned int xParticleManager::GetNumPlaneParticles(double dx, unsigned int ny, 
 	return ndim.x * ny * ndim.z;
 }
 
-unsigned int xParticleManager::GetNumCircleParticles(double d, unsigned int ny, double min_radius, double max_radius)
+unsigned int xParticleManager::GetNumCircleParticles(
+	double d, double min_radius, double max_radius)
 {
-	double r = max_radius;
 	double cr = 0.5 * d;
-	unsigned int nr = static_cast<unsigned int>(cr / (2.0 * r)) - 1;
-	double rr = 2.0 * r * nr + r;
+	unsigned int nr = static_cast<unsigned int>(cr / (2.0 * max_radius)) - 1;
+	double rr = 2.0 * max_radius * nr + max_radius;
+	unsigned int cnt = 0;
 	double space = (cr - rr) / (nr + 1);
-	unsigned int cnt = 1;
 	for (unsigned int i = 1; i <= nr; i++)
 	{
-		double dth = (2.0 * r + space) / (i * (2.0 * r + space));
-		unsigned int _np = static_cast<unsigned int>((2.0 * M_PI) / dth);
-		cnt += _np;
+		double _r = i * (2.0 * max_radius + space);
+		double dth = (2.0 * max_radius + space) / _r;
+		unsigned int npr = static_cast<unsigned int>((2.0 * M_PI) / dth);
+		dth = ((2.0 * M_PI) / npr);
+		for (unsigned int j = 0; j < npr; j++)
+		{
+			cnt++;
+		}
 	}
-	return cnt * ny;
+	return cnt;
 }
 
 xParticleObject* xParticleManager::CreateParticleFromList(
@@ -336,6 +357,76 @@ xParticleObject* xParticleManager::CreateCubeParticle(
 	return xpo;
 }
 
+xParticleObject* xParticleManager::CreateCircleParticle(
+	std::string n, xMaterialType mt, unsigned int _np, xCircleParticleData& d)
+{
+	QString name = QString::fromStdString(n);
+	xParticleObject* xpo = new xParticleObject(n);
+	vector4d* pos = xpo->AllocMemory(_np);
+	xpo->setStartIndex(np);
+	xpo->setMaterialType(mt);
+	n_single_sphere += _np;
+	np += _np;
+	xMaterial xm = GetMaterialConstant(mt);
+	xpo->setDensity(xm.density);
+	xpo->setYoungs(xm.youngs);
+	xpo->setPoisson(xm.poisson);
+	xpo->setMinRadius(d.minr);
+	xpo->setMaxRadius(d.maxr);
+	double r = d.maxr;
+	double cr = 0.5 * d.diameter;
+	unsigned int nr = static_cast<unsigned int>(cr / (2.0 * r)) - 1;
+	double rr = 2.0 * r * nr + r;
+	double space = (cr - rr) / (nr + 1);
+	unsigned int cnt = 0;
+	unsigned int k = 0;
+	bool isStopCreating = false;
+	
+	while (1)
+	{
+		
+		for (unsigned int i = 1; i <= nr; i++)
+		{
+			double _r = i * (2.0 * r + space);
+			double dth = (2.0 * r + space) / _r;
+			double th = 0.5 * k * r / _r;
+			unsigned int npr = static_cast<unsigned int>((2.0 * M_PI) / dth);
+			dth = ((2.0 * M_PI) / npr);
+			for (unsigned int j = 0; j < npr; j++)
+			{
+				vector4d pp = new_vector4d(d.sx + _r * cos(dth * j), d.sy, d.sz + _r * sin(dth * j), r);
+				vector4d new_pp = pp;				
+				new_pp.x = pp.x * cos(th) + pp.z * sin(th);
+				new_pp.z = -pp.x * sin(th) + pp.z * cos(th);
+				pos[xpo->StartIndex() + cnt] = new_pp;
+				cnt++;
+				if (cnt == _np)
+				{
+					isStopCreating = true;
+					break;
+				}
+			}
+			if (isStopCreating) break;
+		}
+		if (isStopCreating) break;
+		k++;
+	}
+	
+	
+	if (d.minr != d.maxr)
+	{
+		double dr = d.maxr - d.minr;
+		srand(GetTickCount());
+		for (unsigned int i = 0; i < _np; i++)
+		{
+			pos[xpo->StartIndex() + i].w = d.minr + dr * frand();
+		}
+	}
+	xpcos[name] = xpo;
+	xObjectManager::XOM()->addObject(xpo);
+	return xpo;
+}
+
 xParticleObject * xParticleManager::CreateClusterParticle(std::string n, xMaterialType mt, unsigned int _np, xClusterObject * xo)
 {
 	unsigned int neach = xo->NumElement();
@@ -349,6 +440,7 @@ xParticleObject * xParticleManager::CreateClusterParticle(std::string n, xMateri
 	n_cluster_sphere += _np;
 	np += rnp;
 	xMaterial xm = GetMaterialConstant(mt);
+	xpo->setShapeForm(CLUSTER_SHAPE);
 	xpo->setDensity(xm.density);
 	xpo->setYoungs(xm.youngs);
 	xpo->setPoisson(xm.poisson);
@@ -389,6 +481,7 @@ bool xParticleManager::CopyPosition(double *pos, unsigned int inp)
 
 bool xParticleManager::SetMassAndInertia(double *mass, double *inertia)
 {
+	unsigned int c = 0;
 	foreach(xParticleObject* xpo, xpcos)
 	{
 		double d = xpo->Density();
@@ -396,8 +489,20 @@ bool xParticleManager::SetMassAndInertia(double *mass, double *inertia)
 		unsigned int sid = xpo->StartIndex();
 		for (unsigned int i = 0; i < xpo->NumParticle(); i++)
 		{
-			mass[i + sid] = d * (4.0 / 3.0) * M_PI * pow(v[i].w, 3.0);
-			inertia[i + sid] = (2.0 / 5.0) * mass[i + sid] * pow(v[i].w, 2.0);
+			double m = d * (4.0 / 3.0) * M_PI * pow(v[i].w, 3.0);
+			double J = (2.0 / 5.0) * mass[i + sid] * pow(v[i].w, 2.0);
+			if (xpo->ShapeForm() == CLUSTER_SHAPE && !(i % xpo->EachCount()))
+			{
+				mass[c + sid] = m;
+				inertia[c + sid] = J;
+				i += xpo->EachCount() - 1;
+			}
+			else
+			{
+				mass[c + sid] = m;
+				inertia[c + sid] = J;
+			}
+			c++;
 		}		
 	}
 	return true;
@@ -454,13 +559,14 @@ void xParticleManager::SetClusterInformation()
 	unsigned int sum_each = 0;
 	foreach(xParticleObject* po, xpcos)
 	{
-		if (po->Shape() == CLUSTER_SHAPE)
+		if (po->ShapeForm() == CLUSTER_SHAPE)
 		{
 			cluster_count[idx] = po->EachCount();
-			cluster_begin[idx + 0] = po->StartIndex();
-			cluster_begin[idx + 1] = sum_each;
+			cluster_begin[idx*2 + 0] = po->StartIndex();
+			cluster_begin[idx*2 + 1] = sum_each;
 			memcpy(cluster_set_location + sum_each, po->RelativeLocation(), sizeof(vector3d) * po->EachCount());
-			for (unsigned int i = po->StartIndex(); i < po->NumParticle(); i++)
+			unsigned int t = po->NumParticle() / po->EachCount();
+			for (unsigned int i = po->StartIndex(); i < t; i++)
 			{
 				for (unsigned int j = 0; j < po->EachCount(); j++)
 				{
@@ -469,9 +575,75 @@ void xParticleManager::SetClusterInformation()
 					cnt++;
 				}
 			}
-			idx++;
 			sum_each += po->EachCount();
 		}
+		idx++;
 	}
 }
 
+void xParticleManager::AddParticleCreatingCondition(xParticleObject* xpo, xParticleCreateCondition& xpcc)
+{
+	xpccs.push_back(xpcc);
+	QRandomGenerator qran;
+	QVector<unsigned int> iList;
+	while (iList.size() != xpo->EachCount())
+	{
+		unsigned int ni = qran.bounded(xpo->EachCount());
+		if (qFind(iList.begin(), iList.end(), ni) != iList.end())
+			continue;
+		iList.push_back(ni);
+	}
+
+	unsigned int it = 0;
+	unsigned int k = 0;
+	QVector<unsigned int>::iterator iter = iList.begin();
+	QList<vector4d> pList;
+	
+	while (1)
+	{
+		if (k * xpo->EachCount() > xpo->NumParticle())
+			break;
+		vector4d* pos = xpo->Position() + k * xpo->EachCount();
+		if ((k + 1) * xpo->EachCount() > xpo->NumParticle())
+			it = xpo->NumParticle() - k * xpo->EachCount();
+		else
+			it = xpo->EachCount();
+		for (unsigned int i = 0; i < it; i++)
+		{
+			pList.push_back(pos[i]);
+		}
+		unsigned int over = 0;
+		foreach(vector4d v, pList)
+		{
+			if (over > it) break;
+			pos[*iter] = v;
+			iter++;
+			over++;
+		}
+		iter = iList.begin();
+		pList.clear();
+		k++;
+	}
+}
+
+unsigned int xParticleManager::ExcuteCreatingCondition(
+	double ct, unsigned int cstep, unsigned int cnp)
+{
+	foreach(xParticleCreateCondition xpcc, xpccs)
+	{
+		if (cstep == 1)
+			return xpcc.neach;
+		if (cnp > xpcc.sid && cnp < xpcc.sid + xpcc.count)
+		{
+			if (!(cstep % xpcc.nstep))
+			{
+				if (cnp + xpcc.neach > np)
+					return np;
+				else
+					return cnp + xpcc.neach;
+			}
+				
+		}
+	}
+	return cnp;
+}

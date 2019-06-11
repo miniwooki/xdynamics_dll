@@ -107,7 +107,7 @@ void xSimulationThread::run()
 		if (isStop)
 			break;
 		cstep++;
-		cout << cstep << endl;
+		//cout << cstep << endl;
 		eachStep++;
 		ct += xSimulation::dt;
 		xSimulation::setCurrentTime(ct);
@@ -139,7 +139,7 @@ void xSimulationThread::run()
 	elapsed_time = tme.elapsed() * 0.001;
 	total_time += elapsed_time;
 	sendProgress(-1, QString("=========  =======    ==========    ======   ========   =============  ====================\n"));
-	//xds->exportPartData();
+	xds->exportPartData();
 	QTime endTime = QTime::currentTime();
 	QDate endDate = QDate::currentDate();
 	int minute = static_cast<int>(total_time / 60.0);

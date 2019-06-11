@@ -3,6 +3,7 @@
 #include "xdynamics_manager/XDiscreteElementMethodModel.h"
 
 xIntegratorVV::xIntegratorVV()
+	: m_np(0)
 {
 
 }
@@ -15,16 +16,18 @@ xIntegratorVV::~xIntegratorVV()
 int xIntegratorVV::Initialize(xDiscreteElementMethodModel* _xdem, xContactManager* _xcm)
 {
 	int ret = xDiscreteElementMethodSimulation::Initialize(_xdem, _xcm);	
+	m_np = xDiscreteElementMethodSimulation::ns;
 	return ret;
 }
 
 int xIntegratorVV::OneStepSimulation(double ct, unsigned int cstep)
 {
+	m_np = xdem->XParticleManager()->ExcuteCreatingCondition(ct, cstep, m_np);
 // 	if (per_np && !((cstep - 1) % per_np) && np < md->ParticleManager()->Np())
 // 		md->ParticleManager()->OneByOneCreating() ? np += md->ParticleManager()->NextCreatingOne(np) : np += md->ParticleManager()->NextCreatingPerGroup();
 	//std::cout << "cstep : " << cstep << " ";
-	this->updatePosition(dpos, dvel, dacc, dep, davel, daacc, np);
-	dtor->detection(dpos, (nPolySphere ? xcm->ContactParticlesMeshObjects()->SphereData() : NULL), nSingleSphere + nClusterSphere, nPolySphere);
+	this->updatePosition(dpos, dvel, dacc, dep, davel, daacc, m_np);
+	dtor->detection(dpos, (nPolySphere ? xcm->ContactParticlesMeshObjects()->SphereData() : NULL), m_np, nPolySphere);
 //	std::cout << "after detection " << std::endl;
 	if (xcm)
 	{
@@ -32,18 +35,24 @@ int xIntegratorVV::OneStepSimulation(double ct, unsigned int cstep)
 			dpos, dvel, davel,
 			dmass, diner, dforce, dmoment,
 			dtor->sortedID(), dtor->cellStart(), dtor->cellEnd(),
-			xdem->XParticleManager()->ClusterIndex(), nSingleSphere, nClusterSphere);
+			xdem->XParticleManager()->ClusterIndex(), m_np, nSingleSphere, nClusterSphere);
 	}
-	this->updateVelocity(dvel, dacc, dep, davel, daacc, dforce, dmoment, dmass, diner, np);
+	this->updateVelocity(dvel, dacc, dep, davel, daacc, dforce, dmoment, dmass, diner, m_np);
 	return 0;
 }
 
 void xIntegratorVV::updatePosition(
 	double* dpos, double* dvel, double* dacc,
-	double* ep, double* ev, double* ea, unsigned int np)
+	double* ep, double* ev, double* ea, double* o, unsigned int np)
 {
 	if (xSimulation::Gpu())
 		vv_update_position(dpos, dvel, dacc,/* ep, ev, ea,*/ np);
+	else if (np != ns)
+	{
+		updateClusterPosition(dpos, NULL, dvel, dacc, ep, o, ea,
+			xdem->XParticleManager()->ClusterIndex(), xdem->XParticleManager()->ClusterCount(),
+			xdem->XParticleManager()->ClusterBegin(), xdem->XParticleManager()->ClusterRelativeLocation(), np);
+	}
 	else
 	{
 		vector4d* p = (vector4d*)dpos;

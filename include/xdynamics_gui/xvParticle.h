@@ -56,6 +56,7 @@ private:
 	unsigned int m_program;
 
 	unsigned int np;
+//	unsigned int *np_buffer;
 	//float *buffer;
 	float *buffers;
 	float *vbuffers;

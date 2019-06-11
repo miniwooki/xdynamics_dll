@@ -200,6 +200,8 @@ typedef struct{ double p0x, p0y, p0z, p1x, p1y, p1z, nx, ny, nz; }xLineObjectDat
 typedef struct{ double xx, xy, xz, yy, yz, zz; }symatrix;
 typedef struct{ double s0, s1, s2, s3, s4, s5; }double6;
 typedef struct{	bool enable; double alpha, start_point, length; }xWaveDampingData;
+typedef struct{ double diameter, sx, sy, sz, dx, dy, dz, minr, maxr; }xCircleParticleData;
+typedef struct { unsigned int sid, count, neach, nstep; }xParticleCreateCondition;
 
 typedef struct 
 {

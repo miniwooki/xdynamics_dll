@@ -46,6 +46,7 @@ public:
 		unsigned int *cell_end,
 		unsigned int *cluster_index,
 		unsigned int np,
+		unsigned int ns,
 		unsigned int nc);
 
 	void update();
@@ -79,6 +80,7 @@ private:
 		unsigned int *cell_end,
 		unsigned int *cluster_index,
 		unsigned int np,
+		unsigned int ns,
 		unsigned int nc);
 
 	unsigned int deviceContactCount(

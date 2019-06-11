@@ -107,11 +107,12 @@ __global__ void vv_update_velocity_kernel(
 	//double3 L = acc[id];
 	double3 av = omega[id];
 	//double3 aa = alpha[id];
-	double3 a = (1.0 / m) * force[id];
+	double3 a = (1.0 / m) * (force[id] + m * cte.gravity);
+	//printf("[%f, %f, %f]", a.x, a.y, a.z);
 	double3 in = (1.0 / iner[id]) * moment[id];
 	v += 0.5 * cte.dt * (acc[id] + a);
 	av += 0.5 * cte.dt * (alpha[id] + in);
-	force[id] = m * cte.gravity;
+	force[id] = make_double3(0.0, 0.0, 0.0); 
 	moment[id] = make_double3(0.0, 0.0, 0.0);
 	vel[id] = v;
 	omega[id] = av;
@@ -606,11 +607,11 @@ __global__ void plane_contact_force_kernel(
 	double3* force, double3* moment,
 	device_contact_property *cp, double* mass,
 	double3* tmax, double* rres,
-	unsigned int* pair_count, unsigned int* pair_id, double2* tsd)
+	unsigned int* pair_count, unsigned int* pair_id, double2* tsd, unsigned int np)
 {
 	unsigned id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
 
-	if (id >= cte.np)
+	if (id >= np)
 		return;
 	unsigned int p_pair_id[3];
 	double2 p_tsd[3];
@@ -1009,7 +1010,7 @@ __global__ void particle_polygonObject_collision_kernel(
 {
 	unsigned id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
 	//unsigned int np = _np;
-	if (id >= cte.np)
+	if (id >= np)
 		return;
 	unsigned int p_pair_id[MAX_P2MS_COUNT];
 	double2 p_tsd[MAX_P2MS_COUNT];
@@ -1142,10 +1143,11 @@ __global__ void decide_rolling_friction_moment_kernel(
 	double* rres,
 	double* inertia,
 	double3 *ev,
-	double3 *moment)
+	double3 *moment,
+	unsigned int np)
 {
 	unsigned int id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
-	if (id >= cte.np)
+	if (id >= np)
 		return;
 	double Tr = rres[id];
 	if (!Tr)

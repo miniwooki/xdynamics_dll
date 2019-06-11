@@ -169,7 +169,7 @@ bool xContactManager::runCollision(
 	double *mass, double* inertia, double *force, double *moment,
 	unsigned int *sorted_id, unsigned int *cell_start,
 	unsigned int *cell_end, unsigned int *cluster_index,
-	unsigned int np, unsigned int nc)
+	unsigned int np, unsigned int ns, unsigned int nc)
 {
 	if (xSimulation::Cpu())
 	{
@@ -182,7 +182,7 @@ bool xContactManager::runCollision(
 			(vector3d*)force,
 			(vector3d*)moment,
 			sorted_id, cell_start, cell_end,
-			cluster_index, np, nc
+			cluster_index, np, ns, nc
 		);
 	}
 	else if (xSimulation::Gpu())
@@ -355,9 +355,10 @@ void xContactManager::hostCollision(
 	unsigned int *cell_end,
 	unsigned int *cluster_index,
 	unsigned int np,
+	unsigned int ns,
 	unsigned int nc)
 {
-	updateCollisionPair(pos, sorted_id, cell_start, cell_end, cluster_index, np, nc);
+	updateCollisionPair(pos, sorted_id, cell_start, cell_end, cluster_index, ns, nc);
 	for (unsigned int i = 0; i < np + nc; i++)
 	{
 		vector3d F = new_vector3d(0.0, 0.0, 0.0);

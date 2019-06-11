@@ -182,6 +182,19 @@ xListParticleData xXLSReader::ReadListParticleData(std::string& _name, int r, in
 	return d;
 }
 
+xCircleParticleData xXLSReader::ReadCircleParticleData(std::string& _name, int r, int& c)
+{
+	xCircleParticleData d = { 0, };
+	double *ptr = &d.sx;
+	std::wstring x;
+	d.diameter = sheet->readNum(r, c++);
+	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 0);
+	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 3);
+	d.minr = sheet->readNum(r, c++);
+	d.maxr = sheet->readNum(r, c++);
+	return d;
+}
+
 xContactParameterData xXLSReader::ReadContactData(std::string& _name, int r, int& c)
 {
 	xContactParameterData d = { 0, };
@@ -384,6 +397,39 @@ void xXLSReader::ReadDEMParticle(xDiscreteElementMethodModel* xdem, xObjectManag
 			else if (form == PLANE_SHAPE)
 			{
 
+			}
+			else if (form == CIRCLE_SHAPE)
+			{
+				xCircleParticleData d = ReadCircleParticleData(name, rc.x, rc.y);
+				unsigned int p_np = xdem->XParticleManager()->NumParticle();
+				unsigned int np = 0;
+				unsigned int neach = 0;
+				unsigned int nstep = 0;
+				unsigned int npcircle = xdem->XParticleManager()->GetNumCircleParticles(d.diameter, d.minr, d.maxr);
+				if (!IsEmptyCell(rc.x, rc.y))
+				{
+					vector2i _rc = new_vector2i(0, 0);
+					xUtilityFunctions::xsplit(sheet->readStr(rc.x, rc.y++), ",", 2, &_rc.x);
+					unsigned int _neach = 0;
+					_rc.x -= 1; _rc.y -= 1;
+					if (!IsEmptyCell(_rc.x, _rc.y))
+					{
+						np = sheet->readNum(_rc.x, _rc.y++);
+						neach = sheet->readNum(_rc.x, _rc.y++);
+						nstep = sheet->readNum(_rc.x, _rc.y);
+					}
+					if (!neach)
+						neach = npcircle;
+				}
+				else
+					np = xdem->XParticleManager()->GetNumCircleParticles(d.diameter, d.minr, d.maxr);
+				xParticleObject* xpo = xdem->XParticleManager()->CreateCircleParticle(name.c_str(), (xMaterialType)material, np, d);
+				if (neach && nstep)
+				{
+					xpo->setEachCount(npcircle);
+					xParticleCreateCondition xpcc = { p_np, np, neach, nstep };
+					xdem->XParticleManager()->AddParticleCreatingCondition(xpo, xpcc);
+				}
 			}
 			else if (form == FROM_SHAPE)
 			{
