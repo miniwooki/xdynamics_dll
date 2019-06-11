@@ -6,12 +6,15 @@ xParticleManager::xParticleManager()
 	: np(0)
 	, r_pos(NULL)
 	, r_vel(NULL)
+	, isCluster(NULL)
 	, cluster_index(NULL)
 	, cluster_count(NULL)
 	, cluster_begin(NULL)
 	, cluster_set_location(NULL)
 	, n_cluster_object(0)
 	, n_cluster_each(0)
+	, n_single_sphere(0)
+	, n_cluster_sphere(0)
 // 	, is_realtime_creating(false)
 // 	, one_by_one(false)
 {
@@ -22,6 +25,7 @@ xParticleManager::~xParticleManager()
 {
 	if (r_pos) delete[] r_pos; r_pos = NULL;
 	if (r_vel) delete[] r_vel; r_vel = NULL;
+	if (isCluster) delete[] isCluster; isCluster = NULL;
 	if (cluster_index) delete[] cluster_index; cluster_index = NULL;
 	if (cluster_count) delete[] cluster_count; cluster_count = NULL;
 	if (cluster_begin) delete[] cluster_begin; cluster_begin = NULL;
@@ -72,6 +76,36 @@ xParticleObject* xParticleManager::XParticleObject(QString& ws)
 	return xpcos[ws];
 }
 
+unsigned int xParticleManager::nClusterObject()
+{
+	return n_cluster_object;
+}
+
+unsigned int xParticleManager::nClusterEach()
+{
+	return n_cluster_each;
+}
+
+unsigned int xParticleManager::nSingleSphere()
+{
+	return n_single_sphere;
+}
+
+unsigned int xParticleManager::nClusterSphere()
+{
+	return n_cluster_sphere;
+}
+
+unsigned int xParticleManager::NumParticleWithCluster()
+{
+	return n_single_sphere + n_cluster_sphere;
+}
+
+unsigned int* xParticleManager::ClusterIndex()
+{
+	return cluster_index;
+}
+
 unsigned int xParticleManager::GetNumCubeParticles(
 	double dx, double dy, double dz, double min_radius, double max_radius)
 {
@@ -120,6 +154,7 @@ xParticleObject* xParticleManager::CreateParticleFromList(
 	xParticleObject* xpo = new xParticleObject(n);
 	vector4d* pos = xpo->AllocMemory(_np);
 	xpo->setStartIndex(np);
+	n_single_sphere += _np;
 	np += _np;
 	xMaterial xm = GetMaterialConstant(mt);
 	xpo->setDensity(xm.density);
@@ -249,6 +284,7 @@ xParticleObject* xParticleManager::CreateCubeParticle(
 	vector4d* pos = xpo->AllocMemory(_np);
 	xpo->setStartIndex(np);
 	xpo->setMaterialType(mt);
+	n_single_sphere += _np;
 	np += _np;
 	xMaterial xm = GetMaterialConstant(mt);
 	xpo->setDensity(xm.density);
@@ -310,6 +346,7 @@ xParticleObject * xParticleManager::CreateClusterParticle(std::string n, xMateri
 	vector4d* pos = xpo->AllocMemory(rnp);
 	xpo->setStartIndex(np);
 	xpo->setMaterialType(mt);
+	n_cluster_sphere += _np;
 	np += rnp;
 	xMaterial xm = GetMaterialConstant(mt);
 	xpo->setDensity(xm.density);
@@ -403,14 +440,17 @@ void xParticleManager::AllocParticleResultMemory(unsigned int npart, unsigned in
 
 void xParticleManager::SetClusterInformation()
 {
+//	isCluster = new bool[]
+	unsigned int ncs = np - n_single_sphere;
 	if (n_cluster_object)
 	{
-		cluster_index = new unsigned int[np];
+		cluster_index = new unsigned int[ncs * 2];
 		cluster_count = new unsigned int[n_cluster_object];
 		cluster_begin = new unsigned int[n_cluster_object * 2];
 		cluster_set_location = new double[n_cluster_each];
 	}
 	unsigned int idx = 0;
+	unsigned int cnt = 0;
 	unsigned int sum_each = 0;
 	foreach(xParticleObject* po, xpcos)
 	{
@@ -422,7 +462,12 @@ void xParticleManager::SetClusterInformation()
 			memcpy(cluster_set_location + sum_each, po->RelativeLocation(), sizeof(vector3d) * po->EachCount());
 			for (unsigned int i = po->StartIndex(); i < po->NumParticle(); i++)
 			{
-				cluster_index[i] = idx;
+				for (unsigned int j = 0; j < po->EachCount(); j++)
+				{
+					cluster_index[cnt * 2 + 0] = idx;
+					cluster_index[cnt * 2 + 1] = i;
+					cnt++;
+				}
 			}
 			idx++;
 			sum_each += po->EachCount();

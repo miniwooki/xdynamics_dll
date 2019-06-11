@@ -25,7 +25,10 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 	xdem = _xdem;
 	double maxRadius = 0;
 	xParticleManager* xpm = xdem->XParticleManager();
-	np = xpm->NumParticle();
+	np = xpm->NumParticleWithCluster();
+	unsigned int rnp = xpm->NumParticle();
+	nSingleSphere = xpm->nSingleSphere();
+	nClusterSphere = rnp - xpm->nSingleSphere();
 	xcm = _xcm;
 // 	if (xpm->RealTimeCreating()/* && !xpm->ChangedParticleModel()*/)
 // 	{
@@ -44,7 +47,7 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 	{
 		nPolySphere = xcm->setupParticlesMeshObjectsContact();
 		xcm->setupParticlesPlanesContact();
-		xcm->allocPairList(np);
+		xcm->allocPairList(rnp);
 		if (nPolySphere)
 			maxRadius = xcm->ContactParticlesMeshObjects()->MaxRadiusOfPolySphere();
 		if (xdem->XParticleManager()->NumClusterSet())
@@ -53,27 +56,30 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 
 	allocationMemory();
 
-	memset(pos, 0, sizeof(double) * np * 4);
+	memset(pos, 0, sizeof(double) * rnp * 4);
 	memset(ep, 0, sizeof(double) * np * 4);
 	memset(vel, 0, sizeof(double) * np * 3);
 	memset(acc, 0, sizeof(double) * np * 3);
 	memset(avel, 0, sizeof(double) * np * 3);
 	memset(aacc, 0, sizeof(double) * np * 3);
-	memset(force, 0, sizeof(double) * np * 3);
-	memset(moment, 0, sizeof(double) * np * 3);
+	memset(force, 0, sizeof(double) * rnp * 3);
+	memset(moment, 0, sizeof(double) * rnp * 3);
 
-	xpm->CopyPosition(pos, np);
+	xpm->CopyPosition(pos, rnp);
 	xpm->SetMassAndInertia(mass, inertia);
-	for (unsigned int i = 0; i < np; i++)
+	for (unsigned int i = 0; i < rnp; i++)
 	{
 		double r = pos[i * 4 + 3];
-	//	vel[0] = -0.1;
-		force[i * 3 + 0] = mass[i] * xModel::gravity.x;
-		force[i * 3 + 1] = mass[i] * xModel::gravity.y;
-		force[i * 3 + 2] = mass[i] * xModel::gravity.z;
-		ep[i * 4 + 0] = 1.0;
 		if (r > maxRadius)
 			maxRadius = r;
+	}
+	for (unsigned int i = 0; i < np; i++)
+	{
+	//	vel[0] = -0.1;
+		//force[i * 3 + 0] = 0.0;// mass[i] * xModel::gravity.x;
+		//force[i * 3 + 1] = 0.0mass[i] * xModel::gravity.y;
+		//force[i * 3 + 2] = mass[i] * xModel::gravity.z;
+		ep[i * 4 + 0] = 1.0;
 	}
 
 	dtor = new xNeiborhoodCell;
@@ -86,7 +92,7 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 		dtor->setWorldOrigin(new_vector3d(-1.0, -1.0, -1.0));
 		dtor->setGridSize(new_vector3ui(128, 128, 128));
 		dtor->setCellSize(maxRadius * 2.0);
-		dtor->initialize(np + nPolySphere);
+		dtor->initialize(rnp + nPolySphere);
 	}
 	// 	switch (md->IntegrationType())
 	// 	{
@@ -281,6 +287,7 @@ void xDiscreteElementMethodSimulation::clearMemory()
 	if (aacc) delete[] aacc; aacc = NULL;
 	if (force) delete[] force; force = NULL;
 	if (moment) delete[] moment; moment = NULL;
+
 	if (xSimulation::Gpu())
 	{
 		if (dmass) checkCudaErrors(cudaFree(dmass)); dmass = NULL;

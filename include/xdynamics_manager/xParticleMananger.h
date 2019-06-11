@@ -23,6 +23,12 @@ public:
 	void ExportParticleDataForView(std::string path);
 // 	void setRealTimeCreating(bool b);
 // 	bool OneByOneCreating();
+	unsigned int nClusterObject();
+	unsigned int nClusterEach();
+	unsigned int nSingleSphere();
+	unsigned int nClusterSphere();
+	unsigned int NumParticleWithCluster();
+	unsigned int* ClusterIndex();
 	double* GetPositionResultPointer(unsigned int pt);
 	double* GetVelocityResultPointer(unsigned int pt);
 // 	unsigned int RealTimeCreating();
@@ -33,6 +39,7 @@ public:
 	static unsigned int GetNumCubeParticles(double dx, double dy, double dz, double min_radius, double max_radius);
 	static unsigned int GetNumPlaneParticles(double dx, unsigned int ny, double dy, double min_radius, double max_radius);
 	static unsigned int GetNumCircleParticles(double d, unsigned int ny, double min_radius, double max_radius);
+
 //	static unsigned int GetNumSPHPlaneParticles(double dx, double dy, double ps);
 
 	xParticleObject* CreateParticleFromList(std::string n, xMaterialType mt, unsigned int _np, vector4d* d);
@@ -49,6 +56,8 @@ private:
 // 	bool one_by_one;
 	unsigned int n_cluster_object;
 	unsigned int n_cluster_each;
+	unsigned int n_single_sphere;
+	unsigned int n_cluster_sphere; // the number of cluster set element
 	unsigned int np;
 	//unsigned int num_xpo;
 	//unsigned int per_np;
@@ -57,6 +66,7 @@ private:
 
 	double *r_pos;
 	double *r_vel;
+	bool *isCluster;
 	unsigned int *cluster_index;
 	unsigned int *cluster_count;
 	unsigned int *cluster_begin;

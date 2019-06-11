@@ -33,10 +33,11 @@ protected:
 	unsigned int np;
 	unsigned int per_np;
 	unsigned int nPolySphere;
+	unsigned int nClusterSphere;
+	unsigned int nSingleSphere;
 	xDiscreteElementMethodModel* xdem;
 	xGridCell* dtor;
 	xContactManager* xcm;
-	bool *isCluster;
 	double *mass;
 	double *inertia;
 	double *pos;
@@ -60,6 +61,8 @@ protected:
 	double *daacc;
 	double *dforce;
 	double *dmoment;
+
+
 
 	QList<QString> partList;
 };

@@ -29,7 +29,7 @@ private:
 		double *dpos, double* dcpos, double * dvel, double * dacc,
 		double *ep, double * domega, double * dalpha, double *dforce, double* dmoment,
 		double *dmass, double* dinertia, unsigned int* cidx, unsigned int* ccnt,  unsigned int* cbegin, double* cdata,
-		unsigned int np);
+		unsigned int np, unsigned int nc);
 //	void integrationQuaternion(double * quat, double * omega, double * moment, double * alpha, double * inertia, unsigned int np);
 };
 

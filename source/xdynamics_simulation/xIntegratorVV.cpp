@@ -24,14 +24,15 @@ int xIntegratorVV::OneStepSimulation(double ct, unsigned int cstep)
 // 		md->ParticleManager()->OneByOneCreating() ? np += md->ParticleManager()->NextCreatingOne(np) : np += md->ParticleManager()->NextCreatingPerGroup();
 	//std::cout << "cstep : " << cstep << " ";
 	this->updatePosition(dpos, dvel, dacc, dep, davel, daacc, np);
-	dtor->detection(dpos, (nPolySphere ? xcm->ContactParticlesMeshObjects()->SphereData() : NULL), np, nPolySphere);
+	dtor->detection(dpos, (nPolySphere ? xcm->ContactParticlesMeshObjects()->SphereData() : NULL), nSingleSphere + nClusterSphere, nPolySphere);
 //	std::cout << "after detection " << std::endl;
 	if (xcm)
 	{
 		xcm->runCollision(
 			dpos, dvel, davel,
 			dmass, diner, dforce, dmoment,
-			dtor->sortedID(), dtor->cellStart(), dtor->cellEnd(), np);
+			dtor->sortedID(), dtor->cellStart(), dtor->cellEnd(),
+			xdem->XParticleManager()->ClusterIndex(), nSingleSphere, nClusterSphere);
 	}
 	this->updateVelocity(dvel, dacc, dep, davel, daacc, dforce, dmoment, dmass, diner, np);
 	return 0;
@@ -127,9 +128,23 @@ void xIntegratorVV::updateClusterPosition(
 }
 
 void xIntegratorVV::updateClusterVelocity(
-	double *dpos, double* dcpos, double * dvel, double * dacc, double * ep,
-	double * domega, double * dalpha, double * dforce, double * dmoment, 
-	double * dmass, double * dinertia, unsigned int* cidx, unsigned int* ccnt, unsigned int* cbegin, double* cdata, unsigned int np)
+	double *dpos, 
+	double* dcpos, 
+	double * dvel, 
+	double * dacc, 
+	double * ep,
+	double * domega, 
+	double * dalpha, 
+	double * dforce, 
+	double * dmoment, 
+	double * dmass, 
+	double * dinertia,
+	unsigned int* cidx, 
+	unsigned int* ccnt, 
+	unsigned int* cbegin,
+	double* cdata,
+	unsigned int np,
+	unsigned int nc)
 {
 	double inv_m = 0;
 	double inv_i = 0;
@@ -144,8 +159,9 @@ void xIntegratorVV::updateClusterVelocity(
 	vector4d* q = (vector4d*)ep;
 	vector3d* J = (vector3d*)dinertia;
 	vector3d* rloc = (vector3d*)cdata;
-	for (unsigned int i = 0; i < np; i++) {
-		unsigned int id = cidx[i];
+	vector2ui* cid = (vector2ui*)cidx;
+	for (unsigned int i = 0; i < np + nc; i++) {
+		unsigned int id = cid[i].x;// cidx[i];
 		unsigned int begin = cbegin[id * 2 + 0];
 		unsigned int loc = cbegin[id * 2 + 1];
 		unsigned int sid = begin + (i - begin) * ccnt[id];
@@ -161,7 +177,7 @@ void xIntegratorVV::updateClusterVelocity(
 			T += m[sid + j];
 			LT += cross(dr, f[sid + j]);
 		}
-		
+		F += dmass[i] * xModel::gravity;
 		vector3d n_prime = ToLocal(e, T + LT);
 		vector3d w_prime = ToLocal(e, o[i]);
 		vector3d rhs = n_prime - Tilde(o[i]) * new_vector3d(J[id].x * w_prime.x, J[id].y * w_prime.y, J[id].z * w_prime.z);
@@ -173,7 +189,7 @@ void xIntegratorVV::updateClusterVelocity(
 		aa[i] = ToGlobal(e, wd_prime);
 		v[i] += 0.5 * xSimulation::dt * a[i];
 		o[i] += 0.5 * xSimulation::dt * aa[i];
-		f[i] = dmass[i] * xModel::gravity;
+		f[i] = new_vector3d(0.0, 0.0, 0.0);// dmass[i] * xModel::gravity;
 		m[i] = new_vector3d(0.0, 0.0, 0.0);
 	}
 }

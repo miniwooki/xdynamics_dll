@@ -14,7 +14,8 @@ public:
 	void cppCollision(
 		xContactPairList* pairs, unsigned int i,
 		vector4d *pos, vector3d *vel,
-		vector3d *omega, double *mass, double &res, vector3d &tmax,
+		vector3d *omega, double *mass, 
+		double &res, vector3d &tmax,
 		vector3d& F, vector3d& M);
 	void updateCollisionPair(unsigned int id, xContactPairList& xcpl, double ri, double rj, vector3d& posi, vector3d& posj);
 	virtual void cuda_collision(
@@ -28,7 +29,6 @@ public:
 	virtual void cudaMemoryAlloc(unsigned int np);
 
 	void deviceContactCount(double* pos, unsigned int *sorted_id, unsigned int *cstart, unsigned int *cend, unsigned int np);
-
 //private:
 // 	unsigned int *d_pair_idx;
 // 	unsigned int *d_pair_other;

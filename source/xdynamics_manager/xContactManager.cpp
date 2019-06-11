@@ -168,7 +168,8 @@ bool xContactManager::runCollision(
 	double *pos, double *vel, double *omega,
 	double *mass, double* inertia, double *force, double *moment,
 	unsigned int *sorted_id, unsigned int *cell_start,
-	unsigned int *cell_end, unsigned int np)
+	unsigned int *cell_end, unsigned int *cluster_index,
+	unsigned int np, unsigned int nc)
 {
 	if (xSimulation::Cpu())
 	{
@@ -180,7 +181,8 @@ bool xContactManager::runCollision(
 			mass,
 			(vector3d*)force,
 			(vector3d*)moment,
-			sorted_id, cell_start, cell_end, np
+			sorted_id, cell_start, cell_end,
+			cluster_index, np, nc
 		);
 	}
 	else if (xSimulation::Gpu())
@@ -252,9 +254,16 @@ void xContactManager::allocPairList(unsigned int np)
 	}
 }
 
-void xContactManager::updateCollisionPair(vector4d* pos, unsigned int* sorted_id, unsigned int* cell_start, unsigned int* cell_end, unsigned int np)
+void xContactManager::updateCollisionPair(
+	vector4d* pos, 
+	unsigned int* sorted_id,
+	unsigned int* cell_start,
+	unsigned int* cell_end,
+	unsigned int* cluster_index,
+	unsigned int np,
+	unsigned int nc)
 {
-	for (unsigned int i = 0; i < np; i++)
+	for (unsigned int i = 0; i < np + nc; i++)
 	{
 		unsigned int count = 0;
 		vector3d p = new_vector3d(pos[i].x, pos[i].y, pos[i].z);
@@ -277,6 +286,9 @@ void xContactManager::updateCollisionPair(vector4d* pos, unsigned int* sorted_id
 							unsigned int k = sorted_id[j];
 							if (i != k && k < np)
 							{
+								unsigned int ci = cluster_index[(k - np) * 2 + 1];
+								if (i == ci)
+									continue;
 								vector3d jp = new_vector3d(pos[k].x, pos[k].y, pos[k].z);
 								double jr = pos[k].w;
 								cpp->updateCollisionPair(k, xcpl[i], r, jr, p, jp);
@@ -331,10 +343,22 @@ void xContactManager::deviceCollision(
 	cu_decide_rolling_friction_moment(d_Tmax, d_RRes, inertia, omega, moment, np);
 }
 
-void xContactManager::hostCollision(vector4d *pos, vector3d *vel, vector3d *omega, double *mass, vector3d *force, vector3d *moment, unsigned int *sorted_id, unsigned int *cell_start, unsigned int *cell_end, unsigned int np)
+void xContactManager::hostCollision(
+	vector4d *pos, 
+	vector3d *vel, 
+	vector3d *omega, 
+	double *mass, 
+	vector3d *force, 
+	vector3d *moment, 
+	unsigned int *sorted_id,
+	unsigned int *cell_start,
+	unsigned int *cell_end,
+	unsigned int *cluster_index,
+	unsigned int np,
+	unsigned int nc)
 {
-	updateCollisionPair(pos, sorted_id, cell_start, cell_end, np);
-	for (unsigned int i = 0; i < np; i++)
+	updateCollisionPair(pos, sorted_id, cell_start, cell_end, cluster_index, np, nc);
+	for (unsigned int i = 0; i < np + nc; i++)
 	{
 		vector3d F = new_vector3d(0.0, 0.0, 0.0);
 		vector3d M = new_vector3d(0.0, 0.0, 0.0);

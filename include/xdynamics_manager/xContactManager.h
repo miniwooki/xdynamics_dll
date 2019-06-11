@@ -44,13 +44,23 @@ public:
 		unsigned int *sorted_id,
 		unsigned int *cell_start,
 		unsigned int *cell_end,
-		unsigned int np);
+		unsigned int *cluster_index,
+		unsigned int np,
+		unsigned int nc);
 
 	void update();
 	void allocPairList(unsigned int np);
 
 private:
-	void updateCollisionPair(vector4d* pos, unsigned int* sorted_id, unsigned int* cell_start, unsigned int* cell_end, unsigned int np);
+	void updateCollisionPair(
+		vector4d* pos, 
+		unsigned int* sorted_id,
+		unsigned int* cell_start,
+		unsigned int* cell_end,
+		unsigned int* cluster_index,
+		unsigned int np,
+		unsigned int nc);
+
 	void deviceCollision(
 		double *pos, double *vel,
 		double *omega, double *mass, double* inertia,
@@ -59,6 +69,7 @@ private:
 		unsigned int *cell_start,
 		unsigned int *cell_end,
 		unsigned int np);
+
 	void hostCollision(
 		vector4d *pos, vector3d *vel,
 		vector3d *omega, double *mass,
@@ -66,7 +77,9 @@ private:
 		unsigned int *sorted_id,
 		unsigned int *cell_start,
 		unsigned int *cell_end,
-		unsigned int np);
+		unsigned int *cluster_index,
+		unsigned int np,
+		unsigned int nc);
 
 	unsigned int deviceContactCount(
 		double *pos, double *vel,

@@ -88,7 +88,7 @@ int wmain(int argc, wchar_t* argv[])
 			//xdm.xRunResultWorld(argv[2]);
 		//}
 		//return 0;
-		xdm->OpenModelXLS(L"C:/xDynamics/resource/triangle_contact_test.xls");
+		xdm->OpenModelXLS(L"C:/xDynamics/resource/cluster_test.xls");
 		//xdm->OpenModelXLS(L"C:/xDynamics/resource/four_bar3d.xls");
 	}
 	

@@ -78,8 +78,16 @@ void xParticleParticleContact::deviceContactCount(double* pos, unsigned int *sor
 // }
 
 void xParticleParticleContact::cppCollision(
-	xContactPairList* pairs, unsigned int i, vector4d *pos, vector3d *vel, 
-	vector3d *omega, double *mass, double &res, vector3d &tmax, vector3d& F, vector3d& M)
+	xContactPairList* pairs,
+	unsigned int i, 
+	vector4d *pos,
+	vector3d *vel, 
+	vector3d *omega,
+	double *mass, 
+	double &res, 
+	vector3d &tmax, 
+	vector3d& F, 
+	vector3d& M)
 {
 	foreach(xPairData* d, pairs->ParticlePair())
 	{
