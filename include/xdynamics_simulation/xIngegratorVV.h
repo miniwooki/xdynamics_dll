@@ -15,7 +15,7 @@ public:
 
 private:
 	void updatePosition(double* dpos, double* dvel, double* dacc, 
-		double* ep, double* ev, double* ea, double* o, unsigned int np);
+		double* ep, double* ev, double* ea, unsigned int np);
 	void updateVelocity(
 		double *dvel, double* dacc, double* ep, 
 		double *domega, double* dalpha, 

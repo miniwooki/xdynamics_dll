@@ -43,13 +43,13 @@ int xIntegratorVV::OneStepSimulation(double ct, unsigned int cstep)
 
 void xIntegratorVV::updatePosition(
 	double* dpos, double* dvel, double* dacc,
-	double* ep, double* ev, double* ea, double* o, unsigned int np)
+	double* ep, double* ev, double* ea, unsigned int np)
 {
 	if (xSimulation::Gpu())
 		vv_update_position(dpos, dvel, dacc,/* ep, ev, ea,*/ np);
-	else if (np != ns)
+	else if (xDiscreteElementMethodSimulation::np != ns)
 	{
-		updateClusterPosition(dpos, NULL, dvel, dacc, ep, o, ea,
+		updateClusterPosition(dpos, NULL, dvel, dacc, ep, ev, ea,
 			xdem->XParticleManager()->ClusterIndex(), xdem->XParticleManager()->ClusterCount(),
 			xdem->XParticleManager()->ClusterBegin(), xdem->XParticleManager()->ClusterRelativeLocation(), np);
 	}
@@ -90,12 +90,12 @@ void xIntegratorVV::updateVelocity(
 			inv_i = 1.0 / dinertia[i];
 			v[i] += 0.5 * xSimulation::dt * a[i];
 			o[i] += 0.5 * xSimulation::dt * aa[i];
-			a[i] = inv_m * f[i];
+			a[i] = inv_m * (f[i] + dmass[i] * xModel::gravity);
 			//vector4d rF = 2.0 * GMatrix(r[i]) * m[i] + GlobalSphereInertiaForce(o[i], dinertia[i], r[i]);
 			aa[i] = inv_i * m[i];
 			v[i] += 0.5 * xSimulation::dt * a[i];
 			o[i] += 0.5 * xSimulation::dt * aa[i];
-			f[i] = dmass[i] * xModel::gravity;
+			f[i] = new_vector3d(0.0, 0.0, 0.0);
 			m[i] = new_vector3d(0.0, 0.0, 0.0);
 		}
 	}

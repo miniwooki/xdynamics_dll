@@ -102,7 +102,9 @@ void xParticleParticleContact::cppCollision(
 			mass[i], mass[j],
 			mpp.Ei, mpp.Ej,
 			mpp.Pri, mpp.Prj,
-			mpp.Gi, mpp.Gj);
+			mpp.Gi, mpp.Gj,
+			restitution, stiffnessRatio,
+			friction, rolling_factor, cohesion);
 		switch (force_model)
 		{
 		case DHS: DHSModel(c, d->gab, d->delta_s, d->dot_s, cp, rv, u, m_fn, m_ft, m_m); break;
@@ -128,6 +130,14 @@ void xParticleParticleContact::updateCollisionPair(unsigned int id, xContactPair
 			*pd = { PARTICLES, 0, id, 0, 0, cdist, u.x, u.y, u.z };
 			xcpl.insertParticleContactPair(pd);
 		}		
+		else
+		{
+			xPairData *pd = xcpl.ParticlePair(id);
+			pd->gab = cdist;
+			pd->nx = u.x;
+			pd->ny = u.y;
+			pd->nz = u.z;
+		}
 	}
 	else
 	{

@@ -199,19 +199,22 @@ bool xParticlePlanesContact::cpplCollision(
 		vector3d m_ft = new_vector3d(0.0, 0.0, 0.0);
 		double rcon = r - 0.5 * d->gab;
 		vector3d u = new_vector3d(d->nx, d->ny, d->nz);
-		vector3d cp = rcon * u;
-		vector3d dv = -v;
+		vector3d cp = r * u;
+		vector3d dv = -v - cross(o, cp);
+		xContactMaterialParameters cmp = hcmp[d->id];
 		xContactParameters c = getContactParameters(
 			r, 0.0,
 			m, 0.0,
 			xmps[d->id].Ei, xmps[d->id].Ej,
 			xmps[d->id].Pri, xmps[d->id].Prj,
-			xmps[d->id].Gi, xmps[d->id].Gj);
+			xmps[d->id].Gi, xmps[d->id].Gj, 
+			cmp.restitution, cmp.stiffness_ratio,
+			cmp.friction, cmp.rolling_friction, cmp.cohesion);
 		switch (force_model)
 		{
 		case DHS: DHSModel(c, d->gab, d->delta_s, d->dot_s, cp, dv, u, m_fn, m_ft, m_m); break;
 		}
-		RollingResistanceForce(rolling_factor, r, 0.0, cp, m_fn, m_ft, res, tmax);
+		RollingResistanceForce(c.rfric, r, 0.0, cp, m_fn, m_ft, res, tmax);
 		F += m_fn + m_ft;
 		M += m_m;
 	}
@@ -240,6 +243,14 @@ void xParticlePlanesContact::updateCollisionPair(
 				xPairData *pd = new xPairData;
 				*pd = { PLANE_SHAPE, 0, i, 0, 0, cdist, u.x, u.y, u.z };
 				xcpl.insertPlaneContactPair(pd);
+			}
+			else
+			{
+				xPairData *pd = xcpl.PlanePair(i);
+				pd->gab = cdist;
+				pd->nx = u.x;
+				pd->ny = u.y;
+				pd->nz = u.z;
 			}
 		}
 		else

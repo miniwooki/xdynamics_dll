@@ -23,6 +23,7 @@ xContactManager::xContactManager()
 	, d_tsd_ptri(NULL)
 	, d_Tmax(NULL)
 	, d_RRes(NULL)
+	, xcpl(NULL)
 	, Tmax(NULL)
 	, RRes(NULL)
 
@@ -38,6 +39,7 @@ xContactManager::~xContactManager()
  	if (cpplane) delete cpplane; cpplane = NULL;
 	if (Tmax) delete[] Tmax; Tmax = NULL;
 	if (RRes) delete[] RRes; RRes = NULL;
+	if (xcpl) delete[] xcpl; xcpl = NULL;
 
 	if (d_pair_count_pp) checkCudaErrors(cudaFree(d_pair_count_pp)); d_pair_count_pp = NULL;
 	if (d_pair_count_ppl) checkCudaErrors(cudaFree(d_pair_count_ppl)); d_pair_count_ppl = NULL;
@@ -179,6 +181,7 @@ bool xContactManager::runCollision(
 			(vector3d*)vel,
 			(vector3d*)omega,
 			mass,
+			inertia,
 			(vector3d*)force,
 			(vector3d*)moment,
 			sorted_id, cell_start, cell_end,
@@ -286,9 +289,9 @@ void xContactManager::updateCollisionPair(
 							unsigned int k = sorted_id[j];
 							if (i != k && k < np)
 							{
-								unsigned int ci = cluster_index[(k - np) * 2 + 1];
-								if (i == ci)
-									continue;
+								//unsigned int ci = cluster_index[(k - np) * 2 + 1];
+// 								if (i == ci)
+// 									continue;
 								vector3d jp = new_vector3d(pos[k].x, pos[k].y, pos[k].z);
 								double jr = pos[k].w;
 								cpp->updateCollisionPair(k, xcpl[i], r, jr, p, jp);
@@ -348,6 +351,7 @@ void xContactManager::hostCollision(
 	vector3d *vel, 
 	vector3d *omega, 
 	double *mass, 
+	double* inertia,
 	vector3d *force, 
 	vector3d *moment, 
 	unsigned int *sorted_id,
@@ -358,7 +362,7 @@ void xContactManager::hostCollision(
 	unsigned int ns,
 	unsigned int nc)
 {
-	updateCollisionPair(pos, sorted_id, cell_start, cell_end, cluster_index, ns, nc);
+	updateCollisionPair(pos, sorted_id, cell_start, cell_end, cluster_index, np, nc);
 	for (unsigned int i = 0; i < np + nc; i++)
 	{
 		vector3d F = new_vector3d(0.0, 0.0, 0.0);
@@ -370,12 +374,22 @@ void xContactManager::hostCollision(
 		vector3d v = vel[i];
 		vector3d o = omega[i];
 		double m = mass[i];
+		double j = inertia[i];
 		double r = pos[i].w;
 		cpplane->cpplCollision(pairs, r, m, p, v, o, R, T, F, M);
 		cpp->cppCollision(pairs, i, pos, vel, omega, mass, R, T, F, M);
 		cpmeshes->cppolyCollision(pairs, r, m, p, v, o, R, T, F, M);
 		force[i] += F;
 		moment[i] += M;
+
+		vector3d _Tmax = j * xSimulation::dt * o - T;
+		if (length(_Tmax) && R)
+		{
+			vector3d _Tr = R * (_Tmax / length(_Tmax));
+			if (length(_Tr) >= length(_Tmax))
+				_Tr = _Tmax;
+			moment[i] += _Tr;
+		}
 	}
 	// 		foreach(xPairData* d, pairs->PlanePair())
 	// 		{

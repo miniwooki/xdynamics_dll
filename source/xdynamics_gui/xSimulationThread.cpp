@@ -135,6 +135,7 @@ void xSimulationThread::run()
 			eachStep = 0;
 		}
 		sendProgress(cstep, "");
+
 	}
 	elapsed_time = tme.elapsed() * 0.001;
 	total_time += elapsed_time;

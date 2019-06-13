@@ -46,6 +46,8 @@ void xContactPairList::deletePlanePairData(unsigned int i)
 
 void xContactPairList::deleteParticlePairData(unsigned int i)
 {
+	if (particle_pair.size())
+		i = i;
 	if (particle_pair.find(i) != particle_pair.end())
 	{
 		xPairData* pd = particle_pair.take(i);
@@ -97,7 +99,10 @@ QMap<unsigned int, xPairData*>& xContactPairList::ParticlePair()
 
 xPairData* xContactPairList::ParticlePair(unsigned int i)
 {
-	return NULL;
+	QMap<unsigned int, xPairData*>::const_iterator it = particle_pair.find(i);
+	if (it == particle_pair.constEnd())
+		return NULL;
+	return particle_pair[i];
 }
 
 QMap<unsigned int, xTrianglePairData*>& xContactPairList::TrianglePair()

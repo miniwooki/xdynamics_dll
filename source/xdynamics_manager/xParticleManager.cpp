@@ -109,7 +109,7 @@ unsigned int* xParticleManager::ClusterIndex()
 
 unsigned int * xParticleManager::ClusterCount()
 {
-	return return cluster_count;
+	return cluster_count;
 }
 
 unsigned int * xParticleManager::ClusterBegin()
@@ -490,7 +490,7 @@ bool xParticleManager::SetMassAndInertia(double *mass, double *inertia)
 		for (unsigned int i = 0; i < xpo->NumParticle(); i++)
 		{
 			double m = d * (4.0 / 3.0) * M_PI * pow(v[i].w, 3.0);
-			double J = (2.0 / 5.0) * mass[i + sid] * pow(v[i].w, 2.0);
+			double J = (2.0 / 5.0) * m * pow(v[i].w, 2.0);
 			if (xpo->ShapeForm() == CLUSTER_SHAPE && !(i % xpo->EachCount()))
 			{
 				mass[c + sid] = m;
@@ -601,13 +601,12 @@ void xParticleManager::AddParticleCreatingCondition(xParticleObject* xpo, xParti
 	
 	while (1)
 	{
-		if (k * xpo->EachCount() > xpo->NumParticle())
-			break;
-		vector4d* pos = xpo->Position() + k * xpo->EachCount();
 		if ((k + 1) * xpo->EachCount() > xpo->NumParticle())
 			it = xpo->NumParticle() - k * xpo->EachCount();
 		else
 			it = xpo->EachCount();
+		vector4d* pos = pos = xpo->Position() + k * xpo->EachCount();
+					
 		for (unsigned int i = 0; i < it; i++)
 		{
 			pList.push_back(pos[i]);
@@ -616,6 +615,7 @@ void xParticleManager::AddParticleCreatingCondition(xParticleObject* xpo, xParti
 		foreach(vector4d v, pList)
 		{
 			if (over > it) break;
+			while (*iter >= it) { iter++; }
 			pos[*iter] = v;
 			iter++;
 			over++;
@@ -623,6 +623,9 @@ void xParticleManager::AddParticleCreatingCondition(xParticleObject* xpo, xParti
 		iter = iList.begin();
 		pList.clear();
 		k++;
+		if (k * xpo->EachCount() > xpo->NumParticle())
+			break;
+
 	}
 }
 

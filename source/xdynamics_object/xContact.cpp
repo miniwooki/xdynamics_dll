@@ -108,23 +108,32 @@ double xContact::RollingFactor() const
 	return rolling_factor;
 }
 
-xContactParameters xContact::getContactParameters(double ir, double jr, double im, double jm, double iE, double jE, double ip, double jp, double is, double js)
+xContactParameters xContact::getContactParameters(
+	double ir, double jr, 
+	double im, double jm, 
+	double iE, double jE, 
+	double ip, double jp, 
+	double is, double js,
+	double rest, double ratio,
+	double fric, double rfric, double coh)
 {
 	xContactParameters cp;
 	double Meq = jm ? (im * jm) / (im + jm) : im;
 	double Req = jr ? (ir * jr) / (ir + jr) : ir;
 	double Eeq = (iE * jE) / (iE*(1 - jp*jp) + jE*(1 - ip * ip));
 	cp.coh_e = ((1.0 - ip * ip) / iE) + ((1.0 - jp * jp) / jE);
-	double lne = log(restitution);
+	double lne = log(rest);
 	double beta = 0.0;
 // 	switch (f_type)
 // 	{
 // 	case DHS:
-	beta = (M_PI / log(restitution));
+	beta = (M_PI / log(rest));
 	cp.kn = (4.0 / 3.0) * Eeq * sqrt(Req);
 	cp.vn = sqrt((4.0 * Meq * cp.kn) / (1.0 + beta * beta));
-	cp.ks = cp.kn * stiffnessRatio;
-	cp.vs = cp.vn * stiffnessRatio;
+	cp.ks = cp.kn * ratio;
+	cp.vs = cp.vn * ratio;
+	cp.fric = fric;
+	cp.rfric = rfric;
 //		break;
 	//}
 	cp.coh_r = Req;
@@ -171,7 +180,7 @@ void xContact::DHSModel(
 		dots = s_dot;
 		//double ds = mag_e * xSimulation::dt;
 		double ft1 = c.ks * ds + c.vs * dot(dv, s_hat);
-		double ft2 = friction * length(Fn);
+		double ft2 = c.fric * length(Fn);
 		Ft = min(ft1, ft2) * s_hat;
 		M = cross(cp, Ft);
 	}

@@ -54,83 +54,17 @@ int xIntegratorHHT::Initialize(xMultiBodyModel* _xmbd)
 	{
 		return xDynamicsError::xdynamicsErrorMultiBodyModelInitialization;
 	}
-	//multibodyDynamics::nnz = 0;
+
 	alpha = -0.3;
 	beta = (1 - alpha) * (1 - alpha) / 4;
 	gamma = 0.5 - alpha;
 	eps = 1E-5;
-// 	int nm = xmbd->NumMass();
-// 	int nr = 0;
-// 	mdim = nm * xModel::OneDOF();
-// 	sdim = nm;
-// 	q.alloc(mdim + xModel::OneDOF());// = new double[mdim];
-// 	q_1.alloc(mdim + xModel::OneDOF());
-// 	qd.alloc(mdim + xModel::OneDOF());// = new double[mdim];
 	pre.alloc(mdim);// = new double[mdim];
 	ipp.alloc(mdim);// = new double[mdim];
 	ipv.alloc(mdim);// = new double[mdim];
 	
-// 	unsigned int idx = 0;
-// 	xPointMass* ground = xModel::Ground();
-// 	q(idx + 0) = ground->Position().x;
-// 	q(idx + 1) = ground->Position().y;
-// 	q(idx + 2) = ground->Position().z;
-// 	q(idx + 3) = ground->EulerParameters().e0;
-// 	q(idx + 4) = ground->EulerParameters().e1;
-// 	q(idx + 5) = ground->EulerParameters().e2;
-// 	q(idx + 6) = ground->EulerParameters().e3;
-// 	foreach(xPointMass* xpm, xmbd->Masses())
-// 	{
-// 		xpm->setXpmIndex(++idx);
-// 		idx = xpm->xpmIndex() * xModel::OneDOF();
-// 		q(idx + 0) = xpm->Position().x;			qd(idx + 0) = xpm->Velocity().x;
-// 		q(idx + 1) = xpm->Position().y;			qd(idx + 1) = xpm->Velocity().y;
-// 		q(idx + 2) = xpm->Position().z;			qd(idx + 2) = xpm->Velocity().z;
-// 		q(idx + 3) = xpm->EulerParameters().e0;	qd(idx + 3) = xpm->DEulerParameters().e0;
-// 		q(idx + 4) = xpm->EulerParameters().e1;	qd(idx + 4) = xpm->DEulerParameters().e1;
-// 		q(idx + 5) = xpm->EulerParameters().e2;	qd(idx + 5) = xpm->DEulerParameters().e2;
-// 		q(idx + 6) = xpm->EulerParameters().e3;	qd(idx + 6) = xpm->DEulerParameters().e3;
-// 		xpm->setupInertiaMatrix();
-// 		xpm->setupTransformationMatrix();
-// 		xpm->AllocResultMomory(xSimulation::npart);
-// 	}
-// 	foreach(xKinematicConstraint* xkc, xmbd->Joints())
-// 	{
-// 		sdim += xkc->NumConst();
-// 		std::string bn = xkc->BaseBodyName();
-// 		std::string an = xkc->ActionBodyName();
-// 		int base_idx = bn == "ground" ? 0 : xmbd->XMass(bn)->xpmIndex();
-// 		int action_idx = an == "ground" ? 0 : xmbd->XMass(an)->xpmIndex();
-// 		xkc->setBaseBodyIndex(base_idx);
-// 		xkc->setActionBodyIndex(action_idx);
-// 		xkc->AllocResultMemory(xSimulation::npart);
-// 	}
-// 	foreach(xForce* xf, xmbd->Forces())
-// 	{
-// 		std::string bn = xf->BaseBodyName();
-// 		std::string an = xf->ActionBodyName();
-// 		int base_idx = bn == "ground" ? 0 : xmbd->XMass(bn)->xpmIndex();
-// 		int action_idx = an == "ground" ? 0 : xmbd->XMass(an)->xpmIndex();
-// 		xf->setBaseBodyIndex(base_idx);
-// 		xf->setActionBodyIndex(action_idx);
-// 	}
-// 	dof = mdim - sdim;
-// 	if (dof < 0)
-// 	{
-// 		xLog::log("There are " + xstring(-dof) + "redundant constraint equations");
-// 		return xDynamicsError::xdynamicsErrorMultiBodyModelRedundantCondition;
-// 	}
-// 	tdim = mdim + sdim;
-// 	lhs.alloc(tdim, tdim);// new_matrix(tdim, tdim);
-// 	cjaco.alloc(sdim * mdim);
 	ee.alloc(tdim);// = new double[tdim];
-//	rhs.alloc(tdim);// = new double[tdim];
-// 	xPointMass* xpm = xmbd->BeginPointMass();
-// 	while (xpm != xmbd->EndPointMass())
-// 	{
-// 		
-// 		xpm = xmbd->NextPointMass();
-// 	}
+
 	dt2accp = xSimulation::dt*xSimulation::dt*(1.0 - 2.0 * beta)*0.5;
 	dt2accv = xSimulation::dt*(1.0 - gamma);
 	dt2acc = xSimulation::dt*xSimulation::dt*beta;
@@ -142,17 +76,7 @@ int xIntegratorHHT::Initialize(xMultiBodyModel* _xmbd)
 	for (unsigned int i(0); i < cjaco.NNZ(); i++){
 		lhs(cjaco.ridx[i] + mdim, cjaco.cidx[i]) = lhs(cjaco.cidx[i], cjaco.ridx[i] + mdim) = cjaco.value[i];
 	}
-// 	std::ofstream qf;
-// 	qf.open("C:/xdynamics/lhs.txt", std::ios::out);
-// 	for (unsigned int i = 0; i < tdim; i++)
-// 	{
-// 		for (unsigned int j = 0; j < tdim; j++)
-// 		{
-// 			qf << lhs(i, j) << " ";
-// 		}
-// 		qf << std::endl;
-// 	}
-// 	qf.close();
+
 	int ret = LinearSolve(tdim, 1, lhs, tdim, rhs, tdim);
 	if (ret)
 		return xDynamicsError::xdynamicsErrorLinearEquationCalculation;
@@ -172,7 +96,6 @@ int xIntegratorHHT::OneStepSimulation(double ct, unsigned int cstep)
 	PredictionStep(ct, cstep);
 	int ret = CorrectionStep(ct, cstep);
 	return ret;
-	//return xDynamicsError::xdynamicsErrorLinearEquationCalculation;
 }
 
 void xIntegratorHHT::PredictionStep(double ct, unsigned int cstep)

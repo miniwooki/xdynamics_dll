@@ -49,7 +49,9 @@ public:
 		double im, double jm,
 		double iE, double jE,
 		double ip, double jp,
-		double is, double js);
+		double is, double js,
+		double rest, double ratio,
+		double fric, double rfric, double coh);
 	// 		contactForce_type cft, double rest, double ratio, double fric);
 	void setMaterialPair(xMaterialPair _mpp);// { mpp = _mpp; }
 

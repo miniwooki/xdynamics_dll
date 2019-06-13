@@ -108,7 +108,8 @@ __global__ void vv_update_velocity_kernel(
 	double3 av = omega[id];
 	//double3 aa = alpha[id];
 	double3 a = (1.0 / m) * (force[id] + m * cte.gravity);
-	//printf("[%f, %f, %f]", a.x, a.y, a.z);
+	/*if(length(force[id]) > 0)
+		printf("[%f, %f, %f]\n", force[id].x, force[id].y, force[id].z);*/
 	double3 in = (1.0 / iner[id]) * moment[id];
 	v += 0.5 * cte.dt * (acc[id] + a);
 	av += 0.5 * cte.dt * (alpha[id] + in);
@@ -679,6 +680,7 @@ __global__ void plane_contact_force_kernel(
 			}
 			calculate_previous_rolling_resistance(
 				cp->rfactor, r, 0, rc, Fn, Ft, res, tma);
+			printf("kn : %f, cn : %f, ks : %f, cs : %f", c.kn, c.vn, c.ks, c.vs);
 			sumF += Fn + Ft;
 			sumM += M;
 			tsd[new_count] = sd;

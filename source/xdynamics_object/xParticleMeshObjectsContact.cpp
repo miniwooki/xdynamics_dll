@@ -128,17 +128,20 @@ bool xParticleMeshObjectsContact::cppolyCollision(
 		vector3d mvel = new_vector3d(hmmi.vx, hmmi.vy, hmmi.vz);
 		vector3d momega = new_vector3d(hmmi.ox, hmmi.oy, hmmi.oz);
 		vector3d rv = mvel + cross(momega, po2cp) - (v + cross(o, rc));
+		xContactMaterialParameters cmp = hcp[j];
 		xContactParameters c = getContactParameters(
 			r, 0.0,
 			m, 0.0,
 			xmps[j].Ei, xmps[j].Ej,
 			xmps[j].Pri, xmps[j].Prj,
-			xmps[j].Gi, xmps[j].Gj);
+			xmps[j].Gi, xmps[j].Gj,
+			cmp.restitution, cmp.stiffness_ratio,
+			cmp.friction, cmp.rolling_friction, cmp.cohesion);
 		switch (force_model)
 		{
 		case DHS: DHSModel(c, d->gab, d->delta_s, d->dot_s, rc, rv, u, m_fn, m_ft, m_m); break;
 		}
-		RollingResistanceForce(rolling_factor, r, 0.0, rc, m_fn, m_ft, res, tmax);
+		RollingResistanceForce(c.rfric, r, 0.0, rc, m_fn, m_ft, res, tmax);
 		vector3d nforce = m_fn + m_ft;
 		F += nforce;
 		M += m_m;
@@ -355,6 +358,14 @@ bool xParticleMeshObjectsContact::updateCollisionPair(
 			*pd = { MESH_SHAPE, 0, id, 0, 0, cdist, unit.x, unit.y, unit.z, cpt.x, cpt.y, cpt.z };
 			xcpl.insertTriangleContactPair(pd);
 		}	
+		else
+		{
+			xTrianglePairData *pd = xcpl.TrianglePair(id);
+			pd->gab = cdist;
+			pd->nx = unit.x;
+			pd->ny = unit.y;
+			pd->nz = unit.z;
+		}
 		return true;
 	}
 	else

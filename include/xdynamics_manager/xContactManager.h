@@ -73,7 +73,7 @@ private:
 
 	void hostCollision(
 		vector4d *pos, vector3d *vel,
-		vector3d *omega, double *mass,
+		vector3d *omega, double *mass, double *inertia,
 		vector3d *force, vector3d *moment,
 		unsigned int *sorted_id,
 		unsigned int *cell_start,
