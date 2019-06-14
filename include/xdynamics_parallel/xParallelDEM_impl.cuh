@@ -680,7 +680,7 @@ __global__ void plane_contact_force_kernel(
 			}
 			calculate_previous_rolling_resistance(
 				cp->rfric, r, 0, rc, Fn, Ft, res, tma);
-			printf("kn : %f, cn : %f, ks : %f, cs : %f", c.kn, c.vn, c.ks, c.vs);
+			//printf("kn : %f, cn : %f, ks : %f, cs : %f", c.kn, c.vn, c.ks, c.vs);
 			sumF += Fn + Ft;
 			sumM += M;
 			tsd[new_count] = sd;
