@@ -496,7 +496,7 @@ __global__ void calculate_p2p_kernel(
 								break;
 							}
 							calculate_previous_rolling_resistance(
-								cp->rfactor, ir, jr, rc, Fn, Ft, res, tma);
+								cp->rfric, ir, jr, rc, Fn, Ft, res, tma);
 							sumF += Fn + Ft;
 							sumM += M;
 							tsd[new_count] = sd;
@@ -679,7 +679,7 @@ __global__ void plane_contact_force_kernel(
 				break;
 			}
 			calculate_previous_rolling_resistance(
-				cp->rfactor, r, 0, rc, Fn, Ft, res, tma);
+				cp->rfric, r, 0, rc, Fn, Ft, res, tma);
 			printf("kn : %f, cn : %f, ks : %f, cs : %f", c.kn, c.vn, c.ks, c.vs);
 			sumF += Fn + Ft;
 			sumM += M;
@@ -1116,7 +1116,7 @@ __global__ void particle_polygonObject_collision_kernel(
 									break;
 								}
 								calculate_previous_rolling_resistance(
-									cmp.rfactor, ir, 0, rc, Fn, Ft, res, tma);
+									cmp.rfric, ir, 0, rc, Fn, Ft, res, tma);
 								sum_force += Fn + Ft;
 								sum_moment += M;
 								dpmi[pidx].force += -(Fn + Ft);// +make_double3(1.0, 5.0, 9.0);

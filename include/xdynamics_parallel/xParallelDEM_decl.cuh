@@ -92,7 +92,6 @@ struct device_contact_property
 	double rfric;
 	double coh;
 	double sratio;
-	double rfactor;
 };
 
 

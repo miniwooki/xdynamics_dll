@@ -216,7 +216,7 @@ void xContact::cudaMemoryAlloc(unsigned int np)
 	device_contact_property hcp = device_contact_property
 	{
 		mpp.Ei, mpp.Ej, mpp.Pri, mpp.Prj, mpp.Gi, mpp.Gj,
-		restitution, friction, 0.0, cohesion, stiffnessRatio, rolling_factor
+		restitution, friction, rolling_factor, cohesion, stiffnessRatio
 	};
 	checkCudaErrors(cudaMalloc((void**)&dcp, sizeof(device_contact_property)));
 	checkCudaErrors(cudaMemcpy(dcp, &hcp, sizeof(device_contact_property), cudaMemcpyHostToDevice));
