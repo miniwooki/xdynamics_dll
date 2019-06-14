@@ -15,6 +15,8 @@
 *.v12.suo
 *.ipch
 *.opensdf
+*.txt
+*.pptx
 
 # Files for the ART/Dalvik VM
 *.dex
@@ -44,6 +46,9 @@ proguard/
 
 # Android Studio captures folder
 captures/
+
+# Folder
+extern/
 
 # IntelliJ
 *.iml
