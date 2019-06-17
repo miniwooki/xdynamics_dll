@@ -15,8 +15,6 @@
 *.v12.suo
 *.ipch
 *.opensdf
-*.txt
-*.pptx
 
 # Files for the ART/Dalvik VM
 *.dex
@@ -87,3 +85,5 @@ fastlane/readme.md
 *.idb
 *.pdb
 *.xml
+*.txt
+*.pptx

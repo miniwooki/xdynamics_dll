@@ -118,7 +118,9 @@ bool xParticleMeshObjectsContact::cppolyCollision(
 {
 	foreach(xTrianglePairData* d, pairs->TrianglePair())
 	{
-		vector3d m_fn, m_m, m_ft;
+		vector3d m_fn = new_vector3d(0.0, 0.0, 0.0);
+		vector3d m_m = new_vector3d(0, 0, 0);
+		vector3d m_ft = new_vector3d(0, 0, 0);
 		unsigned int j = hpi[d->id].id;
 		host_mesh_mass_info hmmi = hpmi[j];
 		double rcon = r - 0.5 * d->gab;
@@ -343,7 +345,7 @@ bool xParticleMeshObjectsContact::updateCollisionPair(
 		vector3d qp = hmi.Q - hmi.P;
 		vector3d rp = hmi.R - hmi.P;
 		vector3d unit = -cross(qp, rp);
-		unit = unit / length(unit);
+		unit = -unit / length(unit);
 		bool overlab = checkOverlab(ctype, ocpt, cpt, ounit, unit);
 		
 		if (overlab)
