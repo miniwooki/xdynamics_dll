@@ -18,8 +18,8 @@ xSmoothedParticleHydrodynamicsModel::xSmoothedParticleHydrodynamicsModel()
 	xsph_ptr = this;
 }
 
-xSmoothedParticleHydrodynamicsModel::xSmoothedParticleHydrodynamicsModel(std::string _name)
-	: name(QString::fromStdString(_name))
+xSmoothedParticleHydrodynamicsModel::xSmoothedParticleHydrodynamicsModel(std::wstring _name)
+	: name(QString::fromStdWString(_name))
 	, bound(DUMMY_PARTICLE_METHOD)
 	, pos(NULL)
 	, vel(NULL)
@@ -219,7 +219,7 @@ void xSmoothedParticleHydrodynamicsModel::CreateParticles(xObjectManager* xobj)
 // 	}
 }
 
-void xSmoothedParticleHydrodynamicsModel::ExportParticleDataForView(std::string& path)
+void xSmoothedParticleHydrodynamicsModel::ExportParticleDataForView(std::wstring& path)
 {
 	std::fstream of;
 	of.open(path, std::ios::out | std::ios::binary);

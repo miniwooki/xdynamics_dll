@@ -30,7 +30,7 @@ xClusterObject::xClusterObject()
 {
 }
 
-xClusterObject::xClusterObject(std::string name)
+xClusterObject::xClusterObject(std::wstring name)
 	: xObject(name, CLUSTER_SHAPE)
 	, nelement(0)
 	, radius(0)

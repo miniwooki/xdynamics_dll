@@ -20,7 +20,7 @@ public:
 
 	xPointMass(xShapeType _s = NO_SHAPE);
 	xPointMass(const xPointMass& xpm);
-	xPointMass(std::string _name, xShapeType _s = NO_SHAPE);
+	xPointMass(std::wstring _name, xShapeType _s = NO_SHAPE);
 	~xPointMass();
 
 	// Declaration set functions

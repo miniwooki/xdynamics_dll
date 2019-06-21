@@ -1,7 +1,7 @@
 #include "xViewExporter.h"
 //#include <QtCore/QFile>
 
-std::fstream *of = NULL;
+std::wfstream *of = NULL;
 
 xViewExporter::xViewExporter()
 {
@@ -13,18 +13,18 @@ xViewExporter::~xViewExporter()
 
 }
 
-void xViewExporter::Open(std::string path)
+void xViewExporter::Open(std::wstring path)
 {
-	of = new std::fstream;
+	of = new std::wfstream;
 	of->open(path, std::ios::out | std::ios::binary);
 	if (of->is_open())
 	{
 		int ver = VERSION_NUMBER;
-		of->write((char*)&ver, sizeof(int));
+		of->write((wchar_t*)&ver, sizeof(int));
 	}
 }
 
-void xViewExporter::Write(char* c, unsigned int sz)
+void xViewExporter::Write(wchar_t* c, unsigned int sz)
 {
 	if (of)
 	{

@@ -20,14 +20,14 @@ public:
 
 	void addObject(xObject* obj);
 	static xObjectManager* XOM();
-	xObject* XObject(std::string& ws);
+	xObject* XObject(std::wstring& ws);
 	QMap<QString, xObject*>& XObjects();
 
-	xLineObject* CreateLineShapeObject(std::string _name, int _xmt);
-	xPlaneObject* CreatePlaneShapeObject(std::string _name, int _xmt);
-	xCubeObject* CreateCubeShapeObject(std::string _name, int _xmt);
-	xMeshObject* CreateMeshShapeObject(std::string _name, int _xmt);
-	xClusterObject* CreateClusterShapeObject(std::string _name, int _xmt);
+	xLineObject* CreateLineShapeObject(std::wstring _name, int _xmt);
+	xPlaneObject* CreatePlaneShapeObject(std::wstring _name, int _xmt);
+	xCubeObject* CreateCubeShapeObject(std::wstring _name, int _xmt);
+	xMeshObject* CreateMeshShapeObject(std::wstring _name, int _xmt);
+	xClusterObject* CreateClusterShapeObject(std::wstring _name, int _xmt);
 
 	void CreateSPHBoundaryParticles(xParticleManager* xpm);
 

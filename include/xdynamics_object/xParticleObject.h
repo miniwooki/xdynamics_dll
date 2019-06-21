@@ -7,10 +7,11 @@ class XDYNAMICS_API xParticleObject : public xObject
 {
 public:
 	xParticleObject();
-	xParticleObject(std::string _name);
+	xParticleObject(std::wstring _name);
 	virtual ~xParticleObject();
 
 	void setStartIndex(unsigned int sid);
+	void setClusterStartIndex(unsigned int csid);
 	void setEachCount(unsigned int ec);
 	void setMinRadius(double _mr);
 	void setMaxRadius(double _mr);
@@ -18,8 +19,10 @@ public:
 	void setRelativeLocation(vector3d* rl);
 
 	vector4d* AllocMemory(unsigned int _np);
+	vector4d* AllocClusterMemory(unsigned int _np);
 
 	void CopyPosition(double* _pos);
+	void CopyClusterPosition(double* _pos, unsigned int* cindex);
 	unsigned int StartIndex() const;
 	unsigned int NumParticle() const;
 	unsigned int EachCount() const;
@@ -45,12 +48,15 @@ private:
 	static unsigned int xpo_count;
 	xShapeType form;
 	unsigned int sid;
+	unsigned int csid;
 	unsigned int np;
+	unsigned int cnp;
 	unsigned int each;
 	double min_radius;
 	double max_radius;
 
 	vector4d* pos;
+	vector4d* cpos;
 	vector3d *relative_loc;
 };
 

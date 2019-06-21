@@ -1,4 +1,5 @@
 #include "xdynamics_simulation/xMultiBodySimulation.h"
+#include <sstream>
 
 xMultiBodySimulation::xMultiBodySimulation()
 	: xSimulation()
@@ -94,10 +95,10 @@ int xMultiBodySimulation::Initialize(xMultiBodyModel* _xmbd)
 	foreach(xKinematicConstraint* xkc, xmbd->Joints())
 	{
 		sdim += xkc->NumConst();
-		std::string bn = xkc->BaseBodyName();
-		std::string an = xkc->ActionBodyName();
-		int base_idx = bn == "ground" ? 0 : xmbd->XMass(bn)->xpmIndex();
-		int action_idx = an == "ground" ? 0 : xmbd->XMass(an)->xpmIndex();
+		std::wstring bn = xkc->BaseBodyName();
+		std::wstring an = xkc->ActionBodyName();
+		int base_idx = bn == L"ground" ? 0 : xmbd->XMass(bn)->xpmIndex();
+		int action_idx = an == L"ground" ? 0 : xmbd->XMass(an)->xpmIndex();
 		xkc->setBaseBodyIndex(base_idx);
 		xkc->setActionBodyIndex(action_idx);
 		xkc->AllocResultMemory(xSimulation::npart);
@@ -109,18 +110,20 @@ int xMultiBodySimulation::Initialize(xMultiBodyModel* _xmbd)
 	}
 	foreach(xForce* xf, xmbd->Forces())
 	{
-		std::string bn = xf->BaseBodyName();
-		std::string an = xf->ActionBodyName();
-		int base_idx = bn == "ground" ? 0 : xmbd->XMass(bn)->xpmIndex();
-		int action_idx = an == "ground" ? 0 : xmbd->XMass(an)->xpmIndex();
+		std::wstring bn = xf->BaseBodyName();
+		std::wstring an = xf->ActionBodyName();
+		int base_idx = bn == L"ground" ? 0 : xmbd->XMass(bn)->xpmIndex();
+		int action_idx = an == L"ground" ? 0 : xmbd->XMass(an)->xpmIndex();
 		xf->setBaseBodyIndex(base_idx);
 		xf->setActionBodyIndex(action_idx);
 		//xf->setBaseLocalCoordinate();
 	}
 	dof = mdim - sdim;
+	std::wstringstream wss;
+	wss << dof;
 	if (dof < 0)
 	{
-		xLog::log("There are " + xUtilityFunctions::xstring(-dof) + "redundant constraint equations");
+		xLog::log(std::wstring(L"There are ") + wss.str() + std::wstring(L"redundant constraint equations"));
 		return xDynamicsError::xdynamicsErrorMultiBodyModelRedundantCondition;
 	}
 	else if (dof == 0)

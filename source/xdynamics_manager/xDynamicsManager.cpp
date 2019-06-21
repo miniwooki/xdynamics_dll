@@ -10,14 +10,14 @@
 #include <map>
 
 xDynamicsManager::xDynamicsManager()
-	: xModel("Model1")
+	: xModel(L"Model1")
 	, xmbd(NULL)
 	, xdem(NULL)
 	, xsph(NULL)
 	, xom(NULL)
 	, xcm(NULL)
 {
-	CreateModel(xModel::name.toStdString(), OBJECT);
+	CreateModel(xModel::name.toStdWString(), OBJECT);
 }
 
 xDynamicsManager::~xDynamicsManager()
@@ -57,7 +57,7 @@ bool xDynamicsManager::getSimulatorFromCommand(int argc, wchar_t* argv[])
 		stype = OpenModelXLS(argv1.c_str()/*argv[1]*/);
 	else
 	{
-		xLog::log("Error : Unsupported file format.");
+		xLog::log(L"Error : Unsupported file format.");
 		return false;
 	}
 		
@@ -127,9 +127,9 @@ bool xDynamicsManager::getSimulatorFromCommand(int argc, wchar_t* argv[])
 	return true;
 }
 
-xDiscreteElementMethodModel* xDynamicsManager::XDEMModel(std::string& _n)
+xDiscreteElementMethodModel* xDynamicsManager::XDEMModel(std::wstring& _n)
 {
-	QString n = QString::fromStdString(_n);
+	QString n = QString::fromStdWString(_n);
 	QStringList keys = xdems.keys();
 	QStringList::const_iterator it = qFind(keys, n);
 	if (it == keys.end() || !keys.size())
@@ -147,9 +147,9 @@ xSmoothedParticleHydrodynamicsModel* xDynamicsManager::XSPHModel()
 	return xsph;
 }
 
-xSmoothedParticleHydrodynamicsModel* xDynamicsManager::XSPHModel(std::string& n)
+xSmoothedParticleHydrodynamicsModel* xDynamicsManager::XSPHModel(std::wstring& n)
 {
-	QString nm = QString::fromStdString(n);
+	QString nm = QString::fromStdWString(n);
 	QStringList keys = xsphs.keys();
 	QStringList::const_iterator it = qFind(keys, nm);
 	if (it == keys.end() || !keys.size())
@@ -162,9 +162,9 @@ xObjectManager* xDynamicsManager::XObject()
 	return xom;
 }
 
-xObjectManager* xDynamicsManager::XObject(std::string& _n)
+xObjectManager* xDynamicsManager::XObject(std::wstring& _n)
 {
-	QString n = QString::fromStdString(_n);
+	QString n = QString::fromStdWString(_n);
 	QStringList keys = xoms.keys();
 	QStringList::const_iterator it = qFind(keys, n);
 	if (it == keys.end() || !keys.size())
@@ -177,9 +177,9 @@ xContactManager* xDynamicsManager::XContact()
 	return xcm;
 }
 
-xContactManager* xDynamicsManager::XContact(std::string& _n)
+xContactManager* xDynamicsManager::XContact(std::wstring& _n)
 {
-	QString n = QString::fromStdString(_n);
+	QString n = QString::fromStdWString(_n);
 	QStringList keys = xcms.keys();
 	QStringList::const_iterator it = qFind(keys, n);
 	if (it == keys.end() || !keys.size())
@@ -192,9 +192,9 @@ xMultiBodyModel* xDynamicsManager::XMBDModel()
 	return xmbd;
 }
 
-xMultiBodyModel* xDynamicsManager::XMBDModel(std::string& _n)
+xMultiBodyModel* xDynamicsManager::XMBDModel(std::wstring& _n)
 {
-	QString n = QString::fromStdString(_n);
+	QString n = QString::fromStdWString(_n);
 	QStringList keys = xmbds.keys();
 	QStringList::const_iterator it = qFind(keys, n);
 	if (it == keys.end() || !keys.size())
@@ -232,11 +232,11 @@ xDynamicsManager::solverType xDynamicsManager::OpenModelXLS(const wchar_t* n)
 		}
 		std::map<xXlsInputDataType, vector2i>::iterator bt = xx.begin();
 		std::map<xXlsInputDataType, vector2i>::iterator et = xx.end();
- 		std::string model_name = xModel::name.toStdString();
- 		std::string full_path = xModel::path.toStdString() + model_name + "/" + model_name;
+ 		std::wstring model_name = xModel::name.toStdWString();
+ 		std::wstring full_path = xModel::path.toStdWString() + model_name + L"/" + model_name;
  		//xUtilityFunctions::DeleteFilesInDirectory(xUtilityFunctions::xstring(xModel::path) + model_name);
  		//xUtilityFunctions
-		QString dDir = QString::fromStdString(full_path);
+		QString dDir = QString::fromStdWString(full_path);
 		QDir dir = QDir(dDir);
 		QStringList delFileList;
 		delFileList = dir.entryList(QStringList("*.*"), QDir::Files | QDir::NoSymLinks);
@@ -247,7 +247,7 @@ xDynamicsManager::solverType xDynamicsManager::OpenModelXLS(const wchar_t* n)
 		}
 		xViewExporter xve;
 
-		xve.Open(full_path + ".vmd");
+		xve.Open(full_path + L".vmd");
 		xls.setViewExporter(&xve);
 		//xls.CreateViewModelOutput(full_path + ".vmd");
 
@@ -303,13 +303,13 @@ xDynamicsManager::solverType xDynamicsManager::OpenModelXLS(const wchar_t* n)
 // 		}
 		if (xdem || xsph)
 		{
-			std::string pv_path = full_path + ".par";
+			std::wstring pv_path = full_path + L".par";
 			if(xdem) xdem->XParticleManager()->ExportParticleDataForView(pv_path);
-			else if (xsph) xsph->ExportParticleDataForView(pv_path);
+			//else if (xsph) xsph->ExportParticleDataForView(pv_path);
 			int vot = VPARTICLE;
-			xve.Write((char*)&vot, sizeof(xViewObjectType));
-			int ns = pv_path.size(); xve.Write((char*)&ns, sizeof(int));
-			xve.Write((char*)pv_path.c_str(), sizeof(char)*pv_path.size());
+			xve.Write((wchar_t*)&vot, sizeof(xViewObjectType));
+			int ns = pv_path.size(); xve.Write((wchar_t*)&ns, sizeof(int));
+			xve.Write((wchar_t*)pv_path.c_str(), sizeof(wchar_t)*pv_path.size());
 		}
 // 		foreach(xObject* xo, xom->XObjects())
 // 		{
@@ -329,7 +329,7 @@ xDynamicsManager::solverType xDynamicsManager::OpenModelXLS(const wchar_t* n)
 	return stype;
 }
 
-void xDynamicsManager::CreateModel(std::string n, modelType t, bool isOnAir /*= false*/)
+void xDynamicsManager::CreateModel(std::wstring n, modelType t, bool isOnAir /*= false*/)
 {
 	QString qname = xModel::name;
 	switch (t)
@@ -342,10 +342,10 @@ void xDynamicsManager::CreateModel(std::string n, modelType t, bool isOnAir /*= 
 	}
 
 	if (isOnAir)
-		setOnAirModel(t, qname.toStdString());
+		setOnAirModel(t, qname.toStdWString());
 }
 
-void xDynamicsManager::setOnAirModel(modelType t, std::string n)
+void xDynamicsManager::setOnAirModel(modelType t, std::wstring n)
 {
 	switch (t)
 	{

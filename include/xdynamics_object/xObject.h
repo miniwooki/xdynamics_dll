@@ -10,7 +10,7 @@ class XDYNAMICS_API xObject
 {
 public:
 	xObject(xShapeType _s = NO_SHAPE);
-	xObject(std::string _name, xShapeType _s = NO_SHAPE);
+	xObject(std::wstring _name, xShapeType _s = NO_SHAPE);
 	xObject(const xObject& o);
 	virtual ~xObject();
 

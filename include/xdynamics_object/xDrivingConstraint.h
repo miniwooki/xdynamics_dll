@@ -11,7 +11,7 @@ class XDYNAMICS_API xDrivingConstraint
 public:
 	enum { ROTATION_DRIVING = 0, TRANSLATION_DRIVING };
 	xDrivingConstraint();
-	xDrivingConstraint(std::string _name, xKinematicConstraint* _kc);
+	xDrivingConstraint(std::wstring _name, xKinematicConstraint* _kc);
 	~xDrivingConstraint();
 
 	void define(xVectorD& q);

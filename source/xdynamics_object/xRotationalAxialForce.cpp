@@ -9,7 +9,7 @@ xRotationalAxialForce::xRotationalAxialForce()
 	memset(&f0_i.x, 0, sizeof(double) * 12);
 }
 
-xRotationalAxialForce::xRotationalAxialForce(std::string _name)
+xRotationalAxialForce::xRotationalAxialForce(std::wstring _name)
 	: xForce(_name, RAXIAL)
 	, location(new_vector3d(0.0, 0.0, 0.0))
 	, direction(new_vector3d(0.0, 0.0, 0.0))

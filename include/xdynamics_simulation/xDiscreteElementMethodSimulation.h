@@ -38,6 +38,7 @@ protected:
 	xDiscreteElementMethodModel* xdem;
 	xGridCell* dtor;
 	xContactManager* xcm;
+	unsigned int *cindex;
 	double *mass;
 	double *inertia;
 	double *pos;

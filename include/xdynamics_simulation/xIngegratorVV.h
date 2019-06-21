@@ -14,7 +14,7 @@ public:
 	virtual int OneStepSimulation(double ct, unsigned int cstep);
 
 private:
-	void updatePosition(double* dpos, double* dvel, double* dacc, 
+	void updatePosition(double* dpos, double* dcpos, double* dvel, double* dacc, 
 		double* ep, double* ev, double* ea, unsigned int np);
 	void updateVelocity(
 		double *dvel, double* dacc, double* ep, 
@@ -24,12 +24,12 @@ private:
 	void updateClusterPosition(
 		double *dpos, double* dcpos, double * dvel, double * dacc,
 		double *ep, double * domega, double * dalpha,
-		unsigned int* cidx, unsigned int* ccnt, unsigned int* cbegin, double* cdata, unsigned int np);
+		unsigned int* cidx, unsigned int* ccnt, unsigned int* cbegin, vector3d* cdata, unsigned int np);
 	void updateClusterVelocity(
 		double *dpos, double* dcpos, double * dvel, double * dacc,
 		double *ep, double * domega, double * dalpha, double *dforce, double* dmoment,
-		double *dmass, double* dinertia, unsigned int* cidx, unsigned int* ccnt,  unsigned int* cbegin, double* cdata,
-		unsigned int np, unsigned int nc);
+		double *dmass, double* dinertia, unsigned int* cidx, 
+		unsigned int* ccnt,  unsigned int* cbegin, vector3d* cdata, unsigned int np);
 
 	unsigned int m_np;
 //	void integrationQuaternion(double * quat, double * omega, double * moment, double * alpha, double * inertia, unsigned int np);

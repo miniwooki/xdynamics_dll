@@ -10,7 +10,7 @@ class XDYNAMICS_API xParticlePlaneContact : public xContact
 {
 public:
 	xParticlePlaneContact();
-	xParticlePlaneContact(std::string _name);
+	xParticlePlaneContact(std::wstring _name);
 	xParticlePlaneContact(const xContact& xc);
 	virtual ~xParticlePlaneContact();
 

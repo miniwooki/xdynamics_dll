@@ -13,7 +13,7 @@ class XDYNAMICS_API xSmoothedParticleHydrodynamicsModel
 {
 public:
 	xSmoothedParticleHydrodynamicsModel();
-	xSmoothedParticleHydrodynamicsModel(std::string _name);
+	xSmoothedParticleHydrodynamicsModel(std::wstring _name);
 	~xSmoothedParticleHydrodynamicsModel();
 
 	static xSmoothedParticleHydrodynamicsModel* XSPH();
@@ -31,7 +31,7 @@ public:
 	bool CheckCorner(vector3d p);
 	void DefineCorners(xObjectManager* xobj);
 	void CreateParticles(xObjectManager* xobj);
-	void ExportParticleDataForView(std::string& path);
+	void ExportParticleDataForView(std::wstring& path);
 
 	unsigned int NumTotalParticle();
 	unsigned int NumFluid();

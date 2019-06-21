@@ -248,7 +248,7 @@ void xParticleMeshObjectsContact::updateMeshObjectData()
 		{
 			ePolySphere += pobj->NumTriangle();
 			cu_update_meshObjectData(dvList, dsphere, dpi, dpmi, dep, ePolySphere - bPolySphere);
-			bPolySphere += ePolySphere;
+			bPolySphere += pobj->NumTriangle();// ePolySphere;
 		}
 	}
 	else
@@ -404,7 +404,7 @@ void xParticleMeshObjectsContact::cudaMemoryAlloc(unsigned int np)
 		ePolySphere += pobj->NumTriangle();
 		//unsigned int *iList = pobj->IndexList();
 		checkCudaErrors(cudaMemcpy(dvList + bPolySphere * 9, vList, sizeof(double) * pobj->NumTriangle() * 9, cudaMemcpyHostToDevice));
-		bPolySphere += ePolySphere;
+		bPolySphere += pobj->NumTriangle();// ePolySphere;
 	}
 	delete[] _hcp;
 }

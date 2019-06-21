@@ -11,7 +11,7 @@ class XDYNAMICS_API xCubeObject : public xPointMass
 {
 public:
 	xCubeObject();
-	xCubeObject(std::string _name);
+	xCubeObject(std::wstring _name);
 	xCubeObject(const xCubeObject& _cube);
 	virtual ~xCubeObject();
 

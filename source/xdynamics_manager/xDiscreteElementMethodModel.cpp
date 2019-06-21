@@ -7,8 +7,8 @@ xDiscreteElementMethodModel::xDiscreteElementMethodModel()
 	xpmgr = new xParticleManager;
 }
 
-xDiscreteElementMethodModel::xDiscreteElementMethodModel(std::string _name)
-	: name(QString::fromStdString(_name))
+xDiscreteElementMethodModel::xDiscreteElementMethodModel(std::wstring _name)
+	: name(QString::fromStdWString(_name))
 	, xpmgr(NULL)
 {
 	xpmgr = new xParticleManager;

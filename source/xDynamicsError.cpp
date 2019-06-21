@@ -3,7 +3,7 @@
 #include "xdynamics_manager/xModel.h"
 #include <iostream>
 
-char xDynamicsError::err[] = "";
+wchar_t xDynamicsError::err[] = L"";
 
 xDynamicsError::xDynamicsError()
 {
@@ -15,7 +15,7 @@ xDynamicsError::~xDynamicsError()
 
 }
 
-char* xDynamicsError::getErrorString()
+wchar_t* xDynamicsError::getErrorString()
 {
 	return err;
 }
@@ -24,7 +24,7 @@ bool xDynamicsError::_check(int result, char const *const func, const char* cons
 {
 	if (result)
 	{
-		sprintf_s(err, "XDynamics error at %s:%d code=%d(%s) \"%s\" \n", file, line, result, _xdynamicsGetErrorEnum(result), func);
+		swprintf_s(err, L"XDynamics error at %hs:%d code=%d(%ws) \"%hs\" \n", file, line, result, _xdynamicsGetErrorEnum(result), func);
 		xLog::log(err);// std::cout << err << std::endl;//printf("%s", err);
 		//return result;
 		//xdynamicsReset();
@@ -33,20 +33,20 @@ bool xDynamicsError::_check(int result, char const *const func, const char* cons
 	return result;
 }
 
-char * xDynamicsError::_xdynamicsGetErrorEnum(int error)
+wchar_t * xDynamicsError::_xdynamicsGetErrorEnum(int error)
 {
 	switch (error)
 	{
 	case xdynamicsErrorMultiBodySimulationHHTIterationOver:
 		//eStr = "N-R iteration of HHT integrator is over.";
-		return "xdynamicsErrorMultiBodySimulationHHTIterationOver";
+		return L"xdynamicsErrorMultiBodySimulationHHTIterationOver";
 	case xdynamicsErrorLinearEquationCalculation:
 		//eStr = "Calculation of linear solver(LAPACK) is failed.";
-		return "xdynamicsErrorLinearEquationCalculation";
+		return L"xdynamicsErrorLinearEquationCalculation";
 	case xdynamicsErrorMultiBodyModelInitialization:
-		return "xdynamicsErrorMultiBodyModelInitialization";
+		return L"xdynamicsErrorMultiBodyModelInitialization";
 	case xdynamicsErrorMultiBodyModelRedundantCondition:
-		return "xdynamicsErrorMultiBodyModelRedundantCondition";
+		return L"xdynamicsErrorMultiBodyModelRedundantCondition";
 	}
 	return NULL;
 }

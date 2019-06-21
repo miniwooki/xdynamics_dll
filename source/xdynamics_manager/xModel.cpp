@@ -29,14 +29,14 @@ xModel::xModel()
 // 	delete pv;
 }
 
-xModel::xModel(const QString _name)
+xModel::xModel(const std::wstring _name)
 {
-	name = _name;
-	std::cout << _name.toStdString() << std::endl;
+	name = QString::fromStdWString(_name);
+	std::wcout << _name << std::endl;
 	xUtilityFunctions::CreateDirectory(path.toStdWString().c_str());
 	if (!ground)
 	{
-		ground = new xPointMass("ground");
+		ground = new xPointMass(L"ground");
 		ground->setXpmIndex(-1);
 	}
 }
@@ -78,12 +78,12 @@ void xModel::setModelName(const QString n)
 		name = n;// wsprintfW(name, TEXT("%s"), n);
 		QString full_path = path + name + "/";
 		xUtilityFunctions::CreateDirectory(full_path.toStdWString().c_str());
-		launchLogSystem(full_path.toStdString());
-		xLog::log("Change Directory : " + full_path.toStdString());
+		launchLogSystem(full_path.toStdWString());
+		xLog::log(L"Change Directory : " + full_path.toStdWString());
 	}
 	else
 	{
-		xLog::log("Not change : You have attempted to change to the currently configured path");
+		xLog::log(L"Not change : You have attempted to change to the currently configured path");
 	}
 }
 
@@ -114,13 +114,13 @@ void xModel::setGravity(double x, double y, double z)
 	gravity.z = z;
 }
 
-void xModel::launchLogSystem(std::string lpath)
+void xModel::launchLogSystem(std::wstring lpath)
 {
 	xLog::launchLogSystem(lpath);
 }
 
-std::string xModel::makeFilePath(std::string file_name)
+std::wstring xModel::makeFilePath(std::wstring file_name)
 {
-	std::string f = path.toStdString() + name.toStdString() + "/" + file_name;
+	std::wstring f = path.toStdWString() + name.toStdWString() + L"/" + file_name;
 	return f;
 }

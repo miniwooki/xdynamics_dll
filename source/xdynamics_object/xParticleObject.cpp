@@ -15,7 +15,7 @@ xParticleObject::xParticleObject()
 
 }
 
-xParticleObject::xParticleObject(std::string _name)
+xParticleObject::xParticleObject(std::wstring _name)
 	: xObject(_name, PARTICLES)
 	, sid(0)
 	, np(0)
@@ -32,12 +32,18 @@ xParticleObject::xParticleObject(std::string _name)
 xParticleObject::~xParticleObject()
 {
 	if (pos) delete[] pos; pos = NULL;
+	if (cpos) delete[] cpos; cpos = NULL;
 	xpo_count--;
 }
 
 void xParticleObject::setStartIndex(unsigned int _sid)
 {
 	sid = _sid;
+}
+
+void xParticleObject::setClusterStartIndex(unsigned int _csid)
+{
+	csid = csid;
 }
 
 void xParticleObject::setEachCount(unsigned int ec)
@@ -53,9 +59,29 @@ vector4d* xParticleObject::AllocMemory(unsigned int _np)
 	return pos;
 }
 
+vector4d* xParticleObject::AllocClusterMemory(unsigned int _np)
+{
+	cnp = _np;
+	if (!cpos)
+		cpos = new vector4d[_np];
+	return cpos;
+}
+
 void xParticleObject::CopyPosition(double* _pos)
 {
 	memcpy(_pos + sid * 4, pos, sizeof(vector4d) * np);
+}
+
+void xParticleObject::CopyClusterPosition(double* _pos, unsigned int* cindex)
+{
+	memcpy(_pos + csid * 4, cpos, sizeof(vector4d) * cnp);
+	for (unsigned int i = 0; i < cnp; i++)
+	{
+		for (unsigned int j = 0; j < each; j++)
+		{
+			cindex[(csid + i) * each + j] = csid + i;
+		}
+	}
 }
 
 unsigned int xParticleObject::StartIndex() const

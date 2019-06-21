@@ -22,7 +22,7 @@ public:
 		vector3d jrforce;
 	}kinematicConstraint_result;
 	xKinematicConstraint();
-	xKinematicConstraint(std::string _name, cType _type, std::string _i, std::string _j);
+	xKinematicConstraint(std::wstring _name, cType _type, std::wstring _i, std::wstring _j);
 	virtual ~xKinematicConstraint();
 
 	QString Name();
@@ -30,8 +30,8 @@ public:
 	unsigned int NumConst();
 	int IndexBaseBody();
 	int IndexActionBody();
-	std::string BaseBodyName();
-	std::string ActionBodyName();
+	std::wstring BaseBodyName();
+	std::wstring ActionBodyName();
 	xPointMass* BaseBody();
 	xPointMass* ActionBody();
 	void setBaseBodyIndex(int _i);

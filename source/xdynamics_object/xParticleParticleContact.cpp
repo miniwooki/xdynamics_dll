@@ -10,7 +10,7 @@ xParticleParticleContact::xParticleParticleContact()
 
 }
 
-xParticleParticleContact::xParticleParticleContact(std::string _name)
+xParticleParticleContact::xParticleParticleContact(std::wstring _name)
 	: xContact(_name, PARTICLE_PARTICLE)
 {
 

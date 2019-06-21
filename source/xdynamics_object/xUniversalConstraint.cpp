@@ -6,10 +6,10 @@ xUniversalConstraint::xUniversalConstraint()
 
 }
 
-xUniversalConstraint::xUniversalConstraint(std::string _name, std::string _i, std::string _j)
+xUniversalConstraint::xUniversalConstraint(std::wstring _name, std::wstring _i, std::wstring _j)
 	: xKinematicConstraint(_name, xKinematicConstraint::UNIVERSAL, _i, _j)
 {
-	hj = new_vector3d(-0.97014250014533202344536934398782, 0, 0.24253562503633300586134233599695);
+	//hj = new_vector3d(-0.97014250014533202344536934398782, 0, 0.24253562503633300586134233599695);
 }
 
 xUniversalConstraint::~xUniversalConstraint()

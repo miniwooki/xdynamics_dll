@@ -21,7 +21,7 @@ public:
 	~xDynamicsManager();
 
 	bool getSimulatorFromCommand(int argc, wchar_t* argv[]);
-	void CreateModel(std::string str, modelType t, bool isOnAir = true);
+	void CreateModel(std::wstring str, modelType t, bool isOnAir = true);
 
 	xMultiBodyModel* XMBDModel();
 	xDiscreteElementMethodModel* XDEMModel();
@@ -29,16 +29,16 @@ public:
 	xObjectManager* XObject();
 	xContactManager* XContact();
 
-	xMultiBodyModel* XMBDModel(std::string& n);
-	xDiscreteElementMethodModel* XDEMModel(std::string& n);
-	xSmoothedParticleHydrodynamicsModel* XSPHModel(std::string& n);
-	xObjectManager* XObject(std::string& n);
-	xContactManager* XContact(std::string& n);
+	xMultiBodyModel* XMBDModel(std::wstring& n);
+	xDiscreteElementMethodModel* XDEMModel(std::wstring& n);
+	xSmoothedParticleHydrodynamicsModel* XSPHModel(std::wstring& n);
+	xObjectManager* XObject(std::wstring& n);
+	xContactManager* XContact(std::wstring& n);
 
 	solverType OpenModelXLS(const wchar_t* n);
 
 private:
-	void setOnAirModel(modelType t, std::string n);
+	void setOnAirModel(modelType t, std::wstring n);
 	QMap<QString, xMultiBodyModel*> xmbds;
 	QMap<QString, xDiscreteElementMethodModel*> xdems;
 	QMap<QString, xSmoothedParticleHydrodynamicsModel*> xsphs;

@@ -13,12 +13,12 @@ class XDYNAMICS_API xMeshObject : public xPointMass
 	}triangle_info;
 public:
 	xMeshObject();
-	xMeshObject(std::string file);
+	xMeshObject(std::wstring file);
 	xMeshObject(const xMeshObject& mesh);
 	virtual ~xMeshObject();
 
 	bool define(xImportShapeType t, vector3d& loc, int ntriangle, double* vList, unsigned int *iList);
-	int DefineShapeFromFile(vector3d & loc, std::string f);
+	int DefineShapeFromFile(vector3d & loc, std::wstring f);
 	void updateDeviceFromHost();
 
 	QString meshDataFile() const;// { return filePath; }
@@ -32,7 +32,7 @@ public:
 	void setRefinementSize(double rs);
 	double RefinementSize();
 	void ChangeVertexGlobal2Local();
-	std::string exportMeshData(std::string path);
+	std::wstring exportMeshData(std::wstring path);
 	virtual unsigned int create_sph_particles(double ps, unsigned int nlayers, vector3d* p = NULL, xMaterialType* t = NULL);
 	virtual QVector<xCorner> get_sph_boundary_corners();
 

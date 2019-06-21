@@ -22,7 +22,7 @@ public:
 // 	void Save(QTextStream& qts);
 // 	void Open(QTextStream& qts, particleManager* pm, geometryObjects* objs);
 	xContact* CreateContactPair(
-		std::string n, xContactForceModelType method, xObject* fo, xObject* so, xContactParameterData& d);
+		std::wstring n, xContactForceModelType method, xObject* fo, xObject* so, xContactParameterData& d);
 
 	unsigned int setupParticlesMeshObjectsContact();
 	void setupParticlesPlanesContact();
@@ -45,9 +45,7 @@ public:
 		unsigned int *cell_start,
 		unsigned int *cell_end,
 		unsigned int *cluster_index,
-		unsigned int np,
-		unsigned int ns,
-		unsigned int nc);
+		unsigned int np);
 
 	void update();
 	void allocPairList(unsigned int np);
@@ -59,8 +57,7 @@ private:
 		unsigned int* cell_start,
 		unsigned int* cell_end,
 		unsigned int* cluster_index,
-		unsigned int np,
-		unsigned int nc);
+		unsigned int np);
 
 	void deviceCollision(
 		double *pos, double *vel,
@@ -79,9 +76,7 @@ private:
 		unsigned int *cell_start,
 		unsigned int *cell_end,
 		unsigned int *cluster_index,
-		unsigned int np,
-		unsigned int ns,
-		unsigned int nc);
+		unsigned int np);
 
 	unsigned int deviceContactCount(
 		double *pos, double *vel,

@@ -7,7 +7,7 @@ xParticlePlaneContact::xParticlePlaneContact()
 
 }
 
-xParticlePlaneContact::xParticlePlaneContact(std::string _name)
+xParticlePlaneContact::xParticlePlaneContact(std::wstring _name)
 	: xContact(_name, PARTICLE_PANE)
 {
 

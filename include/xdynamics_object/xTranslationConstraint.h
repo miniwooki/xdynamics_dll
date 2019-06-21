@@ -8,7 +8,7 @@ class XDYNAMICS_API xTranslationConstraint : public xKinematicConstraint
 {
 public:
 	xTranslationConstraint();
-	xTranslationConstraint(std::string _name, std::string _i, std::string _j);
+	xTranslationConstraint(std::wstring _name, std::wstring _i, std::wstring _j);
 	virtual ~xTranslationConstraint();
 
 	virtual void ConstraintEquation(xVectorD& ce, xVectorD& q, xVectorD& dq, unsigned int sr, double mul);

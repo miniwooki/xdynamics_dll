@@ -14,8 +14,8 @@ xObject::xObject(xShapeType _s)
 	id = count++;
 }
 
-xObject::xObject(std::string _name, xShapeType _s)
-	: name(QString::fromStdString(_name))
+xObject::xObject(std::wstring _name, xShapeType _s)
+	: name(QString::fromStdWString(_name))
 	, id(-1)
 	, vol(0)
 	, d(0)

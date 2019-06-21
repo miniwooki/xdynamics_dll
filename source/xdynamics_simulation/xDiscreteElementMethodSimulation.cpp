@@ -57,6 +57,12 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 	allocationMemory(np, ns);
 
 	memset(pos, 0, sizeof(double) * ns * 4);
+	if (cpos)
+	{
+		memset(cpos, 0, sizeof(double) * np * 4);
+		memset(cindex, 0, sizeof(unsigned int) * ns);
+	}
+		
 	memset(ep, 0, sizeof(double) * np * 4);
 	memset(vel, 0, sizeof(double) * np * 3);
 	memset(acc, 0, sizeof(double) * np * 3);
@@ -65,20 +71,21 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 	memset(force, 0, sizeof(double) * ns * 3);
 	memset(moment, 0, sizeof(double) * ns * 3);
 
-	xpm->CopyPosition(pos, ns);
+	xpm->CopyPosition(pos, cpos, cindex, ns);
 	xpm->SetMassAndInertia(mass, inertia);
 	for (unsigned int i = 0; i < ns; i++)
 	{
 		double r = pos[i * 4 + 3];
+		//vector3d cm = 
 		if (r > maxRadius)
 			maxRadius = r;
 	}
 	for (unsigned int i = 0; i < np; i++)
 	{
-		vel[0] = -0.1;
-		//force[i * 3 + 0] = 0.0;// mass[i] * xModel::gravity.x;
-		//force[i * 3 + 1] = 0.0mass[i] * xModel::gravity.y;
-		//force[i * 3 + 2] = mass[i] * xModel::gravity.z;
+		//vel[0] = -0.1;
+		acc[i * 3 + 0] = 0.0;// mass[i] * xModel::gravity.x;
+		acc[i * 3 + 1] = xModel::gravity.y;
+		acc[i * 3 + 2] = 0.0;// mass[i] * xModel::gravity.z;
 		ep[i * 4 + 0] = 1.0;
 	}
 
@@ -153,7 +160,8 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 	else
 	{
 		dpos = pos;
-		//dep = ep;
+		dcpos = cpos;
+		dep = ep;
 		//drot = rot;
 		dvel = vel;
 		dacc = acc;
@@ -165,7 +173,7 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 		diner = inertia;
 	}
 	if (isSaveMemory)
-		xdem->XParticleManager()->AllocParticleResultMemory(xSimulation::npart, np);
+		xdem->XParticleManager()->AllocParticleResultMemory(xSimulation::npart, ns);
 	//dynamic_cast<neighborhood_cell*>(dtor)->reorderElements(pos, (double*)cm->HostSphereData(), np, nPolySphere);
 	return xDynamicsError::xdynamicsSuccess;
 }
@@ -277,6 +285,8 @@ void xDiscreteElementMethodSimulation::clearMemory()
 	if (mass) delete[] mass; mass = NULL;
 	if (inertia) delete[] inertia; inertia = NULL;
 	if (pos) delete[] pos; pos = NULL;
+	if (cpos) delete[] cpos; cpos = NULL;
+	if (cindex) delete[] cindex; cindex = NULL;
 	if (ep) delete[] ep; ep = NULL;
 	//if (rot) delete[] rot; rot = NULL;
 	if (vel) delete[] vel; vel = NULL;
@@ -308,6 +318,11 @@ void xDiscreteElementMethodSimulation::allocationMemory(unsigned int np, unsigne
 	mass = new double[np];
 	inertia = new double[np];
 	pos = new double[rnp * 4];
+	if (np < rnp)
+	{
+		cpos = new double[np * 4];
+		cindex = new unsigned int[rnp];
+	}
 	ep = new double[np * 4];
 	//rot = new double[np * 4];
 	vel = new double[np * 3];

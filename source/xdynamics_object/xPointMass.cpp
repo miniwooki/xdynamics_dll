@@ -17,7 +17,7 @@ xPointMass::xPointMass(xShapeType _s)
 	setupTransformationMatrix();
 }
 
-xPointMass::xPointMass(std::string _name, xShapeType _s)
+xPointMass::xPointMass(std::wstring _name, xShapeType _s)
 	: xObject(_name, _s)
 	, nr_part(0)
 	//, pmrs(NULL)
@@ -362,7 +362,7 @@ void xPointMass::ExportResults(std::fstream& of)
 	ofs.write((char*)pmrs.data(), sizeof(pointmass_result) * nr_part);
 
 	ofs.close();
-	xLog::log("Exported : " + _path.toStdString());
+	xLog::log(L"Exported : " + _path.toStdWString());
 	of << _path.toStdString() << endl;
 	//std::wcout << "Exported : " << _path.text() << std::endl;
 }

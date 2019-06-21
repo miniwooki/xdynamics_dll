@@ -12,8 +12,8 @@ public:
 	~xLog();
 
 	static void releaseLogSystem();
-	static void launchLogSystem(std::string d);
-	static void log(std::string txt);
+	static void launchLogSystem(std::wstring d);
+	static void log(std::wstring txt);
 
 private:
 	static std::ofstream *qf;

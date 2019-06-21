@@ -13,7 +13,7 @@ xSpringDamperForce::xSpringDamperForce()
 
 }
 
-xSpringDamperForce::xSpringDamperForce(std::string _name)
+xSpringDamperForce::xSpringDamperForce(std::wstring _name)
 	: xForce(_name, TSDA)
 	, init_l(0.0)
 	, k(0.0)

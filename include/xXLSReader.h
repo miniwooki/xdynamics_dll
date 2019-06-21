@@ -3,6 +3,7 @@
 
 #include "xdynamics_decl.h"
 #include "libxl.h"
+//#include "xString."
 #include <QtCore/QString>
 
 using namespace libxl;
@@ -42,17 +43,17 @@ public:
 
 private:
 	bool _IsEmptyCell(int cid);
-	xPointMassData ReadPointMassData(std::string& _name, int r, int& c);
-	xJointData ReadJointData(std::string& _name, int r, int& c);
-	xLineObjectData ReadLineObjectData(std::string& _name, int mat, int r, int& c);
-	xPlaneObjectData ReadPlaneObjectData(std::string& _name, int mat, int r, int& c);
-	xCubeObjectData ReadCubeObjectData(std::string& _name, int mat, int r, int& c);
-	xCubeParticleData ReadCubeParticleData(std::string& _name, int r, int& c);
-	xListParticleData ReadListParticleData(std::string& _name, int r, int& c);
-	xCircleParticleData ReadCircleParticleData(std::string& _name, int r, int& c);
-	xContactParameterData ReadContactData(std::string& _name, int r, int& c);
-	xTSDAData ReadTSDAData(std::string& _name, int r, int& c);
-	xRotationalAxialForceData ReadxRotationalAxialForceData(std::string& _name, int r, int& c);
+	xPointMassData ReadPointMassData(std::wstring& _name, int r, int& c);
+	xJointData ReadJointData(std::wstring& _name, int r, int& c);
+	xLineObjectData ReadLineObjectData(std::wstring& _name, int mat, int r, int& c);
+	xPlaneObjectData ReadPlaneObjectData(std::wstring& _name, int mat, int r, int& c);
+	xCubeObjectData ReadCubeObjectData(std::wstring& _name, int mat, int r, int& c);
+	xCubeParticleData ReadCubeParticleData(std::wstring& _name, int r, int& c);
+	xListParticleData ReadListParticleData(std::wstring& _name, int r, int& c);
+	xCircleParticleData ReadCircleParticleData(std::wstring& _name, int r, int& c);
+	xContactParameterData ReadContactData(std::wstring& _name, int r, int& c);
+	xTSDAData ReadTSDAData(std::wstring& _name, int r, int& c);
+	xRotationalAxialForceData ReadxRotationalAxialForceData(std::wstring& _name, int r, int& c);
 	//xSPHPlaneObjectData ReadSPHPlaneParticleData(std::string& _name, int r, int& c);
 
 	Book* book;

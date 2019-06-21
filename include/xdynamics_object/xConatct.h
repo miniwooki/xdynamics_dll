@@ -13,7 +13,7 @@ class XDYNAMICS_API xContact
 {
 public:
 	xContact();
-	xContact(std::string _name, xContactPairType xcpt);
+	xContact(std::wstring _name, xContactPairType xcpt);
 	xContact(const xContact& xc);
 	virtual ~xContact();
 

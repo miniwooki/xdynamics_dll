@@ -5,6 +5,7 @@
 #include "xdynamics_algebra/xAlgebraMath.h"
 #include "xdynamics_algebra/xUtilityFunctions.h"
 #include "xLog.h"
+#include "xString.h"
 #include <fstream>
 #include <QtCore/QString>
 #include <QtCore/QMap>
@@ -20,7 +21,7 @@ public:
 	enum angle_type{ EULER_ANGLE = 6, EULER_PARAMETERS = 7 };
 
 	xModel();
-	xModel(QString _name);
+	xModel(std::wstring _name);
 	virtual ~xModel();
 
 	static void initialize();
@@ -30,8 +31,8 @@ public:
 	static void setModelPath(const QString p);
 	static void setGravity(double g, int d);
 	static void setGravity(double x, double y, double z);
-	static void launchLogSystem(std::string lpath);
-	static std::string makeFilePath(std::string file_name);
+	static void launchLogSystem(std::wstring lpath);
+	static std::wstring makeFilePath(std::wstring file_name);
 	//static void 
 
 	//static bool isSinglePrecision;

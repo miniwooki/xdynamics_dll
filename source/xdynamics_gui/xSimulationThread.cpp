@@ -107,13 +107,13 @@ void xSimulationThread::run()
 		if (isStop)
 			break;
 		cstep++;
-		//cout << cstep << endl;
+		cout << cstep << endl;
 		eachStep++;
 		ct += xSimulation::dt;
 		xSimulation::setCurrentTime(ct);
 		if (!xds->xRunSimulationThread(ct, cstep))
 		{
-			QString err = xDynamicsError::getErrorString();
+			QString err = QString::fromStdWString(xDynamicsError::getErrorString());
 			sendProgress(ERROR_DETECTED, err);
 			isStop = true;
 		}

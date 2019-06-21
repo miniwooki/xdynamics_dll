@@ -7,7 +7,7 @@ xLineObject::xLineObject()
 	memset(&len, 0, sizeof(double) * 10);
 }
 
-xLineObject::xLineObject(std::string _name)
+xLineObject::xLineObject(std::wstring _name)
 	: xPointMass(_name)
 {
 	memset(&len, 0, sizeof(double) * 10);
