@@ -105,7 +105,7 @@ void xdynamics_gui::xGetPointMassWidget(wpointmass* w)
 	xPointMass* xpm = NULL;
 	if (xdm)
 		if (xdm->XMBDModel())
-			xpm = xdm->XMBDModel()->XMass(n.toStdWString());
+			xpm = xdm->XMBDModel()->XMass(n.toStdString());
 	if (xpm)
 	{
 		wpm->UpdateInformation(xpm);
@@ -182,7 +182,7 @@ bool xdynamics_gui::ReadViewModel(QString path)
 				{
 					if (xdm->XMBDModel())
 					{
-						xPointMass* xpm = xdm->XMBDModel()->XMass(name.toStdWString());
+						xPointMass* xpm = xdm->XMBDModel()->XMass(name.toStdString());
 						if (xpm)
 						{
 							xpm->setConnectedGeometryName(xvo->Name());
@@ -381,7 +381,7 @@ QString xdynamics_gui::ReadXLSFile(QString xls_path)
 		xdm = new xDynamicsManager;
 		//xnavi->setDynamicManager(xdm);
 	}		
-	xdm->OpenModelXLS(xls_path.toStdWString().c_str());
+	xdm->OpenModelXLS(xls_path.toStdString().c_str());
 	int begin = xls_path.lastIndexOf("/");
 	int end = xls_path.lastIndexOf(".");
 	QString modelName = xls_path.mid(begin + 1, end - begin - 1);
@@ -628,7 +628,7 @@ void xdynamics_gui::xGeometrySelection(QString n)
 			{
 				if (xdm->XMBDModel())
 				{
-					xPointMass* pm = xdm->XMBDModel()->XMass(wpm->LEName->text().toStdWString());
+					xPointMass* pm = xdm->XMBDModel()->XMass(wpm->LEName->text().toStdString());
 					if (pm)
 					{
 						//QString n = pm->Name();

@@ -8,7 +8,7 @@ xRevoluteConstraint::xRevoluteConstraint()
 
 }
 
-xRevoluteConstraint::xRevoluteConstraint(std::wstring _name, std::wstring _i, std::wstring _j)
+xRevoluteConstraint::xRevoluteConstraint(std::string _name, std::string _i, std::string _j)
 	: xKinematicConstraint(_name, xKinematicConstraint::REVOLUTE, _i, _j)
 {
 

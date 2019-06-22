@@ -7,7 +7,7 @@ xPlaneObject::xPlaneObject()
 	xObject::shape = PLANE_SHAPE;
 }
 
-xPlaneObject::xPlaneObject(std::wstring _name)
+xPlaneObject::xPlaneObject(std::string _name)
 	: xPointMass(_name)
 {
 	memset(&l1, 0, sizeof(double) * 2 + sizeof(vector3d) * 11);

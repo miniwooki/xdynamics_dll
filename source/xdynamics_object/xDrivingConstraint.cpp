@@ -15,7 +15,7 @@ xDrivingConstraint::xDrivingConstraint()
 
 }
 
-xDrivingConstraint::xDrivingConstraint(std::wstring _name, xKinematicConstraint* _kc)
+xDrivingConstraint::xDrivingConstraint(std::string _name, xKinematicConstraint* _kc)
 	: type(ROTATION_DRIVING)
 	, plus_time(0.0)
 	, start_time(0.0)
@@ -31,7 +31,7 @@ xDrivingConstraint::xDrivingConstraint(std::wstring _name, xKinematicConstraint*
 	else if (kconst->Type() == xKinematicConstraint::TRANSLATIONAL)
 		type = TRANSLATION_DRIVING;
 
-	name = QString::fromStdWString(_name);// wsprintfW(name, TEXT("%s"), _name);
+	name = QString::fromStdString(_name);// wsprintfW(name, TEXT("%s"), _name);
 }
 
 xDrivingConstraint::~xDrivingConstraint()

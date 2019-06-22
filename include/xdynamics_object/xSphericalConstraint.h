@@ -8,7 +8,7 @@ class XDYNAMICS_API xSphericalConstraint : public xKinematicConstraint
 {
 public:
 	xSphericalConstraint();
-	xSphericalConstraint(std::wstring _name, std::wstring _i, std::wstring _j);
+	xSphericalConstraint(std::string _name, std::string _i, std::string _j);
 	virtual ~xSphericalConstraint();
 
 	virtual void ConstraintEquation(xVectorD& ce, xVectorD& q, xVectorD& dq, unsigned int sr, double mul);

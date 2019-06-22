@@ -57,7 +57,7 @@ xContactManager::~xContactManager()
 
 
 xContact* xContactManager::CreateContactPair(
-	std::wstring n, xContactForceModelType method, xObject* o1, xObject* o2, xContactParameterData& d)
+	std::string n, xContactForceModelType method, xObject* o1, xObject* o2, xContactParameterData& d)
 {
 	xContactPairType pt = getContactPair(o1->Shape(), o2->Shape());
 	xContact *c = NULL;
@@ -83,7 +83,7 @@ xContact* xContactManager::CreateContactPair(
 	c->setFriction(d.mu);
 	c->setCohesion(d.coh);
 	c->setRollingFactor(d.rf);
-	QString name = QString::fromStdWString(n);
+	QString name = QString::fromStdString(n);
 	cots[name] = c;
 	//c->setContactParameters(rest, ratio, fric, cohesion);
 	return c;

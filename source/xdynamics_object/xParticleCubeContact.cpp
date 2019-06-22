@@ -12,7 +12,7 @@ xParticleCubeContact::xParticleCubeContact()
 
 }
 
-xParticleCubeContact::xParticleCubeContact(std::wstring _name, xObject* o1, xObject *o2)
+xParticleCubeContact::xParticleCubeContact(std::string _name, xObject* o1, xObject *o2)
 	: xContact(_name, PARTICLE_CUBE)
 	, cu(NULL)
 	, p(NULL)

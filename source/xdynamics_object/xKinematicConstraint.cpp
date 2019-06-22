@@ -13,7 +13,7 @@ xKinematicConstraint::xKinematicConstraint()
 	//memset(name, 0, sizeof(*this));
 }
 
-xKinematicConstraint::xKinematicConstraint(std::wstring _name, cType _type, std::wstring _i, std::wstring _j)
+xKinematicConstraint::xKinematicConstraint(std::string _name, cType _type, std::string _i, std::string _j)
 	: type(_type)
 	, i(-2)
 	, j(-2)
@@ -27,7 +27,7 @@ xKinematicConstraint::xKinematicConstraint(std::wstring _name, cType _type, std:
 	//memset(name, 0, sizeof(*this) - sizeof(name));
 	int mem_sz = sizeof(vector3d) * 6;
 	memset(&location.x, 0, mem_sz);
-	name = QString::fromStdWString(_name);// wsprintfW(name, TEXT("%s"), _name);
+	name = QString::fromStdString(_name);// wsprintfW(name, TEXT("%s"), _name);
 	switch (_type)
 	{
 	case FIXED: nConst = 6; break;
@@ -36,8 +36,8 @@ xKinematicConstraint::xKinematicConstraint(std::wstring _name, cType _type, std:
 	case TRANSLATIONAL: nConst = 5; break;
 	case UNIVERSAL: nConst = 4; break;
 	}
-	base = QString::fromStdWString(_i);
-	action = QString::fromStdWString(_j);
+	base = QString::fromStdString(_i);
+	action = QString::fromStdString(_j);
 	//djaco.alloc(49 * 4);
 }
 
@@ -71,14 +71,14 @@ int xKinematicConstraint::IndexActionBody()
 	return j;
 }
 
-std::wstring xKinematicConstraint::BaseBodyName()
+std::string xKinematicConstraint::BaseBodyName()
 {
-	return base.toStdWString();
+	return base.toStdString();
 }
 
-std::wstring xKinematicConstraint::ActionBodyName()
+std::string xKinematicConstraint::ActionBodyName()
 {
-	return action.toStdWString();
+	return action.toStdString();
 }
 
 xPointMass* xKinematicConstraint::BaseBody()
@@ -142,8 +142,8 @@ void xKinematicConstraint::ExportResults(std::fstream& of)
 {
 	std::ofstream ofs;
 	QString _path = xModel::path + xModel::name + "/" + name + ".bkc";
-	//QString _path = QString(xModel::path) + QString(xModel::name) + L"/" + QString(name) + L".bkc";
-	ofs.open(_path.toStdWString().c_str(), ios::binary | ios::out);
+	//QString _path = QString(xModel::path) + QString(xModel::name) + "/" + QString(name) + ".bkc";
+	ofs.open(_path.toStdString().c_str(), ios::binary | ios::out);
 	char t = 'k';
 	int identifier = RESULT_FILE_IDENTIFIER;
 	ofs.write((char*)&identifier, sizeof(int));
@@ -156,9 +156,9 @@ void xKinematicConstraint::ExportResults(std::fstream& of)
 	// 		<< "afx " << "afy " << "afz " << "amx " << "amy " << "amz "
 	// 		<< "afx " << "afy " << "afz " << "amx " << "amy " << "amz "
 	ofs.close();
-	xLog::log(L"Exported : " + _path.toStdWString());
+	xLog::log("Exported : " + _path.toStdString());
 	of << _path.toStdString() << endl;
-	//std::wcout << L"Exported : " << _path.text() << std::endl;
+	//std::cout << "Exported : " << _path.text() << std::endl;
 }
 
 matrix34d xKinematicConstraint::spherical_constraintJacobian_e(euler_parameters& e, vector3d& s)

@@ -7,7 +7,7 @@ std::ofstream *xLog::qf = NULL;
 
 xLog::xLog()
 {
- 	//log_path = QString::fromStdWString(d);
+ 	//log_path = QString::fromStdString(d);
 //  	if (qf && qf->is_open())
 // 	{
 // 		if (qf.fileName() != qd)
@@ -36,18 +36,18 @@ void xLog::releaseLogSystem()
 	}
 }
 
-void xLog::launchLogSystem(std::wstring d)
+void xLog::launchLogSystem(std::string d)
 {
 	qf = new std::ofstream;
-	d += L"log.txt";
+	d += "log.txt";
 	qf->open(d, ios::out);
 }
 
-void xLog::log(std::wstring txt)
+void xLog::log(std::string txt)
 {
 	QTime cTime = QTime::currentTime();
 	QDate cDate = QDate::currentDate();
-	QString l = ">> " + cTime.toString() + "/" + cDate.toString() + " - " + QString::fromStdWString(txt);
+	QString l = ">> " + cTime.toString() + "/" + cDate.toString() + " - " + QString::fromStdString(txt);
 	//QString k_l = kor(l.toLocal8Bit());
 	//char* local8b = l.toLocal8Bit().data()
 	std::cout << l.toLocal8Bit().data() << std::endl;

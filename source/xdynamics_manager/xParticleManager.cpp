@@ -169,9 +169,9 @@ unsigned int xParticleManager::GetNumCircleParticles(
 }
 
 xParticleObject* xParticleManager::CreateParticleFromList(
-	std::wstring n, xMaterialType mt, unsigned int _np, vector4d* d)
+	std::string n, xMaterialType mt, unsigned int _np, vector4d* d)
 {
-	QString name = QString::fromStdWString(n);
+	QString name = QString::fromStdString(n);
 	xParticleObject* xpo = new xParticleObject(n);
 	vector4d* pos = xpo->AllocMemory(_np);
 	xpo->setStartIndex(np);
@@ -264,10 +264,10 @@ xParticleObject* xParticleManager::CreateParticleFromList(
 // 	return xpo;
 // }
 
-void xParticleManager::SetCurrentParticlesFromPartResult(std::wstring path)
+void xParticleManager::SetCurrentParticlesFromPartResult(std::string path)
 {
 	std::fstream qf;
-	std::wcout << L"SetCurrentParticleFromPartResult : " << path << std::endl;
+	std::cout << "SetCurrentParticleFromPartResult : " << path << std::endl;
 	qf.open(path, std::ios::binary | std::ios::in);
 	double m_ct = 0;
 	unsigned int m_np = 0;
@@ -277,7 +277,7 @@ void xParticleManager::SetCurrentParticlesFromPartResult(std::wstring path)
 		qf.read((char*)&m_np, sizeof(unsigned int));
 		if (np != m_np)
 		{
-			std::wcout << L"Failed setCurrentParticlesFromPartResult" << std::endl;
+			std::cout << "Failed setCurrentParticlesFromPartResult" << std::endl;
 			qf.close();
 			return;
 		}
@@ -298,9 +298,9 @@ void xParticleManager::SetCurrentParticlesFromPartResult(std::wstring path)
 }
 
 xParticleObject* xParticleManager::CreateCubeParticle(
-	std::wstring n, xMaterialType mt, unsigned int _np, xCubeParticleData& d)
+	std::string n, xMaterialType mt, unsigned int _np, xCubeParticleData& d)
 {
-	QString name = QString::fromStdWString(n);
+	QString name = QString::fromStdString(n);
 	xParticleObject* xpo = new xParticleObject(n);
 	vector4d* pos = xpo->AllocMemory(_np);
 	xpo->setStartIndex(np);
@@ -358,9 +358,9 @@ xParticleObject* xParticleManager::CreateCubeParticle(
 }
 
 xParticleObject* xParticleManager::CreateCircleParticle(
-	std::wstring n, xMaterialType mt, unsigned int _np, xCircleParticleData& d)
+	std::string n, xMaterialType mt, unsigned int _np, xCircleParticleData& d)
 {
-	QString name = QString::fromStdWString(n);
+	QString name = QString::fromStdString(n);
 	xParticleObject* xpo = new xParticleObject(n);
 	vector4d* pos = xpo->AllocMemory(_np);
 	xpo->setStartIndex(np);
@@ -427,12 +427,12 @@ xParticleObject* xParticleManager::CreateCircleParticle(
 	return xpo;
 }
 
-xParticleObject * xParticleManager::CreateClusterParticle(std::wstring n, xMaterialType mt, unsigned int _np, xClusterObject * xo)
+xParticleObject * xParticleManager::CreateClusterParticle(std::string n, xMaterialType mt, unsigned int _np, xClusterObject * xo)
 {
 	unsigned int neach = xo->NumElement();
 	unsigned int rnp = _np * neach;
 	double rad = xo->ElementRadius();
-	QString name = QString::fromStdWString(n);
+	QString name = QString::fromStdString(n);
 	xMaterial xm = GetMaterialConstant(mt);
 	xParticleObject* xpo = new xParticleObject(n);
 	xpo->setStartIndex(np);
@@ -516,11 +516,11 @@ bool xParticleManager::SetMassAndInertia(double *mass, double *inertia)
 	return true;
 }
 
-void xParticleManager::ExportParticleDataForView(std::wstring path)
+void xParticleManager::ExportParticleDataForView(std::string path)
 {
-	std::wfstream of;
+	std::fstream of;
 	of.open(path, std::ios::out | std::ios::binary);
-	of.write((wchar_t*)&np, sizeof(unsigned int));
+	of.write((char*)&np, sizeof(unsigned int));
 	foreach(xParticleObject* po, xpcos)
 	{
 		unsigned int _sid = po->StartIndex();
@@ -529,13 +529,13 @@ void xParticleManager::ExportParticleDataForView(std::wstring path)
 		double* _pos = (double *)po->Position();
 		int mat = po->Material();
 		int ns = po->Name().size();
-		of.write((wchar_t*)&ns, sizeof(int));
-		of.write((wchar_t*)po->Name().toStdWString().c_str(), sizeof(wchar_t) * ns);
-		of.write((wchar_t*)&mat, sizeof(int));
-		of.write((wchar_t*)&_sid, sizeof(unsigned int));
-		of.write((wchar_t*)&_np, sizeof(unsigned int));
-		of.write((wchar_t*)&d, sizeof(double) * 2);
-		of.write((wchar_t*)_pos, sizeof(double) * _np * 4);
+		of.write((char*)&ns, sizeof(int));
+		of.write((char*)po->Name().toStdString().c_str(), sizeof(char) * ns);
+		of.write((char*)&mat, sizeof(int));
+		of.write((char*)&_sid, sizeof(unsigned int));
+		of.write((char*)&_np, sizeof(unsigned int));
+		of.write((char*)&d, sizeof(double) * 2);
+		of.write((char*)_pos, sizeof(double) * _np * 4);
 	}
 	of.close();
 }

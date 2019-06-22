@@ -10,20 +10,20 @@ class xForce
 public:
 	enum fType{ NO_TYPE = -1, TSDA = 0, RSDA, RAXIAL };
 	xForce();
-	xForce(std::wstring _name, fType _type);
+	xForce(std::string _name, fType _type);
 	virtual ~xForce();
 
-	void setBaseBodyName(std::wstring bn);
-	void setActionBodyName(std::wstring an);
+	void setBaseBodyName(std::string bn);
+	void setActionBodyName(std::string an);
 	void setBaseBodyIndex(int _i);
 	void setActionBodyIndex(int _j);
 // 	void setBaseLocalCoordinate(vector3d _spi);
 // 	void setActionLocalCoordinate(vector3d _spj);
 
-	std::wstring Name();
+	std::string Name();
 	fType Type();
-	std::wstring BaseBodyName();
-	std::wstring ActionBodyName();
+	std::string BaseBodyName();
+	std::string ActionBodyName();
 
 	virtual void xCalculateForce(const xVectorD& q, const xVectorD& qd) = 0;
 	virtual void xDerivate(xMatrixD& lhs, const xVectorD& q, const xVectorD& qd, double mul) = 0;

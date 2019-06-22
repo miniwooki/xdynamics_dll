@@ -8,7 +8,7 @@ class XDYNAMICS_API xUniversalConstraint : public xKinematicConstraint
 {
 public:
 	xUniversalConstraint();
-	xUniversalConstraint(std::wstring _name, std::wstring _i, std::wstring _j);
+	xUniversalConstraint(std::string _name, std::string _i, std::string _j);
 	virtual ~xUniversalConstraint();
 
 	virtual void ConstraintEquation(xVectorD& ce, xVectorD& q, xVectorD& dq, unsigned int sr, double mul);

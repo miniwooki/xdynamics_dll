@@ -7,7 +7,7 @@ class XDYNAMICS_API xParticleObject : public xObject
 {
 public:
 	xParticleObject();
-	xParticleObject(std::wstring _name);
+	xParticleObject(std::string _name);
 	virtual ~xParticleObject();
 
 	void setStartIndex(unsigned int sid);

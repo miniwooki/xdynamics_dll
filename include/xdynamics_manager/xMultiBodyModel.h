@@ -15,7 +15,7 @@ class XDYNAMICS_API xMultiBodyModel
 {
 public:
 	xMultiBodyModel();
-	xMultiBodyModel(std::wstring _name);
+	xMultiBodyModel(std::string _name);
 	~xMultiBodyModel();
 
 	unsigned int NumMass();
@@ -26,15 +26,15 @@ public:
 	QMap<QString, xKinematicConstraint*>& Joints();
 	QMap<QString, xForce*>& Forces();
 	QMap<QString, xDrivingConstraint*>& Drivings();
-	xPointMass* XMass(std::wstring& ws);
-	xKinematicConstraint* XJoint(std::wstring& ws);
-	xForce* XForce(std::wstring& ws);
-	xDrivingConstraint* xDriving(std::wstring& ws);
+	xPointMass* XMass(std::string& ws);
+	xKinematicConstraint* XJoint(std::string& ws);
+	xForce* XForce(std::string& ws);
+	xDrivingConstraint* xDriving(std::string& ws);
 
-	xPointMass* CreatePointMass(std::wstring _name);
-	xKinematicConstraint* CreateKinematicConstraint(std::wstring _name, xKinematicConstraint::cType _type, std::wstring _i, std::wstring _j);
-	xForce* CreateForceElement(std::wstring _name, xForce::fType _type, std::wstring bn, std::wstring an);
-	xDrivingConstraint* CreateDrivingConstraint(std::wstring _name, xKinematicConstraint* _kc);
+	xPointMass* CreatePointMass(std::string _name);
+	xKinematicConstraint* CreateKinematicConstraint(std::string _name, xKinematicConstraint::cType _type, std::string _i, std::string _j);
+	xForce* CreateForceElement(std::string _name, xForce::fType _type, std::string bn, std::string an);
+	xDrivingConstraint* CreateDrivingConstraint(std::string _name, xKinematicConstraint* _kc);
 
 	//void InsertPointMassFromShape(xPointMass* pm);
 

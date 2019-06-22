@@ -69,8 +69,8 @@ inline QString NameOfMaterial(int i)
 	QString n;
 	switch (xmt)
 	{
-	case NO_MATERIAL: n = "No Material"; break;
-	case STEEL: n = "Steel"; break;
+	case NO_MATERIAL: n = "No Materia"; break;
+	case STEEL: n = "Stee"; break;
 	case MEDIUM_CLAY: n = "Medium clay"; break;
 	case POLYETHYLENE: n = "Polyethylene"; break;
 	case GLASS: n = "Glass"; break;

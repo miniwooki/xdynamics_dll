@@ -11,28 +11,28 @@ namespace xdyn
 	{
 	public:
 		xstring();
-		//xstring(std::wstring ws);
-		xstring(const wchar_t* _wc);
+		//xstring(std::string ws);
+		xstring(const char* _wc);
 		xstring(const xstring& _xs);
 		~xstring();
 
 		void operator= (const xstring& _xs);
-		bool operator== (const wchar_t* _wc);
+		bool operator== (const char* _wc);
 		xstring operator+ (const xstring& _xs);
-		xstring operator+ (const wchar_t* _wc);
-		wchar_t* text() const;
+		xstring operator+ (const char* _wc);
+		char* text() const;
 		int size() const;
-		void split(const wchar_t* c, int n, int* data);
-		void split(const wchar_t* c, int n, double* data);
-		std::wstring toWString();
-		const std::wstring toWString() const;
+		void split(const char* c, int n, int* data);
+		void split(const char* c, int n, double* data);
+		std::string toWString();
+		const std::string toWString() const;
 		//static void get_split_data(xString* ls,  int* data);
 
 	//	friend ostream& operator<<(ostream& os, const xstring& xs);
 	private:
-		int _n_split(const wchar_t* c);
+		int _n_split(const char* c);
 		int len;
-		wchar_t *wc;
+		char *wc;
 	};
 }
 

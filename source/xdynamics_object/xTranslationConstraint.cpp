@@ -8,7 +8,7 @@ xTranslationConstraint::xTranslationConstraint()
 
 }
 
-xTranslationConstraint::xTranslationConstraint(std::wstring _name, std::wstring _i, std::wstring _j)
+xTranslationConstraint::xTranslationConstraint(std::string _name, std::string _i, std::string _j)
 	: xKinematicConstraint(_name, xKinematicConstraint::TRANSLATIONAL, _i, _j)
 {
 

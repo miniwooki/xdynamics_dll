@@ -11,8 +11,8 @@ xForce::xForce()
 
 }
 
-xForce::xForce(std::wstring _name, fType _type)
-	: name(QString::fromStdWString(_name))
+xForce::xForce(std::string _name, fType _type)
+	: name(QString::fromStdString(_name))
 	, type(_type)
 	, i(0)
 	, j(0)
@@ -27,8 +27,8 @@ xForce::~xForce()
 
 }
 
-void xForce::setBaseBodyName(std::wstring bn) { base = QString::fromStdWString(bn); }
-void xForce::setActionBodyName(std::wstring an) { action = QString::fromStdWString(an); }
+void xForce::setBaseBodyName(std::string bn) { base = QString::fromStdString(bn); }
+void xForce::setActionBodyName(std::string an) { action = QString::fromStdString(an); }
 void xForce::setBaseBodyIndex(int _i) { i = _i; }
 void xForce::setActionBodyIndex(int _j){ j = _j; }
 // void xForce::setBaseLocalCoordinate() 
@@ -43,9 +43,9 @@ void xForce::setActionBodyIndex(int _j){ j = _j; }
 // 	spj = _spj; 
 // }
 
-std::wstring xForce::Name()
+std::string xForce::Name()
 {
-	return name.toStdWString();
+	return name.toStdString();
 }
 
 xForce::fType xForce::Type()
@@ -53,12 +53,12 @@ xForce::fType xForce::Type()
 	return type;
 }
 
-std::wstring xForce::BaseBodyName()
+std::string xForce::BaseBodyName()
 {
-	return base.toStdWString();
+	return base.toStdString();
 }
 
-std::wstring xForce::ActionBodyName()
+std::string xForce::ActionBodyName()
 {
-	return action.toStdWString();
+	return action.toStdString();
 }

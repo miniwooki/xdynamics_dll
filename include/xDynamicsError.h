@@ -23,12 +23,12 @@ public:
 	};
 	xDynamicsError();
 	~xDynamicsError();
-	static wchar_t* getErrorString();
+	static char* getErrorString();
 	//static void checkXerror(int val);
 	static bool _check(int result, char const *const func, const char* const file, int const line);
 private:
-	static wchar_t *_xdynamicsGetErrorEnum(int error);
-	static wchar_t err[255];
+	static char *_xdynamicsGetErrorEnum(int error);
+	static char err[255];
 };
 // 
 // 

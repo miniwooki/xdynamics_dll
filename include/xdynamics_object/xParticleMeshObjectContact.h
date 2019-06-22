@@ -11,7 +11,7 @@ class XDYNAMICS_API xParticleMeshObjectContact : public xContact
 {
 public:
 	xParticleMeshObjectContact();
-	xParticleMeshObjectContact(std::wstring _name, xObject* o1, xObject* o2);
+	xParticleMeshObjectContact(std::string _name, xObject* o1, xObject* o2);
 	virtual ~xParticleMeshObjectContact();
 
 	virtual void cudaMemoryAlloc(unsigned int np);

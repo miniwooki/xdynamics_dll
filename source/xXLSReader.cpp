@@ -35,12 +35,12 @@ bool xXLSReader::IsEmptyCell(int r, int c)
 	return _IsEmptyCell(cid);
 }
 
-xPointMassData xXLSReader::ReadPointMassData(std::wstring& _name, int r, int& c)
+xPointMassData xXLSReader::ReadPointMassData(std::string& _name, int r, int& c)
 {
 	xPointMassData d = { 0, };
 	double *ptr = &d.mass;
 	d.mass = sheet->readNum(r, c++);
-	std::wstring x;
+	std::string x;
 	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 1);
 	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 4);
 	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 7);
@@ -49,20 +49,20 @@ xPointMassData xXLSReader::ReadPointMassData(std::wstring& _name, int r, int& c)
 	if (xve)
 	{
 		int t = VMARKER;
-		xve->Write((wchar_t*)&t, sizeof(int));
+		xve->Write((char*)&t, sizeof(int));
 		unsigned int ns = static_cast<unsigned int>(_name.size()); 
-		xve->Write((wchar_t*)&ns, sizeof(unsigned int));
-		xve->Write((wchar_t*)_name.c_str(), sizeof(wchar_t)*ns);
-		xve->Write((wchar_t*)&d, sizeof(xPointMassData));
+		xve->Write((char*)&ns, sizeof(unsigned int));
+		xve->Write((char*)_name.c_str(), sizeof(char)*ns);
+		xve->Write((char*)&d, sizeof(xPointMassData));
 	}
 	return d;
 }
 
-xJointData xXLSReader::ReadJointData(std::wstring& _name, int r, int& c)
+xJointData xXLSReader::ReadJointData(std::string& _name, int r, int& c)
 {
 	xJointData d = { 0, };
 	double *ptr = &d.lx;
-	std::wstring x;
+	std::string x;
 	for (int i = 0; i < 5; i++)
 	{
 		x = sheet->readStr(r, c++);
@@ -71,40 +71,40 @@ xJointData xXLSReader::ReadJointData(std::wstring& _name, int r, int& c)
 	if (xve)
 	{
 		int t = VJOINT;
-		xve->Write((wchar_t*)&t, sizeof(int));
+		xve->Write((char*)&t, sizeof(int));
 		unsigned int ns = static_cast<unsigned int>(_name.size()); 
-		xve->Write((wchar_t*)&ns, sizeof(unsigned int));
-		xve->Write((wchar_t*)_name.c_str(), sizeof(wchar_t)*ns);
-		xve->Write((wchar_t*)&d, sizeof(xJointData));
+		xve->Write((char*)&ns, sizeof(unsigned int));
+		xve->Write((char*)_name.c_str(), sizeof(char)*ns);
+		xve->Write((char*)&d, sizeof(xJointData));
 	}
 	return d;
 }
 
-xLineObjectData xXLSReader::ReadLineObjectData(std::wstring& _name, int mat, int r, int& c)
+xLineObjectData xXLSReader::ReadLineObjectData(std::string& _name, int mat, int r, int& c)
 {
 	xLineObjectData d = { 0, };
 	double* ptr = &d.p0x;
-	std::wstring x;
+	std::string x;
 	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 0);
 	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 3);
 	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 6);
 	if (xve)
 	{
 		int t = VLINE;
-		xve->Write((wchar_t*)&t, sizeof(int));
+		xve->Write((char*)&t, sizeof(int));
 		unsigned int ns = static_cast<unsigned int>(_name.size());
-		xve->Write((wchar_t*)&ns, sizeof(unsigned int));
-		xve->Write((wchar_t*)_name.c_str(), sizeof(wchar_t)*ns);
-		xve->Write((wchar_t*)&d, sizeof(xLineObjectData));
+		xve->Write((char*)&ns, sizeof(unsigned int));
+		xve->Write((char*)_name.c_str(), sizeof(char)*ns);
+		xve->Write((char*)&d, sizeof(xLineObjectData));
 	}
 	return d;
 }
 
-xPlaneObjectData xXLSReader::ReadPlaneObjectData(std::wstring& _name, int mat, int r, int& c)
+xPlaneObjectData xXLSReader::ReadPlaneObjectData(std::string& _name, int mat, int r, int& c)
 {
 	xPlaneObjectData d = { 0, };
 	double *ptr = &d.p0x;
-	std::wstring x;
+	std::string x;
 	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 0);
 	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 3);
 	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 6);
@@ -112,41 +112,41 @@ xPlaneObjectData xXLSReader::ReadPlaneObjectData(std::wstring& _name, int mat, i
 	if (xve)
 	{
 		int t = VPLANE;
-		xve->Write((wchar_t*)&t, sizeof(int));
+		xve->Write((char*)&t, sizeof(int));
 		unsigned int ns = static_cast<unsigned int>(_name.size()); 
-		xve->Write((wchar_t*)&ns, sizeof(unsigned int));
-		xve->Write((wchar_t*)_name.c_str(), sizeof(wchar_t)*ns);
-		xve->Write((wchar_t*)&d, sizeof(xPlaneObjectData));
+		xve->Write((char*)&ns, sizeof(unsigned int));
+		xve->Write((char*)_name.c_str(), sizeof(char)*ns);
+		xve->Write((char*)&d, sizeof(xPlaneObjectData));
 	}
 	return d;
 	
 }
 
-xCubeObjectData xXLSReader::ReadCubeObjectData(std::wstring& _name, int mat, int r, int& c)
+xCubeObjectData xXLSReader::ReadCubeObjectData(std::string& _name, int mat, int r, int& c)
 {
 	xCubeObjectData d = { 0, };
 	double *ptr = &d.p0x;
-	std::wstring x;
+	std::string x;
 	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 0);
 	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 3);
 	if (xve)
 	{
 		int t = VCUBE;
-		xve->Write((wchar_t*)&t, sizeof(int));
+		xve->Write((char*)&t, sizeof(int));
 		unsigned int ns = static_cast<unsigned int>(_name.size()); 
-		xve->Write((wchar_t*)&ns, sizeof(unsigned int));
-		xve->Write((wchar_t*)_name.c_str(), sizeof(wchar_t)*ns);
-		xve->Write((wchar_t*)&d, sizeof(xCubeObjectData));
+		xve->Write((char*)&ns, sizeof(unsigned int));
+		xve->Write((char*)_name.c_str(), sizeof(char)*ns);
+		xve->Write((char*)&d, sizeof(xCubeObjectData));
 	}
 	return d;
 	
 }
 
-xCubeParticleData xXLSReader::ReadCubeParticleData(std::wstring& _name, int r, int& c)
+xCubeParticleData xXLSReader::ReadCubeParticleData(std::string& _name, int r, int& c)
 {
 	xCubeParticleData d = { 0, };
 	double *ptr = &d.dx;
-	std::wstring x;
+	std::string x;
 	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 0);
 	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 3);
 	d.minr = sheet->readNum(r, c++);
@@ -164,7 +164,7 @@ xCubeParticleData xXLSReader::ReadCubeParticleData(std::wstring& _name, int r, i
 	return d;
 }
 
-xListParticleData xXLSReader::ReadListParticleData(std::wstring& _name, int r, int& c)
+xListParticleData xXLSReader::ReadListParticleData(std::string& _name, int r, int& c)
 {
 	xListParticleData d = { 0 };
 	unsigned int number = static_cast<int>(sheet->readNum(r, c++));
@@ -182,11 +182,11 @@ xListParticleData xXLSReader::ReadListParticleData(std::wstring& _name, int r, i
 	return d;
 }
 
-xCircleParticleData xXLSReader::ReadCircleParticleData(std::wstring& _name, int r, int& c)
+xCircleParticleData xXLSReader::ReadCircleParticleData(std::string& _name, int r, int& c)
 {
 	xCircleParticleData d = { 0, };
 	double *ptr = &d.sx;
-	std::wstring x;
+	std::string x;
 	d.diameter = sheet->readNum(r, c++);
 	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 0);
 	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 3);
@@ -195,7 +195,7 @@ xCircleParticleData xXLSReader::ReadCircleParticleData(std::wstring& _name, int 
 	return d;
 }
 
-xContactParameterData xXLSReader::ReadContactData(std::wstring& _name, int r, int& c)
+xContactParameterData xXLSReader::ReadContactData(std::string& _name, int r, int& c)
 {
 	xContactParameterData d = { 0, };
 	d.rest = sheet->readNum(r, c++);
@@ -206,11 +206,11 @@ xContactParameterData xXLSReader::ReadContactData(std::wstring& _name, int r, in
 	return d;
 }
 
-xTSDAData xXLSReader::ReadTSDAData(std::wstring& _name, int r, int& c)
+xTSDAData xXLSReader::ReadTSDAData(std::string& _name, int r, int& c)
 {
 	xTSDAData d = { 0, };
 	double* ptr = &d.spix;
-	std::wstring x;
+	std::string x;
 	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 0);
 	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 3);
 	d.k = sheet->readNum(r, c++);
@@ -219,31 +219,31 @@ xTSDAData xXLSReader::ReadTSDAData(std::wstring& _name, int r, int& c)
 	if (xve)
 	{
 		int t = VTSDA;		
-		xve->Write((wchar_t*)&t, sizeof(int));
+		xve->Write((char*)&t, sizeof(int));
 		unsigned int ns = static_cast<unsigned int>(_name.size()); 
-		xve->Write((wchar_t*)&ns, sizeof(unsigned int));
-		xve->Write((wchar_t*)_name.c_str(), sizeof(wchar_t)*ns);
-		xve->Write((wchar_t*)&d, sizeof(xTSDAData));
+		xve->Write((char*)&ns, sizeof(unsigned int));
+		xve->Write((char*)_name.c_str(), sizeof(char)*ns);
+		xve->Write((char*)&d, sizeof(xTSDAData));
 	}
 	return d;
 }
 
-xRotationalAxialForceData xXLSReader::ReadxRotationalAxialForceData(std::wstring& _name, int r, int& c)
+xRotationalAxialForceData xXLSReader::ReadxRotationalAxialForceData(std::string& _name, int r, int& c)
 {
 	xRotationalAxialForceData d = { 0, };
 	double* ptr = &d.lx;
-	std::wstring x;
+	std::string x;
 	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 0);
 	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 3);
 	d.rforce = sheet->readNum(r, c++);
 	if (xve)
 	{
 		int t = VRAXIAL;
-		xve->Write((wchar_t*)&t, sizeof(int));
+		xve->Write((char*)&t, sizeof(int));
 		unsigned int ns = static_cast<unsigned int>(_name.size());
-		xve->Write((wchar_t*)&ns, sizeof(unsigned int));
-		xve->Write((wchar_t*)_name.c_str(), sizeof(wchar_t)*ns);
-		xve->Write((wchar_t*)&d, sizeof(xRotationalAxialForceData));
+		xve->Write((char*)&ns, sizeof(unsigned int));
+		xve->Write((char*)_name.c_str(), sizeof(char)*ns);
+		xve->Write((char*)&d, sizeof(xRotationalAxialForceData));
 	}
 	return d;
 }
@@ -252,7 +252,7 @@ xRotationalAxialForceData xXLSReader::ReadxRotationalAxialForceData(std::wstring
 // {
 // 	xSPHPlaneObjectData d = { 0, };
 // 	double* ptr = &d.dx;
-// 	std::wstring x;
+// 	std::string x;
 // 	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 2, ptr + 0);
 // 	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 2);
 // 	d.ps = sheet->readNum(r, c++);
@@ -269,12 +269,12 @@ xRotationalAxialForceData xXLSReader::ReadxRotationalAxialForceData(std::wstring
 // 	}
 // }
 
-bool xXLSReader::Load(const wchar_t* n)
+bool xXLSReader::Load(const char* n)
 {
 	book = xlCreateBook();
 	if (book)
 	{
-		connect_file = QString::fromStdWString(n);
+		connect_file = QString::fromStdString(n);
 		return book->load(n);
 	}
 	return false;
@@ -285,11 +285,11 @@ void xXLSReader::ReadMass(xMultiBodyModel* xmbd, vector2i rc)
 	if (xmbd)
 	{
 		int init_col = rc.y;
-		//std::wstring name, str;			
+		//std::string name, str;			
 		while (1)
 		{
 			if (IsEmptyCell(rc.x, rc.y)) break;
-			std::wstring name = sheet->readStr(rc.x, rc.y++);
+			std::string name = sheet->readStr(rc.x, rc.y++);
 			xObject *obj = xObjectManager::XOM()->XObject(name);
 			xPointMass* xpm = NULL;
 			xpm = xmbd->CreatePointMass(name);
@@ -312,16 +312,16 @@ void xXLSReader::ReadJoint(xMultiBodyModel* xmbd, vector2i rc)
 	while (1)
 	{
 		if (IsEmptyCell(rc.x, rc.y))	break;
-		std::wstring name = sheet->readStr(rc.x, rc.y++);
+		std::string name = sheet->readStr(rc.x, rc.y++);
 		xKinematicConstraint::cType type = (xKinematicConstraint::cType)static_cast<int>(sheet->readNum(rc.x, rc.y++));
-		std::wstring base = sheet->readStr(rc.x, rc.y++);
-		std::wstring action = sheet->readStr(rc.x, rc.y++);
+		std::string base = sheet->readStr(rc.x, rc.y++);
+		std::string action = sheet->readStr(rc.x, rc.y++);
 		xKinematicConstraint* xkc = xmbd->CreateKinematicConstraint(name, type, base.c_str(), action.c_str());
 		xkc->SetupDataFromStructure(xmbd->XMass(base), xmbd->XMass(action), ReadJointData(name, rc.x, rc.y));
 		if (!IsEmptyCell(rc.x, rc.y))
 		{
 			vector2i drc = rc;
-			std::wstring str = sheet->readStr(drc.x, drc.y++);
+			std::string str = sheet->readStr(drc.x, drc.y++);
 			uf::xsplit(str, ",", drc);
 			drc.x -= 1; drc.y -= 1;
 			if (!IsEmptyCell(drc.x, drc.y))
@@ -346,10 +346,10 @@ void xXLSReader::ReadForce(xMultiBodyModel* xmbd, vector2i rc)
 	while (1)
 	{
 		if (IsEmptyCell(rc.x, rc.y)) break;
-		std::wstring name = sheet->readStr(rc.x, rc.y++);
+		std::string name = sheet->readStr(rc.x, rc.y++);
 		xForce::fType type = (xForce::fType)static_cast<int>(sheet->readNum(rc.x, rc.y++));
-		std::wstring base = sheet->readStr(rc.x, rc.y++);
-		std::wstring action = sheet->readStr(rc.x, rc.y++);
+		std::string base = sheet->readStr(rc.x, rc.y++);
+		std::string action = sheet->readStr(rc.x, rc.y++);
 		xForce* xf = xmbd->CreateForceElement(name, type, base, action);
 		//xkc->SetupDataFromStructure(ReadJointData(rc.x, rc.y));
 		switch (xf->Type())
@@ -383,7 +383,7 @@ void xXLSReader::ReadDEMParticle(xDiscreteElementMethodModel* xdem, xObjectManag
 		{
 			if (IsEmptyCell(rc.x, rc.y))
 				break;
-			std::wstring name = sheet->readStr(rc.x, rc.y++);
+			std::string name = sheet->readStr(rc.x, rc.y++);
 			xShapeType form = static_cast<xShapeType>(static_cast<int>(sheet->readNum(rc.x, rc.y++)));
 			int material = -1;
 			if (form != FROM_SHAPE)
@@ -433,12 +433,12 @@ void xXLSReader::ReadDEMParticle(xDiscreteElementMethodModel* xdem, xObjectManag
 			}
 			else if (form == FROM_SHAPE)
 			{
-				std::wstring obj;
-				std::wstring limit;
+				std::string obj;
+				std::string limit;
 				obj = sheet->readStr(rc.x, rc.y++);
 				xObject* xo = xom->XObject(obj);
 				limit = sheet->readStr(rc.x, rc.y++);
-				if (limit == L"number")
+				if (limit == "number")
 				{
 					unsigned int num = sheet->readNum(rc.x, rc.y++);
 					switch (xo->Shape())
@@ -451,8 +451,8 @@ void xXLSReader::ReadDEMParticle(xDiscreteElementMethodModel* xdem, xObjectManag
 			{
 				//xListParticleData d = ReadListParticleData(name, rc.x++, rc.y);
 				unsigned int number = static_cast<int>(sheet->readNum(rc.x, rc.y++));
-				std::wstring x;
-				std::wstring fpath = sheet->readStr(rc.x, rc.y++);
+				std::string x;
+				std::string fpath = sheet->readStr(rc.x, rc.y++);
 				vector4d* d = new vector4d[number];
 				std::fstream fs;
 				fs.open(fpath.c_str(), std::ios::in);
@@ -463,7 +463,7 @@ void xXLSReader::ReadDEMParticle(xDiscreteElementMethodModel* xdem, xObjectManag
 				}
 				else
 				{
-					std::wcout << fpath << " not open" << std::endl;
+					std::cout << fpath << " not open" << std::endl;
 				}
 				
 				fs.close();
@@ -472,7 +472,7 @@ void xXLSReader::ReadDEMParticle(xDiscreteElementMethodModel* xdem, xObjectManag
 			}
 			if (!IsEmptyCell(rc.x, rc.y))
 			{
-				std::wstring p_path = sheet->readStr(rc.x, rc.y);
+				std::string p_path = sheet->readStr(rc.x, rc.y);
 				xdem->XParticleManager()->SetCurrentParticlesFromPartResult(p_path);
 			}
 			rc.x++;
@@ -509,10 +509,10 @@ void xXLSReader::ReadContact(xContactManager* xcm, vector2i rc)
 		{
 			if (IsEmptyCell(rc.x, rc.y))
 				break;
-			std::wstring name = sheet->readStr(rc.x, rc.y++);
+			std::string name = sheet->readStr(rc.x, rc.y++);
 			xContactForceModelType method = static_cast<xContactForceModelType>(static_cast<int>(sheet->readNum(rc.x, rc.y++)));
-			std::wstring obj0 = sheet->readStr(rc.x, rc.y++);
-			std::wstring obj1 = sheet->readStr(rc.x, rc.y++);
+			std::string obj0 = sheet->readStr(rc.x, rc.y++);
+			std::string obj1 = sheet->readStr(rc.x, rc.y++);
 			xContactParameterData d = ReadContactData(name, rc.x++, rc.y);
 			xContact* xc = xcm->CreateContactPair(
 				name,
@@ -533,7 +533,7 @@ void xXLSReader::ReadShapeObject(xObjectManager* xom, vector2i rc)
 		while (1)
 		{
 			if (IsEmptyCell(rc.x, rc.y)) break;
-			std::wstring name = sheet->readStr(rc.x, rc.y++);
+			std::string name = sheet->readStr(rc.x, rc.y++);
 			xShapeType form = static_cast<xShapeType>(static_cast<int>(sheet->readNum(rc.x, rc.y++)));
 			int material = static_cast<int>(sheet->readNum(rc.x, rc.y++));
 			if (form == xShapeType::CUBE_SHAPE)
@@ -556,7 +556,7 @@ void xXLSReader::ReadShapeObject(xObjectManager* xom, vector2i rc)
 				xClusterObject* xcs = xom->CreateClusterShapeObject(name, material);
 				unsigned int num = sheet->readNum(rc.x, rc.y++);
 				double rad = sheet->readNum(rc.x, rc.y++);
-				std::wstring sdata;
+				std::string sdata;
 				int loc[2] = { 0, };
 				sdata = sheet->readStr(rc.x, rc.y); uf::xsplit(sdata, ",", 2, loc);
 				vector3d *d = new vector3d[num];
@@ -574,20 +574,20 @@ void xXLSReader::ReadShapeObject(xObjectManager* xom, vector2i rc)
 			else if (form == xShapeType::MESH_SHAPE)
 			{
 				xMeshObject* xmo = xom->CreateMeshShapeObject(name, material);
-				std::wstring x;
+				std::string x;
 				vector3d loc;
 				double fsz = 0.0;
 				x = sheet->readStr(rc.x, rc.y++); uf::xsplit(x, ",", 3, &(loc.x) + 0);
 				fsz = sheet->readNum(rc.x, rc.y++);
 				xmo->setRefinementSize(fsz);
-				std::wstring mf = sheet->readStr(rc.x, rc.y++);
+				std::string mf = sheet->readStr(rc.x, rc.y++);
 				xmo->DefineShapeFromFile(loc, mf);
-				std::wstring file = xModel::makeFilePath(name + L".mesh");
+				std::string file = xModel::makeFilePath(name + ".mesh");
 				int t = VMESH;
-				xve->Write((wchar_t*)&t, sizeof(int));
+				xve->Write((char*)&t, sizeof(int));
 				unsigned int ns = (unsigned int)file.size();
-				xve->Write((wchar_t*)&ns, sizeof(unsigned int));
-				xve->Write((wchar_t*)file.c_str(), sizeof(wchar_t)*ns);
+				xve->Write((char*)&ns, sizeof(unsigned int));
+				xve->Write((char*)file.c_str(), sizeof(char)*ns);
 				xmo->exportMeshData(file);
 				//xmo->splitTriangles(fsz);
 			}
@@ -599,22 +599,22 @@ void xXLSReader::ReadShapeObject(xObjectManager* xom, vector2i rc)
 
 void xXLSReader::ReadIntegrator(vector2i rc)
 {
-	std::wstring sol;
+	std::string sol;
 	int ic = rc.y;
 	while (!IsEmptyCell(rc.x, rc.y))
 	{
 		sol = sheet->readStr(rc.x, rc.y++);
-		if (sol == L"MBD")
+		if (sol == "MBD")
 		{
 			xSimulation::MBDSolverType type = static_cast<xSimulation::MBDSolverType>(static_cast<int>(sheet->readNum(rc.x++, rc.y)));
 			xSimulation::setMBDSolverType(type);
 		}
-		else if (sol == L"DEM")
+		else if (sol == "DEM")
 		{
 			xSimulation::DEMSolverType type = static_cast<xSimulation::DEMSolverType>(static_cast<int>(sheet->readNum(rc.x++, rc.y)));
 			xSimulation::setDEMSolverType(type);
 		}
-		else if (sol == L"SPH")
+		else if (sol == "SPH")
 		{
 			xSimulation::SPHSolverType type = static_cast<xSimulation::SPHSolverType>(static_cast<int>(sheet->readNum(rc.x++, rc.y)));
 			xSimulation::setSPHSolverType(type);
@@ -647,7 +647,7 @@ void xXLSReader::ReadSimulationCondition(vector2i rc)
 		QString dev = ReadStr(rc.x, rc.y++);
 		if (dev == "CPU") xSimulation::setCPUDevice();
 		else if (dev == "GPU") xSimulation::setGPUDevice();
-		else xLog::log(L"Device input error : You have entered an invalid device type.(" + dev.toStdWString() + L")");
+		else xLog::log("Device input error : You have entered an invalid device type.(" + dev.toStdString() + ")");
 	}
 	if (!IsEmptyCell(rc.x, rc.y))
 		xSimulation::setTimeStep(sheet->readNum(rc.x, rc.y++));
@@ -661,7 +661,7 @@ void xXLSReader::ReadInputGravity(vector2i rc)
 {
 	if (!IsEmptyCell(rc.x, rc.y))
 	{
-		std::wstring x;
+		std::string x;
 		double v3[3] = { 0, };
 		x = sheet->readStr(rc.x, rc.y); uf::xsplit(x, ",", 3, v3 + 0);
 		xModel::setGravity(v3[0], v3[1], v3[2]);
@@ -680,10 +680,10 @@ QString xXLSReader::SetupSheet(int idx)
 
 QString xXLSReader::ReadStr(int r, int c)
 {
-	std::wstring s;
+	std::string s;
 	if (sheet)
 		s = sheet->readStr(r, c);
-	return QString::fromStdWString(s);
+	return QString::fromStdString(s);
 }
 
 void xXLSReader::setViewExporter(xViewExporter* _xve)

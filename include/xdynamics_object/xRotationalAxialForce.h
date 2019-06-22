@@ -7,7 +7,7 @@ class xRotationalAxialForce : public xForce
 {
 public:
 	xRotationalAxialForce();
-	xRotationalAxialForce(std::wstring _name);
+	xRotationalAxialForce(std::string _name);
 	virtual ~xRotationalAxialForce();
 
 	void SetupDataFromStructure(xPointMass* ip, xPointMass* jp, xRotationalAxialForceData& d);

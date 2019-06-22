@@ -113,7 +113,7 @@ void xSimulationThread::run()
 		xSimulation::setCurrentTime(ct);
 		if (!xds->xRunSimulationThread(ct, cstep))
 		{
-			QString err = QString::fromStdWString(xDynamicsError::getErrorString());
+			QString err = QString::fromStdString(xDynamicsError::getErrorString());
 			sendProgress(ERROR_DETECTED, err);
 			isStop = true;
 		}
@@ -127,7 +127,7 @@ void xSimulationThread::run()
 			if (xds->savePartData(ct, part))
 			{
 				ch.clear();
- 				QString ymd = QString::fromStdWString(xUtilityFunctions::GetDateTimeFormat("%d-%m-%y %H:%M:%S", 0));
+ 				QString ymd = QString::fromStdString(xUtilityFunctions::GetDateTimeFormat("%d-%m-%y %H:%M:%S", 0));
  				ch.sprintf("Part%04d   %4.5f %10d      %5d      %4.5f     %4.5f    %s", part, ct, cstep, eachStep, elapsed_time - previous_time, total_time, ymd.toStdString().c_str());
  				//ch = "dd";
  				sendProgress(part, ch);

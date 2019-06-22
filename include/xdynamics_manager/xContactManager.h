@@ -22,7 +22,7 @@ public:
 // 	void Save(QTextStream& qts);
 // 	void Open(QTextStream& qts, particleManager* pm, geometryObjects* objs);
 	xContact* CreateContactPair(
-		std::wstring n, xContactForceModelType method, xObject* fo, xObject* so, xContactParameterData& d);
+		std::string n, xContactForceModelType method, xObject* fo, xObject* so, xContactParameterData& d);
 
 	unsigned int setupParticlesMeshObjectsContact();
 	void setupParticlesPlanesContact();

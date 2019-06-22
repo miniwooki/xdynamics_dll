@@ -8,7 +8,7 @@ class XDYNAMICS_API xPlaneObject : public xPointMass
 {
 public:
 	xPlaneObject();
-	xPlaneObject(std::wstring _name);
+	xPlaneObject(std::string _name);
 	virtual ~xPlaneObject();
 
 	bool define(vector3d& _xw, vector3d& _pa, vector3d& _pb);

@@ -26,9 +26,9 @@ std::string xUtilityFunctions::xstring(double v)
 	return QString("%1").arg(v).toStdString();
 }
 
-void xUtilityFunctions::CreateDirectory(const wchar_t* _path)
+void xUtilityFunctions::CreateDirectory(const char* _path)
 {
-	QString path = QString::fromStdWString(_path);
+	QString path = QString::fromStdString(_path);
 	if (!QDir(path).exists())
 		QDir().mkdir(path);
 // 	try
@@ -52,14 +52,14 @@ vector3d xUtilityFunctions::QuaternionRotation(vector4d & q, vector3d & v)
 	return p_hat;
 }
 
-std::string xUtilityFunctions::xstring(std::wstring v)
+std::string xUtilityFunctions::xstring(std::string v)
 {
-	return QString::fromStdWString(v).toStdString();
+	return QString::fromStdString(v).toStdString();
 }
 
-QString xUtilityFunctions::GetFileName(const wchar_t* pn)
+QString xUtilityFunctions::GetFileName(const char* pn)
 {
-	QString path = QString::fromStdWString(pn);
+	QString path = QString::fromStdString(pn);
 	int begin = path.lastIndexOf('/');
 	int end = path.lastIndexOf('.');
 	return path.mid(begin+1, end - begin-1);
@@ -77,9 +77,9 @@ QString xUtilityFunctions::GetFileName(const wchar_t* pn)
 // 	return b;
 }
 
-QString xUtilityFunctions::FileExtension(const wchar_t* f)
+QString xUtilityFunctions::FileExtension(const char* f)
 {
-	QString path = QString::fromStdWString(f);
+	QString path = QString::fromStdString(f);
 	int begin = path.lastIndexOf('.');
 	return path.mid(begin);
 // 	
@@ -90,15 +90,15 @@ QString xUtilityFunctions::FileExtension(const wchar_t* f)
 // 	}
 // 	catch (boost::filesystem::filesystem_error& ex)
 // 	{
-// 		std::wcout << ex.what() << std::endl;
+// 		std::cout << ex.what() << std::endl;
 // 		throw;
 // 	}
 // 	return b;
 }
 
-bool xUtilityFunctions::ExistFile(const wchar_t* n)
+bool xUtilityFunctions::ExistFile(const char* n)
 {
-	QString path = QString::fromStdWString(n);
+	QString path = QString::fromStdString(n);
 	return QFile().exists(path);
 // 	bool b = false;
 // 	try
@@ -108,15 +108,15 @@ bool xUtilityFunctions::ExistFile(const wchar_t* n)
 // 	}
 // 	catch (boost::filesystem::filesystem_error& ex)
 // 	{
-// 		std::wcout << ex.what() << std::endl;
+// 		std::cout << ex.what() << std::endl;
 // 		throw;
 // 	}
 // 	return b;
 }
 
-void xUtilityFunctions::DirectoryFileList(const wchar_t* _path)
+void xUtilityFunctions::DirectoryFileList(const char* _path)
 {
-	QString path = QString::fromStdWString(_path);
+	QString path = QString::fromStdString(_path);
 	QDir d(path);
 	QStringList ls = d.entryList();
 	foreach(QString s, ls)
@@ -128,49 +128,49 @@ void xUtilityFunctions::DirectoryFileList(const wchar_t* _path)
 // 		boost::filesystem::path p(_path);
 // 		if (boost::filesystem::exists(p))
 // 		{
-// 			std::wcout << std::endl << "File list of " << _path << std::endl;
+// 			std::cout << std::endl << "File list of " << _path << std::endl;
 // 			for (auto i = directory_iterator(p); i != directory_iterator(); i++)
 // 			{
 // 				if (!is_directory(i->path()))
 // 				{
-// 					std::wcout << "     " << i->path().filename().string() << std::endl;
+// 					std::cout << "     " << i->path().filename().string() << std::endl;
 // 				}
 // 			}
 // 		}
 // 	}
 // 	catch (boost::filesystem::filesystem_error& ex)
 // 	{
-// 		std::wcout << ex.what() << std::endl;
+// 		std::cout << ex.what() << std::endl;
 // 		throw;
 // 	}
 }
 
-std::wstring xUtilityFunctions::Multibyte2WString(const char* c)
-{
-	int len = (int)strlen(c);
-	wchar_t* wcArr = NULL;// new wchar_t[len];// (wchar_t*)calloc(1, len);
-	len = MultiByteToWideChar(CP_ACP, 0, c, len, NULL, NULL);
-	wcArr = SysAllocStringLen(NULL, len);
-	MultiByteToWideChar(CP_ACP, 0, c, len, wcArr, len);
-	wstring cstr = wcArr;
-	SysFreeString(wcArr);// [] wcArr;
-	return cstr;
-}
+//std::wstring xUtilityFunctions::Multibyte2WString(const char* c)
+//{
+//	int len = (int)strlen(c);
+//	wchar_t* wcArr = NULL;// new char[len];// (char*)calloc(1, len);
+//	len = MultiByteToWideChar(CP_ACP, 0, c, len, NULL, NULL);
+//	wcArr = SysAllocStringLen(NULL, len);
+//	MultiByteToWideChar(CP_ACP, 0, c, len, wcArr, len);
+//	wstring cstr = wcArr;
+//	SysFreeString(wcArr);// [] wcArr;
+//	return cstr;
+//}
+//
+//std::wstring xUtilityFunctions::WideChar2String(const wchar_t* wc)
+//{
+//	int wLen;
+//	wchar_t* cArr;
+//
+//	wLen = (int)wcslen(wc);
+//	cArr = (wchar_t*)calloc(1, wLen * 2 + 1);
+//	WideCharToMultiByte(CP_ACP, 0, wc, wLen, cArr, wLen * 2, 0, 0);
+//	wstring cstr = cArr;
+//	delete cArr;
+//	return cstr;
+//}
 
-std::string xUtilityFunctions::WideChar2String(const wchar_t* wc)
-{
-	int wLen;
-	char* cArr;
-
-	wLen = (int)wcslen(wc);
-	cArr = (char*)calloc(1, wLen * 2 + 1);
-	WideCharToMultiByte(CP_ACP, 0, wc, wLen, cArr, wLen * 2, 0, 0);
-	string cstr = cArr;
-	delete cArr;
-	return cstr;
-}
-
-std::wstring xUtilityFunctions::GetDateTimeFormat(const char* format, int nseg)
+std::string xUtilityFunctions::GetDateTimeFormat(const char* format, int nseg)
 {
 	time_t rawtime;
 	struct tm timeinfo;
@@ -179,7 +179,7 @@ std::wstring xUtilityFunctions::GetDateTimeFormat(const char* format, int nseg)
 	localtime_s(&timeinfo, &rawtime);
 	char bufftime[64];
 	strftime(bufftime, 64, format, &timeinfo);
-	return Multibyte2WString(bufftime);
+	return bufftime;
 }
 
 int xUtilityFunctions::FindNumString(const string& s, const char* c)
@@ -199,25 +199,25 @@ int xUtilityFunctions::FindNumString(const string& s, const char* c)
 	return ns;
 }
 
-void xUtilityFunctions::xsplit(const std::wstring& s, const char* c, int n, int* data)
+void xUtilityFunctions::xsplit(const std::string& s, const char* c, int n, int* data)
 {
-	QString d = QString::fromStdWString(s);
+	QString d = QString::fromStdString(s);
 	QStringList ds = d.split(c);
 	for (int i = 0; i < n; i++)
 		data[i] = ds.at(i).toInt();
 }
 
-void xUtilityFunctions::xsplit(const std::wstring& s, const char* c, vector2i& data)
+void xUtilityFunctions::xsplit(const std::string& s, const char* c, vector2i& data)
 {
-	QString d = QString::fromStdWString(s);
+	QString d = QString::fromStdString(s);
 	QStringList ds = d.split(c);
 	data.x = ds.at(0).toDouble();
 	data.y = ds.at(1).toDouble();
 }
 
-void xUtilityFunctions::xsplit(const std::wstring& s, const char* c, int n, double* data)
+void xUtilityFunctions::xsplit(const std::string& s, const char* c, int n, double* data)
 {
-	QString d = QString::fromStdWString(s);
+	QString d = QString::fromStdString(s);
 	QStringList ds = d.split(c);
 	for (int i = 0; i < n; i++)
 		data[i] = ds.at(i).toDouble();
@@ -237,7 +237,7 @@ void xUtilityFunctions::xsplit(const std::wstring& s, const char* c, int n, doub
 // 	}
 }
 
-void xUtilityFunctions::xsplit(const wchar_t* wc, const char* c, int n, int* data)
+void xUtilityFunctions::xsplit(const char* wc, const char* c, int n, int* data)
 {
 	QString d = toWideCharToQString(wc);
 	QStringList ds = d.split(c);
@@ -260,7 +260,7 @@ void xUtilityFunctions::xsplit(const wchar_t* wc, const char* c, int n, int* dat
 // 	}
 }
 
-void xUtilityFunctions::xsplit(const wchar_t* wc, const char* c, int n, double* data)
+void xUtilityFunctions::xsplit(const char* wc, const char* c, int n, double* data)
 {
 	QString d = toWideCharToQString(wc);
 	QStringList ds = d.split(c);
@@ -283,18 +283,18 @@ void xUtilityFunctions::xsplit(const wchar_t* wc, const char* c, int n, double* 
 // 	}
 }
 
-unsigned int xUtilityFunctions::xsplitn(const wchar_t* s, const char* c)
+unsigned int xUtilityFunctions::xsplitn(const char* s, const char* c)
 {
 	QString d = toWideCharToQString(s);
 	return d.split(c).size();
 }
 
-void xUtilityFunctions::xsplit(const wchar_t* wc, const char* c, int n, std::wstring* data)
+void xUtilityFunctions::xsplit(const char* wc, const char* c, int n, std::string* data)
 {
 	QString d = toWideCharToQString(wc);
 	QStringList ds = d.split(c);
 	for (int i = 0; i < n; i++)
-		data[i] = ds.at(i).toStdWString();
+		data[i] = ds.at(i).toStdString();
 	// 	string s = WideChar2String(wc);
 	// 	basic_string<char>::size_type start = 0, end;
 	// 	static const basic_string<char>::size_type npos = -1;
@@ -312,12 +312,12 @@ void xUtilityFunctions::xsplit(const wchar_t* wc, const char* c, int n, std::wst
 	// 	}
 }
 
-// void xUtilityFunctions::Split2WString(const wchar_t* wc, const wchar_t* c, int& n, wstring* data)
+// void xUtilityFunctions::Split2WString(const char* wc, const char* c, int& n, wstring* data)
 // {
 // 	n = 0;
 // 	wstring s = wc;
-// 	basic_string<wchar_t>::size_type start = 0, end;
-// 	static const basic_string<wchar_t>::size_type npos = -1;
+// 	basic_string<char>::size_type start = 0, end;
+// 	static const basic_string<char>::size_type npos = -1;
 // 	int ns = 0;
 // 	int len = (int)wcslen(c);
 // 	while (1)

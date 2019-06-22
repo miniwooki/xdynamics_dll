@@ -13,15 +13,15 @@ xResultManager::~xResultManager()
 
 }
 
-void xResultManager::xRun(const std::wstring _cpath, const std::wstring _cname)
+void xResultManager::xRun(const std::string _cpath, const std::string _cname)
 {
-	wchar_t cmd[64] = { 0, };
+	char cmd[64] = { 0, };
 	
-	cur_path = QString::fromStdWString(_cpath);
-	cur_name = QString::fromStdWString(_cname);
-	std::wstring _path = _cpath + _cname + L"/";
-	std::wcout << L"Welcome to result world." << std::endl;
-	std::wcout << L"Current path - " << _path.c_str() << std::endl;
+	cur_path = QString::fromStdString(_cpath);
+	cur_name = QString::fromStdString(_cname);
+	std::string _path = _cpath + _cname + "/";
+	std::cout << "Welcome to result world." << std::endl;
+	std::cout << "Current path - " << _path.c_str() << std::endl;
 
 	xUtilityFunctions::DirectoryFileList(_path.c_str());
 	int ret = 0;
@@ -29,8 +29,8 @@ void xResultManager::xRun(const std::wstring _cpath, const std::wstring _cname)
 	while (1)
 	{
 		ret = 0;
-		std::wcout << L">> ";
-		std::wcin.getline(cmd, sizeof(cmd), '\n');
+		std::cout << ">> ";
+		std::cin.getline(cmd, sizeof(cmd), '\n');
 		ncmd = xUtilityFunctions::xsplitn(cmd, " ");
 		switch (ncmd)
 		{
@@ -40,24 +40,24 @@ void xResultManager::xRun(const std::wstring _cpath, const std::wstring _cname)
 		}
 	
 		if (!ret)
-			std::wcout << L"The command you entered does not exist." << std::endl;
+			std::cout << "The command you entered does not exist." << std::endl;
 		else if (ret == -1)
 			break;
 		fflush(stdin);
 	}
 }
 
-void xResultManager::setCurrentPath(std::wstring new_path)
+void xResultManager::setCurrentPath(std::string new_path)
 {
-	cur_path = QString::fromStdWString(new_path);// wsprintfW(cur_path, TEXT("%s"), new_path);
+	cur_path = QString::fromStdString(new_path);// wsprintfW(cur_path, TEXT("%s"), new_path);
 }
 
-void xResultManager::setCurrentName(std::wstring new_name)
+void xResultManager::setCurrentName(std::string new_name)
 {
-	cur_name = QString::fromStdWString(new_name);// wsprintfW(cur_name, TEXT("%s"), new_name);
+	cur_name = QString::fromStdString(new_name);// wsprintfW(cur_name, TEXT("%s"), new_name);
 }
 
-void xResultManager::ExportBPM2TXT(std::wstring& file_name)
+void xResultManager::ExportBPM2TXT(std::string& file_name)
 {
 	std::fstream ifs;
 	ifs.open(file_name.c_str(), ios::binary | ios::in);
@@ -71,9 +71,9 @@ void xResultManager::ExportBPM2TXT(std::wstring& file_name)
 	xPointMass::pointmass_result *pms = new xPointMass::pointmass_result[nr_part];
 	ifs.read((char*)pms, sizeof(xPointMass::pointmass_result) * nr_part);
 	ifs.close();
-	//size_t begin = file_name.find_last_of(L".");
-	size_t end = file_name.find_last_of(L"/");
-	std::wstring new_file_name = file_name.substr(0, end + 1) + xUtilityFunctions::GetFileName(file_name.c_str()).toStdWString() + L".txt";
+	//size_t begin = file_name.find_last_of(".");
+	size_t end = file_name.find_last_of("/");
+	std::string new_file_name = file_name.substr(0, end + 1) + xUtilityFunctions::GetFileName(file_name.c_str()).toStdString() + ".txt";
 	ifs.open(new_file_name, ios::out);
 	ifs << "time " << "px " << "py " << "pz " << "vx " << "vy " << "vz " << "ax " << "ay " << "az "
 		<< "avx " << "avy " << "avz " << "aax " << "aay " << "aaz "
@@ -96,7 +96,7 @@ void xResultManager::ExportBPM2TXT(std::wstring& file_name)
 	ifs.close();
 }
 
-void xResultManager::ExportBKC2TXT(std::wstring& file_name)
+void xResultManager::ExportBKC2TXT(std::string& file_name)
 {
 	std::fstream ifs;
 	ifs.open(file_name, ios::binary | ios::in);
@@ -109,8 +109,8 @@ void xResultManager::ExportBKC2TXT(std::wstring& file_name)
 	xKinematicConstraint::kinematicConstraint_result *pms = new xKinematicConstraint::kinematicConstraint_result[nr_part];
 	ifs.read((char*)pms, sizeof(xKinematicConstraint::kinematicConstraint_result) * nr_part);
 	ifs.close();
-	//size_t begin = file_name.find_last_of(L".");
-	std::wstring new_file_name = xUtilityFunctions::GetFileName(file_name.c_str()).toStdWString() + L".txt";//.substr(0, begin) + L".txt";
+	//size_t begin = file_name.find_last_of(".");
+	std::string new_file_name = xUtilityFunctions::GetFileName(file_name.c_str()).toStdString() + ".txt";//.substr(0, begin) + ".txt";
 	ifs.open(new_file_name, ios::out);
 	ifs << "time " << "locx " << "locy " << "locz "// << "vx " << "vy " << "vz " << "ax " << "ay " << "az "
 		<< "iafx " << "iafy " << "iafz " << "irfx " << "irfy " << "irfz "
@@ -128,35 +128,35 @@ void xResultManager::ExportBKC2TXT(std::wstring& file_name)
 	ifs.close();
 }
 
-int xResultManager::Execute0(wchar_t *d)
+int xResultManager::Execute0(char *d)
 {
 	return 1;
 }
 
-int xResultManager::Execute1(wchar_t *d)
+int xResultManager::Execute1(char *d)
 {
-	if (!wcscmp(L"exit", d))
+	if (!strcmp("exit", d))
 		return -1;
-	else if (!wcscmp(L"list", d))
+	else if (!strcmp("list", d))
 	{
-		xUtilityFunctions::DirectoryFileList((cur_path + cur_name).toStdWString().c_str());
+		xUtilityFunctions::DirectoryFileList((cur_path + cur_name).toStdString().c_str());
 		return 1;
 	}
 	return 0;
 }
 
-int xResultManager::Execute2(wchar_t *d)
+int xResultManager::Execute2(char *d)
 {
-	wchar_t val[64] = { 0, };
-	std::wstring data[2];
+	char val[64] = { 0, };
+	std::string data[2];
 	xUtilityFunctions::xsplit(d, " ", 2, data);
-	if (data[0] == L"get")
+	if (data[0] == "get")
 	{
-		if (data[1] == L"ascii")
+		if (data[1] == "ascii")
 		{
-			std::wcout << "Please enter a result file to import : ";
-			std::wcin >> val;
-			std::wstring fn = (cur_path + cur_name + "/").toStdWString() + val;
+			std::cout << "Please enter a result file to import : ";
+			std::cin >> val;
+			std::string fn = (cur_path + cur_name + "/").toStdString() + val;
 			if (xUtilityFunctions::ExistFile(fn.c_str()))
 			{
 				QString ext = xUtilityFunctions::FileExtension(fn.c_str());
@@ -168,23 +168,23 @@ int xResultManager::Execute2(wchar_t *d)
 			return 1;
 		}
 	}
-	else if (data[0] == L"set")
+	else if (data[0] == "set")
 	{
-		if (data[1] == L"model")
+		if (data[1] == "mode")
 		{
-			std::wcout << L"Please enter a model name : ";
-			std::wcin >> val;
-			std::wstring cname = val;
-			std::wstring fn = cur_path.toStdWString() + val + L"/";
+			std::cout << "Please enter a model name : ";
+			std::cin >> val;
+			std::string cname = val;
+			std::string fn = cur_path.toStdString() + val + "/";
 			if (xUtilityFunctions::ExistFile(fn.c_str()))
 			{
-				cur_name = QString::fromStdWString(cname);
+				cur_name = QString::fromStdString(cname);
 			//	_path = fn;
 				xUtilityFunctions::DirectoryFileList(fn.c_str());
 			}
 			else
 			{
-				std::wcout << L"The model you entered does not exist." << std::endl;
+				std::cout << "The model you entered does not exist." << std::endl;
 			}
 			return 1;
 		}

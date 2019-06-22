@@ -11,8 +11,8 @@ public:
 	xViewExporter();
 	~xViewExporter();
 
-	void Open(std::wstring path);
-	void Write(wchar_t* c, unsigned int sz);
+	void Open(std::string path);
+	void Write(char* c, unsigned int sz);
 	void Close();
 	
 private:

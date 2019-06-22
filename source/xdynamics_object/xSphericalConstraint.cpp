@@ -7,7 +7,7 @@ xSphericalConstraint::xSphericalConstraint()
 
 }
 
-xSphericalConstraint::xSphericalConstraint(std::wstring _name, std::wstring _i, std::wstring _j)
+xSphericalConstraint::xSphericalConstraint(std::string _name, std::string _i, std::string _j)
 	: xKinematicConstraint(_name, xKinematicConstraint::SPHERICAL, _i, _j)
 {
 

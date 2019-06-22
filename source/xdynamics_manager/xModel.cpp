@@ -18,25 +18,25 @@ xModel::unit_type xModel::unit = MKS;
 xModel::xModel()
 {
 	//xLog();
-// 	wchar_t* pv = NULL;
+// 	char* pv = NULL;
 // 	size_t len = 0;
-// 	_wdupenv_s(&pv, &len, L"USERPROFILE");
+// 	_wdupenv_s(&pv, &len, "USERPROFILE");
 // 	path = pv;// wsprintfW(path, TEXT("%s"), pv);
-// 	//wchar_t wcarr[11] = { 0, };
+// 	//char wcarr[11] = { 0, };
 // 	//MultiByteToWideChar(CP_ACP, NULL, "/Documents/", -1, wcarr, 11 * 2);
-// 	path = path + L"/Documents/xdynamics/";
-// 		//lstrcatW(path, L"/Documents/xdynamics/");
+// 	path = path + "/Documents/xdynamics/";
+// 		//lstrcatW(path, "/Documents/xdynamics/");
 // 	delete pv;
 }
 
-xModel::xModel(const std::wstring _name)
+xModel::xModel(const std::string _name)
 {
-	name = QString::fromStdWString(_name);
-	std::wcout << _name << std::endl;
-	xUtilityFunctions::CreateDirectory(path.toStdWString().c_str());
+	name = QString::fromStdString(_name);
+	std::cout << _name << std::endl;
+	xUtilityFunctions::CreateDirectory(path.toStdString().c_str());
 	if (!ground)
 	{
-		ground = new xPointMass(L"ground");
+		ground = new xPointMass("ground");
 		ground->setXpmIndex(-1);
 	}
 }
@@ -77,13 +77,13 @@ void xModel::setModelName(const QString n)
 	{
 		name = n;// wsprintfW(name, TEXT("%s"), n);
 		QString full_path = path + name + "/";
-		xUtilityFunctions::CreateDirectory(full_path.toStdWString().c_str());
-		launchLogSystem(full_path.toStdWString());
-		xLog::log(L"Change Directory : " + full_path.toStdWString());
+		xUtilityFunctions::CreateDirectory(full_path.toStdString().c_str());
+		launchLogSystem(full_path.toStdString());
+		xLog::log("Change Directory : " + full_path.toStdString());
 	}
 	else
 	{
-		xLog::log(L"Not change : You have attempted to change to the currently configured path");
+		xLog::log("Not change : You have attempted to change to the currently configured path");
 	}
 }
 
@@ -114,13 +114,13 @@ void xModel::setGravity(double x, double y, double z)
 	gravity.z = z;
 }
 
-void xModel::launchLogSystem(std::wstring lpath)
+void xModel::launchLogSystem(std::string lpath)
 {
 	xLog::launchLogSystem(lpath);
 }
 
-std::wstring xModel::makeFilePath(std::wstring file_name)
+std::string xModel::makeFilePath(std::string file_name)
 {
-	std::wstring f = path.toStdWString() + name.toStdWString() + L"/" + file_name;
+	std::string f = path.toStdString() + name.toStdString() + "/" + file_name;
 	return f;
 }

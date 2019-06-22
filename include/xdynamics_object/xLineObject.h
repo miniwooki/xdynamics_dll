@@ -8,7 +8,7 @@ class XDYNAMICS_API xLineObject : public xPointMass
 {
 public:
 	xLineObject();
-	xLineObject(std::wstring _name);
+	xLineObject(std::string _name);
 	virtual ~xLineObject();
 
 	bool define(vector3d p0, vector3d p1, vector3d n);

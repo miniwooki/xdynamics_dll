@@ -10,7 +10,7 @@ class XDYNAMICS_API xParticleCubeContact : public xContact
 {
 public:
 	xParticleCubeContact();
-	xParticleCubeContact(std::wstring _name, xObject* o1, xObject *o2);
+	xParticleCubeContact(std::string _name, xObject* o1, xObject *o2);
 	virtual ~xParticleCubeContact();
 
 	xCubeObject* CubeObject();

@@ -14,8 +14,8 @@ xContact::xContact()
 
 }
 
-xContact::xContact(std::wstring _name, xContactPairType xcpt)
-	: name(QString::fromStdWString(_name))
+xContact::xContact(std::string _name, xContactPairType xcpt)
+	: name(QString::fromStdString(_name))
 	, type(xcpt)
 	, force_model(DHS)
 	, dcp(NULL)

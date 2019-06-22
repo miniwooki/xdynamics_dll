@@ -9,7 +9,7 @@ class XDYNAMICS_API xDiscreteElementMethodModel
 {
 public:
 	xDiscreteElementMethodModel();
-	xDiscreteElementMethodModel(std::wstring _name);
+	xDiscreteElementMethodModel(std::string _name);
 	~xDiscreteElementMethodModel();
 
 	xParticleManager* XParticleManager();

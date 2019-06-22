@@ -103,20 +103,20 @@ bool xDynamicsSimulator::xInitialize(
 		//std::cout << xmbd->Initialized() << " " << xdm->XMBDModel() << std::endl;
 		if (xdm->XMBDModel() && !xmbd->Initialized())
 		{
-			xLog::log(L"An uninitialized multibody model has been detected.");
+			xLog::log("An uninitialized multibody model has been detected.");
 			//int ret = xmbd->Initialize(xdm->XMBDModel());
 			if (!checkXerror(xmbd->Initialize(xdm->XMBDModel())))
-				xLog::log(L"The initialization of multibody model was succeeded.");
+				xLog::log("The initialization of multibody model was succeeded.");
 		}
 	}
 	if (xdem)
 	{
 		if (xdm->XDEMModel() && !xdem->Initialized())
 		{
-			xLog::log(L"An uninitialized discrete element method model has been detected.");
+			xLog::log("An uninitialized discrete element method model has been detected.");
 			//int ret = xdem->Initialize(xdm->XDEMModel(), xdm->XContact());
 			if (!checkXerror(xdem->Initialize(xdm->XDEMModel(), xdm->XContact())))
-				xLog::log(L"The initialization of discrete element method model was succeeded.");
+				xLog::log("The initialization of discrete element method model was succeeded.");
 		}
 		//xdem->EnableSaveResultToMemory(exefromgui);
 	}
@@ -124,9 +124,9 @@ bool xDynamicsSimulator::xInitialize(
 	{
 		if (xdm->XSPHModel() && !xsph->Initialized())
 		{
-			xLog::log(L"An uninitialized smoothed particle hydrodynamics model has been detected.");
+			xLog::log("An uninitialized smoothed particle hydrodynamics model has been detected.");
 			if (!checkXerror(xsph->Initialize(xdm->XSPHModel())))
-				xLog::log(L"The initialization of smoothed particle hydrodynamics mode was succeeded.");
+				xLog::log("The initialization of smoothed particle hydrodynamics mode was succeeded.");
 		}
 	}
 // 	xuf::DeleteFileByEXT(xuf::xstring(xModel::path) + xuf::xstring(xModel::name), "bin");
@@ -193,7 +193,7 @@ bool xDynamicsSimulator::xRunSimulationThread(double ct, unsigned int cstep)
 bool xDynamicsSimulator::xRunSimulation()
 {
 // 	isStop = false;
-	wchar_t buf[255] = { 0, };
+	char buf[255] = { 0, };
  	unsigned int part = 0;
  	unsigned int cstep = 0;
  	unsigned int eachStep = 0;
@@ -205,9 +205,9 @@ bool xDynamicsSimulator::xRunSimulation()
  	double total_time = 0.0;
 	double elapsed_time = 0.0;
 	double previous_time = 0.0;
-	xLog::log(L"=========  =======    ==========    ======   ========   =============  ====================");
-	xLog::log(L"PART       SimTime    TotalSteps    Steps    Time/Sec   TotalTime/Sec  Finish time         ");
-	xLog::log(L"=========  =======    ==========    ======   ========   =============  ====================");
+	xLog::log("=========  =======    ==========    ======   ========   =============  ====================");
+	xLog::log("PART       SimTime    TotalSteps    Steps    Time/Sec   TotalTime/Sec  Finish time         ");
+	xLog::log("=========  =======    ==========    ======   ========   =============  ====================");
 	//xTime tme;
 	QTime tme;
 	QTime startTime = tme.currentTime();
@@ -242,7 +242,7 @@ bool xDynamicsSimulator::xRunSimulation()
 			part++;
 			if (savePartData(ct, part))
 			{
-				swprintf_s(buf, L"Part%04d   %4.5f %10d      %5d      %4.5f     %4.5f    %ws", part, ctime, cstep, eachStep, elapsed_time - previous_time, total_time, xUtilityFunctions::GetDateTimeFormat("%d-%m-%y %H:%M:%S", 0).c_str());
+				sprintf_s(buf, "Part%04d   %4.5f %10d      %5d      %4.5f     %4.5f    %s", part, ctime, cstep, eachStep, elapsed_time - previous_time, total_time, xUtilityFunctions::GetDateTimeFormat("%d-%m-%y %H:%M:%S", 0).c_str());
 				xLog::log(buf);
 			}
 			eachStep = 0;
@@ -251,7 +251,7 @@ bool xDynamicsSimulator::xRunSimulation()
 	//tme.stop();
 	elapsed_time = tme.elapsed() * 0.001;
 	total_time += elapsed_time;
-	xLog::log(L"=========  =======    ==========    ======   ========   =============  ====================\n");
+	xLog::log("=========  =======    ==========    ======   ========   =============  ====================\n");
 	exportPartData();
 	QTime endTime = QTime::currentTime();
 	QDate endDate = QDate::currentDate();
@@ -259,9 +259,9 @@ bool xDynamicsSimulator::xRunSimulation()
 	int hour = static_cast<int>(minute / 60.0);
 	double second = total_time - (hour * 3600 + minute * 60);
 	xLog::log(
-		L"     Starting time/date     = " + startTime.toString().toStdWString() + L" / " + startDate.toString().toStdWString() + L"\n" +
-		L"     Ending time/date       = " + endTime.toString().toStdWString() + L" / " + endDate.toString().toStdWString() + L"\n" +
-		L"     CPU + GPU time         = " + QString("%1").arg(total_time).toStdWString() + L" second  ( " + QString("%1").arg(hour).toStdWString() + L" h. " + QString("%1").arg(minute).toStdWString() + L" m. " + QString("%1").arg(second).toStdWString() + L" s. )");
+		"     Starting time/date     = " + startTime.toString().toStdString() + " / " + startDate.toString().toStdString() + "\n" +
+		"     Ending time/date       = " + endTime.toString().toStdString() + " / " + endDate.toString().toStdString() + "\n" +
+		"     CPU + GPU time         = " + QString("%1").arg(total_time).toStdString() + " second  ( " + QString("%1").arg(hour).toStdString() + " h. " + QString("%1").arg(minute).toStdString() + " m. " + QString("%1").arg(second).toStdString() + " s. )");
 	return true;
 // 		QMutexLocker locker(&m_mutex);
 // 		if (isStop)

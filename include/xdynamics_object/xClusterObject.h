@@ -25,7 +25,7 @@ class XDYNAMICS_API xClusterObject : public xObject
 {
 public:
 	xClusterObject();
-	xClusterObject(std::wstring name);
+	xClusterObject(std::string name);
 	virtual ~xClusterObject();
 
 	void setClusterSet(unsigned int num, double rad, vector3d* d);

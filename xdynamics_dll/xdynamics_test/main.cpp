@@ -5,7 +5,7 @@
 
 //static xMultiBodySimulation* xmbs = NULL;
 
-int wmain(int argc, wchar_t* argv[])
+int main(int argc, char* argv[])
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	//xModel::setModelName("fdafd");
@@ -88,7 +88,7 @@ int wmain(int argc, wchar_t* argv[])
 			//xdm.xRunResultWorld(argv[2]);
 		//}
 		//return 0;
-		xdm->OpenModelXLS(L"C:/xDynamics/resource/cluster_test.xls");
+		xdm->OpenModelXLS("C:/xDynamics/resource/cluster_test.xls");
 		//xdm->OpenModelXLS(L"C:/xDynamics/resource/four_bar3d.xls");
 	}
 	

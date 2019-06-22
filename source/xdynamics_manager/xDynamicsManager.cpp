@@ -10,14 +10,14 @@
 #include <map>
 
 xDynamicsManager::xDynamicsManager()
-	: xModel(L"Model1")
+	: xModel("Model1")
 	, xmbd(NULL)
 	, xdem(NULL)
 	, xsph(NULL)
 	, xom(NULL)
 	, xcm(NULL)
 {
-	CreateModel(xModel::name.toStdWString(), OBJECT);
+	CreateModel(xModel::name.toStdString(), OBJECT);
 }
 
 xDynamicsManager::~xDynamicsManager()
@@ -41,15 +41,15 @@ xDynamicsManager::~xDynamicsManager()
 	xObject::initialize();
 }
 
-bool xDynamicsManager::getSimulatorFromCommand(int argc, wchar_t* argv[])
+bool xDynamicsManager::getSimulatorFromCommand(int argc, char* argv[])
 {
-	std::wstring argv1 = argv[1];
+	std::string argv1 = argv[1];
 //	std::string check_command = xUtilityFunctions::WideChar2String(/*argv[1]*/);
-	if (argv1 == L"-result")
+	if (argv1 == "-result")
 		return NULL;
 	int nOpt = argc - 2;
 	//QString file = xUtilityFunctions::WideChar2String(/*argv[1]*/);
-	//size_t begin = argv1.find_last_of(L".") + 1;
+	//size_t begin = argv1.find_last_of(".") + 1;
 	QString ext = xUtilityFunctions::FileExtension(argv1.c_str());// .substr(begin, argv1.size());
 	solverType stype;
 	//xLog::log(ext.toStdString().c_str());
@@ -57,7 +57,7 @@ bool xDynamicsManager::getSimulatorFromCommand(int argc, wchar_t* argv[])
 		stype = OpenModelXLS(argv1.c_str()/*argv[1]*/);
 	else
 	{
-		xLog::log(L"Error : Unsupported file format.");
+		xLog::log("Error : Unsupported file format.");
 		return false;
 	}
 		
@@ -68,43 +68,43 @@ bool xDynamicsManager::getSimulatorFromCommand(int argc, wchar_t* argv[])
 // 		bool default_set = false;
 // 		for (int i = 2; i < argc; i++)
 // 		{
-// 			std::wstring opt_id = argv[i];// xUtilityFunctions::WideChar2String(argv[i]);
-// 			std::wstring opt_value = argv[i + 1];// xUtilityFunctions::WideChar2String(argv[i + 1]);
-// 			if (opt_id == L"-default")
+// 			std::string opt_id = argv[i];// xUtilityFunctions::WideChar2String(argv[i]);
+// 			std::string opt_value = argv[i + 1];// xUtilityFunctions::WideChar2String(argv[i + 1]);
+// 			if (opt_id == "-default")
 // 				default_set = true;
-// 			if (opt_id == L"-i")
+// 			if (opt_id == "-i")
 // 			{
-// 				if (opt_value == L"hht")
+// 				if (opt_value == "hht")
 // 				{
 // 					xIntegratorHHT* hht = dynamic_cast<xIntegratorHHT*>(xds->setupMBDSimulation(xSimulation::IMPLICIT_HHT));
-// 					wchar_t yorn;
+// 					char yorn;
 // 					double alpha = 0.0, eps = 0.0;
 // 					while (!default_set)
 // 					{
-// 						std::wcout << L"1. Default alpha : " << hht->AlphaValue() << std::endl;
-// 						std::wcout << L"2. Default tolerance : " << hht->Tolerance() << std::endl;
-// 						std::wcout << L"Do you want to edit it?(y/n) : ";
+// 						std::cout << "1. Default alpha : " << hht->AlphaValue() << std::endl;
+// 						std::cout << "2. Default tolerance : " << hht->Tolerance() << std::endl;
+// 						std::cout << "Do you want to edit it?(y/n) : ";
 // 						std::wcin >> yorn;
 // 						if (yorn == L'y')
 // 						{
 // 							unsigned int n = 0;
-// 							std::wcout << L"Enter the number of the value to change : ";
+// 							std::cout << "Enter the number of the value to change : ";
 // 							std::wcin >> n;
 // 							if (n == 1)
 // 							{
-// 								std::wcout << L"Please enter a alpha value : ";
+// 								std::cout << "Please enter a alpha value : ";
 // 								std::wcin >> alpha;
 // 								hht->setAlphaValue(alpha);
 // 							}
 // 							else if (n == 2)
 // 							{
-// 								std::wcout << L"Please enter a tolerance : ";
+// 								std::cout << "Please enter a tolerance : ";
 // 								std::wcin >> eps;
 // 								hht->setImplicitTolerance(eps);
 // 							}
 // 							else
 // 							{
-// 								std::wcout << L"You have entered an invalid number." << std::endl;
+// 								std::cout << "You have entered an invalid number." << std::endl;
 // 							}
 // 						}
 // 						else
@@ -117,19 +117,19 @@ bool xDynamicsManager::getSimulatorFromCommand(int argc, wchar_t* argv[])
 // 	}
 // 	else
 // 	{
-// 		std::wcout << L"It will be simulation by setting as default." << std::endl;
+// 		std::cout << "It will be simulation by setting as default." << std::endl;
 // 		if (xmbd)
 // 		{
 // 			xds->setupMBDSimulation(xSimulation::IMPLICIT_HHT);
-// 			std::wcout << L"    Default multibody solver : Implicit HHT\n" << std::endl;
+// 			std::cout << "    Default multibody solver : Implicit HHT\n" << std::endl;
 // 		}			
 // 	}
 	return true;
 }
 
-xDiscreteElementMethodModel* xDynamicsManager::XDEMModel(std::wstring& _n)
+xDiscreteElementMethodModel* xDynamicsManager::XDEMModel(std::string& _n)
 {
-	QString n = QString::fromStdWString(_n);
+	QString n = QString::fromStdString(_n);
 	QStringList keys = xdems.keys();
 	QStringList::const_iterator it = qFind(keys, n);
 	if (it == keys.end() || !keys.size())
@@ -147,9 +147,9 @@ xSmoothedParticleHydrodynamicsModel* xDynamicsManager::XSPHModel()
 	return xsph;
 }
 
-xSmoothedParticleHydrodynamicsModel* xDynamicsManager::XSPHModel(std::wstring& n)
+xSmoothedParticleHydrodynamicsModel* xDynamicsManager::XSPHModel(std::string& n)
 {
-	QString nm = QString::fromStdWString(n);
+	QString nm = QString::fromStdString(n);
 	QStringList keys = xsphs.keys();
 	QStringList::const_iterator it = qFind(keys, nm);
 	if (it == keys.end() || !keys.size())
@@ -162,9 +162,9 @@ xObjectManager* xDynamicsManager::XObject()
 	return xom;
 }
 
-xObjectManager* xDynamicsManager::XObject(std::wstring& _n)
+xObjectManager* xDynamicsManager::XObject(std::string& _n)
 {
-	QString n = QString::fromStdWString(_n);
+	QString n = QString::fromStdString(_n);
 	QStringList keys = xoms.keys();
 	QStringList::const_iterator it = qFind(keys, n);
 	if (it == keys.end() || !keys.size())
@@ -177,9 +177,9 @@ xContactManager* xDynamicsManager::XContact()
 	return xcm;
 }
 
-xContactManager* xDynamicsManager::XContact(std::wstring& _n)
+xContactManager* xDynamicsManager::XContact(std::string& _n)
 {
-	QString n = QString::fromStdWString(_n);
+	QString n = QString::fromStdString(_n);
 	QStringList keys = xcms.keys();
 	QStringList::const_iterator it = qFind(keys, n);
 	if (it == keys.end() || !keys.size())
@@ -192,9 +192,9 @@ xMultiBodyModel* xDynamicsManager::XMBDModel()
 	return xmbd;
 }
 
-xMultiBodyModel* xDynamicsManager::XMBDModel(std::wstring& _n)
+xMultiBodyModel* xDynamicsManager::XMBDModel(std::string& _n)
 {
-	QString n = QString::fromStdWString(_n);
+	QString n = QString::fromStdString(_n);
 	QStringList keys = xmbds.keys();
 	QStringList::const_iterator it = qFind(keys, n);
 	if (it == keys.end() || !keys.size())
@@ -202,7 +202,7 @@ xMultiBodyModel* xDynamicsManager::XMBDModel(std::wstring& _n)
 	return xmbds[n];
 }
 
-xDynamicsManager::solverType xDynamicsManager::OpenModelXLS(const wchar_t* n)
+xDynamicsManager::solverType xDynamicsManager::OpenModelXLS(const char* n)
 {
 	xXLSReader xls;
 	if (xls.Load(n))
@@ -216,7 +216,7 @@ xDynamicsManager::solverType xDynamicsManager::OpenModelXLS(const wchar_t* n)
 		{
 			vector2i d;
 			QString tn = xls.ReadStr(0, c++);
-			std::wstring t = xls.ReadStr(0, c++).toStdWString();
+			std::string t = xls.ReadStr(0, c++).toStdString();
 			xUtilityFunctions::xsplit(t, ",", d);
 			d.x -= 1; d.y -= 1;
 			if (tn == "SHAPE") xx[XLS_SHAPE] = d;
@@ -225,18 +225,18 @@ xDynamicsManager::solverType xDynamicsManager::OpenModelXLS(const wchar_t* n)
 			else if (tn == "FORCE") xx[XLS_FORCE] = d;
 			else if (tn == "PARTICLE") xx[XLS_PARTICLE] = d;
 			else if (tn == "CONTACT") xx[XLS_CONTACT] = d;
-			else if (tn == "KERNEL") xx[XLS_KERNEL] = d;
+			else if (tn == "KERNE") xx[XLS_KERNEL] = d;
 			else if (tn == "INTEGRATOR") xx[XLS_INTEGRATOR] = d;
 			else if (tn == "SIMULATION") xx[XLS_SIMULATION] = d;
 			else if (tn == "GRAVITY") xx[XLS_GRAVITY] = d;
 		}
 		std::map<xXlsInputDataType, vector2i>::iterator bt = xx.begin();
 		std::map<xXlsInputDataType, vector2i>::iterator et = xx.end();
- 		std::wstring model_name = xModel::name.toStdWString();
- 		std::wstring full_path = xModel::path.toStdWString() + model_name + L"/" + model_name;
+ 		std::string model_name = xModel::name.toStdString();
+ 		std::string full_path = xModel::path.toStdString() + model_name + "/" + model_name;
  		//xUtilityFunctions::DeleteFilesInDirectory(xUtilityFunctions::xstring(xModel::path) + model_name);
  		//xUtilityFunctions
-		QString dDir = QString::fromStdWString(full_path);
+		QString dDir = QString::fromStdString(full_path);
 		QDir dir = QDir(dDir);
 		QStringList delFileList;
 		delFileList = dir.entryList(QStringList("*.*"), QDir::Files | QDir::NoSymLinks);
@@ -247,7 +247,7 @@ xDynamicsManager::solverType xDynamicsManager::OpenModelXLS(const wchar_t* n)
 		}
 		xViewExporter xve;
 
-		xve.Open(full_path + L".vmd");
+		xve.Open(full_path + ".vmd");
 		xls.setViewExporter(&xve);
 		//xls.CreateViewModelOutput(full_path + ".vmd");
 
@@ -303,13 +303,13 @@ xDynamicsManager::solverType xDynamicsManager::OpenModelXLS(const wchar_t* n)
 // 		}
 		if (xdem || xsph)
 		{
-			std::wstring pv_path = full_path + L".par";
+			std::string pv_path = full_path + ".par";
 			if(xdem) xdem->XParticleManager()->ExportParticleDataForView(pv_path);
 			//else if (xsph) xsph->ExportParticleDataForView(pv_path);
 			int vot = VPARTICLE;
-			xve.Write((wchar_t*)&vot, sizeof(xViewObjectType));
-			int ns = pv_path.size(); xve.Write((wchar_t*)&ns, sizeof(int));
-			xve.Write((wchar_t*)pv_path.c_str(), sizeof(wchar_t)*pv_path.size());
+			xve.Write((char*)&vot, sizeof(xViewObjectType));
+			int ns = pv_path.size(); xve.Write((char*)&ns, sizeof(int));
+			xve.Write((char*)pv_path.c_str(), sizeof(char)*pv_path.size());
 		}
 // 		foreach(xObject* xo, xom->XObjects())
 // 		{
@@ -329,7 +329,7 @@ xDynamicsManager::solverType xDynamicsManager::OpenModelXLS(const wchar_t* n)
 	return stype;
 }
 
-void xDynamicsManager::CreateModel(std::wstring n, modelType t, bool isOnAir /*= false*/)
+void xDynamicsManager::CreateModel(std::string n, modelType t, bool isOnAir /*= false*/)
 {
 	QString qname = xModel::name;
 	switch (t)
@@ -342,10 +342,10 @@ void xDynamicsManager::CreateModel(std::wstring n, modelType t, bool isOnAir /*=
 	}
 
 	if (isOnAir)
-		setOnAirModel(t, qname.toStdWString());
+		setOnAirModel(t, qname.toStdString());
 }
 
-void xDynamicsManager::setOnAirModel(modelType t, std::wstring n)
+void xDynamicsManager::setOnAirModel(modelType t, std::string n)
 {
 	switch (t)
 	{

@@ -16,7 +16,7 @@ xMeshObject::xMeshObject()
 
 }
 
-xMeshObject::xMeshObject(std::wstring _name)
+xMeshObject::xMeshObject(std::string _name)
 	: xPointMass(_name, MESH_SHAPE)
 	, vertexList(NULL)
 	, maxRadii(0)
@@ -58,7 +58,7 @@ bool xMeshObject::define(xImportShapeType t, vector3d& loc, int _ntriangle, doub
 	return true;
 }
 
-int xMeshObject::DefineShapeFromFile(vector3d& loc, std::wstring f)
+int xMeshObject::DefineShapeFromFile(vector3d& loc, std::string f)
 {
 	std::fstream ofs;
 	ofs.open(f, std::ios::in);
@@ -430,21 +430,21 @@ void xMeshObject::ChangeVertexGlobal2Local()
 	}
 }
 
-std::wstring xMeshObject::exportMeshData(std::wstring path)
+std::string xMeshObject::exportMeshData(std::string path)
 {
-	std::wfstream fs;
+	std::fstream fs;
 	fs.open(path, std::ios::out | std::ios::binary);
 	unsigned int ns = static_cast<unsigned int>(name.size());
-	fs.write((wchar_t*)&ns, sizeof(unsigned int));
-	fs.write((wchar_t*)name.toStdWString().c_str(), sizeof(wchar_t)*ns);
+	fs.write((char*)&ns, sizeof(unsigned int));
+	fs.write((char*)name.toStdString().c_str(), sizeof(char)*ns);
 	double *_vertex = this->VertexList();
 	double *_normal = this->NormalList();
-	fs.write((wchar_t*)&material, sizeof(int));
-	fs.write((wchar_t*)&pos, sizeof(double) * 3);
+	fs.write((char*)&material, sizeof(int));
+	fs.write((char*)&pos, sizeof(double) * 3);
 	unsigned int nt = this->NumTriangle();
-	fs.write((wchar_t*)&nt, sizeof(unsigned int));
-	fs.write((wchar_t*)_vertex, sizeof(double) * this->NumTriangle() * 9);
-	fs.write((wchar_t*)_normal, sizeof(double) * this->NumTriangle() * 9);
+	fs.write((char*)&nt, sizeof(unsigned int));
+	fs.write((char*)_vertex, sizeof(double) * this->NumTriangle() * 9);
+	fs.write((char*)_normal, sizeof(double) * this->NumTriangle() * 9);
 	fs.close();	
 	return path;
 }

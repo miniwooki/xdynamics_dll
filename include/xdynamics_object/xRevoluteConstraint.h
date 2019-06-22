@@ -9,7 +9,7 @@ class XDYNAMICS_API xRevoluteConstraint : public xKinematicConstraint
 {
 public:
 	xRevoluteConstraint();
-	xRevoluteConstraint(std::wstring _name, std::wstring _i, std::wstring _j);
+	xRevoluteConstraint(std::string _name, std::string _i, std::string _j);
 	virtual ~xRevoluteConstraint();
 
 	virtual void ConstraintEquation(xVectorD& ce, xVectorD& q, xVectorD& dq, unsigned int sr, double mul);

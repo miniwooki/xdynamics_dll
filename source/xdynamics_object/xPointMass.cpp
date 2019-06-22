@@ -17,7 +17,7 @@ xPointMass::xPointMass(xShapeType _s)
 	setupTransformationMatrix();
 }
 
-xPointMass::xPointMass(std::wstring _name, xShapeType _s)
+xPointMass::xPointMass(std::string _name, xShapeType _s)
 	: xObject(_name, _s)
 	, nr_part(0)
 	//, pmrs(NULL)
@@ -352,8 +352,8 @@ void xPointMass::ExportResults(std::fstream& of)
 {
 	std::ofstream ofs;
 	QString _path = xModel::path + xModel::name + "/" + name + ".bpm";
-	//QString _path = QString(xModel::path) + QString(xModel::name) + L"/" + QString(name.text()) + L".bpm";
-	ofs.open(_path.toStdWString(), ios::binary | ios::out);
+	//QString _path = QString(xModel::path) + QString(xModel::name) + "/" + QString(name.text()) + ".bpm";
+	ofs.open(_path.toStdString(), ios::binary | ios::out);
 	char t = 'p';
 	int identifier = RESULT_FILE_IDENTIFIER;
 	ofs.write((char*)&identifier, sizeof(int));
@@ -362,9 +362,9 @@ void xPointMass::ExportResults(std::fstream& of)
 	ofs.write((char*)pmrs.data(), sizeof(pointmass_result) * nr_part);
 
 	ofs.close();
-	xLog::log(L"Exported : " + _path.toStdWString());
+	xLog::log("Exported : " + _path.toStdString());
 	of << _path.toStdString() << endl;
-	//std::wcout << "Exported : " << _path.text() << std::endl;
+	//std::cout << "Exported : " << _path.text() << std::endl;
 }
 
 void xPointMass::SetDataFromStructure(int id, xPointMassData& d)

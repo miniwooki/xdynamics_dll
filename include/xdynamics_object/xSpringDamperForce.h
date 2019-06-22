@@ -7,7 +7,7 @@ class xSpringDamperForce : public xForce
 {
 public:
 	xSpringDamperForce();
-	xSpringDamperForce(std::wstring _name);
+	xSpringDamperForce(std::string _name);
 	virtual ~xSpringDamperForce();
 
 	void SetupDataFromStructure(xPointMass* ip, xPointMass* jp, xTSDAData& d);

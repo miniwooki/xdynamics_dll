@@ -8,7 +8,7 @@ class XDYNAMICS_API xParticleParticleContact : public xContact
 {
 public:
 	xParticleParticleContact();
-	xParticleParticleContact(std::wstring _name);
+	xParticleParticleContact(std::string _name);
 	virtual ~xParticleParticleContact();
 
 	void cppCollision(

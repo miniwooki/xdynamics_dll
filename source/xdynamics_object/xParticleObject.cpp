@@ -15,7 +15,7 @@ xParticleObject::xParticleObject()
 
 }
 
-xParticleObject::xParticleObject(std::wstring _name)
+xParticleObject::xParticleObject(std::string _name)
 	: xObject(_name, PARTICLES)
 	, sid(0)
 	, np(0)

@@ -8,7 +8,7 @@ xCubeObject::xCubeObject()
 	memset(&ori.x, 0, sizeof(double) * 12);
 }
 
-xCubeObject::xCubeObject(std::wstring _name)
+xCubeObject::xCubeObject(std::string _name)
 	: xPointMass(_name, CUBE_SHAPE)
 	, planes(NULL)
 {

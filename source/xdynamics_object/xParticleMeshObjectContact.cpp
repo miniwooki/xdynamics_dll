@@ -8,7 +8,7 @@ xParticleMeshObjectContact::xParticleMeshObjectContact()
 
 }
 
-xParticleMeshObjectContact::xParticleMeshObjectContact(std::wstring _name, xObject* o1, xObject* o2)
+xParticleMeshObjectContact::xParticleMeshObjectContact(std::string _name, xObject* o1, xObject* o2)
 	: xContact(_name, PARTICLE_MESH_SHAPE)
 	, maxRadii(0)
 	, p(NULL)

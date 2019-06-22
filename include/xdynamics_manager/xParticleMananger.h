@@ -21,7 +21,7 @@ public:
 	bool SetMassAndInertia(double *mass, double *inertia);
 	QMap<QString, xParticleObject*>& XParticleObjects();
 	xParticleObject* XParticleObject(QString& ws);
-	void ExportParticleDataForView(std::wstring path);
+	void ExportParticleDataForView(std::string path);
 // 	void setRealTimeCreating(bool b);
 // 	bool OneByOneCreating();
 	unsigned int nClusterObject();
@@ -38,7 +38,7 @@ public:
 	double* GetVelocityResultPointer(unsigned int pt);
 // 	unsigned int RealTimeCreating();
 	void AllocParticleResultMemory(unsigned int npart, unsigned int np);
-	void SetCurrentParticlesFromPartResult(std::wstring path);
+	void SetCurrentParticlesFromPartResult(std::string path);
 	void SetClusterInformation();
 	void AddParticleCreatingCondition(xParticleObject* xpo, xParticleCreateCondition& xpcc);
 	unsigned int ExcuteCreatingCondition(double ct, unsigned int cstep, unsigned int cnp);
@@ -48,14 +48,14 @@ public:
 	static unsigned int GetNumCircleParticles(double d, double min_radius, double max_radius);
 //	static unsigned int GetNumSPHPlaneParticles(double dx, double dy, double ps);
 
-	xParticleObject* CreateParticleFromList(std::wstring n, xMaterialType mt, unsigned int _np, vector4d* d);
-	xParticleObject* CreateCubeParticle(std::wstring n, xMaterialType mt, unsigned int _np, xCubeParticleData& d);
-	xParticleObject* CreateCircleParticle(std::wstring n, xMaterialType mt, unsigned int _np, xCircleParticleData& d);
-	xParticleObject* CreateClusterParticle(std::wstring n, xMaterialType mt, unsigned int _np, xClusterObject* xo);
+	xParticleObject* CreateParticleFromList(std::string n, xMaterialType mt, unsigned int _np, vector4d* d);
+	xParticleObject* CreateCubeParticle(std::string n, xMaterialType mt, unsigned int _np, xCubeParticleData& d);
+	xParticleObject* CreateCircleParticle(std::string n, xMaterialType mt, unsigned int _np, xCircleParticleData& d);
+	xParticleObject* CreateClusterParticle(std::string n, xMaterialType mt, unsigned int _np, xClusterObject* xo);
 //	xParticleObject* CreateSPHParticles(xObject* xobj, double ps, unsigned int nlayer);
 //	xParticleObject* CreateBoundaryParticles(xObject* xobj, double lx, double ly, double lz, double ps);
-	//xParticleObject* CreateSPHLineParticle(std::wstring n, xMa)
-	//xParticleObject* CreateSPHPlaneParticleObject(std::wstring n, xMaterialType mt, xSPHPlaneObjectData& d);
+	//xParticleObject* CreateSPHLineParticle(std::string n, xMa)
+	//xParticleObject* CreateSPHPlaneParticleObject(std::string n, xMaterialType mt, xSPHPlaneObjectData& d);
 
 private:
 	//void create_sph_particles_with_plane_shape(double dx, double dy, double lx, double ly, double lz, double ps);
