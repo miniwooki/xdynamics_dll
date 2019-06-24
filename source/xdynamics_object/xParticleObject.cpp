@@ -72,7 +72,7 @@ void xParticleObject::CopyPosition(double* _pos)
 	memcpy(_pos + sid * 4, pos, sizeof(vector4d) * np);
 }
 
-void xParticleObject::CopyClusterPosition(double* _pos, unsigned int* cindex)
+void xParticleObject::CopyClusterPosition(double* _pos, double *ep, unsigned int* cindex)
 {
 	memcpy(_pos + csid * 4, cpos, sizeof(vector4d) * cnp);
 	for (unsigned int i = 0; i < cnp; i++)

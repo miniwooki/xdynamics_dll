@@ -18,7 +18,7 @@ public:
 	static std::string xstring(double v);
 	static std::string xstring(std::string v);
 	//static std::wstring WideChar2String(const wchar_t* wc);
-	//static std::wstring Multibyte2WString(const char* c);
+	//static std::string Multibyte2WString(const wchar_t* c);
 	static std::string GetDateTimeFormat(const char* format, int nseg);
 	static int FindNumString(const string& s, const char* c);
 	static void xsplit(const std::string& s, const char* c, int n, int* data);

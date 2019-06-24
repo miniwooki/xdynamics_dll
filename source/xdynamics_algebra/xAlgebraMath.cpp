@@ -101,6 +101,16 @@ vector3d EulerParameterToEulerAngle(const euler_parameters& ep)
 		atan2(m31, m32));
 }
 
+euler_parameters EulerAngleToEulerParameters(const vector3d v3)
+{
+	return new_euler_parameters(
+		cos(0.5 * v3.y) * cos(0.5 * (v3.x + v3.z)),
+		sin(0.5 * v3.y) * cos(0.5 * (v3.x - v3.z)),
+		sin(0.5 * v3.y) * sin(0.5 * (v3.x - v3.z)),
+		cos(0.5 * v3.y) * sin(0.5 * (v3.x + v3.z)));
+
+}
+
 vector3d ToVector3D(vector3ui& v3)
 {
 	return

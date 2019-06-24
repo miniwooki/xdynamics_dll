@@ -157,18 +157,18 @@ void xUtilityFunctions::DirectoryFileList(const char* _path)
 //	return cstr;
 //}
 //
-//std::wstring xUtilityFunctions::WideChar2String(const wchar_t* wc)
-//{
-//	int wLen;
-//	wchar_t* cArr;
-//
-//	wLen = (int)wcslen(wc);
-//	cArr = (wchar_t*)calloc(1, wLen * 2 + 1);
-//	WideCharToMultiByte(CP_ACP, 0, wc, wLen, cArr, wLen * 2, 0, 0);
-//	wstring cstr = cArr;
-//	delete cArr;
-//	return cstr;
-//}
+// std::string xUtilityFunctions::WideChar2String(const wchar_t* wc)
+// {
+// 	int wLen;
+// 	char* cArr;
+// 
+// 	wLen = (int)wcslen(wc);
+// 	cArr = (char*)calloc(1, wLen * 2 + 1);
+// 	WideCharToMultiByte(CP_ACP, 0, wc, wLen, cArr, wLen * 2, 0, 0);
+// 	string cstr = cArr;
+// 	delete cArr;
+// 	return cstr;
+// }
 
 std::string xUtilityFunctions::GetDateTimeFormat(const char* format, int nseg)
 {

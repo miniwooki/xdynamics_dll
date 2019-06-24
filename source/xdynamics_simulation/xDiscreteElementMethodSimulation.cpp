@@ -71,7 +71,7 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 	memset(force, 0, sizeof(double) * ns * 3);
 	memset(moment, 0, sizeof(double) * ns * 3);
 
-	xpm->CopyPosition(pos, cpos, cindex, ns);
+	xpm->CopyPosition(pos, cpos, ep, cindex, ns);
 	xpm->SetMassAndInertia(mass, inertia);
 	for (unsigned int i = 0; i < ns; i++)
 	{

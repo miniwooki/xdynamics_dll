@@ -457,6 +457,8 @@ xParticleObject * xParticleManager::CreateClusterParticle(std::string n, xMateri
 	for (unsigned int i = 0; i < _np; i++)
 	{
 		vector3d cp = new_vector3d(0.0, 0.01, 0.0);
+		//vector3d rot = new_vector3d(180 * frand(), 180 * frand(), 180 * frand());
+	//	matrix33d A = GlobalTransformationMatrix(EulerAngleToEulerParameters(rot));
 		for (unsigned int j = 0; j < neach; j++)
 		{
 			vector3d m_pos = cp + rloc[j];
@@ -476,13 +478,13 @@ QMap<QString, xParticleObject*>& xParticleManager::XParticleObjects()
 	return xpcos;
 }
 
-bool xParticleManager::CopyPosition(double *pos, double *cpos, unsigned int* cindex, unsigned int inp)
+bool xParticleManager::CopyPosition(double *pos, double *cpos, double* ep, unsigned int* cindex, unsigned int inp)
 {
 	foreach(xParticleObject* xpo, xpcos)
 	{
 		xpo->CopyPosition(pos);
 		if (cpos && xpo->ShapeForm() == CLUSTER_SHAPE)
-			xpo->CopyClusterPosition(cpos, cindex);
+			xpo->CopyClusterPosition(pos, cpos, ep, cindex);
 	}
 	return true;
 }
