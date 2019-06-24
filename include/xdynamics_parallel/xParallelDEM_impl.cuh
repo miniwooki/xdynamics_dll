@@ -1133,8 +1133,8 @@ __global__ void particle_polygonObject_collision_kernel(
 	}
 	force[id] += sum_force;
 	moment[id] += sum_moment;
-	if (new_count - sid > MAX_P2MS_COUNT)
-		printf("The total of contact with triangle is over(%d)\n.", new_count - sid);
+	/*if (new_count - sid > MAX_P2MS_COUNT)
+		printf("The total of contact with triangle is over(%d)\n.", new_count - sid);*/
 	pair_count[id] = new_count - sid;
 	tmax[id] += tma;
 	rres[id] += res;
