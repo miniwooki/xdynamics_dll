@@ -22,7 +22,7 @@ public:
 	vector4d* AllocClusterMemory(unsigned int _np);
 
 	void CopyPosition(double* _pos);
-	void CopyClusterPosition(double* _pos, unsigned int* cindex);
+	void CopyClusterPosition(double* _pos, double* _ep, unsigned int* cindex);
 	unsigned int StartIndex() const;
 	unsigned int NumParticle() const;
 	unsigned int EachCount() const;
@@ -30,6 +30,7 @@ public:
 	double MaxRadius() const;
 	xShapeType ShapeForm() const;
 	vector4d* Position() const;
+	vector4d* EulerParameters() const;
 	vector3d* RelativeLocation() const;
 
 	virtual unsigned int create_sph_particles(double ps, unsigned int nlayers, vector3d* p = NULL, xMaterialType* t = NULL);
@@ -57,6 +58,7 @@ private:
 
 	vector4d* pos;
 	vector4d* cpos;
+	vector4d* ep;
 	vector3d *relative_loc;
 };
 

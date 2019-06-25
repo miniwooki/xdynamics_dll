@@ -70,7 +70,14 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 	memset(aacc, 0, sizeof(double) * np * 3);
 	memset(force, 0, sizeof(double) * ns * 3);
 	memset(moment, 0, sizeof(double) * ns * 3);
-
+	for (unsigned int i = 0; i < np; i++)
+	{
+		//vel[0] = -0.1;
+		acc[i * 3 + 0] = 0.0;// mass[i] * xModel::gravity.x;
+		acc[i * 3 + 1] = xModel::gravity.y;
+		acc[i * 3 + 2] = 0.0;// mass[i] * xModel::gravity.z;
+		ep[i * 4 + 0] = 1.0;
+	}
 	xpm->CopyPosition(pos, cpos, ep, cindex, ns);
 	xpm->SetMassAndInertia(mass, inertia);
 	for (unsigned int i = 0; i < ns; i++)
@@ -80,14 +87,7 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 		if (r > maxRadius)
 			maxRadius = r;
 	}
-	for (unsigned int i = 0; i < np; i++)
-	{
-		//vel[0] = -0.1;
-		acc[i * 3 + 0] = 0.0;// mass[i] * xModel::gravity.x;
-		acc[i * 3 + 1] = xModel::gravity.y;
-		acc[i * 3 + 2] = 0.0;// mass[i] * xModel::gravity.z;
-		ep[i * 4 + 0] = 1.0;
-	}
+	
 
 	dtor = new xNeiborhoodCell;
 	// 	switch (md->SortType())
@@ -316,12 +316,16 @@ void xDiscreteElementMethodSimulation::allocationMemory(unsigned int np, unsigne
 {
 	clearMemory();
 	mass = new double[np];
-	inertia = new double[np];
 	pos = new double[rnp * 4];
 	if (np < rnp)
 	{
 		cpos = new double[np * 4];
+		inertia = new double[np * 3];
 		cindex = new unsigned int[rnp];
+	}
+	else
+	{
+		inertia = new double[np];
 	}
 	ep = new double[np * 4];
 	//rot = new double[np * 4];

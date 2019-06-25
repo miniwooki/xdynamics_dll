@@ -447,24 +447,26 @@ xParticleObject * xParticleManager::CreateClusterParticle(std::string n, xMateri
 	xpo->setEachCount(neach);
 	vector4d* pos = xpo->AllocMemory(rnp);
 	vector4d* cpos = xpo->AllocClusterMemory(_np);
+	euler_parameters* ep = (euler_parameters*)xpo->EulerParameters();
 	n_cluster_sphere += _np;
 	np += rnp;
-	
-	
-	
+	double norm = 0;
 	vector3d* rloc = xo->RelativeLocation();
 	xpo->setRelativeLocation(xo->RelativeLocation());
 	for (unsigned int i = 0; i < _np; i++)
 	{
 		vector3d cp = new_vector3d(0.0, 0.01, 0.0);
-		//vector3d rot = new_vector3d(180 * frand(), 180 * frand(), 180 * frand());
-	//	matrix33d A = GlobalTransformationMatrix(EulerAngleToEulerParameters(rot));
+		vector3d rot = new_vector3d(180 * frand(), 180 * frand(), 180 * frand());
+		euler_parameters m_ep = EulerAngleToEulerParameters(rot);
+		matrix33d A = GlobalTransformationMatrix(m_ep);
 		for (unsigned int j = 0; j < neach; j++)
 		{
-			vector3d m_pos = cp + rloc[j];
+			vector3d m_pos = cp + A * rloc[j];
 			pos[i * neach + j] = new_vector4d(m_pos.x, m_pos.y, m_pos.z, rad);
 		}
 		cpos[i] = new_vector4d(cp.x, cp.y, cp.z, 0.0);
+		ep[i] = m_ep;
+		norm = length(new_vector4d(m_ep.e0, m_ep.e1, m_ep.e2, m_ep.e3));
 	}
 	xpcos[name] = xpo;
 	xObjectManager::XOM()->addObject(xpo);
@@ -478,13 +480,13 @@ QMap<QString, xParticleObject*>& xParticleManager::XParticleObjects()
 	return xpcos;
 }
 
-bool xParticleManager::CopyPosition(double *pos, double *cpos, double* ep, unsigned int* cindex, unsigned int inp)
+bool xParticleManager::CopyPosition(double *pos, double* cpos, double* ep, unsigned int* cindex, unsigned int inp)
 {
 	foreach(xParticleObject* xpo, xpcos)
 	{
 		xpo->CopyPosition(pos);
 		if (cpos && xpo->ShapeForm() == CLUSTER_SHAPE)
-			xpo->CopyClusterPosition(pos, cpos, ep, cindex);
+			xpo->CopyClusterPosition(cpos, ep, cindex);
 	}
 	return true;
 }
@@ -497,6 +499,8 @@ bool xParticleManager::SetMassAndInertia(double *mass, double *inertia)
 		double d = xpo->Density();
 		vector4d* v = xpo->Position();
 		unsigned int sid = xpo->StartIndex();
+		vector4d* pos = xpo->Position();
+		vector3d* rloc = xpo->RelativeLocation();
 		for (unsigned int i = 0; i < xpo->NumParticle(); i++)
 		{
 			double m = d * (4.0 / 3.0) * M_PI * pow(v[i].w, 3.0);
@@ -504,7 +508,18 @@ bool xParticleManager::SetMassAndInertia(double *mass, double *inertia)
 			if (xpo->ShapeForm() == CLUSTER_SHAPE && !(i % xpo->EachCount()))
 			{
 				mass[c + sid] = m;
-				inertia[c + sid] = J;
+				vector3d J3 = new_vector3d(0, 0, 0);
+				vector3d m_pos = new_vector3d(pos[i].x, pos[i].y, pos[i].z);
+				for (unsigned int j = 0; j < xpo->EachCount(); j++)
+				{
+					vector3d dr = m_pos - rloc[j];
+					J3.x += dr.y * dr.y + dr.z * dr.z;
+					J3.y += dr.x * dr.x + dr.z * dr.z;
+					J3.z += dr.x * dr.x + dr.y * dr.y;
+				}
+				inertia[(c + sid) * 3 + 0] = J3.x;
+				inertia[(c + sid) * 3 + 1] = J3.y;
+				inertia[(c + sid) * 3 + 2] = J3.z;
 				i += xpo->EachCount() - 1;
 			}
 			else

@@ -17,7 +17,7 @@ public:
 
 	unsigned int NumParticle();
 	unsigned int NumClusterSet();
-	bool CopyPosition(double *pos, double *cpos, double* ep, unsigned int* cindex, unsigned int inp);
+	bool CopyPosition(double *pos, double* cpos, double* ep, unsigned int* cindex, unsigned int inp);
 	bool SetMassAndInertia(double *mass, double *inertia);
 	QMap<QString, xParticleObject*>& XParticleObjects();
 	xParticleObject* XParticleObject(QString& ws);

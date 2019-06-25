@@ -63,7 +63,11 @@ vector4d* xParticleObject::AllocClusterMemory(unsigned int _np)
 {
 	cnp = _np;
 	if (!cpos)
+	{
 		cpos = new vector4d[_np];
+		ep = new vector4d[_np];
+	}
+		
 	return cpos;
 }
 
@@ -72,9 +76,10 @@ void xParticleObject::CopyPosition(double* _pos)
 	memcpy(_pos + sid * 4, pos, sizeof(vector4d) * np);
 }
 
-void xParticleObject::CopyClusterPosition(double* _pos, double *ep, unsigned int* cindex)
+void xParticleObject::CopyClusterPosition(double* _pos, double *_ep, unsigned int* cindex)
 {
 	memcpy(_pos + csid * 4, cpos, sizeof(vector4d) * cnp);
+	memcpy(_ep + csid * 4, ep, sizeof(vector4d) * cnp);
 	for (unsigned int i = 0; i < cnp; i++)
 	{
 		for (unsigned int j = 0; j < each; j++)
@@ -117,6 +122,11 @@ xShapeType xParticleObject::ShapeForm() const
 vector4d* xParticleObject::Position() const
 {
 	return pos;
+}
+
+vector4d * xParticleObject::EulerParameters() const
+{
+	return ep;
 }
 
 vector3d * xParticleObject::RelativeLocation() const
