@@ -1,7 +1,7 @@
 #include "xdynamics_gui.h"
 #include "xdynamics_manager/xDynamicsManager.h"
 #include "xModelNavigator.h"
-#include "xGLWidget.h"
+//#include "xGLWidget.h"
 #include "xSimulationThread.h"
 #include "xdynamics_simulation/xSimulation.h"
 #include "xNewDialog.h"
@@ -84,6 +84,7 @@ xdynamics_gui::xdynamics_gui(int _argc, char** _argv, QWidget *parent)
 	connect(xnavi, SIGNAL(InitializeWidgetStatement()), this, SLOT(xInitializeWidgetStatement()));
 	connect(xgl, SIGNAL(signalGeometrySelection(QString)), this, SLOT(xGeometrySelection(QString)));
 	connect(xgl, SIGNAL(releaseOperation()), this, SLOT(xReleaseOperation()));
+	connect(xgl, SIGNAL(contextSignal(QString, contextMenuType)), this, SLOT(xContextMenuProcess(QString, contextMenuType)));
 	xNew();
 }
 
@@ -370,6 +371,10 @@ void xdynamics_gui::OpenFile(QString s)
  				isOnViewModel = ReadViewModel(vf);
 		}
 	}
+	else if (ext == "stl")
+	{
+		xgl->ReadSTLFile(s);
+	}
 	else
 		xcw->write(xCommandWindow::CMD_ERROR, kor("지원하지 않는 파일 형식입니다."));
 }
@@ -387,6 +392,11 @@ QString xdynamics_gui::ReadXLSFile(QString xls_path)
 	QString modelName = xls_path.mid(begin + 1, end - begin - 1);
 	QString viewFile = path + modelName + "/" + modelName + ".vmd";
 	return viewFile;
+}
+
+void xdynamics_gui::ReadSTLFile(QString path)
+{
+
 }
 
 void xdynamics_gui::setupMainOperations()
@@ -575,6 +585,22 @@ void xdynamics_gui::xEditCommandLine()
 	QString c = e->text();
 	switch (caction)
 	{
+	case CONVERT_MESH_TO_SPHERE:
+	{
+		double ft = c.toDouble();
+		if (ft)
+		{
+			if (!xgl->vParticles())
+				xgl->createParticles();
+			if (xgl->vParticles())
+			{
+				QString file = xcl->MeshObjectCommandProcess(c);
+				xgl->vParticles()->defineFromListFile(file);
+			}
+		}		
+		e->clear();
+		break;
+	}
 	case CYLINDER:
 	{
 		QString msg = xcl->CylinderCommandProcess(c);
@@ -613,6 +639,7 @@ void xdynamics_gui::xEditCommandLine()
 		e->clear();
 		break;
 	}
+
 	default:
 		break;
 	}
@@ -669,6 +696,20 @@ void xdynamics_gui::xStopSimulationThread()
 {
 	if (sThread)
 		sThread->setStopCondition();
+}
+
+void xdynamics_gui::xContextMenuProcess(QString nm, contextMenuType vot)
+{
+	switch (vot)
+	{
+	case CONTEXT_CONVERT_SPHERE:
+		caction = CONVERT_MESH_TO_SPHERE;
+		xcomm->widget()->setFocus();
+		xcomm->setWindowTitle("Input the fit ratio.");
+		xcl->SetCurrentAction(caction);
+		xcl->SetCurrentObject(xgl->Objects()[nm]);
+		break;
+	}
 }
 
 void xdynamics_gui::deleteFileByEXT(QString ext)

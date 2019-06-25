@@ -1119,8 +1119,8 @@ __global__ void particle_polygonObject_collision_kernel(
 									cmp.rfric, ir, 0, rc, Fn, Ft, res, tma);
 								sum_force += Fn + Ft;
 								sum_moment += M;
-								dpmi[pidx].force += -(Fn + Ft);// +make_double3(1.0, 5.0, 9.0);
-								dpmi[pidx].moment += -cross(po2cp, Fn + Ft);
+								dpmi[pidx].force += -cmp.amp * (Fn + Ft);// +make_double3(1.0, 5.0, 9.0);
+								dpmi[pidx].moment += -cross(po2cp, cmp.amp * (Fn + Ft));
 								tsd[new_count] = sd;
 								pair_id[new_count] = k;
 								new_count++;

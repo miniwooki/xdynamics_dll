@@ -19,6 +19,7 @@ public:
 	virtual void draw(GLenum eMode);
 	void defineMeshObject(unsigned int nt, double* v, double* n);
 	unsigned int NumTriangles() { return ntriangle; }
+	QString GenerateFitSphereFile(double ft);
 
 private:
 	void _drawPolygons();

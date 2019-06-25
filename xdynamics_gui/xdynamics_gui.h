@@ -8,14 +8,14 @@
 #include "xdynamics_algebra/xUtilityFunctions.h"
 #include "ui_xdynamics_gui.h"
 #include "xCommandWindow.h"
-//#include "xGLWidget.h"
+#include "xGLWidget.h"
 #include "xAnimationTool.h"
 
 
 class xDynamicsManager;
 class xModelNavigator;
 class xCommandLine;
-class xGLWidget;
+//class xGLWidget;
 class wsimulation;
 class wpointmass;
 class xChartWindow;
@@ -27,13 +27,14 @@ class xdynamics_gui : public QMainWindow
 
 public:
 	enum { NEW = 0, OPEN, SAVE };
-	enum { CUBE = 3, CYLINDER, CHART };
+	enum { CUBE = 3, CYLINDER, CHART, CONVERT_MESH_TO_SPHERE };
 	
 	xdynamics_gui(int _argc, char** _argv, QWidget *parent = Q_NULLPTR);
 	~xdynamics_gui();
 	static xdynamics_gui* XGUI();
 	bool ReadViewModel(QString path);
 	QString ReadXLSFile(QString path);
+	void ReadSTLFile(QString path);
 	bool ReadModelResults(QString path);
 	void OpenFile(QString path);
 	//void xInitializeGUI(int _argc, char** _argv);
@@ -57,6 +58,7 @@ private slots:
 	void xInitializeWidgetStatement();
 	void xOnGeometrySelectionOfPointMass();
 	void xStopSimulationThread();
+	void xContextMenuProcess(QString nm, contextMenuType vot);
 	
 private:
 	void setupMainOperations();

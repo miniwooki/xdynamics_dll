@@ -52,6 +52,7 @@ void xDrivingConstraint::define(xVectorD& q)
 		vector3d fi = Ai * kconst->fi;// im->toGlobal(kconst->f_i());
 		vector3d fj = Aj * kconst->fj;
 		init_v = acos(dot(fi, fj));
+
 	}
 	else if (type == TRANSLATION_DRIVING)
 	{

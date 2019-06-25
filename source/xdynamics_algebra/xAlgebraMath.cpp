@@ -121,6 +121,16 @@ vector3d ToVector3D(vector3ui& v3)
 	};
 }
 
+vector3d ToVector3D(vector3f& v3)
+{
+	return
+	{
+		static_cast<double>(v3.x),
+		static_cast<double>(v3.y),
+		static_cast<double>(v3.z)
+	};
+}
+
 vector3ui ToVector3UI(vector3d& v3)
 {
 	return

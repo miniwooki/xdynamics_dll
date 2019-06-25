@@ -228,6 +228,31 @@ bool xvParticle::defineFromViewFile(QString path)
 	return _define();
 }
 
+bool xvParticle::defineFromListFile(QString path)
+{
+	QFile qf(path);
+	qf.open(QIODevice::ReadOnly);
+	QString name;
+	QTextStream qts(&qf);
+	qts >> name;
+	unsigned int _np = 0;
+	qts >> _np;
+	resizePositionMemory(np, np + _np);
+	double d_pos[4] = { 0, };
+	for (unsigned int i = 0; i < _np; i++)
+	{
+		qts >> d_pos[0] >> d_pos[1] >> d_pos[2] >> d_pos[3];
+		pos[(np + i) * 4 + 0] = (float)d_pos[0];
+		pos[(np + i) * 4 + 1] = (float)d_pos[1];
+		pos[(np + i) * 4 + 2] = (float)d_pos[2];
+		pos[(np + i) * 4 + 3] = (float)d_pos[3];
+	}
+	np += _np;
+	
+	color = new float[np * 4];
+	return _define();
+}
+
 void xvParticle::setParticlePosition(double* p, unsigned int n)
 {
 // 	if (pos && p)

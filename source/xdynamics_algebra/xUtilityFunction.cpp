@@ -406,6 +406,44 @@ vector3d xUtilityFunctions::CenterOfTriangle(vector3d& P, vector3d& Q, vector3d&
 	return M1 + t * D1;
 }
 
+vector4d xUtilityFunctions::FitSphereToTriangle(vector3d& P, vector3d& Q, vector3d& R, double ft)
+{
+	vector3d V = Q - P;
+	vector3d W = R - P;
+	vector3d N = cross(V, W);
+	N = N / length(N);// .length();
+	vector3d M1 = (Q + P) / 2;
+	vector3d M2 = (R + P) / 2;
+	vector3d D1 = cross(N, V);
+	vector3d D2 = cross(N, W);
+	double t;// = (D2.x*(M1.y - M2.y)) / (D1.x*D2.y - D1.y*D2.x) - (D2.y*(M1.x - M2.x)) / (D1.x*D2.y - D1.y*D2.x);
+	if (abs(D1.x*D2.y - D1.y*D2.x) > 1E-13)
+	{
+		t = (D2.x*(M1.y - M2.y)) / (D1.x*D2.y - D1.y*D2.x) - (D2.y*(M1.x - M2.x)) / (D1.x*D2.y - D1.y*D2.x);
+	}
+	else if (abs(D1.x*D2.z - D1.z*D2.x) > 1E-13)
+	{
+		t = (D2.x*(M1.z - M2.z)) / (D1.x*D2.z - D1.z*D2.x) - (D2.z*(M1.x - M2.x)) / (D1.x*D2.z - D1.z*D2.x);
+	}
+	else if (abs(D1.y*D2.z - D1.z*D2.y) > 1E-13)
+	{
+		t = (D2.y*(M1.z - M2.z)) / (D1.y*D2.z - D1.z*D2.y) - (D2.z*(M1.y - M2.y)) / (D1.y*D2.z - D1.z*D2.y);
+	}
+	vector3d Ctri = M1 + t * D1;
+	vector3d Csph = new_vector3d(0.0, 0.0, 0.0);
+	double fc = 0;
+	double tol = 1e-4;
+	double r = length(P - Ctri);
+	while (abs(fc - ft) > tol)
+	{
+		double d = ft * r;
+		double p = d / length(N);
+		Csph = Ctri - p * N;
+		r = length(P - Csph);
+		fc = d / r;
+	}
+	return new_vector4d(Csph.x, Csph.y, Csph.z, r);
+}
 
 std::string xUtilityFunctions::xstring(QString v)
 {

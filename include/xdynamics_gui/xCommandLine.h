@@ -5,6 +5,8 @@
 #include <QString>
 #include <QStringList>
 
+class xvObject;
+
 class xCommandLine
 {
 public:
@@ -14,9 +16,11 @@ public:
 	bool IsFinished();
 	bool IsWrongCommand();
 	void SetCurrentAction(int i);
+	void SetCurrentObject(xvObject* vxo);
 	QString getPassedCommand();
 	QString CylinderCommandProcess(QString& com);
 	QString CubeCommandProcess(QString& com);
+	QString MeshObjectCommandProcess(QString& com);
 	xCylinderObjectData GetCylinderParameters();
 	xCubeObjectData GetCubeParameters();
 
@@ -32,6 +36,7 @@ private:
 	int current_log_index;
 	QStringList logs;
 	xCylinderObjectData* cylinder;
+	xvObject* xobj;
 	xCubeObjectData* cube;
 };
 

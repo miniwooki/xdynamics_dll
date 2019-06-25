@@ -25,6 +25,7 @@ class XDYNAMICS_API xParticleMeshObjectsContact : public xContact
 
 	struct host_mesh_mass_info
 	{
+		double mass;
 		double px, py, pz;
 		double vx, vy, vz;
 		double ox, oy, oz;

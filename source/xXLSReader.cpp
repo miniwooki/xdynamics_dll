@@ -513,13 +513,19 @@ void xXLSReader::ReadContact(xContactManager* xcm, vector2i rc)
 			xContactForceModelType method = static_cast<xContactForceModelType>(static_cast<int>(sheet->readNum(rc.x, rc.y++)));
 			std::string obj0 = sheet->readStr(rc.x, rc.y++);
 			std::string obj1 = sheet->readStr(rc.x, rc.y++);
-			xContactParameterData d = ReadContactData(name, rc.x++, rc.y);
+			xContactParameterData d = ReadContactData(name, rc.x, rc.y);
 			xContact* xc = xcm->CreateContactPair(
 				name,
 				method,
 				xObjectManager::XOM()->XObject(obj0),
 				xObjectManager::XOM()->XObject(obj1),
 				d);
+			if (!IsEmptyCell(rc.x, rc.y))
+			{
+				double mul = sheet->readNum(rc.x, rc.y);
+				xc->setStiffMultiplyer(mul);
+			}
+			rc.x++;
 			rc.y = 0;
 		}
 	}

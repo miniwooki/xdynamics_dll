@@ -192,6 +192,7 @@ XDYNAMICS_API euler_parameters EulerAngleToEulerParameters(const vector3d v3);
 XDYNAMICS_API vector3d ToVector3D(vector3ui& v3);
 XDYNAMICS_API vector3ui ToVector3UI(vector3d& v3);
 XDYNAMICS_API vector3i ToVector3I(vector3d& v3);
+XDYNAMICS_API vector3d ToVector3D(vector3f& v3);
 XDYNAMICS_API int xSign(double v);
 
 #endif

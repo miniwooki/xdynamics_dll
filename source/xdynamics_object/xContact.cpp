@@ -10,6 +10,7 @@ xContact::xContact()
 	, stiffnessRatio(0)
 	, friction(0)
 	, rolling_factor(0)
+	, stiff_multiplyer(1.0)
 {
 
 }
@@ -26,6 +27,7 @@ xContact::xContact(std::string _name, xContactPairType xcpt)
 	, stiffnessRatio(0)
 	, friction(0)
 	, rolling_factor(0)
+	, stiff_multiplyer(1.0)
 {
 
 }
@@ -216,7 +218,7 @@ void xContact::cudaMemoryAlloc(unsigned int np)
 	device_contact_property hcp = device_contact_property
 	{
 		mpp.Ei, mpp.Ej, mpp.Pri, mpp.Prj, mpp.Gi, mpp.Gj,
-		restitution, friction, rolling_factor, cohesion, stiffnessRatio
+		restitution, friction, rolling_factor, cohesion, stiffnessRatio, stiff_multiplyer
 	};
 	checkCudaErrors(cudaMalloc((void**)&dcp, sizeof(device_contact_property)));
 	checkCudaErrors(cudaMemcpy(dcp, &hcp, sizeof(device_contact_property), cudaMemcpyHostToDevice));
@@ -225,4 +227,14 @@ void xContact::cudaMemoryAlloc(unsigned int np)
 void xContact::collision(double r, double m, vector3d& pos, vector3d& vel, vector3d& omega, vector3d& fn, vector3d& ft)
 {
 
+}
+
+double xContact::StiffMultiplyer() const
+{
+	return stiff_multiplyer;
+}
+
+void xContact::setStiffMultiplyer(double d)
+{
+	stiff_multiplyer = d;
 }

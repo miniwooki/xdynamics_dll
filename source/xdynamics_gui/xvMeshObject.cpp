@@ -1,6 +1,7 @@
 #include "xvMeshObject.h"
 #include "xvShader.h"
 #include "xvAnimationController.h"
+#include "xdynamics_algebra/xUtilityFunctions.h"
 
 xvMeshObject::xvMeshObject()
 : xvObject()
@@ -87,6 +88,32 @@ void xvMeshObject::defineMeshObject(unsigned int nt, double* v, double* n)
 	if (!program.Program())
 		program.compileProgram(polygonVertexShader, polygonFragmentShader);
 	display = true;
+}
+
+QString xvMeshObject::GenerateFitSphereFile(double ft)
+{
+	QString path = kor(getenv("USERPROFILE")) + "/Documents/xdynamics/" + Name() + "txt";
+	//		unsigned int a, b, c;
+	vector3f *vertice = (vector3f*)vertexList;
+	QFile qf(path);
+	qf.open(QIODevice::WriteOnly);
+	QTextStream qts(&qf);
+	qts << name << endl;
+	qts << ntriangle << endl;
+	for (unsigned int i = 0; i < ntriangle; i++)
+	{
+		vector3d P = ToVector3D(vertice[i]);
+		//hpi[i].indice.x = vi++;
+		vector3d Q = ToVector3D(vertice[i + 1]);
+		//hpi[i].indice.y = vi++;
+		vector3d R = ToVector3D(vertice[i + 2]);
+		//hpi[i].indice.z = vi++;
+		//vector3d ctri = xUtilityFunctions::CenterOfTriangle(hpi[i].P, hpi[i].Q, hpi[i].R);
+		vector4d csph = xUtilityFunctions::FitSphereToTriangle(P, Q, R, ft);
+		qts << csph.x << " " << csph.y << " " << csph.z << " " << csph.w << endl;
+	}
+	qf.close();
+	return path;
 }
 
 void xvMeshObject::_drawPolygons()

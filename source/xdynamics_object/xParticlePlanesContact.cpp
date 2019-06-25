@@ -44,6 +44,7 @@ void xParticlePlanesContact::define(unsigned int id, xParticlePlaneContact* d)
 	cp.stiffness_ratio = d->StiffnessRatio();
 	cp.friction = d->Friction();
 	cp.rolling_friction = d->RollingFactor();
+	cp.stiffness_multiplyer = d->StiffMultiplyer();
 	xmp = d->MaterialPropertyPair();
 	hcmp[id] = cp;
 	xmps[id] = xmp;
@@ -69,6 +70,7 @@ void xParticlePlanesContact::define(unsigned int id, xParticleCubeContact* d)
 		cp.stiffness_ratio = d->StiffnessRatio();
 		cp.friction = d->Friction();
 		cp.rolling_friction = d->RollingFactor();
+		cp.stiffness_multiplyer = d->StiffMultiplyer();
 		xmp = d->MaterialPropertyPair();
 		hcmp[id + i] = cp;
 		xmps[id + i] = xmp;
@@ -266,7 +268,7 @@ void xParticlePlanesContact::cudaMemoryAlloc(unsigned int np)
 	for (unsigned int i = 0; i < nplanes; i++)
 	{
 		_hcp[i] = { xmps[i].Ei, xmps[i].Ej, xmps[i].Pri, xmps[i].Prj, xmps[i].Gi, xmps[i].Gj,
-			hcmp[i].restitution, hcmp[i].friction, hcmp[i].rolling_friction, hcmp[i].cohesion, hcmp[i].stiffness_ratio };
+			hcmp[i].restitution, hcmp[i].friction, hcmp[i].rolling_friction, hcmp[i].cohesion, hcmp[i].stiffness_ratio, hcmp[i].stiffness_multiplyer };
 	}
 	checkCudaErrors(cudaMalloc((void**)&dpi, sizeof(device_plane_info) * nplanes));
 	checkCudaErrors(cudaMalloc((void**)&dcp, sizeof(device_contact_property) * nplanes));

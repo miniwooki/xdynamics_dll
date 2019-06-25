@@ -1,6 +1,7 @@
 #include "xCommandLine.h"
 #include "xdynamics_algebra/xUtilityFunctions.h"
 //#include "modelManager.h"
+#include "xvMeshObject.h"
 #include <QTextStream>
 
 // int xCommandLine::step0(int c, QString s)
@@ -145,11 +146,17 @@ void xCommandLine::SetCurrentAction(int i)
 	{
 	case 3: cube = new xCubeObjectData; break;
 	case 4: cylinder = new xCylinderObjectData; break; // 3 is cylinder action
+	case 5: caction = i; break;
 	default:
 		break;
 	}
 	cstep = 0;
 	isOnCommand = true;
+}
+
+void xCommandLine::SetCurrentObject(xvObject* vxo)
+{
+	xobj = vxo;
 }
 
 QString xCommandLine::getPassedCommand()
@@ -253,6 +260,20 @@ QString xCommandLine::CubeCommandProcess(QString& com)
 	}
 	isWrongCommand = true;
 	return "Invalid command";
+}
+
+QString xCommandLine::MeshObjectCommandProcess(QString& com)
+{
+	QString o;
+	switch (caction)
+	{
+	case 5:
+		o = dynamic_cast<xvMeshObject*>(xobj)->GenerateFitSphereFile(com.toDouble());
+		break;
+	default:
+		break;
+	}
+	return o;
 }
 
 xCylinderObjectData xCommandLine::GetCylinderParameters()

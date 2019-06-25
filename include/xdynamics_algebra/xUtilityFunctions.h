@@ -40,6 +40,7 @@ public:
 	static vector3d QuaternionRotation(vector4d& q, vector3d& v);
 	static double SignedVolumeOfTriangle(vector3d& v1, vector3d& v2, vector3d& v3);
 	static vector3d CenterOfTriangle(vector3d& P, vector3d& Q, vector3d& R);
+	static vector4d FitSphereToTriangle(vector3d& P, vector3d& Q, vector3d& R, double ft);
 };
 
 #endif

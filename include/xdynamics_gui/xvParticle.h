@@ -29,6 +29,7 @@ public:
 	
 	
 	bool defineFromViewFile(QString path);
+	bool defineFromListFile(QString path);
 
 	void setParticlePosition(double* p, unsigned int n);
 	bool UploadParticleFromFile(unsigned int i, QString path);

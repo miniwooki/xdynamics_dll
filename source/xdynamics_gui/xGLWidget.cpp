@@ -11,7 +11,6 @@
 #include "xvPlane.h"
 #include "xvCube.h"
 #include "xvCylinder.h"
-#include "xvMeshObject.h"
 #include "xvAnimationController.h"
 #include "xModelNavigator.h"
 #include <QShortcut>
@@ -103,6 +102,86 @@ bool xGLWidget::Upload_DEM_Results(QStringList& sl)
 		}
 	}
 	return true;
+}
+
+void xGLWidget::ReadSTLFile(QString& s)
+{
+	QFile ofs(s);
+	ofs.open(QIODevice::ReadOnly);
+	QTextStream qts(&ofs);
+	QString ch;
+	qts >> ch >> ch >> ch;
+	unsigned int ntri = 0;
+	while (!qts.atEnd())
+	{
+		qts >> ch;
+		if (ch == "facet")
+			ntri++;
+	}
+	double *vertexList = new double[ntri * 9];
+	double *normalList = new double[ntri * 9];
+	double x, y, z;
+	double nx, ny, nz;
+	ofs.close();
+	ofs.setFileName(s);
+	ofs.open(QIODevice::ReadOnly);
+	//ofs.seekg(0, ios::beg);
+	qts >> ch >> ch >> ch;
+	vector3d p, q, r;// , c;
+	vector3d com = new_vector3d(0.0, 0.0, 0.0);
+	double _vol = 0.0;
+	double min_radius = 10000.0;
+	double max_radius = 0.0;
+	
+	for (unsigned int i = 0; i < ntri; i++)
+	{
+		qts >> ch >> ch >> nx >> ny >> nz;
+		normalList[i * 9 + 0] = nx;
+		normalList[i * 9 + 1] = ny;
+		normalList[i * 9 + 2] = nz;
+		normalList[i * 9 + 3] = nx;
+		normalList[i * 9 + 4] = ny;
+		normalList[i * 9 + 5] = nz;
+		normalList[i * 9 + 6] = nx;
+		normalList[i * 9 + 7] = ny;
+		normalList[i * 9 + 8] = nz;
+		qts >> ch >> ch;
+		qts >> ch >> x >> y >> z;
+		p.x = vertexList[i * 9 + 0] = 0.001 * x;
+		p.y = vertexList[i * 9 + 1] = 0.001 * y;
+		p.z = vertexList[i * 9 + 2] = 0.001 * z;
+		vertexList[i * 9 + 0] = vertexList[i * 9 + 0];
+		vertexList[i * 9 + 1] = vertexList[i * 9 + 1];
+		vertexList[i * 9 + 2] = vertexList[i * 9 + 2];
+
+		qts >> ch >> x >> y >> z;
+		q.x = vertexList[i * 9 + 3] = 0.001 * x;
+		q.y = vertexList[i * 9 + 4] = 0.001 * y;
+		q.z = vertexList[i * 9 + 5] = 0.001 * z;
+		vertexList[i * 9 + 3] = vertexList[i * 9 + 3];
+		vertexList[i * 9 + 4] = vertexList[i * 9 + 4];
+		vertexList[i * 9 + 5] = vertexList[i * 9 + 5];
+
+		qts >> ch >> x >> y >> z;
+		r.x = vertexList[i * 9 + 6] = 0.001 * x;
+		r.y = vertexList[i * 9 + 7] = 0.001 * y;
+		r.z = vertexList[i * 9 + 8] = 0.001 * z;
+		vertexList[i * 9 + 6] = vertexList[i * 9 + 6];
+		vertexList[i * 9 + 7] = vertexList[i * 9 + 7];
+		vertexList[i * 9 + 8] = vertexList[i * 9 + 8];
+		qts >> ch >> ch;
+	}
+	ofs.close();
+	int begin = s.lastIndexOf('/');
+	int end = s.lastIndexOf('.');	
+	QString obj_name = s.mid(begin + 1, end - begin - 1);
+	xvMeshObject *vm = new xvMeshObject(obj_name);
+	vm->defineMeshObject(ntri, vertexList, normalList);
+	vm->setPosition(0.0,0.0,0.0);
+	delete[] vertexList;
+	delete[] normalList;
+	v_objs[obj_name] = vm;
+	v_wobjs[vm->ID()] = (void*)vm;
 }
 
 void xGLWidget::ClearViewObject()
@@ -241,10 +320,10 @@ void xGLWidget::ShowContextMenu(const QPoint& pos)
 			subMenu->addAction("Delete");
 		//	subMenu->addAction("Property");
 			//subMenu->addAction("Motion");
-// 			if (vobj->ViewObjectType() == vobject::V_POLYGON)
-// 			{
-// 				subMenu->addAction("Refinement");
-// 			}
+ 			if (vobj->ObjectType() == xvObject::V_POLYGON)
+ 			{
+ 				subMenu->addAction("Convert sphere");
+ 			}
 			myMenu.addMenu(subMenu);
 			menus.push_back(subMenu);
 		}
@@ -283,6 +362,10 @@ void xGLWidget::ShowContextMenu(const QPoint& pos)
 			{
 				setSelectMarking(pmenuTitle);
 				emit signalGeometrySelection(pmenuTitle);
+			}
+			else if (txt == "Convert sphere")
+			{
+				emit contextSignal(pmenuTitle, CONTEXT_CONVERT_SPHERE);
 			}
 // 			else if (txt == "Property"){
 // 				emit contextSignal(pmenuTitle, CONTEXT_PROPERTY);

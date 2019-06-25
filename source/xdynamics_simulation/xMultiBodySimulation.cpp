@@ -126,13 +126,13 @@ int xMultiBodySimulation::Initialize(xMultiBodyModel* _xmbd)
 		xLog::log(std::string("There are ") + wss.str() + std::string("redundant constraint equations"));
 		return xDynamicsError::xdynamicsErrorMultiBodyModelRedundantCondition;
 	}
-	else if (dof == 0)
-	{
-		tdim = sdim;
-		lhs.alloc(sdim, sdim);// new_matrix(tdim, tdim);
-		cjaco.alloc(sdim, sdim);
-		rhs.alloc(sdim);// = new double[tdim];
-	}
+// 	else if (dof == 0)
+// 	{
+// // 		tdim = sdim;
+// // 		lhs.alloc(sdim, sdim);// new_matrix(tdim, tdim);
+// // 		cjaco.alloc(sdim, sdim);
+// // 		rhs.alloc(sdim);// = new double[tdim];
+// 	}
 	else
 	{
 		tdim = mdim + sdim;
@@ -222,6 +222,7 @@ void xMultiBodySimulation::ConstructForceVector(xVectorD& v)
 		e = xpm->EulerParameters();// new_euler_parameters(q(i + 3), q(i + 4), q(i + 5), q(i + 6));
 		ev = xpm->DEulerParameters();// new_euler_parameters(qd(i + 3), qd(i + 4), qd(i + 5), qd(i + 6));
 		f = xpm->Mass() * xModel::gravity + xpm->ContactForce() + xpm->AxialForce() + xpm->HydroForce();
+		std::cout << f.x << " " << f.y << " " << f.z << std::endl;
 		m = 2.0 * GMatrix(e) * (xpm->ContactMoment() + xpm->AxialMoment() + xpm->HydroMoment());
 		m += CalculateInertiaForce(ev, xpm->Inertia(), e) + xpm->EulerParameterMoment();
 		v(j + 0) = f.x; v(j + 1) = f.y; v(j + 2) = f.z;

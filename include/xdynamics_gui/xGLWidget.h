@@ -6,6 +6,7 @@
 //#include "vpolygon.h"
 #include "xvMarker.h"
 #include "xvParticle.h"
+#include "xvMeshObject.h"
 //#include "contactConstant.h"
 /*#include <QGLWidget>*/
 #include <QMenu>
@@ -40,6 +41,10 @@ enum projectionType{
 	PERSPECTIVE_PROJECTION
 };
 
+enum contextMenuType {
+	CONTEXT_CONVERT_SPHERE = 0
+};
+
 class xGLWidget : public QGLWidget
 {
 	Q_OBJECT
@@ -53,6 +58,7 @@ public:
 
 	//	void setModeler(modeler* _md) { md = _md; }
 // 	void makeCube(cube* c);
+	void ReadSTLFile(QString& s);
 	void ClearViewObject();
 	void createMeshObjectGeometry(QString& _name);
 	void createCubeGeometry(QString& _name, xCubeObjectData& d);
@@ -201,7 +207,7 @@ signals:
 	void signalGeometrySelection(QString);
 	void releaseOperation();
 	//void propertySignal(QString, context_object_type);
-	//void contextSignal(QString, context_menu);
+	void contextSignal(QString, contextMenuType);
 };
 
 

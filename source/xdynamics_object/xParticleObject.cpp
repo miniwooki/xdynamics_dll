@@ -99,6 +99,11 @@ unsigned int xParticleObject::NumParticle() const
 	return np;
 }
 
+unsigned int xParticleObject::NumCluster() const
+{
+	return cnp;
+}
+
 unsigned int xParticleObject::EachCount() const
 {
 	return each;
@@ -122,6 +127,11 @@ xShapeType xParticleObject::ShapeForm() const
 vector4d* xParticleObject::Position() const
 {
 	return pos;
+}
+
+vector4d* xParticleObject::ClusterPosition() const
+{
+	return cpos;
 }
 
 vector4d * xParticleObject::EulerParameters() const

@@ -25,11 +25,13 @@ public:
 	void CopyClusterPosition(double* _pos, double* _ep, unsigned int* cindex);
 	unsigned int StartIndex() const;
 	unsigned int NumParticle() const;
+	unsigned int NumCluster() const;
 	unsigned int EachCount() const;
 	double MinRadius() const;
 	double MaxRadius() const;
 	xShapeType ShapeForm() const;
 	vector4d* Position() const;
+	vector4d* ClusterPosition() const;
 	vector4d* EulerParameters() const;
 	vector3d* RelativeLocation() const;
 

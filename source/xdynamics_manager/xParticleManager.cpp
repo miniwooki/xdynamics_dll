@@ -497,19 +497,18 @@ bool xParticleManager::SetMassAndInertia(double *mass, double *inertia)
 	foreach(xParticleObject* xpo, xpcos)
 	{
 		double d = xpo->Density();
-		vector4d* v = xpo->Position();
+		//vector4d* v = xpo->Position();
 		unsigned int sid = xpo->StartIndex();
-		vector4d* pos = xpo->Position();
-		vector3d* rloc = xpo->RelativeLocation();
-		for (unsigned int i = 0; i < xpo->NumParticle(); i++)
+		if (xpo->ShapeForm() == CLUSTER_SHAPE)
 		{
-			double m = d * (4.0 / 3.0) * M_PI * pow(v[i].w, 3.0);
-			double J = (2.0 / 5.0) * m * pow(v[i].w, 2.0);
-			if (xpo->ShapeForm() == CLUSTER_SHAPE && !(i % xpo->EachCount()))
+			vector4d* cpos = xpo->ClusterPosition();
+			vector3d* rloc = xpo->RelativeLocation();
+			for (unsigned int i = 0; i < xpo->NumCluster(); i++)
 			{
-				mass[c + sid] = m;
+				double m = d * (4.0 / 3.0) * M_PI * pow(cpos[i].w, 3.0);
+				mass[i + sid] = m;
 				vector3d J3 = new_vector3d(0, 0, 0);
-				vector3d m_pos = new_vector3d(pos[i].x, pos[i].y, pos[i].z);
+				vector3d m_pos = new_vector3d(cpos[i].x, cpos[i].y, cpos[i].z);
 				for (unsigned int j = 0; j < xpo->EachCount(); j++)
 				{
 					vector3d dr = m_pos - rloc[j];
@@ -517,18 +516,23 @@ bool xParticleManager::SetMassAndInertia(double *mass, double *inertia)
 					J3.y += dr.x * dr.x + dr.z * dr.z;
 					J3.z += dr.x * dr.x + dr.y * dr.y;
 				}
-				inertia[(c + sid) * 3 + 0] = J3.x;
-				inertia[(c + sid) * 3 + 1] = J3.y;
-				inertia[(c + sid) * 3 + 2] = J3.z;
-				i += xpo->EachCount() - 1;
+				inertia[(i + sid) * 3 + 0] = J3.x;
+				inertia[(i + sid) * 3 + 1] = J3.y;
+				inertia[(i + sid) * 3 + 2] = J3.z;
+				//i += xpo->EachCount() - 1;
 			}
-			else
+		}
+		else
+		{
+			vector4d* pos = xpo->Position();
+			for (unsigned int i = 0; i < xpo->NumParticle(); i++)
 			{
-				mass[c + sid] = m;
-				inertia[c + sid] = J;
-			}
-			c++;
-		}		
+				double m = d * (4.0 / 3.0) * M_PI * pow(pos[i].w, 3.0);
+				double J = (2.0 / 5.0) * m * pow(pos[i].w, 2.0);
+				mass[i + sid] = m;
+				inertia[i + sid] = J;
+			}			
+		}	
 	}
 	return true;
 }

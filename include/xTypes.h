@@ -69,8 +69,8 @@ inline QString NameOfMaterial(int i)
 	QString n;
 	switch (xmt)
 	{
-	case NO_MATERIAL: n = "No Materia"; break;
-	case STEEL: n = "Stee"; break;
+	case NO_MATERIAL: n = "No Material"; break;
+	case STEEL: n = "Steel"; break;
 	case MEDIUM_CLAY: n = "Medium clay"; break;
 	case POLYETHYLENE: n = "Polyethylene"; break;
 	case GLASS: n = "Glass"; break;
@@ -192,8 +192,8 @@ typedef struct{ double rest, rto, mu, coh, rf; }xContactParameterData;
 typedef struct{ double mass, ixx, iyy, izz, ixy, ixz, iyz, px, py, pz, e0, e1, e2, e3, vx, vy, vz; }xPointMassData;
 typedef struct{ double lx, ly, lz, fix, fiy, fiz, gix, giy, giz, fjx, fjy, fjz, gjx, gjy, gjz; }xJointData;
 typedef struct{ double Ei, Ej, Pri, Prj, Gi, Gj; }xMaterialPair;
-typedef struct{ double coh_r, coh_e, kn, vn, ks, vs, fric, rfric; }xContactParameters;
-typedef struct{ double restitution, friction, rolling_friction, cohesion, stiffness_ratio; }xContactMaterialParameters;
+typedef struct{ double coh_r, coh_e, kn, vn, ks, vs, fric, rfric, amp; }xContactParameters;
+typedef struct{ double restitution, friction, rolling_friction, cohesion, stiffness_ratio, stiffness_multiplyer; }xContactMaterialParameters;
 typedef struct{ double spix, spiy, spiz, spjx, spjy, spjz, k, c, init_l; }xTSDAData;
 typedef struct{ int correction, dim, type; double factor; }xKernelFunctionData;
 typedef struct{ double p0x, p0y, p0z, p1x, p1y, p1z, nx, ny, nz; }xLineObjectData;
@@ -201,7 +201,8 @@ typedef struct{ double xx, xy, xz, yy, yz, zz; }symatrix;
 typedef struct{ double s0, s1, s2, s3, s4, s5; }double6;
 typedef struct{	bool enable; double alpha, start_point, length; }xWaveDampingData;
 typedef struct{ double diameter, sx, sy, sz, dx, dy, dz, minr, maxr; }xCircleParticleData;
-typedef struct { unsigned int sid, count, neach, nstep; }xParticleCreateCondition;
+typedef struct{ unsigned int sid, count, neach, nstep; }xParticleCreateCondition;
+/*typedef struct{ double tstart, dpdt }xObjectMovingCondition;*/
 
 typedef struct 
 {

@@ -74,6 +74,7 @@ unsigned int xParticleMeshObjectsContact::define(QMap<QString, xParticleMeshObje
 		cp.stiffness_ratio = cpm->StiffnessRatio();
 		cp.friction = cpm->Friction();
 		cp.rolling_friction = cpm->RollingFactor();
+		cp.stiffness_multiplyer = cpm->StiffMultiplyer();
 		xmp = cpm->MaterialPropertyPair();
 		hcp[idx] = cp;
 		xmps[idx] = xmp;
@@ -94,17 +95,26 @@ unsigned int xParticleMeshObjectsContact::define(QMap<QString, xParticleMeshObje
 			hpi[i].R = pos + ToGlobal(ep, vList[vi++]);
 			//hpi[i].indice.z = vi++;
 			
-			vector3d ctri = xUtilityFunctions::CenterOfTriangle(hpi[i].P, hpi[i].Q, hpi[i].R);
-			double rad = length(ctri - hpi[i].P);
-			if (rad > maxRadii)
-				maxRadii = rad;
-			hsphere[i] = new_vector4d(ctri.x, ctri.y, ctri.z, rad);
+			//vector3d ctri = xUtilityFunctions::CenterOfTriangle(hpi[i].P, hpi[i].Q, hpi[i].R);
+			vector4d csph = xUtilityFunctions::FitSphereToTriangle(hpi[i].P, hpi[i].Q, hpi[i].R, 0.8);
+			//double rad = length(ctri - hpi[i].P);
+			if (csph.w > maxRadii)
+				maxRadii = csph.w;
+			hsphere[i] = csph;// new_vector4d(ctri.x, ctri.y, ctri.z, rad);
 			//hpi[i] = po;
 			//vi++;
 		}
 		bPolySphere += pobj->NumTriangle();
+		std::fstream fs;
+		fs.open("C:/xdynamics/tri_sphere.txt", std::ios::out);
+		for (unsigned int i = 0; i < pobj->NumTriangle(); i++)
+		{
+			fs << hsphere[i].x << " " << hsphere[i].y << " " << hsphere[i].z << " " << hsphere[i].w << std::endl;
+		}
+		fs.close();
 		idx++;
 	}
+	
 	maxRadius = maxRadii;
 	if (xSimulation::Cpu())
 		dsphere = (double *)hsphere;
@@ -301,6 +311,7 @@ void xParticleMeshObjectsContact::updateMeshMassData()
 		vector3d omega = 2.0 * GMatrix(ep) * ev;		
 		hpmi[id] =
 		{
+			o->Mass(),
 			pos.x, pos.y, pos.z,
 			vel.x, vel.y, vel.z,
 			omega.x, omega.y, omega.z,
@@ -325,6 +336,8 @@ void xParticleMeshObjectsContact::getMeshContactForce()
 		xMeshObject* o = xmo.value();
 		//double f = hpmi[id].force
 		o->setContactForce(hpmi[id].fx, hpmi[id].fy, hpmi[id].fz);
+		//std::cout << hpmi[id].fx << " " << hpmi[id].fy << " " << hpmi[id].fz << std::endl;
+		std::cout << o->Velocity().x << " " << o->Velocity().y << " " << o->Velocity().z << std::endl;
 		o->setContactMoment(hpmi[id].mx, hpmi[id].my, hpmi[id].mz);
 	}
 }
@@ -383,7 +396,7 @@ void xParticleMeshObjectsContact::cudaMemoryAlloc(unsigned int np)
 	for (unsigned int i = 0; i < nPobjs; i++)
 	{
 		_hcp[i] = { xmps[i].Ei, xmps[i].Ej, xmps[i].Pri, xmps[i].Prj, xmps[i].Gi, xmps[i].Gj,
-			hcp[i].restitution, hcp[i].friction, hcp[i].rolling_friction, hcp[i].cohesion, hcp[i].stiffness_ratio };
+			hcp[i].restitution, hcp[i].friction, hcp[i].rolling_friction, hcp[i].cohesion, hcp[i].stiffness_ratio, hcp[i].stiffness_multiplyer };
 	}
 	checkCudaErrors(cudaMalloc((void**)&dsphere, sizeof(double) * npolySphere * 4));
 	checkCudaErrors(cudaMalloc((void**)&dpi, sizeof(device_triangle_info) * npolySphere));
