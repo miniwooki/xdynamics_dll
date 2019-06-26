@@ -7,6 +7,7 @@ xParticleMeshObjectsContact::xParticleMeshObjectsContact()
 	: xContact()
 	, hsphere(NULL)
 	, dsphere(NULL)
+	, dlocal(NULL)
 	, hpi(NULL)
 	, dpi(NULL)
 	, hcp(NULL)
@@ -26,17 +27,31 @@ xParticleMeshObjectsContact::xParticleMeshObjectsContact()
 xParticleMeshObjectsContact::~xParticleMeshObjectsContact()
 {
 	if (hsphere) delete[] hsphere; hsphere = NULL;
+	
 	if (hpi) delete[] hpi; hpi = NULL;
 	if (hcp) delete[] hcp; hcp = NULL;
 	if (xmps) delete[] xmps; xmps = NULL;
 	if (hpmi) delete[] hpmi; hpmi = NULL;
 	//qDeleteAll(pair_ip);
 	if (dsphere) checkCudaErrors(cudaFree(dsphere)); dsphere = NULL;
+	if (dlocal) checkCudaErrors(cudaFree(dlocal)); dlocal = NULL;
 	if (dpi) checkCudaErrors(cudaFree(dpi)); dpi = NULL;
 	if (dvList) checkCudaErrors(cudaFree(dvList)); dvList = NULL;
 	if (diList) checkCudaErrors(cudaFree(diList)); diList = NULL;
 	if (dpmi) checkCudaErrors(cudaFree(dpmi)); dpmi = NULL;
 	if (dep) checkCudaErrors(cudaFree(dep)); dep = NULL;
+}
+
+vector4d * xParticleMeshObjectsContact::GetCurrentSphereData()
+{
+	if (xSimulation::Gpu())
+		checkCudaErrors(cudaMemcpy(hsphere, dsphere, sizeof(vector4d) * npolySphere, cudaMemcpyDeviceToHost));
+	return hsphere;
+}
+
+unsigned int xParticleMeshObjectsContact::NumSphereData()
+{
+	return npolySphere;
 }
 
 unsigned int xParticleMeshObjectsContact::define(QMap<QString, xParticleMeshObjectContact*>& cpmesh)
@@ -81,9 +96,10 @@ unsigned int xParticleMeshObjectsContact::define(QMap<QString, xParticleMeshObje
 		pair_ip[idx] = pobj;
 		ePolySphere += pobj->NumTriangle();
 		unsigned int vi = 0;
+		vector3d* hlocal = new vector3d[npolySphere];
 		for (unsigned int i = bPolySphere; i < ePolySphere; i++)
 		{
-//			host_mesh_info po;
+			//			host_mesh_info po;
 			hpi[i].id = idx;
 			vector3d pos = pobj->Position();
 			euler_parameters ep = pobj->EulerParameters();
@@ -94,24 +110,29 @@ unsigned int xParticleMeshObjectsContact::define(QMap<QString, xParticleMeshObje
 			//hpi[i].indice.y = vi++;
 			hpi[i].R = pos + ToGlobal(ep, vList[vi++]);
 			//hpi[i].indice.z = vi++;
-			
+
 			//vector3d ctri = xUtilityFunctions::CenterOfTriangle(hpi[i].P, hpi[i].Q, hpi[i].R);
 			vector4d csph = xUtilityFunctions::FitSphereToTriangle(hpi[i].P, hpi[i].Q, hpi[i].R, 0.8);
 			//double rad = length(ctri - hpi[i].P);
 			if (csph.w > maxRadii)
 				maxRadii = csph.w;
 			hsphere[i] = csph;// new_vector4d(ctri.x, ctri.y, ctri.z, rad);
+			vector3d r_pos = ToLocal(ep, (new_vector3d(csph.x - pos.x, csph.y - pos.y, csph.z - pos.z)));
+			hlocal[i] = r_pos;
 			//hpi[i] = po;
 			//vi++;
 		}
 		bPolySphere += pobj->NumTriangle();
-		std::fstream fs;
+		checkCudaErrors(cudaMemcpy(dlocal, hlocal, sizeof(vector3d) * npolySphere, cudaMemcpyHostToDevice));
+		delete[] hlocal; hlocal = NULL;
+
+		/*std::fstream fs;
 		fs.open("C:/xdynamics/tri_sphere.txt", std::ios::out);
 		for (unsigned int i = 0; i < pobj->NumTriangle(); i++)
 		{
 			fs << hsphere[i].x << " " << hsphere[i].y << " " << hsphere[i].z << " " << hsphere[i].w << std::endl;
 		}
-		fs.close();
+		fs.close();*/
 		idx++;
 	}
 	
@@ -257,7 +278,7 @@ void xParticleMeshObjectsContact::updateMeshObjectData()
 		foreach(xMeshObject* pobj, pair_ip)
 		{
 			ePolySphere += pobj->NumTriangle();
-			cu_update_meshObjectData(dvList, dsphere, dpi, dpmi, dep, ePolySphere - bPolySphere);
+			cu_update_meshObjectData(dvList, dsphere, dlocal, dpi, dpmi, dep, ePolySphere - bPolySphere);
 			bPolySphere += pobj->NumTriangle();// ePolySphere;
 		}
 	}
@@ -399,6 +420,7 @@ void xParticleMeshObjectsContact::cudaMemoryAlloc(unsigned int np)
 			hcp[i].restitution, hcp[i].friction, hcp[i].rolling_friction, hcp[i].cohesion, hcp[i].stiffness_ratio, hcp[i].stiffness_multiplyer };
 	}
 	checkCudaErrors(cudaMalloc((void**)&dsphere, sizeof(double) * npolySphere * 4));
+	checkCudaErrors(cudaMalloc((void**)&dlocal, sizeof(double) * npolySphere * 3));
 	checkCudaErrors(cudaMalloc((void**)&dpi, sizeof(device_triangle_info) * npolySphere));
 	checkCudaErrors(cudaMalloc((void**)&dcp, sizeof(device_contact_property) * nPobjs));
 	checkCudaErrors(cudaMalloc((void**)&dvList, sizeof(double) * npolySphere * 9));

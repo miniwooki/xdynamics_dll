@@ -23,6 +23,7 @@ public:
 	QString MeshObjectCommandProcess(QString& com);
 	xCylinderObjectData GetCylinderParameters();
 	xCubeObjectData GetCubeParameters();
+	xvObject* GetCurrentObject();
 
 private:
 	bool is_finished;

@@ -128,10 +128,6 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 				xcm->ContactParticlesMeshObjects()->cudaMemoryAlloc(np);
 			if (xcm->ContactParticlesPlanes())
 				xcm->ContactParticlesPlanes()->cudaMemoryAlloc(np);
-			// 			if (xcm->ContactParticlesPolygonObjects())
-			// 				xcm->ContactParticlesPolygonObjects()->cudaMemoryAlloc();
-// 			foreach(xContact* c, xcm->Contacts())
-// 				c->cudaMemoryAlloc();
 		}
 		device_dem_parameters dp;
 		dp.np = np;
@@ -228,6 +224,14 @@ QString xDiscreteElementMethodSimulation::SaveStepResult(unsigned int pt, double
 	qf.close();
 	/*qf.open(QIODevice::WriteOnly);*/
 	partList.push_back(fname);
+	//vector4d* h_sphere = xcm->ContactParticlesMeshObjects()->GetCurrentSphereData();
+	//foreach(xParticleMeshObjectContact* cpm, xcm->ContactParticlesMeshObjects())
+	//{
+	//	xMeshObject* pobj = cpm->MeshObject();
+	//	QString m_path = fname + "/" + pobj->Name() + "/";
+	//	xUtilityFunctions::CreateDirectory(m_path.toUtf8().data());
+	//	m_path += pobj->Name() + Q
+	//}
 	return fname;
 }
 

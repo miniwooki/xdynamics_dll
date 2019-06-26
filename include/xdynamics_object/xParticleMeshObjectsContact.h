@@ -40,6 +40,8 @@ public:
 	double MaxRadiusOfPolySphere() { return maxRadius; }
 	double* SphereData() { return dsphere; }
 	vector4d* HostSphereData() { return hsphere; }
+	vector4d* GetCurrentSphereData();
+	unsigned int NumSphereData();
 	unsigned int define(QMap<QString, xParticleMeshObjectContact*>& cppos);
 	bool cppolyCollision(
 		xContactPairList* pairs, double r, double m,
@@ -77,6 +79,7 @@ private:
 	// 	contact_parameter* dcp;
 	vector4d *hsphere;
 	double* dsphere;
+	double* dlocal;
 	double* dvList;
 	unsigned int* diList;
 	//double* dvertexList;

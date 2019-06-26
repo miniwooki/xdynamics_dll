@@ -90,9 +90,48 @@ void xvMeshObject::defineMeshObject(unsigned int nt, double* v, double* n)
 	display = true;
 }
 
-QString xvMeshObject::GenerateFitSphereFile(double ft)
+vector4f xvMeshObject::FitSphereToTriangle(vector3f& P, vector3f& Q, vector3f& R, float ft)
 {
-	QString path = kor(getenv("USERPROFILE")) + "/Documents/xdynamics/" + Name() + "txt";
+	vector3f V = Q - P;
+	vector3f W = R - P;
+	vector3f N = cross(V, W);
+	N = N / length(N);// .length();
+	vector3f M1 = (Q + P) / 2;
+	vector3f M2 = (R + P) / 2;
+	vector3f D1 = cross(N, V);
+	vector3f D2 = cross(N, W);
+	float t;// = (D2.x*(M1.y - M2.y)) / (D1.x*D2.y - D1.y*D2.x) - (D2.y*(M1.x - M2.x)) / (D1.x*D2.y - D1.y*D2.x);
+	if (abs(D1.x*D2.y - D1.y*D2.x) > 1E-13)
+	{
+		t = (D2.x*(M1.y - M2.y)) / (D1.x*D2.y - D1.y*D2.x) - (D2.y*(M1.x - M2.x)) / (D1.x*D2.y - D1.y*D2.x);
+	}
+	else if (abs(D1.x*D2.z - D1.z*D2.x) > 1E-13)
+	{
+		t = (D2.x*(M1.z - M2.z)) / (D1.x*D2.z - D1.z*D2.x) - (D2.z*(M1.x - M2.x)) / (D1.x*D2.z - D1.z*D2.x);
+	}
+	else if (abs(D1.y*D2.z - D1.z*D2.y) > 1E-13)
+	{
+		t = (D2.y*(M1.z - M2.z)) / (D1.y*D2.z - D1.z*D2.y) - (D2.z*(M1.y - M2.y)) / (D1.y*D2.z - D1.z*D2.y);
+	}
+	vector3f Ctri = M1 + t * D1;
+	vector3f Csph = new_vector3f(0.0f, 0.0f, 0.0f);
+	float fc = 0;
+	float tol = 1e-4f;
+	float r = length(P - Ctri);
+	while (abs(fc - ft) > tol)
+	{
+		float d = ft * r;
+		float p = d / length(N);
+		Csph = Ctri - p * N;
+		r = length(P - Csph);
+		fc = d / r;
+	}
+	return new_vector4f(Csph.x, Csph.y, Csph.z, r);
+}
+
+QString xvMeshObject::GenerateFitSphereFile(float ft)
+{
+	QString path = kor(getenv("USERPROFILE")) + "/Documents/xdynamics/" + Name() + ".txt";
 	//		unsigned int a, b, c;
 	vector3f *vertice = (vector3f*)vertexList;
 	QFile qf(path);
@@ -102,14 +141,14 @@ QString xvMeshObject::GenerateFitSphereFile(double ft)
 	qts << ntriangle << endl;
 	for (unsigned int i = 0; i < ntriangle; i++)
 	{
-		vector3d P = ToVector3D(vertice[i]);
+		vector3f P = vertice[i * 3 + 0];
 		//hpi[i].indice.x = vi++;
-		vector3d Q = ToVector3D(vertice[i + 1]);
+		vector3f Q = vertice[i * 3 + 1];
 		//hpi[i].indice.y = vi++;
-		vector3d R = ToVector3D(vertice[i + 2]);
+		vector3f R = vertice[i * 3 + 2];
 		//hpi[i].indice.z = vi++;
 		//vector3d ctri = xUtilityFunctions::CenterOfTriangle(hpi[i].P, hpi[i].Q, hpi[i].R);
-		vector4d csph = xUtilityFunctions::FitSphereToTriangle(P, Q, R, ft);
+		vector4f csph = FitSphereToTriangle(P, Q, R, ft);
 		qts << csph.x << " " << csph.y << " " << csph.z << " " << csph.w << endl;
 	}
 	qf.close();

@@ -217,7 +217,7 @@ void cu_particle_polygonObject_collision(
 	double* pos, double* vel, double* omega,
 	double* force, double* moment, double* mass,
 	double* tmax, double* rres,
-	unsigned int* pair_count, unsigned int *pair_id, double* tsd,
+	unsigned int* pair_count, unsigned int *pair_id, double* tsd, double* dsph,
 	unsigned int* sorted_index, unsigned int* cstart, unsigned int* cend, device_contact_property *cp,
 	unsigned int np)
 {
@@ -230,7 +230,7 @@ void cu_particle_polygonObject_collision(
 			(double4 *)pos, (double3 *)vel, (double3 *)omega,
 			(double3 *)force, (double3 *)moment, mass,
 			(double3 *)tmax, rres,
-			pair_count, pair_id, (double2 *)tsd,
+			pair_count, pair_id, (double2 *)tsd, (double4 *)dsph,
 			sorted_index, cstart, cend, cp, np);
 		break;
 	}
@@ -276,7 +276,7 @@ double3 reductionD3(double3* in, unsigned int np)
 }
 
 void cu_update_meshObjectData(
-	double *vList, double* sph, device_triangle_info* poly,
+	double *vList, double* sph, double* dlocal, device_triangle_info* poly,
 	device_mesh_mass_info* dpmi, double* ep, unsigned int ntriangle)
 {
 	computeGridSize(ntriangle, 256, numBlocks, numThreads);
@@ -285,6 +285,7 @@ void cu_update_meshObjectData(
 		(double4 *)ep,
 		vList,
 		(double4 *)sph,
+		(double3 *)dlocal,
 		poly,
 		ntriangle);
 }

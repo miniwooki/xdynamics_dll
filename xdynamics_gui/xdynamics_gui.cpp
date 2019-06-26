@@ -590,12 +590,15 @@ void xdynamics_gui::xEditCommandLine()
 		double ft = c.toDouble();
 		if (ft)
 		{
-			if (!xgl->vParticles())
-				xgl->createParticles();
-			if (xgl->vParticles())
+			xvParticle* xp = xgl->createParticleObject(xcl->GetCurrentObject()->Name());
+			//if (!xgl->vParticles())
+				//xgl->createParticles();
+			//if (xgl->vParticles())
+			if(xp)
 			{
 				QString file = xcl->MeshObjectCommandProcess(c);
-				xgl->vParticles()->defineFromListFile(file);
+				//xgl->vParticles()->defineFromListFile(file);
+				xp->defineFromListFile(file);
 			}
 		}		
 		e->clear();

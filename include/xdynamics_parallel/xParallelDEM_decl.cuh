@@ -12,7 +12,7 @@ typedef unsigned int uint;
 //#include <helper_cuda.h>
 #define MAX_P2P_COUNT  12
 #define MAX_P2PL_COUNT 3
-#define MAX_P2MS_COUNT 3
+#define MAX_P2MS_COUNT 5
 //__constant__ device_parameters cte;
 //double3 toDouble3(VEC3D& v3) { return double3(v3.x, v3.y, v3.z); }
 //inline double3 change_cuda_double3(VEC3D& v3) { return make_double3(v3.x, v3.y, v3.z); }
@@ -155,7 +155,7 @@ void XDYNAMICS_API cu_particle_polygonObject_collision(
 	double* pos, double* vel, double* omega,
 	double* force, double* moment, double* mass,
 	double* tmax, double* rres,
-	unsigned int* pair_count, unsigned int *pair_id, double* tsd,
+	unsigned int* pair_count, unsigned int *pair_id, double* tsd, double* dsph,
 	unsigned int* sidx, unsigned int* cstart, unsigned int* cend, device_contact_property *cp,
 	unsigned int np/*, double3* mpos, double3* mf, double3* mm, double3& _mf, double3& _mm*/);
 
@@ -177,7 +177,7 @@ void XDYNAMICS_API cu_decide_rolling_friction_moment(
 
 double3 XDYNAMICS_API reductionD3(double3* in, unsigned int np);
 void XDYNAMICS_API cu_update_meshObjectData(
-	double *vList, double* sph, device_triangle_info* poly,
+	double *vList, double* sph, double* dlocal, device_triangle_info* poly,
 	device_mesh_mass_info* dpmi, double* ep, unsigned int np);
 
 #endif

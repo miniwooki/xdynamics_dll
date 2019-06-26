@@ -146,7 +146,7 @@ void xCommandLine::SetCurrentAction(int i)
 	{
 	case 3: cube = new xCubeObjectData; break;
 	case 4: cylinder = new xCylinderObjectData; break; // 3 is cylinder action
-	case 5: caction = i; break;
+	case 6: caction = i; break;
 	default:
 		break;
 	}
@@ -267,7 +267,7 @@ QString xCommandLine::MeshObjectCommandProcess(QString& com)
 	QString o;
 	switch (caction)
 	{
-	case 5:
+	case 6:
 		o = dynamic_cast<xvMeshObject*>(xobj)->GenerateFitSphereFile(com.toDouble());
 		break;
 	default:
@@ -300,4 +300,9 @@ xCubeObjectData xCommandLine::GetCubeParameters()
 		is_finished = false;
 	}
 	return d;
+}
+
+xvObject * xCommandLine::GetCurrentObject()
+{
+	return xobj;
 }

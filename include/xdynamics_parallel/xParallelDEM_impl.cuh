@@ -1006,7 +1006,7 @@ __global__ void particle_polygonObject_collision_kernel(
 	device_triangle_info* dpi, device_mesh_mass_info* dpmi,
 	double4 *pos, double3 *vel, double3 *omega, double3 *force, double3 *moment,
 	double* mass, double3* tmax, double* rres,
-	unsigned int* pair_count, unsigned int* pair_id, double2* tsd, 
+	unsigned int* pair_count, unsigned int* pair_id, double2* tsd, double4* dsph,
 	unsigned int* sorted_index, unsigned int* cstart, unsigned int* cend,
 	device_contact_property *cp, unsigned int np)
 {
@@ -1059,28 +1059,37 @@ __global__ void particle_polygonObject_collision_kernel(
 						if (k >= cte.np)
 						{
 							k -= cte.np;
-							int t = -1;
+//							int t = -1;
 							unsigned int pidx = dpi[k].id;
 							device_contact_property cmp = cp[pidx];
 							device_mesh_mass_info pmi = dpmi[pidx];
-							double3 cpt = closestPtPointTriangle(dpi[k], ipos, ir, t);
-							double3 po2cp = cpt - pmi.origin;
-							double cdist = ir - length(ipos - cpt);
-							Fn = make_double3(0.0, 0.0, 0.0);
+							double4 jpos = dsph[k];
+							double jr = jpos.w;
+							double3 rp = make_double3(jpos.x - ipos.x, jpos.y - ipos.y, jpos.z - ipos.z);
+							double dist = length(rp);
+							double cdist = (ir + jr) - dist;
+							//double3 cpt = closestPtPointTriangle(dpi[k], ipos, ir, t);
 							
+							//double cdist = ir - length(ipos - cpt)*/;
+							Fn = make_double3(0.0, 0.0, 0.0);
 							if (cdist > 0)
 							{
-								
-								device_triangle_info tri = dpi[k];
-								double3 qp = tri.Q - tri.P;
-								double3 rp = tri.R - tri.P;
 								double rcon = ir - 0.5 * cdist;
-								unit = -cross(qp, rp);
-								unit = unit / length(unit);
-								bool overlab = checkOverlab(ctype, previous_cpt, cpt, previous_unit, unit);
+								
+								double3 unit = rp / dist;
+								//double3 rc = ir * unit;
+								//double3 rv = jvel + cross(jomega, -jr * unit) - (ivel + cross(iomega, ir * unit));
+
+								//device_triangle_info tri = dpi[k];
+								//double3 qp = tri.Q - tri.P;
+								//double3 rp = tri.R - tri.P;
+								//double rcon = ir - 0.5 * cdist;
+								//unit = -cross(qp, rp);
+							//	unit = unit / length(unit);
+								//bool overlab = checkOverlab(ctype, previous_cpt, cpt, previous_unit, unit);
 								//printf("is overlab : %d", overlab);
-								if (overlab)
-									continue;
+								//if (overlab)
+								//	continue;
 								double2 sd = make_double2(0.0, 0.0);
 								for (unsigned int i = 0; i < old_count; i++)
 								{
@@ -1090,13 +1099,14 @@ __global__ void particle_polygonObject_collision_kernel(
 										break;
 									}
 								}
-								*(&(ctype.x) + t) += 1;
+								//*(&(ctype.x) + t) += 1;
 								//printf("index : %d - %f\n", k, dist);
 								//printf("ctype : [%d, %d, %d]\n", ctype.x, ctype.y, ctype.z);
-								previous_cpt = cpt;
-								previous_unit = unit;
+								//previous_cpt = cpt;
+								//previous_unit = unit;
 								//printf("ctype : [%f, %f, %f]\n", unit.x, unit.y, unit.z);
 								double3 rc = ir * unit;
+								double3 po2cp = (ipos + rc) - pmi.origin;
 								double3 dv = pmi.vel + cross(pmi.omega, po2cp) - (ivel + cross(iomega, rc));
 								device_force_constant c = getConstant(
 									TCM, ir, 0, im, 0, cmp.Ei, cmp.Ej,
@@ -1119,8 +1129,8 @@ __global__ void particle_polygonObject_collision_kernel(
 									cmp.rfric, ir, 0, rc, Fn, Ft, res, tma);
 								sum_force += Fn + Ft;
 								sum_moment += M;
-								dpmi[pidx].force += -cmp.amp * (Fn + Ft);// +make_double3(1.0, 5.0, 9.0);
-								dpmi[pidx].moment += -cross(po2cp, cmp.amp * (Fn + Ft));
+								dpmi[pidx].force += -/*cmp.amp * */(Fn + Ft);// +make_double3(1.0, 5.0, 9.0);
+								dpmi[pidx].moment += -cross(po2cp, /*cmp.amp * */(Fn + Ft));
 								tsd[new_count] = sd;
 								pair_id[new_count] = k;
 								new_count++;
@@ -1224,7 +1234,7 @@ __device__ double3 toGlobal(double3& v, double4& ep)
 
 __global__ void updateMeshObjectData_kernel(
 	device_mesh_mass_info *dpmi, double4* mep, double* vList,
-	double4* sphere, device_triangle_info* dpi, unsigned int ntriangle)
+	double4* sphere, double3* dlocal, device_triangle_info* dpi, unsigned int ntriangle)
 {
 	unsigned id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
 	unsigned int np = ntriangle;
@@ -1270,7 +1280,8 @@ __global__ void updateMeshObjectData_kernel(
 		t = (D2.y*(M1.z - M2.z)) / (D1.y*D2.z - D1.z*D2.y) - (D2.z*(M1.y - M2.y)) / (D1.y*D2.z - D1.z*D2.y);
 	}
 	double3 ctri = M1 + t * D1;
-	sphere[id] = make_double4(ctri.x, ctri.y, ctri.z, sph.w);
+	double3 r_pos = pos + toGlobal(dlocal[id], ep);
+	sphere[id] = make_double4(r_pos.x, r_pos.y, r_pos.z, sph.w);
 	dpi[id].P = P;
 	dpi[id].Q = Q;
 	dpi[id].R = R;

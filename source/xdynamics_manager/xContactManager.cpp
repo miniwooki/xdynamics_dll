@@ -341,7 +341,7 @@ void xContactManager::deviceCollision(
 			cpmeshes->updateMeshMassData();
 			cu_particle_polygonObject_collision(1, cpmeshes->deviceTrianglesInfo(), cpmeshes->devicePolygonObjectMassInfo(),
 				pos, vel, omega, force, moment, mass,
-				d_Tmax, d_RRes, d_pair_count_ptri, d_pair_id_ptri, d_tsd_ptri,
+				d_Tmax, d_RRes, d_pair_count_ptri, d_pair_id_ptri, d_tsd_ptri, cpmeshes->SphereData(),
 				sorted_id, cell_start, cell_end, cpmeshes->DeviceContactProperty(), np);
 			cpmeshes->getMeshContactForce();
 		}

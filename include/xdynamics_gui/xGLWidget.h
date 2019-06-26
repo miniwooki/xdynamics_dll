@@ -65,6 +65,7 @@ public:
 	void createPlaneGeometry(QString& _name, xPlaneObjectData& d);
 	void createCylinderGeometry(QString& _name, xCylinderObjectData& d);
 	xvParticle* createParticles();
+	xvParticle* createParticleObject(QString n);
 // 	void makeLine();
 // 	void makeCylinder(cylinder* cy);
 // 	void makeParticle(double* pos, unsigned int n);
@@ -192,6 +193,7 @@ private:
 	QMap<int, void*> v_wobjs;
 //	vparticles *vp;
 	xvParticle* vp;
+	QMap<QString, xvParticle*> xp_objs;
 	QStringList outputNameList;
 
 	// 	float maxViewPoint[3];

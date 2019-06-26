@@ -187,6 +187,7 @@ void xGLWidget::ReadSTLFile(QString& s)
 void xGLWidget::ClearViewObject()
 {
 	qDeleteAll(v_objs);
+	qDeleteAll(xp_objs);
 	v_objs.clear();
 	v_wobjs.clear();
 	selectedObjects.clear();
@@ -261,10 +262,22 @@ xvParticle* xGLWidget::createParticles()
 	return vp;
 }
 
+xvParticle * xGLWidget::createParticleObject(QString n)
+{
+	QMap<QString, xvParticle*>::iterator xp = xp_objs.find(n);
+	if (xp == xp_objs.end())
+	{
+		xp_objs[n] = new xvParticle();
+		return xp_objs[n];
+	}
+	return NULL;
+}
+
 void xGLWidget::glObjectClear()
 {
 	//	qDeleteAll(v_pobjs);
 	qDeleteAll(v_objs);
+	qDeleteAll(xp_objs);
 	if (ground_marker) delete ground_marker; ground_marker = NULL;
 	if (vp) delete vp; vp = NULL;
 }
@@ -585,6 +598,11 @@ void xGLWidget::drawObject(GLenum eMode)
 	if (vp)
 	{
 		vp->draw(GL_RENDER, wHeight, protype, abs(trans_z));
+	}
+
+	foreach(xvParticle* xp, xp_objs)
+	{
+		xp->draw(GL_RENDER, wHeight, protype, abs(trans_z));
 	}
 
 	glEnable(GL_BLEND);
