@@ -60,7 +60,7 @@ public:
 // 	void makeCube(cube* c);
 	void ReadSTLFile(QString& s);
 	void ClearViewObject();
-	void createMeshObjectGeometry(QString& _name);
+	xvMeshObject* createMeshObjectGeometry(QString& _name);
 	void createCubeGeometry(QString& _name, xCubeObjectData& d);
 	void createPlaneGeometry(QString& _name, xPlaneObjectData& d);
 	void createCylinderGeometry(QString& _name, xCylinderObjectData& d);
@@ -98,6 +98,8 @@ public:
 	xvObject* Object(QString n);
 	xvObject* Object(int id);
 	QMap<QString, xvObject*>& Objects() { return v_objs; }
+	QMap<QString, xvParticle*>& ParticleObjects() { return xp_objs; }
+	xvParticle* ParticleObject(QString n);
 	xvParticle* vParticles();// { return vp; }
 // 	vobject* getVObjectFromName(QString name);
 // 	vpolygon* getVPolyObjectFromName(QString name);

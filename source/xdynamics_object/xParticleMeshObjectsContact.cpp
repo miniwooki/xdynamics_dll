@@ -8,6 +8,7 @@ xParticleMeshObjectsContact::xParticleMeshObjectsContact()
 	, hsphere(NULL)
 	, dsphere(NULL)
 	, dlocal(NULL)
+	, hlocal(NULL)
 	, hpi(NULL)
 	, dpi(NULL)
 	, hcp(NULL)
@@ -27,7 +28,7 @@ xParticleMeshObjectsContact::xParticleMeshObjectsContact()
 xParticleMeshObjectsContact::~xParticleMeshObjectsContact()
 {
 	if (hsphere) delete[] hsphere; hsphere = NULL;
-	
+	if (hlocal) delete[] hlocal; hlocal = NULL;
 	if (hpi) delete[] hpi; hpi = NULL;
 	if (hcp) delete[] hcp; hcp = NULL;
 	if (xmps) delete[] xmps; xmps = NULL;
@@ -63,6 +64,7 @@ unsigned int xParticleMeshObjectsContact::define(QMap<QString, xParticleMeshObje
 	}
 	nPobjs = cpmesh.size();
 	hsphere = new vector4d[npolySphere];
+	hlocal = new vector3d[npolySphere];
 	hpi = new host_mesh_info[npolySphere];
 	hcp = new xContactMaterialParameters[nPobjs];
 	xmps = new xMaterialPair[nPobjs];
@@ -96,7 +98,8 @@ unsigned int xParticleMeshObjectsContact::define(QMap<QString, xParticleMeshObje
 		pair_ip[idx] = pobj;
 		ePolySphere += pobj->NumTriangle();
 		unsigned int vi = 0;
-		vector3d* hlocal = new vector3d[npolySphere];
+		//vector3d* hlocal = new vector3d[npolySphere];
+		double* t_radius = new double[npolySphere];
 		for (unsigned int i = bPolySphere; i < ePolySphere; i++)
 		{
 			//			host_mesh_info po;
@@ -119,13 +122,12 @@ unsigned int xParticleMeshObjectsContact::define(QMap<QString, xParticleMeshObje
 			hsphere[i] = csph;// new_vector4d(ctri.x, ctri.y, ctri.z, rad);
 			vector3d r_pos = ToLocal(ep, (new_vector3d(csph.x - pos.x, csph.y - pos.y, csph.z - pos.z)));
 			hlocal[i] = r_pos;
-			//hpi[i] = po;
-			//vi++;
+			t_radius[i] = csph.w;
 		}
+		ExportTriangleSphereLocalPosition(pobj->Name().toStdString(), bPolySphere, ePolySphere, hlocal, t_radius);
 		bPolySphere += pobj->NumTriangle();
-		checkCudaErrors(cudaMemcpy(dlocal, hlocal, sizeof(vector3d) * npolySphere, cudaMemcpyHostToDevice));
-		delete[] hlocal; hlocal = NULL;
-
+		delete[] t_radius;
+		//delete[] hlocal; hlocal = NULL;
 		/*std::fstream fs;
 		fs.open("C:/xdynamics/tri_sphere.txt", std::ios::out);
 		for (unsigned int i = 0; i < pobj->NumTriangle(); i++)
@@ -430,6 +432,7 @@ void xParticleMeshObjectsContact::cudaMemoryAlloc(unsigned int np)
 	checkCudaErrors(cudaMemcpy(dsphere, hsphere, sizeof(double) * npolySphere * 4, cudaMemcpyHostToDevice));
 	checkCudaErrors(cudaMemcpy(dpi, hpi, sizeof(device_triangle_info) * npolySphere, cudaMemcpyHostToDevice));
 	checkCudaErrors(cudaMemcpy(dcp, _hcp, sizeof(device_contact_property) * nPobjs, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(dlocal, hlocal, sizeof(vector3d) * npolySphere, cudaMemcpyHostToDevice));
 	unsigned int bPolySphere = 0;
 	unsigned int ePolySphere = 0;
 	foreach(xMeshObject* pobj, pair_ip)
@@ -483,6 +486,20 @@ device_triangle_info* xParticleMeshObjectsContact::deviceTrianglesInfo()
 device_mesh_mass_info* xParticleMeshObjectsContact::devicePolygonObjectMassInfo()
 {
 	return dpmi;
+}
+
+void xParticleMeshObjectsContact::ExportTriangleSphereLocalPosition(std::string & name, unsigned int b, unsigned int e, vector3d* hlocal, double *rad)
+{
+	std::string path = xModel::makeFilePath(name) + ".tsd";
+	std::fstream fs;
+	fs.open(path, std::ios::out | std::ios::binary);
+	vector3d* data = hlocal + b;
+	unsigned int sz = e - b;
+	fs.write((char*)&sz, sizeof(unsigned int));
+	fs.write((char*)hlocal, sizeof(vector3d) * sz);
+	fs.write((char*)rad, sizeof(double) * sz);
+	fs.close();
+
 }
 
 vector3d xParticleMeshObjectsContact::particle_polygon_contact_detection(

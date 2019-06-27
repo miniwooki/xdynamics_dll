@@ -61,6 +61,7 @@ private slots:
 	void xContextMenuProcess(QString nm, contextMenuType vot);
 	
 private:
+	void setupMeshSphere();
 	void setupMainOperations();
 	void setupObjectOperations();
 	void setupAnimationTool();

@@ -64,6 +64,7 @@ public:
 	void setZeroCollisionForce();
 	device_triangle_info* deviceTrianglesInfo();
 	device_mesh_mass_info* devicePolygonObjectMassInfo();
+	void ExportTriangleSphereLocalPosition(std::string& name, unsigned int b, unsigned int e, vector3d* hlocal, double *rad);
 
 private:
 	vector3d particle_polygon_contact_detection(
@@ -80,6 +81,7 @@ private:
 	vector4d *hsphere;
 	double* dsphere;
 	double* dlocal;
+	vector3d* hlocal;
 	double* dvList;
 	unsigned int* diList;
 	//double* dvertexList;

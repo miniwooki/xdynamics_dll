@@ -188,7 +188,7 @@ bool xdynamics_gui::ReadViewModel(QString path)
 						{
 							xpm->setConnectedGeometryName(xvo->Name());
 							vector3d p = xpm->Position();
-							xvo->setPosition(static_cast<float>(p.x), static_cast<float>(p.y), static_cast<float>(p.z));
+							xvo->setPosition(static_cast<float>(p.x), static_cast<float>(p.y), static_cast<float>(p.z));								
 						}
 					}
 				}
@@ -224,11 +224,13 @@ bool xdynamics_gui::ReadViewModel(QString path)
 		}
 		else if (vot == xViewObjectType::VMESH)
 		{
-			xgl->createMeshObjectGeometry(name);
+			xvMeshObject* xm = xgl->createMeshObjectGeometry(name);
+			
 		}
 		delete[] _name;
 	}
 	qf.close();
+	
 	xgl->fitView();
 	return true;
 }
@@ -399,6 +401,41 @@ void xdynamics_gui::ReadSTLFile(QString path)
 
 }
 
+void xdynamics_gui::setupMeshSphere()
+{
+	foreach(xvObject* xvo, xgl->Objects())
+	{
+		if (xvo->ObjectType() == xvObject::V_POLYGON)
+		{
+			std::string nm = xvo->Name().toStdString();
+			std::string m_path = xModel::makeFilePath(nm) + ".tsd";
+			bool b = xUtilityFunctions::ExistFile(m_path.c_str());
+			if (b)
+			{
+				QFile qf(m_path.c_str());
+				qf.open(QIODevice::ReadOnly);
+				unsigned int sz = 0;
+				qf.read((char*)&sz, sizeof(unsigned int));
+				double *data = new double[sz * 3];
+				double *rdata = new double[sz];
+				qf.read((char*)data, sizeof(double) * sz * 3);
+				qf.read((char*)rdata, sizeof(double) * sz);
+				qf.close();
+				xvParticle *xp = xgl->createParticleObject(xvo->Name());
+				xp->setRelativePosition(sz, data, rdata);
+				xObject* xo = xdm->XObject()->XObject(nm);
+				if (xo)
+				{
+					xPointMass* xpm = dynamic_cast<xPointMass*>(xo);
+					xp->defineFromRelativePosition(xpm->Position(), xpm->EulerParameters());
+				}
+				delete[] data;
+				delete[] rdata;
+			}
+		}
+	}	
+}
+
 void xdynamics_gui::setupMainOperations()
 {
 	QAction* a;
@@ -561,6 +598,18 @@ void xdynamics_gui::xRecieveProgress(int pt, QString ch)
  			QString fileName;
 			fileName.sprintf("Part%04d", pt);
  			xgl->vParticles()->UploadParticleFromFile(pt, path + xModel::name + "/" + fileName + ".bin");
+			QMapIterator<QString, xvParticle*> xps(xgl->ParticleObjects());
+			while (xps.hasNext())
+			{
+				xps.next();
+				QString k = xps.key();
+				xvParticle* v = xps.value();
+				xPointMass* xpm = dynamic_cast<xPointMass*>(xdm->XObject()->XObject(k.toStdString()));
+				if (xpm)
+				{
+					v->UploadParticleFromRelativePosition(pt, xpm->Position(), xpm->EulerParameters());
+				}
+			}
  		}
  		xvAnimationController::setTotalFrame(pt);
 	}
@@ -736,11 +785,19 @@ void xdynamics_gui::xRunSimulationThread(double dt, unsigned int st, double et)
 	setupAnimationTool();
 	sThread = new xSimulationThread;
 	sThread->xInitialize(xdm, dt, st, et);
+	setupMeshSphere();
 	//xcw->write(xCommandWindow::CMD_INFO, QString("%1, %1, %1").arg(dt).arg(st).arg(et));
 	//xcw->write(xCommandWindow::CMD_INFO, "Thread Initialize Done.");
 	xvAnimationController::allocTimeMemory(xSimulation::npart);
 	if(xgl->vParticles())
 		xgl->vParticles()->setBufferMemories(xSimulation::npart);
+	foreach(xvParticle* xp, xgl->ParticleObjects())
+	{
+		if (xp->hasRelativePosition())
+		{
+			xp->setBufferMemories(xSimulation::npart);
+		}
+	}
 	connect(sThread, SIGNAL(finishedThread()), this, SLOT(xExitSimulationThread()));
 	connect(sThread, SIGNAL(sendProgress(int, QString)), this, SLOT(xRecieveProgress(int, QString)));
 	//xcw->write(xCommandWindow::CMD_INFO, "Thread Initialize Done.");

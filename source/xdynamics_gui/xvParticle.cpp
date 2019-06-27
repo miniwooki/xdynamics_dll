@@ -1,6 +1,7 @@
 #include "xvParticle.h"
 #include "xvShader.h"
 #include "../xTypes.h"
+#include "xdynamics_algebra/xAlgebraMath.h"
 //#include "colors.h"
 //#include "msgBox.h"
 //#include "model.h"
@@ -21,12 +22,14 @@
 
 xvParticle::xvParticle()
 	: np(0)
+	, r_np(0)
 	, isSetColor(false)
 	, pos(NULL)
 	, color(NULL)
 	, buffers(NULL)
 	, vbuffers(NULL)
 	, color_buffers(NULL)
+	, r_pos(NULL)
 	, pscale(0)
 	, isDefine(false)
 {
@@ -42,6 +45,7 @@ xvParticle::~xvParticle()
 	if (buffers) delete[] buffers; buffers = NULL;
 	if (vbuffers) delete[] vbuffers; vbuffers = NULL;
 	if (color_buffers) delete[] color_buffers; color_buffers = NULL;
+	if (r_pos) delete[] r_pos; r_pos = NULL;
 	if (m_posVBO){
 		glDeleteBuffers(1, &m_posVBO);
 		m_posVBO = 0;
@@ -253,6 +257,19 @@ bool xvParticle::defineFromListFile(QString path)
 	return _define();
 }
 
+void xvParticle::setRelativePosition(unsigned int sz, double* d, double* r)
+{
+	r_pos = new double[sz * 4];
+	for (unsigned int i = 0; i < sz; i++)
+	{
+		r_pos[i * 4 + 0] = d[i * 3 + 0];
+		r_pos[i * 4 + 1] = d[i * 3 + 1];
+		r_pos[i * 4 + 2] = d[i * 3 + 2];
+		r_pos[i * 4 + 3] = r[i];
+	}
+	r_np = sz;
+}
+
 void xvParticle::setParticlePosition(double* p, unsigned int n)
 {
 // 	if (pos && p)
@@ -303,6 +320,35 @@ bool xvParticle::UploadParticleFromFile(unsigned int i, QString path)
 	delete[] _pos;
 	delete[] _vel;
 	return true;
+}
+
+bool xvParticle::UploadParticleFromRelativePosition(unsigned int i, vector3d & p, euler_parameters & ep)
+{
+	matrix33d A = GlobalTransformationMatrix(ep);
+	unsigned int sid = np * i * 4;
+	unsigned int vid = np * i * 3;
+	xvAnimationController::addTime(i, 0);
+	for (unsigned int j = 0; j < np; j++)
+	{
+		unsigned int s = j * 4;
+		unsigned int v = j * 3;
+		vector3d rp = new_vector3d(r_pos[i * 4 + 0], r_pos[i * 4 + 1], r_pos[i * 4 + 2]);
+		vector3d gp = p + A * rp;
+		buffers[s + sid + 0] = static_cast<float>(gp.x);
+		buffers[s + sid + 1] = static_cast<float>(gp.y);
+		buffers[s + sid + 2] = static_cast<float>(gp.z);
+		buffers[s + sid + 3] = static_cast<float>(r_pos[s + 3]);
+
+		vbuffers[v + vid + 0] = 0.0f;// static_cast<float>(_vel[v + 0]);
+		vbuffers[v + vid + 1] = 0.0f;//static_cast<float>(_vel[v + 1]);
+		vbuffers[v + vid + 2] = 0.0f;// static_cast<float>(_vel[v + 2]);
+
+		color_buffers[s + sid + 0] = 0.0f;
+		color_buffers[s + sid + 1] = 0.0f;
+		color_buffers[s + sid + 2] = 1.0f;
+		color_buffers[s + sid + 3] = 1.0f;
+	}
+	return false;
 }
 
 void xvParticle::resizePositionMemory(unsigned int n0, unsigned int n1)
@@ -496,6 +542,25 @@ double xvParticle::MinRadiusOfGroupData(QString& n)
 double xvParticle::MaxnRadiusOfGroupData(QString& n)
 {
 	return pgds[n].max_rad;
+}
+
+bool xvParticle::defineFromRelativePosition(vector3d & p, euler_parameters & ep)
+{
+	resizePositionMemory(np, np + r_np);
+	matrix33d A = GlobalTransformationMatrix(ep);
+	for (unsigned int i = 0; i < r_np; i++)
+	{
+		vector3d rp = new_vector3d(r_pos[i * 4 + 0], r_pos[i * 4 + 1], r_pos[i * 4 + 2]);
+		vector3d gp = p + A * rp;
+		pos[(np + i) * 4 + 0] = (float)gp.x;
+		pos[(np + i) * 4 + 1] = (float)gp.y;
+		pos[(np + i) * 4 + 2] = (float)gp.z;
+		pos[(np + i) * 4 + 3] = (float)r_pos[i * 4 + 3];
+	}
+	np += r_np;
+
+	color = new float[np * 4];
+	return _define();
 }
 
 // void xvParticle::changeParticles(VEC4D_PTR _pos)

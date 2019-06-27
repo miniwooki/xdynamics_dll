@@ -90,6 +90,21 @@ void xvMeshObject::defineMeshObject(unsigned int nt, double* v, double* n)
 	display = true;
 }
 
+//void xvMeshObject::setMeshSphere(unsigned int sz, double * d)
+//{
+//	if (sz != ntriangle)
+//	{
+//
+//	}
+//	r_sphere = new float[ntriangle * 3];
+//	for (unsigned int i = 0; i < ntriangle; i++)
+//	{
+//		r_sphere[i * 3 + 0] = static_cast<float>(d[i * 3 + 0]);
+//		r_sphere[i * 3 + 1] = static_cast<float>(d[i * 3 + 1]);
+//		r_sphere[i * 3 + 2] = static_cast<float>(d[i * 3 + 2]);
+//	}
+//}
+
 vector4f xvMeshObject::FitSphereToTriangle(vector3f& P, vector3f& Q, vector3f& R, float ft)
 {
 	vector3f V = Q - P;

@@ -194,7 +194,7 @@ void xGLWidget::ClearViewObject()
 	if (vp) delete vp; vp = NULL;
 }
 
-void xGLWidget::createMeshObjectGeometry(QString& file)
+xvMeshObject* xGLWidget::createMeshObjectGeometry(QString& file)
 {
 	QFile qf(file);
 	qf.open(QIODevice::ReadOnly);
@@ -224,6 +224,7 @@ void xGLWidget::createMeshObjectGeometry(QString& file)
 	delete[] _normal;
 	v_objs[obj_name] = vm;
 	v_wobjs[vm->ID()] = (void*)vm;
+	return vm;
 //	return vm;
 }
 
@@ -533,6 +534,15 @@ void xGLWidget::drawGroundCoordinate(GLenum eMode)
 // 
 // 	}
 // }
+
+xvParticle * xGLWidget::ParticleObject(QString n)
+{
+	QStringList l = xp_objs.keys();
+	QStringList::const_iterator it = qFind(l, n);
+	if (it == l.end())
+		return NULL;
+	return xp_objs[n];
+}
 
 xvParticle* xGLWidget::vParticles()
 {
