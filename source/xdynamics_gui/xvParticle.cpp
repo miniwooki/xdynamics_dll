@@ -332,7 +332,7 @@ bool xvParticle::UploadParticleFromRelativePosition(unsigned int i, vector3d & p
 	{
 		unsigned int s = j * 4;
 		unsigned int v = j * 3;
-		vector3d rp = new_vector3d(r_pos[i * 4 + 0], r_pos[i * 4 + 1], r_pos[i * 4 + 2]);
+		vector3d rp = new_vector3d(r_pos[s + 0], r_pos[s + 1], r_pos[s + 2]);
 		vector3d gp = p + A * rp;
 		buffers[s + sid + 0] = static_cast<float>(gp.x);
 		buffers[s + sid + 1] = static_cast<float>(gp.y);

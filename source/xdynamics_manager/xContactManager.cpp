@@ -309,8 +309,8 @@ void xContactManager::updateCollisionPair(
 				}
 			}
 		}
-		if (count > 1)
-			std::cout << "mesh contact overlab occured." << std::endl;
+		/*if (count > 1)
+			std::cout << "mesh contact overlab occured." << std::endl;*/
 	}
 }
 

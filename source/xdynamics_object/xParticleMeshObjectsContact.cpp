@@ -262,6 +262,7 @@ void xParticleMeshObjectsContact::updateMeshObjectData()
 		vector3d omega = 2.0 * GMatrix(ep) * ev;
 		hpmi[id] =
 		{
+			mesh->Mass(),
 			pos.x, pos.y, pos.z,	
 			vel.x, vel.y, vel.z,
 			omega.x, omega.y, omega.z,
@@ -305,13 +306,14 @@ void xParticleMeshObjectsContact::updateMeshObjectData()
 					hep[id * 4 + 1],
 					hep[id * 4 + 2],
 					hep[id * 4 + 3]);
-				hpi[i].P = pos + ToGlobal(ep, vList[vi++]);
+				/*hpi[i].P = pos + ToGlobal(ep, vList[vi++]);
 				hpi[i].Q = pos + ToGlobal(ep, vList[vi++]);
 				hpi[i].R = pos + ToGlobal(ep, vList[vi++]);
-
 				vector3d ctri = xUtilityFunctions::CenterOfTriangle(hpi[i].P, hpi[i].Q, hpi[i].R);
-				double rad = length(ctri - hpi[i].P);
-				hsphere[i] = new_vector4d(ctri.x, ctri.y, ctri.z, rad);
+				double rad = length(ctri - hpi[i].P);*/
+				vector3d gsph = pos + ToGlobal(ep, hlocal[i]);
+				hsphere[i] = new_vector4d(gsph.x, gsph.y, gsph.z, hsphere[i].w);
+				///hsphere[i] = new_vector4d(ctri.x, ctri.y, ctri.z, rad);
 			}
 			bPolySphere += mesh->NumTriangle();
 		}	
@@ -373,23 +375,30 @@ bool xParticleMeshObjectsContact::updateCollisionPair(
 	
 	host_mesh_info hmi = hpi[id];
 	host_mesh_mass_info hmmi = hpmi[hmi.id];
+	vector3d jpos = new_vector3d(hsphere[id].x, hsphere[id].y, hsphere[id].z);
+	double jr = hsphere[id].w;
 	vector3d cpt = particle_polygon_contact_detection(hmi, pos, r, t);
 	vector3d po2cp = cpt - new_vector3d(hmmi.px, hmmi.py, hmmi.pz);
-	double cdist = r - length(pos - cpt);
+	vector3d rp = jpos - pos;
+	double dist = length(rp);
+	//double cdist = r - length(pos - cpt);
+	double cdist = (r + jr) - dist;
 	if (cdist > 0)
 	{
-		vector3d qp = hmi.Q - hmi.P;
+		/*vector3d qp = hmi.Q - hmi.P;
 		vector3d rp = hmi.R - hmi.P;
-		vector3d unit = -cross(qp, rp);
-		unit = -unit / length(unit);
-		bool overlab = checkOverlab(ctype, ocpt, cpt, ounit, unit);
+		vector3d unit = -cross(qp, rp);*/
+		vector3d unit = rp / dist;
+		cpt = 0.5 * (jpos + pos);
+		//unit = -unit / length(unit);
+		//bool overlab = checkOverlab(ctype, ocpt, cpt, ounit, unit);
 		
-		if (overlab)
+		/*if (overlab)
 			return false;
 
 		ocpt = cpt;
 		ounit = unit;
-		*(&(ctype.x) + t) += 1;
+		*(&(ctype.x) + t) += 1;*/
 		if (xcpl.IsNewTriangleContactPair(id))
 		{
 			xTrianglePairData* pd = new xTrianglePairData;
