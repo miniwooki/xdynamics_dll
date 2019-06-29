@@ -64,6 +64,7 @@ struct device_plane_info
 
 struct device_mesh_mass_info
 {
+	double mass;
 	double3 origin;
 	double3 vel;
 	double3 omega;

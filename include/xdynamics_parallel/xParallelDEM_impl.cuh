@@ -1023,7 +1023,7 @@ __global__ void particle_polygonObject_collision_kernel(
 		p_tsd[i] = tsd[sid + i];
 	}
 	unsigned int old_count = pair_count[id];
-//	double cdist = 0.0;
+	//	double cdist = 0.0;
 	double im = mass[id];
 	double3 ipos = make_double3(pos[id].x, pos[id].y, pos[id].z);
 	double3 ivel = make_double3(vel[id].x, vel[id].y, vel[id].z);
@@ -1059,37 +1059,28 @@ __global__ void particle_polygonObject_collision_kernel(
 						if (k >= cte.np)
 						{
 							k -= cte.np;
-//							int t = -1;
+							int t = -1;
 							unsigned int pidx = dpi[k].id;
 							device_contact_property cmp = cp[pidx];
 							device_mesh_mass_info pmi = dpmi[pidx];
-							double4 jpos = dsph[k];
-							double jr = jpos.w;
-							double3 rp = make_double3(jpos.x - ipos.x, jpos.y - ipos.y, jpos.z - ipos.z);
-							double dist = length(rp);
-							double cdist = (ir + jr) - dist;
-							//double3 cpt = closestPtPointTriangle(dpi[k], ipos, ir, t);
-							
-							//double cdist = ir - length(ipos - cpt)*/;
+							double3 cpt = closestPtPointTriangle(dpi[k], ipos, ir, t);
+							double3 po2cp = cpt - pmi.origin;
+							double cdist = ir - length(ipos - cpt);
 							Fn = make_double3(0.0, 0.0, 0.0);
+
 							if (cdist > 0)
 							{
-								double rcon = ir - 0.5 * cdist;
-								
-								double3 unit = rp / dist;
-								//double3 rc = ir * unit;
-								//double3 rv = jvel + cross(jomega, -jr * unit) - (ivel + cross(iomega, ir * unit));
 
-								//device_triangle_info tri = dpi[k];
-								//double3 qp = tri.Q - tri.P;
-								//double3 rp = tri.R - tri.P;
-								//double rcon = ir - 0.5 * cdist;
-								//unit = -cross(qp, rp);
-							//	unit = unit / length(unit);
-								//bool overlab = checkOverlab(ctype, previous_cpt, cpt, previous_unit, unit);
+								device_triangle_info tri = dpi[k];
+								double3 qp = tri.Q - tri.P;
+								double3 rp = tri.R - tri.P;
+								double rcon = ir - 0.5 * cdist;
+								unit = -cross(qp, rp);
+								unit = unit / length(unit);
+								bool overlab = checkOverlab(ctype, previous_cpt, cpt, previous_unit, unit);
 								//printf("is overlab : %d", overlab);
-								//if (overlab)
-								//	continue;
+								if (overlab)
+									continue;
 								double2 sd = make_double2(0.0, 0.0);
 								for (unsigned int i = 0; i < old_count; i++)
 								{
@@ -1099,14 +1090,13 @@ __global__ void particle_polygonObject_collision_kernel(
 										break;
 									}
 								}
-								//*(&(ctype.x) + t) += 1;
+								*(&(ctype.x) + t) += 1;
 								//printf("index : %d - %f\n", k, dist);
 								//printf("ctype : [%d, %d, %d]\n", ctype.x, ctype.y, ctype.z);
-								//previous_cpt = cpt;
-								//previous_unit = unit;
+								previous_cpt = cpt;
+								previous_unit = unit;
 								//printf("ctype : [%f, %f, %f]\n", unit.x, unit.y, unit.z);
 								double3 rc = ir * unit;
-								double3 po2cp = (ipos + rc) - pmi.origin;
 								double3 dv = pmi.vel + cross(pmi.omega, po2cp) - (ivel + cross(iomega, rc));
 								device_force_constant c = getConstant(
 									TCM, ir, 0, im, 0, cmp.Ei, cmp.Ej,
@@ -1129,8 +1119,8 @@ __global__ void particle_polygonObject_collision_kernel(
 									cmp.rfric, ir, 0, rc, Fn, Ft, res, tma);
 								sum_force += Fn + Ft;
 								sum_moment += M;
-								dpmi[pidx].force += -/*cmp.amp * */(Fn + Ft);// +make_double3(1.0, 5.0, 9.0);
-								dpmi[pidx].moment += -cross(po2cp, /*cmp.amp * */(Fn + Ft));
+								dpmi[pidx].force += -(Fn + Ft);// +make_double3(1.0, 5.0, 9.0);
+								dpmi[pidx].moment += -cross(po2cp, Fn + Ft);
 								tsd[new_count] = sd;
 								pair_id[new_count] = k;
 								new_count++;
@@ -1143,12 +1133,162 @@ __global__ void particle_polygonObject_collision_kernel(
 	}
 	force[id] += sum_force;
 	moment[id] += sum_moment;
-	/*if (new_count - sid > MAX_P2MS_COUNT)
-		printf("The total of contact with triangle is over(%d)\n.", new_count - sid);*/
+	if (new_count - sid > MAX_P2MS_COUNT)
+		printf("The total of contact with triangle is over(%d)\n.", new_count - sid);
 	pair_count[id] = new_count - sid;
 	tmax[id] += tma;
 	rres[id] += res;
 }
+
+//template<int TCM>
+//__global__ void particle_polygonObject_collision_kernel(
+//	device_triangle_info* dpi, device_mesh_mass_info* dpmi,
+//	double4 *pos, double3 *vel, double3 *omega, double3 *force, double3 *moment,
+//	double* mass, double3* tmax, double* rres,
+//	unsigned int* pair_count, unsigned int* pair_id, double2* tsd, double4* dsph,
+//	unsigned int* sorted_index, unsigned int* cstart, unsigned int* cend,
+//	device_contact_property *cp, unsigned int np)
+//{
+//	unsigned id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
+//	//unsigned int np = _np;
+//	if (id >= np)
+//		return;
+//	unsigned int p_pair_id[MAX_P2MS_COUNT];
+//	double2 p_tsd[MAX_P2MS_COUNT];
+//	unsigned int sid = id * MAX_P2MS_COUNT;
+//	for (unsigned int i = 0; i < MAX_P2MS_COUNT; i++)
+//	{
+//		p_pair_id[i] = pair_id[sid + i];
+//		p_tsd[i] = tsd[sid + i];
+//	}
+//	unsigned int old_count = pair_count[id];
+////	double cdist = 0.0;
+//	double im = mass[id];
+//	double3 ipos = make_double3(pos[id].x, pos[id].y, pos[id].z);
+//	double3 ivel = make_double3(vel[id].x, vel[id].y, vel[id].z);
+//	double3 iomega = make_double3(omega[id].x, omega[id].y, omega[id].z);
+//	double3 unit = make_double3(0.0, 0.0, 0.0);
+//	int3 gridPos = calcGridPos(make_double3(ipos.x, ipos.y, ipos.z));
+//	double ir = pos[id].w;
+//	double3 M = make_double3(0, 0, 0);
+//	int3 neighbour_pos = make_int3(0, 0, 0);
+//	uint grid_hash = 0;
+//	double3 Fn = make_double3(0, 0, 0);
+//	double3 Ft = make_double3(0, 0, 0);
+//	double3 sum_force = make_double3(0, 0, 0);
+//	double3 sum_moment = make_double3(0, 0, 0);
+//	unsigned int new_count = sid;
+//	double res = 0.0;
+//	double3 tma = make_double3(0.0, 0.0, 0.0);
+//	double3 previous_cpt = make_double3(0.0, 0.0, 0.0);
+//	double3 previous_unit = make_double3(0.0, 0.0, 0.0);
+//	unsigned int start_index = 0;
+//	unsigned int end_index = 0;
+//	int3 ctype = make_int3(0, 0, 0);
+//	for (int z = -1; z <= 1; z++) {
+//		for (int y = -1; y <= 1; y++) {
+//			for (int x = -1; x <= 1; x++) {
+//				neighbour_pos = make_int3(gridPos.x + x, gridPos.y + y, gridPos.z + z);
+//				grid_hash = calcGridHash(neighbour_pos);
+//				start_index = cstart[grid_hash];
+//				if (start_index != 0xffffffff) {
+//					end_index = cend[grid_hash];
+//					for (unsigned int j = start_index; j < end_index; j++) {
+//						unsigned int k = sorted_index[j];
+//						if (k >= cte.np)
+//						{
+//							k -= cte.np;
+////							int t = -1;
+//							unsigned int pidx = dpi[k].id;
+//							device_contact_property cmp = cp[pidx];
+//							device_mesh_mass_info pmi = dpmi[pidx];
+//							double4 jpos = dsph[k];
+//							double jr = jpos.w;
+//							double3 rp = make_double3(jpos.x - ipos.x, jpos.y - ipos.y, jpos.z - ipos.z);
+//							double dist = length(rp);
+//							double cdist = (ir + jr) - dist;
+//							//double3 cpt = closestPtPointTriangle(dpi[k], ipos, ir, t);
+//							
+//							//double cdist = ir - length(ipos - cpt)*/;
+//							Fn = make_double3(0.0, 0.0, 0.0);
+//							if (cdist > 0)
+//							{
+//								double rcon = ir - 0.5 * cdist;
+//								
+//								double3 unit = rp / dist;
+//								//double3 rc = ir * unit;
+//								//double3 rv = jvel + cross(jomega, -jr * unit) - (ivel + cross(iomega, ir * unit));
+//
+//								//device_triangle_info tri = dpi[k];
+//								//double3 qp = tri.Q - tri.P;
+//								//double3 rp = tri.R - tri.P;
+//								//double rcon = ir - 0.5 * cdist;
+//								//unit = -cross(qp, rp);
+//							//	unit = unit / length(unit);
+//								//bool overlab = checkOverlab(ctype, previous_cpt, cpt, previous_unit, unit);
+//								//printf("is overlab : %d", overlab);
+//								//if (overlab)
+//								//	continue;
+//								double2 sd = make_double2(0.0, 0.0);
+//								for (unsigned int i = 0; i < old_count; i++)
+//								{
+//									if (p_pair_id[i] == k)
+//									{
+//										sd = p_tsd[i];
+//										break;
+//									}
+//								}
+//								//*(&(ctype.x) + t) += 1;
+//								//printf("index : %d - %f\n", k, dist);
+//								//printf("ctype : [%d, %d, %d]\n", ctype.x, ctype.y, ctype.z);
+//								//previous_cpt = cpt;
+//								//previous_unit = unit;
+//								//printf("ctype : [%f, %f, %f]\n", unit.x, unit.y, unit.z);
+//								double3 rc = ir * unit;
+//								//double3 cpt = 0.5 * (ipos + jpos);
+//								double3 po2cp = (ipos + rc) - pmi.origin;
+//								double3 dv = pmi.vel + cross(pmi.omega, po2cp) - (ivel + cross(iomega, rc));
+//								device_force_constant c = getConstant(
+//									TCM, ir, 0, im, 0, cmp.Ei, cmp.Ej,
+//									cmp.pri, cmp.prj, cmp.Gi, cmp.Gj,
+//									cmp.rest, cmp.fric, cmp.rfric, cmp.sratio);
+//								switch (TCM)
+//								{
+//								case 0:
+//									HMCModel(
+//										c, 0, 0, 0, 0, 0, 0, 0, rcon, cdist, iomega,
+//										dv, unit, Ft, Fn, M);
+//									break;
+//								case 1:
+//									DHSModel(
+//										c, ir, 0, 0, 0, 0, 0, 0, rcon, cdist, iomega, sd.x, sd.y,
+//										dv, unit, Ft, Fn, M);
+//									break;
+//								}
+//								calculate_previous_rolling_resistance(
+//									cmp.rfric, ir, 0, rc, Fn, Ft, res, tma);
+//								sum_force += Fn + Ft;
+//								sum_moment += M;
+//								dpmi[pidx].force += -/*cmp.amp * */(Fn + Ft);// +make_double3(1.0, 5.0, 9.0);
+//								dpmi[pidx].moment += -cross(po2cp, /*cmp.amp * */(Fn + Ft));
+//								tsd[new_count] = sd;
+//								pair_id[new_count] = k;
+//								new_count++;
+//							}
+//						}
+//					}
+//				}
+//			}
+//		}
+//	}
+//	force[id] += sum_force;
+//	moment[id] += sum_moment;
+//	/*if (new_count - sid > MAX_P2MS_COUNT)
+//		printf("The total of contact with triangle is over(%d)\n.", new_count - sid);*/
+//	pair_count[id] = new_count - sid;
+//	tmax[id] += tma;
+//	rres[id] += res;
+//}
 
 __global__ void decide_rolling_friction_moment_kernel(
 	double3* tmax,
@@ -1281,6 +1421,10 @@ __global__ void updateMeshObjectData_kernel(
 	}
 	double3 ctri = M1 + t * D1;
 	double3 r_pos = pos + toGlobal(dlocal[id], ep);
+	//if (id == 0)
+	//{
+	//	printf("%f, %f, %f\n", r_pos.x, r_pos.y, r_pos.z);
+	//}
 	sphere[id] = make_double4(r_pos.x, r_pos.y, r_pos.z, sph.w);
 	dpi[id].P = P;
 	dpi[id].Q = Q;

@@ -112,5 +112,9 @@ QMap<unsigned int, xTrianglePairData*>& xContactPairList::TrianglePair()
 
 xTrianglePairData* xContactPairList::TrianglePair(unsigned int i)
 {
-	return NULL;
+	QMap<unsigned int, xTrianglePairData*>::const_iterator it = triangle_pair.find(i);
+	if (it == triangle_pair.constEnd())
+		return NULL;
+
+	return triangle_pair[i];
 }

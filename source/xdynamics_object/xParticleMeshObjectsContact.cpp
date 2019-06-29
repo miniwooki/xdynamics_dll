@@ -69,6 +69,7 @@ unsigned int xParticleMeshObjectsContact::define(QMap<QString, xParticleMeshObje
 	hcp = new xContactMaterialParameters[nPobjs];
 	xmps = new xMaterialPair[nPobjs];
 	hpmi = new host_mesh_mass_info[nPobjs];
+	memset(hpmi, 0, sizeof(host_mesh_mass_info) * nPobjs);
 	// 	if (simulation::isCpu())
 	// 		dsphere = (double*)hsphere;
 // 	if (!pct)
@@ -124,7 +125,7 @@ unsigned int xParticleMeshObjectsContact::define(QMap<QString, xParticleMeshObje
 			hlocal[i] = r_pos;
 			t_radius[i] = csph.w;
 		}
-		ExportTriangleSphereLocalPosition(pobj->Name().toStdString(), bPolySphere, ePolySphere, hlocal, t_radius);
+	//	ExportTriangleSphereLocalPosition(pobj->Name().toStdString(), bPolySphere, ePolySphere, hlocal, t_radius);
 		bPolySphere += pobj->NumTriangle();
 		delete[] t_radius;
 		//delete[] hlocal; hlocal = NULL;

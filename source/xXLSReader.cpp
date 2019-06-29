@@ -520,11 +520,11 @@ void xXLSReader::ReadContact(xContactManager* xcm, vector2i rc)
 				xObjectManager::XOM()->XObject(obj0),
 				xObjectManager::XOM()->XObject(obj1),
 				d);
-			if (!IsEmptyCell(rc.x, rc.y))
+		/*	if (!IsEmptyCell(rc.x, rc.y))
 			{
 				double mul = sheet->readNum(rc.x, rc.y);
 				xc->setStiffMultiplyer(mul);
-			}
+			}*/
 			rc.x++;
 			rc.y = 0;
 		}

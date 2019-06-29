@@ -190,6 +190,7 @@ void xIntegratorVV::updateClusterVelocity(
 			vector3d gp = cpos + ToGlobal(e, rloc[loc + j]);
 			vector3d dr = gp - cpos;
 			F += f[sid + j];
+			//vector3d T_f = cross(dr, f[sid + j]);
 			T += m[sid + j];
 			LT += cross(dr, f[sid + j]);
 			f[sid + j] = new_vector3d(0.0, 0.0, 0.0);// dmass[i] * xModel::gravity;

@@ -457,6 +457,7 @@ xParticleObject * xParticleManager::CreateClusterParticle(std::string n, xMateri
 	{
 		vector3d cp = new_vector3d(0.0, 0.01, 0.0);
 		vector3d rot = new_vector3d(180 * frand(), 180 * frand(), 180 * frand());
+		//vector3d rot = new_vector3d(0,0,45);
 		euler_parameters m_ep = EulerAngleToEulerParameters(rot);
 		matrix33d A = GlobalTransformationMatrix(m_ep);
 		for (unsigned int j = 0; j < neach; j++)
@@ -464,7 +465,7 @@ xParticleObject * xParticleManager::CreateClusterParticle(std::string n, xMateri
 			vector3d m_pos = cp + A * rloc[j];
 			pos[i * neach + j] = new_vector4d(m_pos.x, m_pos.y, m_pos.z, rad);
 		}
-		cpos[i] = new_vector4d(cp.x, cp.y, cp.z, 0.0);
+		cpos[i] = new_vector4d(cp.x, cp.y, cp.z, rad);
 		ep[i] = m_ep;
 		norm = length(new_vector4d(m_ep.e0, m_ep.e1, m_ep.e2, m_ep.e3));
 	}
@@ -506,7 +507,7 @@ bool xParticleManager::SetMassAndInertia(double *mass, double *inertia)
 			for (unsigned int i = 0; i < xpo->NumCluster(); i++)
 			{
 				double m = d * (4.0 / 3.0) * M_PI * pow(cpos[i].w, 3.0);
-				mass[i + sid] = m;
+				mass[i + sid] = m * xpo->EachCount();
 				vector3d J3 = new_vector3d(0, 0, 0);
 				vector3d m_pos = new_vector3d(cpos[i].x, cpos[i].y, cpos[i].z);
 				for (unsigned int j = 0; j < xpo->EachCount(); j++)
