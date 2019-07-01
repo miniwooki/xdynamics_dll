@@ -126,8 +126,10 @@ struct device_cluster_information
 
 void XDYNAMICS_API setDEMSymbolicParameter(device_dem_parameters *h_paras);
 
-void XDYNAMICS_API vv_update_position(double *pos, double *vel, double *acc, unsigned int np);
-void XDYNAMICS_API vv_update_velocity(double *vel, double *acc, double *omega, double *alpha, double *force, double *moment, double* mass, double* iner, unsigned int np);
+void XDYNAMICS_API vv_update_position(
+	double *pos, double* ep, double *vel, double* ev, double *acc, double* ea, unsigned int np);
+void XDYNAMICS_API vv_update_velocity(
+	double *vel, double *acc, double* ep, double *ev, double *ea, double *force, double *moment, double* mass, double* iner, unsigned int np);
 
 void XDYNAMICS_API cu_calculateHashAndIndex(unsigned int* hash, unsigned int* index, double *pos, unsigned int np);
 void XDYNAMICS_API cu_calculateHashAndIndexForPolygonSphere(
@@ -136,7 +138,7 @@ void XDYNAMICS_API cu_calculateHashAndIndexForPolygonSphere(
 void XDYNAMICS_API cu_reorderDataAndFindCellStart(unsigned int* hash, unsigned int* index, unsigned int* cstart, unsigned int* cend, unsigned int* sorted_index, unsigned int np, /*unsigned int nsphere,*/ unsigned int ncell);
 
 void XDYNAMICS_API cu_calculate_p2p(
-	const int tcm, double* pos, double* vel,
+	const int tcm, double* pos, double* ep, double* vel,
 	double* omega, double* force,
 	double* moment, double* mass, double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd,
@@ -146,7 +148,7 @@ void XDYNAMICS_API cu_calculate_p2p(
 // Function for contact between particle and plane
 void XDYNAMICS_API cu_plane_contact_force(
 	const int tcm, device_plane_info* plan,
-	double* pos, double* vel, double* omega,
+	double* pos, double* ep, double* vel, double* omega,
 	double* force, double* moment, double* mass,
 	double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd,
@@ -154,14 +156,14 @@ void XDYNAMICS_API cu_plane_contact_force(
 
 void XDYNAMICS_API cu_cube_contact_force(
 	const int tcm, device_plane_info* plan,
-	double* pos, double* vel, double* omega,
+	double* pos, double* ep, double* vel, double* omega,
 	double* force, double* moment, double* mass,
 	unsigned int np, device_contact_property *cp);
 
 // Function for contact between particle and polygonObject
 void XDYNAMICS_API cu_particle_polygonObject_collision(
 	const int tcm, device_triangle_info* dpi, device_mesh_mass_info* dpmi,
-	double* pos, double* vel, double* omega,
+	double* pos, double* ep, double* vel, double* omega,
 	double* force, double* moment, double* mass,
 	double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd, double* dsph,
@@ -171,7 +173,7 @@ void XDYNAMICS_API cu_particle_polygonObject_collision(
 // Function for contact between particle and cylinder
 void XDYNAMICS_API cu_cylinder_hertzian_contact_force(
 	const int tcm, device_cylinder_info* cyl,
-	double* pos, double* vel, double* omega,
+	double* pos, double* ep, double* vel, double* omega,
 	double* force, double* moment, double* mass,
 	unsigned int np, device_contact_property* cp,
 	double3* mpos, double3* mf, double3* mm, double3& _mf, double3& _mm);
@@ -180,7 +182,8 @@ void XDYNAMICS_API cu_decide_rolling_friction_moment(
 	double* tmax,
 	double* rres,
 	double* inertia,
-	double* omega,
+	double* ep,
+	double* ev,
 	double* moment,
 	unsigned int np);
 
@@ -189,7 +192,7 @@ void XDYNAMICS_API cu_update_meshObjectData(
 	double *vList, double* sph, double* dlocal, device_triangle_info* poly,
 	device_mesh_mass_info* dpmi, double* ep, unsigned int np);
 
-void XDYNAMICS_API cu_clusters_contact(double* pos, double* vel,
+void XDYNAMICS_API cu_clusters_contact(double* pos, double* ep, double* vel,
 	double* omega, double* force,
 	double* moment, double* mass, double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd,
@@ -198,7 +201,7 @@ void XDYNAMICS_API cu_clusters_contact(double* pos, double* vel,
 
 void XDYNAMICS_API cu_cluster_plane_contact(
 	device_plane_info* plan,
-	double* pos, double* vel, double* omega,
+	double* pos, double* ep, double* vel, double* omega,
 	double* force, double* moment, double* mass,
 	double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd, xClusterInformation* xci,

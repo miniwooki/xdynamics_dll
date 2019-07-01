@@ -215,11 +215,11 @@ bool xParticlePlanesContact::cpplCollision(
 			cmp.friction, cmp.rolling_friction, cmp.cohesion);
 		switch (force_model)
 		{
-		case DHS: DHSModel(c, d->gab, d->delta_s, d->dot_s, cp, dv, u, m_fn, m_ft, m_m); break;
+		case DHS: DHSModel(c, d->gab, d->delta_s, d->dot_s, dv, u, m_fn, m_ft); break;
 		}
 		RollingResistanceForce(c.rfric, r, 0.0, cp, m_fn, m_ft, res, tmax);
 		F += m_fn + m_ft;
-		M += m_m;
+		M += cross(cp, m_fn + m_ft);
 	}
 	return true;
 }

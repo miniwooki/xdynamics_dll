@@ -117,6 +117,16 @@ __device__ double3 toLocal(double3& v, double4& ep)
 	);
 }
 
+__device__ double3 toAngularVelocity(double4& e, double4& d)
+{
+	double3 o = make_double3(
+		-e.y * d.x + e.x * d.y + e.w * d.z - e.z * d.w,
+		-e.z * d.x - e.w * d.y + e.x * d.z + e.y * d.w,
+		-e.w * d.x - e.z * d.y - e.y * d.z + e.x * d.w
+	);
+	return o;
+}
+
 __device__
 uint calcGridHash(int3 gridPos)
 {
@@ -137,12 +147,75 @@ int3 calcGridPos(double3 p)
 	return gridPos;
 }
 
-__global__ void vv_update_position_kernel(double4* pos, double3* vel, double3* acc, unsigned int np)
+__device__
+double4 calculate_uceom(double3& J, double4& ep, double4& ev, double3& n_prime)
+{
+	double4 lhs[4] = { 0, };
+	lhs[0].x = 2.0 * J.x * (-ep.y); lhs[0].y = 2.0 * J.x * ep.x;	lhs[0].z = 2.0 * J.x * ep.w;	lhs[0].w = 2.0 * J.x * (-ep.z);
+	lhs[1].x = 2.0 * J.y * (-ep.z); lhs[1].y = 2.0 * J.y * (-ep.w); lhs[1].z = 2.0 * J.y * ep.x;	lhs[1].w = 2.0 * J.y * ep.y;
+	lhs[2].x = 2.0 * J.z * (-ep.w); lhs[2].y = 2.0 * J.z * ep.z;	lhs[2].z = 2.0 * J.z * (-ep.y); lhs[2].w = 2.0 * J.z * ep.x;
+	lhs[3].x = ep.x;				lhs[3].y = ep.y;				lhs[3].z = ep.z;				lhs[3].w = ep.w;
+	double3 T = make_double3(
+		J.x * (-ep.y * ev.x + ep.x * ev.y + ep.w * ev.z - ep.z * ev.w),
+		J.y * (-ep.z * ev.x - ep.w * ev.y + ep.x * ev.z + ep.y * ev.w),
+		J.z * (-ep.w * ev.x + ep.z * ev.y - ep.y * ev.z + ep.x * ev.w));
+	double4 LH0 = make_double4(
+		4.0 * (-ev.y * T.x - ev.z * T.y - ev.w * T.z),
+		4.0 * (ev.x * T.x - ev.w * T.y + ev.z * T.z),
+		4.0 * (ev.w * T.x + ev.x * T.y - ev.y * T.z),
+		4.0 * (-ev.z * T.x + ev.y * T.y + ev.x * T.z));
+	double3 LH = make_double3(
+		(-ep.y * LH0.x + ep.x * LH0.y + ep.w * LH0.z - ep.z * LH0.w),
+		(-ep.z * LH0.x - ep.w * LH0.y + ep.x * LH0.z + ep.y * LH0.w),
+		(-ep.w * LH0.x + ep.z * LH0.y - ep.y * LH0.z + ep.x * LH0.w));
+	double4 r0 = make_double4(LH.x, LH.y, LH.z, dot(ev, ev));
+	double4 rhs = make_double4(n_prime.x, n_prime.y, n_prime.z, 0.0) - r0;
+
+	double det =
+		lhs[0].x*lhs[1].y*lhs[2].z*lhs[3].w + lhs[0].x*lhs[1].z*lhs[2].w*lhs[3].y + lhs[0].x*lhs[1].w*lhs[2].y*lhs[3].z -
+		lhs[0].x*lhs[1].w*lhs[2].z*lhs[3].y - lhs[0].x*lhs[1].z*lhs[2].y*lhs[3].w - lhs[0].x*lhs[1].y*lhs[2].w*lhs[3].z -
+		lhs[0].y*lhs[1].x*lhs[2].z*lhs[3].w - lhs[0].z*lhs[1].x*lhs[2].w*lhs[3].y - lhs[0].w*lhs[1].x*lhs[2].y*lhs[3].z +
+		lhs[0].w*lhs[1].x*lhs[2].z*lhs[3].y + lhs[0].z*lhs[1].x*lhs[2].y*lhs[3].w + lhs[0].y*lhs[1].x*lhs[2].w*lhs[3].z +
+		lhs[0].y*lhs[1].z*lhs[2].x*lhs[3].w + lhs[0].z*lhs[1].w*lhs[2].x*lhs[3].y + lhs[0].w*lhs[1].y*lhs[2].x*lhs[3].z -
+		lhs[0].w*lhs[1].z*lhs[2].x*lhs[3].y - lhs[0].z*lhs[1].y*lhs[2].x*lhs[3].w - lhs[0].y*lhs[1].w*lhs[2].x*lhs[3].z -
+		lhs[0].y*lhs[1].z*lhs[2].w*lhs[3].x - lhs[0].z*lhs[1].w*lhs[2].y*lhs[3].x - lhs[0].w*lhs[1].y*lhs[2].z*lhs[3].x +
+		lhs[0].w*lhs[1].z*lhs[2].y*lhs[3].x + lhs[0].z*lhs[1].y*lhs[2].w*lhs[3].x + lhs[0].y*lhs[1].w*lhs[2].z*lhs[3].x;
+	matrix44d o;
+	o.a00 = lhs[1].y*lhs[2].z*lhs[3].w + lhs[1].z*lhs[2].w*lhs[3].y + lhs[1].w*lhs[2].y*lhs[3].z - lhs[1].w*lhs[2].z*lhs[3].y - lhs[1].z*lhs[2].y*lhs[3].w - lhs[1].y*lhs[2].w*lhs[3].z;
+	o.a01 = -lhs[0].y*lhs[2].z*lhs[3].w - lhs[0].z*lhs[2].w*lhs[3].y - lhs[0].w*lhs[2].y*lhs[3].z + lhs[0].w*lhs[2].z*lhs[3].y + lhs[0].z*lhs[2].y*lhs[3].w + lhs[0].y*lhs[2].w*lhs[3].z;
+	o.a02 = lhs[0].y*lhs[1].z*lhs[3].w + lhs[0].z*lhs[1].w*lhs[3].y + lhs[0].w*lhs[1].y*lhs[3].z - lhs[0].w*lhs[1].z*lhs[3].y - lhs[0].z*lhs[1].y*lhs[3].w - lhs[0].y*lhs[1].w*lhs[3].z;
+	o.a03 = -lhs[0].y*lhs[1].z*lhs[2].w - lhs[0].z*lhs[1].w*lhs[2].y - lhs[0].w*lhs[1].y*lhs[2].z + lhs[0].w*lhs[1].z*lhs[2].y + lhs[0].z*lhs[1].y*lhs[2].w + lhs[0].y*lhs[1].w*lhs[2].z;
+
+	o.a10 = -lhs[1].x*lhs[2].z*lhs[3].w - lhs[1].z*lhs[2].w*lhs[3].x - lhs[1].w*lhs[2].x*lhs[3].z + lhs[1].w*lhs[2].z*lhs[3].x + lhs[1].z*lhs[2].x*lhs[3].w + lhs[1].x*lhs[2].w*lhs[3].z;
+	o.a11 = lhs[0].x*lhs[2].z*lhs[3].w + lhs[0].z*lhs[2].w*lhs[3].x + lhs[0].w*lhs[2].x*lhs[3].z - lhs[0].w*lhs[2].z*lhs[3].x - lhs[0].z*lhs[2].x*lhs[3].w - lhs[0].x*lhs[2].w*lhs[3].z;
+	o.a12 = -lhs[0].x*lhs[1].z*lhs[3].w - lhs[0].z*lhs[1].w*lhs[3].x - lhs[0].w*lhs[1].x*lhs[3].z + lhs[0].w*lhs[1].z*lhs[3].x + lhs[0].z*lhs[1].x*lhs[3].w + lhs[0].x*lhs[1].w*lhs[3].z;
+	o.a13 = lhs[0].x*lhs[1].z*lhs[2].w + lhs[0].z*lhs[1].w*lhs[2].x + lhs[0].w*lhs[1].x*lhs[2].z - lhs[0].w*lhs[1].z*lhs[2].x - lhs[0].z*lhs[1].x*lhs[2].w - lhs[0].x*lhs[1].w*lhs[2].z;
+
+	o.a20 = lhs[1].x*lhs[2].y*lhs[3].w + lhs[1].y*lhs[2].w*lhs[3].x + lhs[1].w*lhs[2].x*lhs[3].y - lhs[1].w*lhs[2].y*lhs[3].x - lhs[1].y*lhs[2].x*lhs[3].w - lhs[1].x*lhs[2].w*lhs[3].y;
+	o.a21 = -lhs[0].x*lhs[2].y*lhs[3].w - lhs[0].y*lhs[2].w*lhs[3].x - lhs[0].w*lhs[2].x*lhs[3].y + lhs[0].w*lhs[2].y*lhs[3].x + lhs[0].y*lhs[2].x*lhs[3].w + lhs[0].x*lhs[2].w*lhs[3].y;
+	o.a22 = lhs[0].x*lhs[1].y*lhs[3].w + lhs[0].y*lhs[1].w*lhs[3].x + lhs[0].w*lhs[1].x*lhs[3].y - lhs[0].w*lhs[1].y*lhs[3].x - lhs[0].y*lhs[1].x*lhs[3].w - lhs[0].x*lhs[1].w*lhs[3].y;
+	o.a23 = -lhs[0].x*lhs[1].y*lhs[2].w - lhs[0].y*lhs[1].w*lhs[2].x - lhs[0].w*lhs[1].x*lhs[2].y + lhs[0].w*lhs[1].y*lhs[2].x + lhs[0].y*lhs[1].x*lhs[2].w + lhs[0].x*lhs[1].w*lhs[2].y;
+
+	o.a30 = -lhs[1].x*lhs[2].y*lhs[3].z - lhs[1].y*lhs[2].z*lhs[3].x - lhs[1].z*lhs[2].x*lhs[3].y + lhs[1].z*lhs[2].y*lhs[3].x + lhs[1].y*lhs[2].x*lhs[3].z + lhs[1].x*lhs[2].z*lhs[3].y;
+	o.a31 = lhs[0].x*lhs[2].y*lhs[3].z + lhs[0].y*lhs[2].z*lhs[3].x + lhs[0].z*lhs[2].x*lhs[3].y - lhs[0].z*lhs[2].y*lhs[3].x - lhs[0].y*lhs[2].x*lhs[3].z - lhs[0].x*lhs[2].z*lhs[3].y;
+	o.a32 = -lhs[0].x*lhs[1].y*lhs[3].z - lhs[0].y*lhs[1].z*lhs[3].x - lhs[0].z*lhs[1].x*lhs[3].y + lhs[0].z*lhs[1].y*lhs[3].x + lhs[0].y*lhs[1].x*lhs[3].z + lhs[0].x*lhs[1].z*lhs[3].y;
+	o.a33 = lhs[0].x*lhs[1].y*lhs[2].z + lhs[0].y*lhs[1].z*lhs[2].x + lhs[0].z*lhs[1].x*lhs[2].y - lhs[0].z*lhs[1].y*lhs[2].x - lhs[0].y*lhs[1].x*lhs[2].z - lhs[0].x*lhs[1].z*lhs[2].y;
+	double m = (1.0 / det);// return (1.0 / det) * o;
+	return m * make_double4(
+		o.a00 * rhs.x + o.a01 * rhs.y + o.a02 * rhs.z + o.a03 * rhs.w,
+		o.a10 * rhs.x + o.a11 * rhs.y + o.a12 * rhs.z + o.a13 * rhs.w,
+		o.a20 * rhs.x + o.a21 * rhs.y + o.a22 * rhs.z + o.a23 * rhs.w,
+		o.a30 * rhs.x + o.a31 * rhs.y + o.a32 * rhs.z + o.a33 * rhs.w);
+}
+
+__global__ void vv_update_position_kernel(
+	double4* pos, double4* ep, double3* vel, double4* ev, double3* acc, double4* ea, unsigned int np)
 {
 	unsigned int id = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
 	if (id >= np)
 		return;
-
+	double4 new_ep = ep[id] + cte.dt * ev[id] + cte.half2dt * ea[id];
+	ep[id] = normalize(new_ep);
 	double3 _p = cte.dt * vel[id] + cte.half2dt * acc[id];
 	pos[id].x += _p.x;
 	pos[id].y += _p.y;
@@ -151,7 +224,7 @@ __global__ void vv_update_position_kernel(double4* pos, double3* vel, double3* a
 
 __global__ void vv_update_position_cluster_kernel(
 	double4* pos, double4* cpos, double4* ep, double3* rloc,
-	double3 *vel, double3* acc, double3* omega, double3* alpha, 
+	double3 *vel, double3* acc, double4* ev, double4* ea, 
 	xClusterInformation* xci, unsigned int np)
 {
 	unsigned int id = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
@@ -174,12 +247,12 @@ __global__ void vv_update_position_cluster_kernel(
 		
 	double4 cp = cpos[id];
 	double4 cep = ep[id];
-	double3 w = omega[id];
-	double3 wd = alpha[id];
+	double4 w = ev[id];
+	double4 wd = ea[id];
 	double3 old_p = make_double3(cp.x, cp.y, cp.z);
 	double3 new_p = old_p + cte.dt * vel[id] + cte.half2dt * acc[id];
 	cpos[id] = make_double4(new_p.x, new_p.y, new_p.z, cp.w);
-	double4 ev = make_double4(
+	/*double4 ev = make_double4(
 		-cep.y * w.x - cep.z * w.y - cep.w * w.z,
 		cep.x * w.x + cep.w * w.y - cep.z * w.z,
 		-cep.w * w.x + cep.x * w.y + cep.y * w.z,
@@ -191,8 +264,8 @@ __global__ void vv_update_position_cluster_kernel(
 		-cep.w * wd.x + cep.x * wd.y + cep.y * wd.z,
 		cep.z * wd.x - cep.y * wd.y + cep.x * wd.z
 	);
-	double4 ea = 0.5 * Lpwd - 0.25 * dot(w, w) * cep;
-	double4 new_ep = ep[id] + cte.dt * ev + cte.half2dt * ea;
+	double4 ea = 0.5 * Lpwd - 0.25 * dot(w, w) * cep;*/
+	double4 new_ep = ep[id] + cte.dt * w + cte.half2dt * wd;
 	ep[id] = normalize(new_ep);
 	unsigned int sid = sbegin + id * neach;
 	for (unsigned int j = 0; j < neach; j++)
@@ -206,8 +279,9 @@ __global__ void vv_update_position_cluster_kernel(
 __global__ void vv_update_velocity_kernel(
 	double3* vel,
 	double3* acc,
-	double3* omega,
-	double3* alpha,
+	double4* ep,
+	double4* ev,
+	double4* ea,
 	double3* force,
 	double3* moment,
 	double* mass,
@@ -220,20 +294,25 @@ __global__ void vv_update_velocity_kernel(
 	double m = mass[id];
 	double3 v = vel[id];
 	//double3 L = acc[id];
-	double3 av = omega[id];
+	double4 e = ep[id];
+	double4 av = ev[id];
 	//double3 aa = alpha[id];
 	double3 a = (1.0 / m) * (force[id] + m * cte.gravity);
+	double in = iner[id];
+	double3 J = make_double3(in, in, in);
+	double3 n_prime = toLocal(moment[id], e);
+	double4 m_ea = calculate_uceom(J, e, av, n_prime);
 	/*if(length(force[id]) > 0)
 		printf("[%f, %f, %f]\n", force[id].x, force[id].y, force[id].z);*/
-	double3 in = (1.0 / iner[id]) * moment[id];
+	//double3 in = (1.0 / iner[id]) * moment[id];
 	v += 0.5 * cte.dt * (acc[id] + a);
-	av += 0.5 * cte.dt * (alpha[id] + in);
+	av = av + 0.5 * cte.dt * (ea[id] + m_ea);
 	force[id] = make_double3(0.0, 0.0, 0.0); 
 	moment[id] = make_double3(0.0, 0.0, 0.0);
 	vel[id] = v;
-	omega[id] = av;
+	ev[id] = av;
 	acc[id] = a;
-	alpha[id] = in;
+	ea[id] = m_ea;
 }
 
 __global__ void vv_update_cluster_velocity_kernel(
@@ -241,8 +320,8 @@ __global__ void vv_update_cluster_velocity_kernel(
 	double4* ep,
 	double3* vel,
 	double3* acc,
-	double3* omega,
-	double3* alpha,
+	double4* ev,
+	double4* ea,
 	double3* force,
 	double3* moment,
 	double3* rloc,
@@ -272,8 +351,8 @@ __global__ void vv_update_cluster_velocity_kernel(
 	double m = mass[id];
 	double3 v = vel[id];
 	double3 a = acc[id];
-	double3 av = omega[id];
-	double3 aa = alpha[id];
+	double4 av = ev[id];
+	double4 aa = ea[id];
 	double4 e = ep[id];
 	double inv_m = 1.0 / m;
 	//double3 in = (1.0 / iner[id]) * moment[id];
@@ -296,19 +375,20 @@ __global__ void vv_update_cluster_velocity_kernel(
 	}
 	F += m * cte.gravity;
 	double3 n_prime = toLocal(T + LT, e);
-	double3 w_prime = toLocal(av, e);
+	double4 m_ea = calculate_uceom(in, e, av, n_prime);
+	/*double3 w_prime = toLocal(av, e);
 	double3 Jwp = make_double3(in.x * w_prime.x, in.y * w_prime.y, in.z * w_prime.z);
 	double3 tJwp = make_double3(-av.z * Jwp.y + av.y * Jwp.z, av.z * Jwp.x - av.x * Jwp.z, -av.y * Jwp.x + av.x * Jwp.y);
 	double3 rhs = n_prime - tJwp;
-	double3 wd_prime = make_double3(rhs.x / in.x, rhs.y / in.y, rhs.z / in.z);
+	double3 wd_prime*/// = make_double3(rhs.x / in.x, rhs.y / in.y, rhs.z / in.z);
 	v += 0.5 * cte.dt * a;
-	av += 0.5 * cte.dt * aa;
+	av = av + 0.5 * cte.dt * aa;
 	a = inv_m * F;
-	aa = toGlobal(wd_prime, e);
+	aa = m_ea;
 	vel[id] = v + 0.5 * cte.dt * a;
-	omega[id] = av + 0.5 * cte.dt * aa;
+	ev[id] = av + 0.5 * cte.dt * aa;
 	acc[id] = a;
-	alpha[id] = aa;
+	ea[id] = aa;
 }
 
 
@@ -573,7 +653,7 @@ __device__ void DHSModel(
 		_ds = ds;
 		dots = s_dot;
 		Ft = min(c.ks * ds + c.vs * (dot(dv, sh)), c.mu * length(Fn)) * sh;
-		M = cross(ir * unit, Ft);
+		M = cross(ir * unit, Fn + Ft);
 		/*if (length(iomega)){
 		double3 on = iomega / length(iomega);
 		M += c.ms * fsn * rcon * on;
@@ -590,8 +670,8 @@ __device__ void calculate_previous_rolling_resistance(
 }
 
 __global__ void calcluate_clusters_contact_kernel(
-	double4* pos, double3* vel,
-	double3* omega, double3* force,
+	double4* pos, double4* ep, double3* vel,
+	double4* ev, double3* force,
 	double3* moment, double* mass, double3* tmax, double* rres,
 	unsigned int* pair_count, unsigned int* pair_id, double2* tsd,
 	unsigned int* sorted_index, unsigned int* cstart,
@@ -630,7 +710,7 @@ __global__ void calcluate_clusters_contact_kernel(
 	double4 jpos = make_double4(0, 0, 0, 0);
 	double3 ivel = vel[cid];
 	double3 jvel = make_double3(0, 0, 0);
-	double3 iomega = omega[cid];
+	double3 iomega = toAngularVelocity(ep[cid], ev[cid]);
 	double3 jomega = make_double3(0, 0, 0);
 	int3 gridPos = calcGridPos(make_double3(ipos.x, ipos.y, ipos.z));
 
@@ -662,7 +742,7 @@ __global__ void calcluate_clusters_contact_kernel(
 						if (id == k || k >= np || (di <= neach))
 							continue;
 						unsigned int ck = (k / neach);
-						jpos = pos[k]; jvel = vel[ck]; jomega = omega[ck];
+						jpos = pos[k]; jvel = vel[ck]; jomega = toAngularVelocity(ep[ck], ev[ck]);
 						jr = jpos.w; jm = mass[ck];
 						double3 rp = make_double3(jpos.x - ipos.x, jpos.y - ipos.y, jpos.z - ipos.z);
 						double dist = length(rp);
@@ -727,8 +807,8 @@ __global__ void calcluate_clusters_contact_kernel(
 
 template <int TCM>
 __global__ void calculate_p2p_kernel(
-	double4* pos, double3* vel,
-	double3* omega, double3* force,
+	double4* pos, double4* ep, double3* vel,
+	double4* ev, double3* force,
 	double3* moment, double* mass, double3* tmax, double* rres,
 	unsigned int* pair_count, unsigned int* pair_id, double2* tsd,
 	unsigned int* sorted_index, unsigned int* cstart,
@@ -751,7 +831,7 @@ __global__ void calculate_p2p_kernel(
 	double4 jpos = make_double4(0, 0, 0, 0);
 	double3 ivel = vel[id];
 	double3 jvel = make_double3(0, 0, 0);
-	double3 iomega = omega[id];
+	double3 iomega = toAngularVelocity(ep[id], ev[id]);
 	double3 jomega = make_double3(0, 0, 0);
 	int3 gridPos = calcGridPos(make_double3(ipos.x, ipos.y, ipos.z));
 
@@ -781,7 +861,7 @@ __global__ void calculate_p2p_kernel(
 						unsigned int k = sorted_index[j];
 						if (id == k || k >= np)
 							continue;
-						jpos = pos[k]; jvel = vel[k]; jomega = omega[k];
+						jpos = pos[k]; jvel = vel[k]; jomega = toAngularVelocity(ep[k], ev[k]);
 						jr = jpos.w; jm = mass[k];
 						double3 rp = make_double3(jpos.x - ipos.x, jpos.y - ipos.y, jpos.z - ipos.z);
 						double dist = length(rp);
@@ -929,7 +1009,7 @@ __device__ double particle_plane_contact_detection(
 
 __global__ void cluster_plane_contact_kernel(
 	device_plane_info *plane,
-	double4* pos, double3* vel, double3* omega,
+	double4* pos, double4 *ep, double3* vel, double4* ev,
 	double3* force, double3* moment,
 	device_contact_property *cp, double* mass,
 	double3* tmax, double* rres,
@@ -969,7 +1049,7 @@ __global__ void cluster_plane_contact_kernel(
 	double3 ipos3 = make_double3(ipos.x, ipos.y, ipos.z);
 	double r = ipos.w;
 	double3 ivel = vel[cid];
-	double3 iomega = omega[cid];
+	double3 iomega = toAngularVelocity(ep[id], ev[cid]);
 
 	double3 Fn = make_double3(0, 0, 0);
 	double3 Ft = make_double3(0, 0, 0);
@@ -1038,7 +1118,7 @@ __global__ void cluster_plane_contact_kernel(
 template <int TCM>
 __global__ void plane_contact_force_kernel(
 	device_plane_info *plane,
-	double4* pos, double3* vel, double3* omega,
+	double4* pos, double4 *ep, double3* vel, double4* ev,
 	double3* force, double3* moment,
 	device_contact_property *cp, double* mass,
 	double3* tmax, double* rres,
@@ -1062,7 +1142,7 @@ __global__ void plane_contact_force_kernel(
 	double3 ipos3 = make_double3(ipos.x, ipos.y, ipos.z);
 	double r = ipos.w;
 	double3 ivel = vel[id];
-	double3 iomega = omega[id];
+	double3 iomega = toAngularVelocity(ep[id], ev[id]);
 
 	double3 Fn = make_double3(0, 0, 0);
 	double3 Ft = make_double3(0, 0, 0);
@@ -1233,7 +1313,7 @@ __device__ float particle_cylinder_contact_detection(
 template<int TCM>
 __global__ void cylinder_hertzian_contact_force_kernel(
 	device_cylinder_info *cy,
-	double4* pos, double3* vel, double3* omega,
+	double4* pos, double4 *ep, double3* vel, double4* ev,
 	double3* force, double3* moment, device_contact_property *cp,
 	double* mass, double3* mpos, double3* mf, double3* mm, unsigned int np)
 {
@@ -1248,7 +1328,7 @@ __global__ void cylinder_hertzian_contact_force_kernel(
 	double im = mass[id];
 	double4 ipos = make_double4(pos[id].x, pos[id].y, pos[id].z, pos[id].w);
 	double3 ivel = make_double3(vel[id].x, vel[id].y, vel[id].z);
-	double3 iomega = make_double3(omega[id].x, omega[id].y, omega[id].z);
+	double3 iomega = toAngularVelocity(ep[id], ev[id]);
 	double3 unit = make_double3(0.0, 0.0, 0.0);
 	double3 cpt = make_double3(0.0, 0.0, 0.0);
 	double3 mp = make_double3(mpos->x, mpos->y, mpos->z);
@@ -1438,7 +1518,7 @@ __device__ bool checkOverlab(int3 ctype, double3 p, double3 c, double3 u0, doubl
 template<int TCM>
 __global__ void particle_polygonObject_collision_kernel(
 	device_triangle_info* dpi, device_mesh_mass_info* dpmi,
-	double4 *pos, double3 *vel, double3 *omega, double3 *force, double3 *moment,
+	double4 *pos, double4 *ep, double3 *vel, double4 *ev, double3 *force, double3 *moment,
 	double* mass, double3* tmax, double* rres,
 	unsigned int* pair_count, unsigned int* pair_id, double2* tsd, double4* dsph,
 	unsigned int* sorted_index, unsigned int* cstart, unsigned int* cend,
@@ -1461,7 +1541,7 @@ __global__ void particle_polygonObject_collision_kernel(
 	double im = mass[id];
 	double3 ipos = make_double3(pos[id].x, pos[id].y, pos[id].z);
 	double3 ivel = make_double3(vel[id].x, vel[id].y, vel[id].z);
-	double3 iomega = make_double3(omega[id].x, omega[id].y, omega[id].z);
+	double3 iomega = toAngularVelocity(ep[id], ev[id]);
 	double3 unit = make_double3(0.0, 0.0, 0.0);
 	int3 gridPos = calcGridPos(make_double3(ipos.x, ipos.y, ipos.z));
 	double ir = pos[id].w;
@@ -1728,7 +1808,8 @@ __global__ void decide_rolling_friction_moment_kernel(
 	double3* tmax,
 	double* rres,
 	double* inertia,
-	double3 *ev,
+	double4 *ep,
+	double4 *ev,
 	double3 *moment,
 	unsigned int np)
 {
@@ -1741,7 +1822,7 @@ __global__ void decide_rolling_friction_moment_kernel(
 	double3 Tmax = tmax[id];// make_double3(rfm[id].x, rfm[id].y, rfm[id].z);
 
 	double J = inertia[id];
-	double3 iomega = ev[id];
+	double3 iomega = toAngularVelocity(ep[id], ev[id]);
 	double3 _Tmax = J * cte.dt * iomega - Tmax;
 	if (length(_Tmax) && Tr)
 	{

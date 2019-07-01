@@ -77,7 +77,7 @@ public:
 protected:
 	double cohesionForce(double coh_r, double coh_e, double Fn);
 	void DHSModel(xContactParameters& c, double cdist, double& ds, 
-		double& dots, vector3d& cp, vector3d& dv, vector3d& unit, vector3d& Fn, vector3d& Ft, vector3d& M);
+		double& dots, vector3d& dv, vector3d& unit, vector3d& Fn, vector3d& Ft);
 	void RollingResistanceForce(
 		double rf, double ir, double jr, vector3d rc,
 		vector3d Fn, vector3d Ft, double& Mr, vector3d& Tmax);

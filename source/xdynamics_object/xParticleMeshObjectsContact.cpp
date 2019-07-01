@@ -175,12 +175,12 @@ bool xParticleMeshObjectsContact::cppolyCollision(
 			cmp.friction, cmp.rolling_friction, cmp.cohesion);
 		switch (force_model)
 		{
-		case DHS: DHSModel(c, d->gab, d->delta_s, d->dot_s, rc, rv, u, m_fn, m_ft, m_m); break;
+		case DHS: DHSModel(c, d->gab, d->delta_s, d->dot_s, rv, u, m_fn, m_ft); break;
 		}
 		RollingResistanceForce(c.rfric, r, 0.0, rc, m_fn, m_ft, res, tmax);
 		vector3d nforce = m_fn + m_ft;
 		F += nforce;
-		M += m_m;
+		M += cross(rc, nforce);
 		hpmi[j].fx += -nforce.x;
 		hpmi[j].fy += -nforce.y;
 		hpmi[j].fz += -nforce.z;

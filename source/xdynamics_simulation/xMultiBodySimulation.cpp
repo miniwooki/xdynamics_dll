@@ -182,8 +182,8 @@ void xMultiBodySimulation::ConstructContraintJacobian()
 	{
 		id = xpm->xpmIndex() * xModel::OneDOF();
 		sc = (xpm->xpmIndex() - 1) * xModel::OneDOF();
-		vector4d e = 2.0 * xpm->EulerParameters();// new_vector4d(q(id + 3), q(id + 4), q(id + 5), q(id + 6));
-		cjaco.insert(sr++, sc + 3, e);
+		euler_parameters e = 2.0 * xpm->EulerParameters();// new_vector4d(q(id + 3), q(id + 4), q(id + 5), q(id + 6));
+		cjaco.insert(sr++, sc + 3, new_vector4d(e.e0, e.e1, e.e2, e.e3));
 	}
 	
 // 	xKinematicConstraint* xkc = xmbd->BeginKinematicConstraint();

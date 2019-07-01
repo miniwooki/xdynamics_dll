@@ -41,6 +41,7 @@ public:
 	static double SignedVolumeOfTriangle(vector3d& v1, vector3d& v2, vector3d& v3);
 	static vector3d CenterOfTriangle(vector3d& P, vector3d& Q, vector3d& R);
 	static vector4d FitSphereToTriangle(vector3d& P, vector3d& Q, vector3d& R, double ft);
+	static double FitClusterRadius(vector4d *cpos, unsigned int n);
 };
 
 #endif

@@ -103,12 +103,25 @@ vector3d EulerParameterToEulerAngle(const euler_parameters& ep)
 
 euler_parameters EulerAngleToEulerParameters(const vector3d v3)
 {
+	vector3d r = M_PI * v3 / 180.0;
 	return new_euler_parameters(
-		cos(0.5 * v3.y) * cos(0.5 * (v3.x + v3.z)),
-		sin(0.5 * v3.y) * cos(0.5 * (v3.x - v3.z)),
-		sin(0.5 * v3.y) * sin(0.5 * (v3.x - v3.z)),
-		cos(0.5 * v3.y) * sin(0.5 * (v3.x + v3.z)));
+		cos(0.5 * r.y) * cos(0.5 * (r.x + r.z)),
+		sin(0.5 * r.y) * cos(0.5 * (r.x - r.z)),
+		sin(0.5 * r.y) * sin(0.5 * (r.x - r.z)),
+		cos(0.5 * r.y) * sin(0.5 * (r.x + r.z)));
 
+}
+
+euler_parameters CalculateUCEOM(matrix33d & J, euler_parameters & ep, euler_parameters & ev, vector3d & n_prime)
+{
+	matrix34d G = GMatrix(ep);
+	matrix34d Gd = GMatrix(ev);
+	matrix34d JPL = 2.0 * J * G;
+	vector3d LH = G * (4.0 * (Gd * (J * (G * ev))));
+	matrix44d lhs = new_matrix44d(JPL, ep);
+	vector4d r0 = new_vector4d(LH.x, LH.y, LH.z, dot(ev, ev));
+	vector4d rhs = new_vector4d(n_prime.x, n_prime.y, n_prime.z, 0.0) - r0;
+	return ToEulerParameters(Inverse4X4(lhs) * rhs);
 }
 
 vector3d ToVector3D(vector3ui& v3)
@@ -129,6 +142,12 @@ vector3d ToVector3D(vector3f& v3)
 		static_cast<double>(v3.y),
 		static_cast<double>(v3.z)
 	};
+}
+
+euler_parameters ToEulerParameters(vector4d & v4)
+{
+	euler_parameters e = new_euler_parameters(v4.x, v4.y, v4.z, v4.w);
+	return e;
 }
 
 vector3ui ToVector3UI(vector3d& v3)
@@ -222,7 +241,7 @@ vector4d operator- (const vector4d &v1) { return{ -v1.x, -v1.y, -v1.z, -v1.w }; 
 // Define euler_parameters operators
 euler_parameters operator+ (const euler_parameters &v1, const euler_parameters &v2) { return euler_parameters{ v1.e0 + v2.e0, v1.e1 + v2.e1, v1.e2 + v2.e2, v1.e3 + v2.e3 }; }
 euler_parameters operator- (const euler_parameters &v1, const euler_parameters &v2) { return euler_parameters{ v1.e0 - v2.e0, v1.e1 - v2.e1, v1.e2 - v2.e2, v1.e3 - v2.e3 }; }
-vector4d operator* (const double v, const euler_parameters &v2) { return vector4d{ v * v2.e0, v * v2.e1, v * v2.e2, v * v2.e3 }; }
+euler_parameters operator* (const double v, const euler_parameters &v2) { return euler_parameters{ v * v2.e0, v * v2.e1, v * v2.e2, v * v2.e3 }; }
 euler_parameters operator/ (const euler_parameters &v1, const double v) { return euler_parameters{ v1.e0 / v, v1.e1 / v, v1.e2 / v, v1.e3 / v }; }
 void operator+= (euler_parameters &v1, const euler_parameters &v2) { v1.e0 += v2.e0, v1.e1 += v2.e1, v1.e2 += v2.e2, v1.e3 += v2.e3; }
 void operator-= (euler_parameters &v1, const euler_parameters &v2) { v1.e0 -= v2.e0, v1.e1 -= v2.e1, v1.e2 -= v2.e2, v1.e3 -= v2.e3; }
@@ -523,6 +542,7 @@ double length(const vector3ui &v) { return sqrt(dot(v, v)); }
 double length(const vector3f &v) { return sqrt(dot(v, v)); }
 double length(const vector3d &v) { return sqrt(dot(v, v)); }
 double length(const vector4d &v){ return sqrt(dot(v, v)); }
+double length(const euler_parameters & v){ return sqrt(dot(v,v)); }
 
 vector3d normalize(const vector3d& v)
 {
@@ -530,6 +550,11 @@ vector3d normalize(const vector3d& v)
 }
 
 vector4d normalize(const vector4d & v)
+{
+	return v / length(v);
+}
+
+euler_parameters normalize(const euler_parameters & v)
 {
 	return v / length(v);
 }
@@ -566,6 +591,17 @@ vector4i new_vector4i(int x, int y, int z, int w) { return vector4i{ x, y, z, w 
 vector4ui new_vector4ui(unsigned int x, unsigned int y, unsigned int z, unsigned int w) { return vector4ui{ x, y, z, w }; }
 vector4f new_vector4f(float x, float y, float z, float w) { return vector4f{ x, y, z, w }; }
 vector4d new_vector4d(double x, double y, double z, double w) { return vector4d{ x, y, z, w }; }
+
+matrix44d new_matrix44d(const matrix34d & m34d, const euler_parameters & e)
+{
+	matrix44d m44 = {
+		m34d.a00, m34d.a01, m34d.a02, m34d.a03,
+		m34d.a10, m34d.a11, m34d.a12, m34d.a13,
+		m34d.a20, m34d.a21, m34d.a22, m34d.a23,
+		e.e0, e.e1, e.e2, e.e3
+	};
+	return m44;
+}
 
 euler_parameters new_euler_parameters(double e0, double e1, double e2, double e3) { return euler_parameters{ e0, e1, e2, e3 }; }
 
@@ -711,11 +747,6 @@ matrix33d new_identity3(const double j)
 	return { j, 0, 0, 0, j, 0, 0, 0, j };
 }
 
-vector3d ToAngularVelocity(const euler_parameters& e, const euler_parameters& ev)
-{
-	return 2.0 * GMatrix(e) * ev;
-}
-
 vector3d ToGlobal(const euler_parameters& e, const vector3d& v3)
 {
 	vector3d tv;
@@ -731,6 +762,11 @@ vector3d ToLocal(const euler_parameters & e, const vector3d & v3)
 	vector3d tv;
 	tv = Transpose(GlobalTransformationMatrix(e)) * v3;
 	return tv;
+}
+
+vector3d ToAngularVelocity(const euler_parameters &e, const euler_parameters& ev)
+{
+	return 2.0 * LMatrix(e) * ev;
 }
 
 matrix33d Tilde(const vector3d & v)

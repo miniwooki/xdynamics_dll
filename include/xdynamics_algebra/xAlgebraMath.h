@@ -81,7 +81,7 @@ XDYNAMICS_API vector4d operator- (const vector4d &v1);
 // Declaration euler parameters operators
 XDYNAMICS_API euler_parameters operator+ (const euler_parameters &v1, const euler_parameters &v2);
 XDYNAMICS_API euler_parameters operator- (const euler_parameters &v1, const euler_parameters &v2);
-XDYNAMICS_API vector4d operator* (const double v, const euler_parameters &v2);
+XDYNAMICS_API euler_parameters operator* (const double v, const euler_parameters &v2);
 XDYNAMICS_API euler_parameters operator/ (const euler_parameters &v1, const double v);
 XDYNAMICS_API void operator+= (euler_parameters &v1, const euler_parameters &v2);
 XDYNAMICS_API void operator-= (euler_parameters &v1, const euler_parameters &v2);
@@ -126,6 +126,8 @@ XDYNAMICS_API vector4ui new_vector4ui(unsigned int x, unsigned int y, unsigned i
 XDYNAMICS_API vector4f new_vector4f(float x, float y, float z, float w);
 XDYNAMICS_API vector4d new_vector4d(double x, double y, double z, double w);
 
+XDYNAMICS_API matrix44d new_matrix44d(const matrix34d& m34d, const euler_parameters& e);
+
 XDYNAMICS_API euler_parameters new_euler_parameters(double e0, double e1, double e2, double e3);
 XDYNAMICS_API euler_parameters new_euler_parameters(vector4d& e);
 
@@ -157,9 +159,11 @@ XDYNAMICS_API double length(const vector3ui &v);
 XDYNAMICS_API double length(const vector3f &v);
 XDYNAMICS_API double length(const vector3d &v);
 XDYNAMICS_API double length(const vector4d& v);
+XDYNAMICS_API double length(const euler_parameters& v);
 
 XDYNAMICS_API vector3d normalize(const vector3d& v);
 XDYNAMICS_API vector4d normalize(const vector4d& v);
+XDYNAMICS_API euler_parameters normalize(const euler_parameters& v);
 
 XDYNAMICS_API double xmin(double v1, double v2, double v3 = FLT_MAX);
 XDYNAMICS_API double xmax(double v1, double v2, double v3 = -FLT_MIN);
@@ -188,11 +192,13 @@ XDYNAMICS_API int LinearSolve(int n, int nrhs, xMatrixD& a, int lda, xVectorD& b
 XDYNAMICS_API void coordinatePartitioning(xSparseD& lhs, int* uID);
 XDYNAMICS_API vector3d EulerParameterToEulerAngle(const euler_parameters& e);
 XDYNAMICS_API euler_parameters EulerAngleToEulerParameters(const vector3d v3);
+XDYNAMICS_API euler_parameters CalculateUCEOM(matrix33d& J, euler_parameters& ep, euler_parameters& ev, vector3d& n_prime);
 // Conversion
 XDYNAMICS_API vector3d ToVector3D(vector3ui& v3);
 XDYNAMICS_API vector3ui ToVector3UI(vector3d& v3);
 XDYNAMICS_API vector3i ToVector3I(vector3d& v3);
 XDYNAMICS_API vector3d ToVector3D(vector3f& v3);
+XDYNAMICS_API euler_parameters ToEulerParameters(vector4d& v4);
 XDYNAMICS_API int xSign(double v);
 
 #endif

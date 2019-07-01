@@ -72,8 +72,8 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 	memset(ep, 0, sizeof(double) * ns * 4);
 	memset(vel, 0, sizeof(double) * ns * 3);
 	memset(acc, 0, sizeof(double) * ns * 3);
-	memset(avel, 0, sizeof(double) * ns * 3);
-	memset(aacc, 0, sizeof(double) * ns * 3);
+	memset(avel, 0, sizeof(double) * ns * 4);
+	memset(aacc, 0, sizeof(double) * ns * 4);
 	memset(force, 0, sizeof(double) * np * 3);
 	memset(moment, 0, sizeof(double) * np * 3);
 	for (unsigned int i = 0; i < ns; i++)
@@ -120,8 +120,8 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 		checkCudaErrors(cudaMemcpy(dep, ep, sizeof(double) * ns * 4, cudaMemcpyHostToDevice));
 		checkCudaErrors(cudaMemcpy(dvel, vel, sizeof(double) * ns * 3, cudaMemcpyHostToDevice));
 		checkCudaErrors(cudaMemcpy(dacc, acc, sizeof(double) * ns * 3, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(davel, avel, sizeof(double) * ns * 3, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(daacc, aacc, sizeof(double) * ns * 3, cudaMemcpyHostToDevice));
+		checkCudaErrors(cudaMemcpy(davel, avel, sizeof(double) * ns * 4, cudaMemcpyHostToDevice));
+		checkCudaErrors(cudaMemcpy(daacc, aacc, sizeof(double) * ns * 4, cudaMemcpyHostToDevice));
 		checkCudaErrors(cudaMemcpy(dforce, force, sizeof(double) * np * 3, cudaMemcpyHostToDevice));
 		checkCudaErrors(cudaMemcpy(dmoment, moment, sizeof(double) * np * 3, cudaMemcpyHostToDevice));
 		checkCudaErrors(cudaMemcpy(dmass, mass, sizeof(double) * ns, cudaMemcpyHostToDevice));
@@ -223,7 +223,7 @@ QString xDiscreteElementMethodSimulation::SaveStepResult(unsigned int pt, double
 		checkCudaErrors(cudaMemcpy(pos, dpos, sizeof(double) * np * 4, cudaMemcpyDeviceToHost));
 		checkCudaErrors(cudaMemcpy(vel, dvel, sizeof(double) * ns * 3, cudaMemcpyDeviceToHost));
 		//checkCudaErrors(cudaMemcpy(ep, dep, sizeof(double) * np * 4, cudaMemcpyDeviceToHost));
-		checkCudaErrors(cudaMemcpy(avel, davel, sizeof(double) * ns * 3, cudaMemcpyDeviceToHost));
+		checkCudaErrors(cudaMemcpy(avel, davel, sizeof(double) * ns * 4, cudaMemcpyDeviceToHost));
 	}
 	//char pname[256] = { 0, };
  	QString fname = xModel::path + xModel::name;
@@ -239,7 +239,7 @@ QString xDiscreteElementMethodSimulation::SaveStepResult(unsigned int pt, double
 		qf.write((char*)pos, sizeof(double) * np * 4);
 		qf.write((char*)vel, sizeof(double) * ns * 3);
 		//qf.write((char*)ep, sizeof(double) * np * 4);
-		qf.write((char*)avel, sizeof(double) * ns * 3);
+		qf.write((char*)avel, sizeof(double) * ns * 4);
 	}
 	qf.close();
 	/*qf.open(QIODevice::WriteOnly);*/
@@ -362,8 +362,8 @@ void xDiscreteElementMethodSimulation::allocationMemory(unsigned int np, unsigne
 	//rot = new double[np * 4];
 	vel = new double[np * 3];
 	acc = new double[np * 3];
-	avel = new double[np * 3];
-	aacc = new double[np * 3];
+	avel = new double[np * 4];
+	aacc = new double[np * 4];
 	force = new double[rnp * 3];
 	moment = new double[rnp * 3];
 
@@ -379,8 +379,8 @@ void xDiscreteElementMethodSimulation::allocationMemory(unsigned int np, unsigne
 		checkCudaErrors(cudaMalloc((void**)&dep, sizeof(double) * np * 4));
 		checkCudaErrors(cudaMalloc((void**)&dvel, sizeof(double) * np * 3));
 		checkCudaErrors(cudaMalloc((void**)&dacc, sizeof(double) * np * 3));
-		checkCudaErrors(cudaMalloc((void**)&davel, sizeof(double) * np * 3));
-		checkCudaErrors(cudaMalloc((void**)&daacc, sizeof(double) * np * 3));
+		checkCudaErrors(cudaMalloc((void**)&davel, sizeof(double) * np * 4));
+		checkCudaErrors(cudaMalloc((void**)&daacc, sizeof(double) * np * 4));
 		checkCudaErrors(cudaMalloc((void**)&dforce, sizeof(double) * rnp * 3));
 		checkCudaErrors(cudaMalloc((void**)&dmoment, sizeof(double) * rnp * 3));
 		if (xdem->XParticleManager()->nClusterObject())

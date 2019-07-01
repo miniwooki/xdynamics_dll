@@ -461,7 +461,7 @@ xParticleObject * xParticleManager::CreateClusterParticle(
 	{
 		vector3d cp = new_vector3d(0.0, 0.005 * (i + 1), 0.0);
 		vector3d rot = new_vector3d(180 * frand(), 180 * frand(), 180 * frand());
-		//vector3d rot = new_vector3d(0,0,45);
+		//vector3d rot = new_vector3d(30,0,0);
 		euler_parameters m_ep = EulerAngleToEulerParameters(rot);
 		matrix33d A = GlobalTransformationMatrix(m_ep);
 		for (unsigned int j = 0; j < neach; j++)

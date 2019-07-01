@@ -166,7 +166,7 @@ double xContact::cohesionForce(double coh_r, double coh_e, double Fn)
 
 void xContact::DHSModel(
 	xContactParameters& c, double cdist, double& ds, double& dots, 
-	vector3d& cp, vector3d& dv, vector3d& unit, vector3d& Fn, vector3d& Ft, vector3d& M)
+	vector3d& dv, vector3d& unit, vector3d& Fn, vector3d& Ft/*, vector3d& M*/)
 {
 	//vector3d Fn, Ft;
 	double fsn = (-c.kn * pow(cdist, 1.5));
@@ -184,7 +184,7 @@ void xContact::DHSModel(
 		double ft1 = c.ks * ds + c.vs * dot(dv, s_hat);
 		double ft2 = c.fric * length(Fn);
 		Ft = min(ft1, ft2) * s_hat;
-		M = cross(cp, Ft);
+		//M = cross(cp, Ft);
 	}
 	//F = Fn + Ft;
 }

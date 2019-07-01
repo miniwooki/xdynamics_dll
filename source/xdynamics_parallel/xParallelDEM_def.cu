@@ -30,24 +30,34 @@ void computeGridSize(unsigned n, unsigned blockSize, unsigned &numBlocks, unsign
 	numBlocks = iDivUp(n, numThreads);
 }
 
-void vv_update_position(double *pos, double *vel, double *acc, unsigned int np)
+void vv_update_position(
+	double *pos, double* ep, double *vel, 
+	double* ev, double *acc, double* ea, unsigned int np)
 {
 	computeGridSize(np, 256, numBlocks, numThreads);
 	vv_update_position_kernel << < numBlocks, numThreads >> > (
 		(double4 *)pos,
+		(double4 *)ep,
 		(double3 *)vel,
+		(double4 *)ev,
 		(double3 *)acc,
+		(double4 *)ea,
 		np);
 }
 
-void vv_update_velocity(double *vel, double *acc, double *omega, double *alpha, double *force, double *moment, double* mass, double* iner, unsigned int np)
+void vv_update_velocity(
+	double *vel, double *acc, 
+	double* ep, double *ev, double *ea, 
+	double *force, double *moment, double* mass, 
+	double* iner, unsigned int np)
 {
 	computeGridSize(np, 256, numBlocks, numThreads);
 	vv_update_velocity_kernel << < numBlocks, numThreads >> > (
 		(double3 *)vel,
 		(double3 *)acc,
-		(double3 *)omega,
-		(double3 *)alpha,
+		(double4 *)ep,
+		(double4 *)ev,
+		(double4 *)ea,
 		(double3 *)force,
 		(double3 *)moment,
 		mass,
@@ -110,8 +120,8 @@ void cu_reorderDataAndFindCellStart(
 }
 
 void cu_calculate_p2p(
-	const int tcm, double* pos, double* vel,
-	double* omega, double* force, double* moment,
+	const int tcm, double* pos, double* ep, double* vel,
+	double* ev, double* force, double* moment,
 	double* mass, double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd,
 	unsigned int* sorted_index, unsigned int* cstart,
@@ -122,8 +132,8 @@ void cu_calculate_p2p(
 	{
 	case 0:
 		calculate_p2p_kernel<0> << < numBlocks, numThreads >> > (
-			(double4 *)pos, (double3 *)vel,
-			(double3 *)omega, (double3 *)force,
+			(double4 *)pos, (double4 *)ep, (double3 *)vel,
+			(double4 *)ev, (double3 *)force,
 			(double3 *)moment, mass, (double3 *)tmax, rres,
 			pair_count, pair_id, (double2 *)tsd,
 			sorted_index, cstart,
@@ -131,8 +141,8 @@ void cu_calculate_p2p(
 		break;
 	case 1:
 		calculate_p2p_kernel<1> << < numBlocks, numThreads >> > (
-			(double4 *)pos, (double3 *)vel,
-			(double3 *)omega, (double3 *)force,
+			(double4 *)pos, (double4 *)ep, (double3 *)vel,
+			(double4 *)ev, (double3 *)force,
 			(double3 *)moment, mass, (double3 *)tmax, rres,
 			pair_count, pair_id, (double2 *)tsd,
 			sorted_index, cstart,
@@ -143,7 +153,7 @@ void cu_calculate_p2p(
 
 void cu_plane_contact_force(
 	const int tcm, device_plane_info* plan,
-	double* pos, double* vel, double* omega,
+	double* pos, double* ep, double* vel, double* ev,
 	double* force, double* moment, double* mass,
 	double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd,
@@ -153,13 +163,13 @@ void cu_plane_contact_force(
 	switch (tcm)
 	{
 	case 0: plane_contact_force_kernel<0> << < numBlocks, numThreads >> > (
-		plan, (double4 *)pos, (double3 *)vel, (double3 *)omega,
+		plan, (double4 *)pos, (double4 *)ep, (double3 *)vel, (double4 *)ev,
 		(double3 *)force, (double3 *)moment, cp, mass,
 		(double3 *)tmax, rres,
 		pair_count, pair_id, (double2 *)tsd, np);
 		break;
 	case 1: plane_contact_force_kernel<1> << < numBlocks, numThreads >> > (
-		plan, (double4 *)pos, (double3 *)vel, (double3 *)omega,
+		plan, (double4 *)pos, (double4 *)ep, (double3 *)vel, (double4 *)ev,
 		(double3 *)force, (double3 *)moment, cp, mass,
 		(double3 *)tmax, rres,
 		pair_count, pair_id, (double2 *)tsd, np);
@@ -169,7 +179,7 @@ void cu_plane_contact_force(
 
 void cu_cube_contact_force(
 	const int tcm, device_plane_info* plan,
-	double* pos, double* vel, double* omega,
+	double* pos, double* ep, double* vel, double* omega,
 	double* force, double* moment, double* mass,
 	unsigned int np, device_contact_property *cp)
 {
@@ -192,7 +202,7 @@ void cu_cube_contact_force(
 
 void cu_cylinder_hertzian_contact_force(
 	const int tcm, device_cylinder_info* cyl,
-	double* pos, double* vel, double* omega,
+	double* pos, double* ep, double* vel, double* ev,
 	double* force, double* moment,
 	double* mass, unsigned int np, device_contact_property *cp,
 	double3* mpos, double3* mf, double3* mm, double3& _mf, double3& _mm)
@@ -201,11 +211,11 @@ void cu_cylinder_hertzian_contact_force(
 	switch (tcm)
 	{
 	case 0: cylinder_hertzian_contact_force_kernel<0> << < numBlocks, numThreads >> > (
-		cyl, (double4 *)pos, (double3 *)vel, (double3 *)omega,
+		cyl, (double4 *)pos, (double4 *)ep, (double3 *)vel, (double4 *)ev,
 		(double3 *)force, (double3 *)moment, cp, mass, mpos, mf, mm, np);
 		break;
 	case 1: cylinder_hertzian_contact_force_kernel<1> << < numBlocks, numThreads >> > (
-		cyl, (double4 *)pos, (double3 *)vel, (double3 *)omega,
+		cyl, (double4 *)pos, (double4 *)ep, (double3 *)vel, (double4 *)ev,
 		(double3 *)force, (double3 *)moment, cp, mass, mpos, mf, mm, np);
 		break;
 	}
@@ -214,7 +224,7 @@ void cu_cylinder_hertzian_contact_force(
 
 void cu_particle_polygonObject_collision(
 	const int tcm, device_triangle_info* dpi, device_mesh_mass_info* dpmi,
-	double* pos, double* vel, double* omega,
+	double* pos, double* ep, double* vel, double* ev,
 	double* force, double* moment, double* mass,
 	double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd, double* dsph,
@@ -227,7 +237,7 @@ void cu_particle_polygonObject_collision(
 	case 1:
 		particle_polygonObject_collision_kernel<1> << < numBlocks, numThreads >> > (
 			dpi, dpmi,
-			(double4 *)pos, (double3 *)vel, (double3 *)omega,
+			(double4 *)pos, (double4 *)ep, (double3 *)vel, (double4 *)ev,
 			(double3 *)force, (double3 *)moment, mass,
 			(double3 *)tmax, rres,
 			pair_count, pair_id, (double2 *)tsd, (double4 *)dsph,
@@ -240,7 +250,8 @@ void cu_decide_rolling_friction_moment(
 	double* tmax,
 	double* rres,
 	double* inertia,
-	double* omega,
+	double* ep,
+	double* ev,
 	double* moment,
 	unsigned int np)
 {
@@ -249,7 +260,8 @@ void cu_decide_rolling_friction_moment(
 		(double3 *)tmax,
 		rres,
 		inertia,
-		(double3 *)omega,
+		(double4 *)ep,
+		(double4 *)ev,
 		(double3 *)moment,
 		np);
 }
@@ -290,8 +302,8 @@ void cu_update_meshObjectData(
 		ntriangle);
 }
 
-void cu_clusters_contact(double* pos, double* vel,
-	double* omega, double* force,
+void cu_clusters_contact(double* pos, double* ep, double* vel,
+	double* ev, double* force,
 	double* moment, double* mass, double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd,
 	unsigned int* sorted_index, unsigned int* cstart,
@@ -299,8 +311,8 @@ void cu_clusters_contact(double* pos, double* vel,
 {
 	computeGridSize(np, 256, numBlocks, numThreads);
 	calcluate_clusters_contact_kernel << < numBlocks, numThreads >> > (
-			(double4 *)pos, (double3 *)vel,
-			(double3 *)omega, (double3 *)force,
+			(double4 *)pos, (double4 *)ep, (double3 *)vel,
+			(double4 *)ev, (double3 *)force,
 			(double3 *)moment, mass, (double3 *)tmax, rres,
 			pair_count, pair_id, (double2 *)tsd,
 			sorted_index, cstart,
@@ -309,7 +321,7 @@ void cu_clusters_contact(double* pos, double* vel,
 
 void cu_cluster_plane_contact(
 	device_plane_info* plan,
-	double* pos, double* vel, double* omega,
+	double* pos, double* ep, double* vel, double* ev,
 	double* force, double* moment, double* mass,
 	double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd, 
@@ -317,7 +329,7 @@ void cu_cluster_plane_contact(
 {
 	computeGridSize(np, 256, numBlocks, numThreads);
 	cluster_plane_contact_kernel << < numBlocks, numThreads >> > (
-		plan, (double4 *)pos, (double3 *)vel, (double3 *)omega,
+		plan, (double4 *)pos, (double4 *)ep, (double3 *)vel, (double4 *)ev,
 		(double3 *)force, (double3 *)moment, cp, mass,
 		(double3 *)tmax, rres,
 		pair_count, pair_id, (double2 *)tsd, xci, np);
@@ -326,7 +338,7 @@ void cu_cluster_plane_contact(
 void vv_update_cluster_position(
 	double *pos, double *cpos, double* ep,
 	double *rloc, double *vel, double *acc,
-	double* omega, double* alpha,
+	double* ev, double* ea,
 	xClusterInformation *xci, unsigned int np)
 {
 	computeGridSize(np, 256, numBlocks, numThreads);
@@ -338,15 +350,15 @@ void vv_update_cluster_position(
 		(double3*)rloc,
 		(double3*)vel,
 		(double3*)acc, 
-		(double3*)omega,
-		(double3*)alpha,
+		(double4*)ev,
+		(double4*)ea,
 		xci,
 		np);
 }
 
 void vv_update_cluster_velocity(
-	double* cpos, double* ep, double *vel, double *acc, double *omega,
-	double *alpha, double *force, double *moment, double* rloc,
+	double* cpos, double* ep, double *vel, double *acc, double *ev,
+	double *ea, double *force, double *moment, double* rloc,
 	double* mass, double* iner, xClusterInformation* xci, unsigned int np)
 {
 	computeGridSize(np, 256, numBlocks, numThreads);
@@ -355,8 +367,8 @@ void vv_update_cluster_velocity(
 		(double4*)ep,
 		(double3*)vel,
 		(double3*)acc,
-		(double3*)omega,
-		(double3*)alpha,
+		(double4*)ev,
+		(double4*)ea,
 		(double3*)force,
 		(double3*)moment,
 		(double3*)rloc,

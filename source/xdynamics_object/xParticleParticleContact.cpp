@@ -82,7 +82,8 @@ void xParticleParticleContact::cppCollision(
 	unsigned int i, 
 	vector4d *pos,
 	vector3d *vel, 
-	vector3d *omega,
+	euler_parameters *ep,
+	euler_parameters *ev,
 	double *mass, 
 	double &res, 
 	vector3d &tmax, 
@@ -98,7 +99,7 @@ void xParticleParticleContact::cppCollision(
 		vector3d m_ft = new_vector3d(0, 0, 0);
 		unsigned int j = d->id;
 		unsigned int neach = 0;
-		unsigned int ck = 0;
+		unsigned int ck = j;
 		unsigned int ci = i;
 		if (nco)
 		{
@@ -111,7 +112,9 @@ void xParticleParticleContact::cppCollision(
 		double rcon = pos[i].w - 0.5 * d->gab;
 		vector3d u = new_vector3d(d->nx, d->ny, d->nz);
 		vector3d cp = rcon * u;
-		vector3d rv = vel[ck] + cross(omega[ck], -pos[j].w * u) - (vel[ci] + cross(omega[ci], pos[i].w * u));
+		vector3d wi = ToAngularVelocity(ep[ci], ev[ci]);
+		vector3d wj = ToAngularVelocity(ep[ck], ev[ck]);
+		vector3d rv = vel[ck] + cross(wj, -pos[j].w * u) - (vel[ci] + cross(wi, pos[i].w * u));
 		xContactParameters c = getContactParameters(
 			pos[i].w, pos[j].w,
 			mass[ci], mass[ck],
@@ -122,11 +125,11 @@ void xParticleParticleContact::cppCollision(
 			friction, rolling_factor, cohesion);
 		switch (force_model)
 		{
-		case DHS: DHSModel(c, d->gab, d->delta_s, d->dot_s, cp, rv, u, m_fn, m_ft, m_m); break;
+		case DHS: DHSModel(c, d->gab, d->delta_s, d->dot_s, rv, u, m_fn, m_ft); break;
 		}
 		RollingResistanceForce(rolling_factor, pos[i].w, pos[j].w, cp, m_fn, m_ft, res, tmax);
 		F += m_fn + m_ft;
-		M += m_m;
+		M += cross(cp, m_fn + m_ft);
 	}
 }
 

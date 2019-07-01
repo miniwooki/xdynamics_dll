@@ -445,6 +445,21 @@ vector4d xUtilityFunctions::FitSphereToTriangle(vector3d& P, vector3d& Q, vector
 	return new_vector4d(Csph.x, Csph.y, Csph.z, r);
 }
 
+double xUtilityFunctions::FitClusterRadius(vector4d * cpos, unsigned int n)
+{
+	int cnt = 0;
+	double maximum = -FLT_MAX;
+	while (cnt + 1 < n)
+	{
+		vector3d b = cpos[cnt];
+		for (int i = cnt; i < n; i++)
+		{
+			double dij = 
+		}
+	}
+	return 0.0;
+}
+
 std::string xUtilityFunctions::xstring(QString v)
 {
 	return v.toStdString();
