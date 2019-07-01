@@ -10,6 +10,7 @@
 xContactManager::xContactManager()
 	: cpp(NULL)
 	, ncontact(0)
+	, ncobject(0)
 	, cpmeshes(NULL)
 	, cpplane(NULL)
 	, d_pair_count_pp(NULL)
@@ -100,6 +101,11 @@ unsigned int xContactManager::setupParticlesMeshObjectsContact()
 	return n;
 }
 
+void xContactManager::setNumClusterObject(unsigned int nc)
+{
+	ncobject = nc;
+}
+
 void xContactManager::setupParticlesPlanesContact()
 {
 	unsigned int n = 0;
@@ -170,7 +176,8 @@ bool xContactManager::runCollision(
 	double *pos, double *vel, double *omega,
 	double *mass, double* inertia, double *force, double *moment,
 	unsigned int *sorted_id, unsigned int *cell_start,
-	unsigned int *cell_end, unsigned int *cluster_index,
+	unsigned int *cell_end,
+	xClusterInformation* xci,
 	unsigned int np)
 {
 	if (xSimulation::Cpu())
@@ -185,7 +192,8 @@ bool xContactManager::runCollision(
 			(vector3d*)force,
 			(vector3d*)moment,
 			sorted_id, cell_start, cell_end,
-			cluster_index, np
+			xci,
+			np
 		);
 	}
 	else if (xSimulation::Gpu())
@@ -193,7 +201,7 @@ bool xContactManager::runCollision(
 		deviceCollision(
 			pos, vel, omega,
 			mass, inertia, force, moment,
-			sorted_id, cell_start, cell_end, np
+			sorted_id, cell_start, cell_end, xci, np
 		);
 	}
 	return true;
@@ -262,12 +270,17 @@ void xContactManager::updateCollisionPair(
 	unsigned int* sorted_id,
 	unsigned int* cell_start,
 	unsigned int* cell_end,
-	unsigned int* cluster_index,
+	xClusterInformation* xci,
 	unsigned int np)
 {
 	for (unsigned int i = 0; i < np; i++)
 	{
 		unsigned int count = 0;
+		unsigned int neach = 0;
+		if (ncobject)
+			for (unsigned int j = 0; j < ncobject; j++)
+				if (i >= xci[j].sid && i < xci[j].sid + xci[j].count * xci[j].neach)
+					neach = xci[j].neach;
 		vector3d p = new_vector3d(pos[i].x, pos[i].y, pos[i].z);
 		double r = pos[i].w;
 		if(cpplane)
@@ -286,18 +299,13 @@ void xContactManager::updateCollisionPair(
 						unsigned int eid = cell_end[hash];
 						for (unsigned int j = sid; j < eid; j++) {
 							unsigned int k = sorted_id[j];
-							if (i != k && k < np)
+							unsigned int di = i >= k ? i - k : k - i;
+							if (i != k && k < np && !(di <= neach))
 							{
-								if (cluster_index)
-								{
-									//unsigned int ci = cluster_index[k];
-									if (cluster_index[i] == cluster_index[k])
-										continue;
-								}
-								
+								//unsigned int ck = k / neach;
 								vector3d jp = new_vector3d(pos[k].x, pos[k].y, pos[k].z);
 								double jr = pos[k].w;
-								cpp->updateCollisionPair(k, xcpl[i], r, jr, p, jp);
+								cpp->updateCollisionPair(k, neach ? 1 : 0, xcpl[i], r, jr, p, jp);
 							}
 							else if (k >= np)
 							{
@@ -318,34 +326,54 @@ void xContactManager::deviceCollision(
 	double *pos, double *vel, double *omega,
 	double *mass, double* inertia, double *force, double *moment,
 	unsigned int *sorted_id, unsigned int *cell_start,
-	unsigned int *cell_end, unsigned int np)
+	unsigned int *cell_end, xClusterInformation* xci, unsigned int np)
 {
-	cu_calculate_p2p(1, pos, vel, omega, force, moment, mass,
-		d_Tmax, d_RRes, d_pair_count_pp, d_pair_id_pp, d_tsd_pp, sorted_id,
-		cell_start, cell_end, cpp->DeviceContactProperty(), np);
+	if (xci)
+	{
+		cu_clusters_contact(pos, vel, omega, force, moment, mass,
+			d_Tmax, d_RRes, d_pair_count_pp, d_pair_id_pp, d_tsd_pp, sorted_id,
+			cell_start, cell_end, cpp->DeviceContactProperty(), xci, np);
+		if (cpplane)
+		{
+			if (cpplane->NumContact())
+			{
+				cu_cluster_plane_contact(cpplane->devicePlaneInfo(), pos, vel,
+					omega, force, moment, mass,
+					d_Tmax, d_RRes, d_pair_count_ppl, d_pair_id_ppl, d_tsd_ppl, xci,
+					np, cpplane->DeviceContactProperty());
+			}
+		}
+	}
+	else
+	{
+		cu_calculate_p2p(1, pos, vel, omega, force, moment, mass,
+			d_Tmax, d_RRes, d_pair_count_pp, d_pair_id_pp, d_tsd_pp, sorted_id,
+			cell_start, cell_end, cpp->DeviceContactProperty(), np);
 
-	if (cpplane)
-	{
-		if (cpplane->NumContact())
+		if (cpplane)
 		{
-			cu_plane_contact_force(1, cpplane->devicePlaneInfo(), pos, vel,
-				omega, force, moment, mass,
-				d_Tmax, d_RRes, d_pair_count_ppl, d_pair_id_ppl, d_tsd_ppl,
-				np, cpplane->DeviceContactProperty());
+			if (cpplane->NumContact())
+			{
+				cu_plane_contact_force(1, cpplane->devicePlaneInfo(), pos, vel,
+					omega, force, moment, mass,
+					d_Tmax, d_RRes, d_pair_count_ppl, d_pair_id_ppl, d_tsd_ppl,
+					np, cpplane->DeviceContactProperty());
+			}
+		}
+		if (cpmeshes)
+		{
+			if (cpmeshes->NumContactObjects())
+			{
+				cpmeshes->updateMeshMassData();
+				cu_particle_polygonObject_collision(1, cpmeshes->deviceTrianglesInfo(), cpmeshes->devicePolygonObjectMassInfo(),
+					pos, vel, omega, force, moment, mass,
+					d_Tmax, d_RRes, d_pair_count_ptri, d_pair_id_ptri, d_tsd_ptri, cpmeshes->SphereData(),
+					sorted_id, cell_start, cell_end, cpmeshes->DeviceContactProperty(), np);
+				cpmeshes->getMeshContactForce();
+			}
 		}
 	}
-	if (cpmeshes)
-	{
-		if (cpmeshes->NumContactObjects())
-		{
-			cpmeshes->updateMeshMassData();
-			cu_particle_polygonObject_collision(1, cpmeshes->deviceTrianglesInfo(), cpmeshes->devicePolygonObjectMassInfo(),
-				pos, vel, omega, force, moment, mass,
-				d_Tmax, d_RRes, d_pair_count_ptri, d_pair_id_ptri, d_tsd_ptri, cpmeshes->SphereData(),
-				sorted_id, cell_start, cell_end, cpmeshes->DeviceContactProperty(), np);
-			cpmeshes->getMeshContactForce();
-		}
-	}
+	
 	cu_decide_rolling_friction_moment(d_Tmax, d_RRes, inertia, omega, moment, np);
 }
 
@@ -360,10 +388,10 @@ void xContactManager::hostCollision(
 	unsigned int *sorted_id,
 	unsigned int *cell_start,
 	unsigned int *cell_end,
-	unsigned int *cluster_index,
+	xClusterInformation* xci,
 	unsigned int np)
 {
-	updateCollisionPair(pos, sorted_id, cell_start, cell_end, cluster_index, np);
+	updateCollisionPair(pos, sorted_id, cell_start, cell_end, xci, np);
 	for (unsigned int i = 0; i < np; i++)
 	{
 		vector3d F = new_vector3d(0.0, 0.0, 0.0);
@@ -373,15 +401,17 @@ void xContactManager::hostCollision(
 		xContactPairList* pairs = &xcpl[i];
 		vector3d p = new_vector3d(pos[i].x, pos[i].y, pos[i].z);
 		unsigned int ci = 0;
-		if (cluster_index)
-			ci = cluster_index[i];
+		//if (cluster_index)
+		//	ci = cluster_index[i];
 		vector3d v = vel[ci];
 		vector3d o = omega[ci];
 		double m = mass[ci];
 		double j = inertia[ci];
 		double r = pos[i].w;
+		if (i > 2 && pairs->PlanePair().size())
+			R = 0;
 		cpplane->cpplCollision(pairs, r, m, p, v, o, R, T, F, M);
-		cpp->cppCollision(pairs, i, pos, vel, omega, mass, R, T, F, M);
+		cpp->cppCollision(pairs, i, pos, vel, omega, mass, R, T, F, M, xci, ncobject);
 		cpmeshes->cppolyCollision(pairs, r, m, p, v, o, R, T, F, M);
 		force[i] += F;
 		moment[i] += M;

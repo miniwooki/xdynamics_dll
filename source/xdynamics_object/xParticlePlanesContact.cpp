@@ -203,6 +203,7 @@ bool xParticlePlanesContact::cpplCollision(
 		vector3d u = new_vector3d(d->nx, d->ny, d->nz);
 		vector3d cp = r * u;
 		vector3d dv = -v - cross(o, cp);
+		//unsigned int jjjj = d->id;
 		xContactMaterialParameters cmp = hcmp[d->id];
 		xContactParameters c = getContactParameters(
 			r, 0.0,
@@ -243,7 +244,7 @@ void xParticlePlanesContact::updateCollisionPair(
 			if (xcpl.IsNewPlaneContactPair(i))
 			{
 				xPairData *pd = new xPairData;
-				*pd = { PLANE_SHAPE, 0, i, 0, 0, cdist, u.x, u.y, u.z };
+				*pd = { PLANE_SHAPE, 0, 0, i, 0, 0, cdist, u.x, u.y, u.z };
 				xcpl.insertPlaneContactPair(pd);
 			}
 			else

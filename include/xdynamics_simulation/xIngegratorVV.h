@@ -23,13 +23,11 @@ private:
 		double *dmass, double* dinertia, unsigned int np);
 	void updateClusterPosition(
 		double *dpos, double* dcpos, double * dvel, double * dacc,
-		double *ep, double * domega, double * dalpha,
-		unsigned int* cidx, unsigned int* ccnt, unsigned int* cbegin, vector3d* cdata, unsigned int np);
+		double *ep, double * domega, double * dalpha, unsigned int np);
 	void updateClusterVelocity(
 		double *dpos, double* dcpos, double * dvel, double * dacc,
 		double *ep, double * domega, double * dalpha, double *dforce, double* dmoment,
-		double *dmass, double* dinertia, unsigned int* cidx, 
-		unsigned int* ccnt,  unsigned int* cbegin, vector3d* cdata, unsigned int np);
+		double *dmass, double* dinertia, unsigned int np);
 
 	unsigned int m_np;
 //	void integrationQuaternion(double * quat, double * omega, double * moment, double * alpha, double * inertia, unsigned int np);

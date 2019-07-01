@@ -16,8 +16,10 @@ public:
 	~xParticleManager();
 
 	unsigned int NumParticle();
-	unsigned int NumClusterSet();
-	bool CopyPosition(double *pos, double* cpos, double* ep, unsigned int* cindex, unsigned int inp);
+	//unsigned int NumClusterSet();
+	bool CopyPosition(
+		double *pos, double* cpos, double* ep, unsigned int inp);
+	void CopyClusterInformation(xClusterInformation* xci, double* rcloc);
 	bool SetMassAndInertia(double *mass, double *inertia);
 	QMap<QString, xParticleObject*>& XParticleObjects();
 	xParticleObject* XParticleObject(QString& ws);
@@ -25,21 +27,22 @@ public:
 // 	void setRealTimeCreating(bool b);
 // 	bool OneByOneCreating();
 	unsigned int nClusterObject();
+	unsigned int NumCluster();
 	unsigned int nClusterEach();
-	unsigned int nSingleSphere();
-	unsigned int nClusterSphere();
-	unsigned int NumParticleWithCluster();
-	unsigned int* ClusterIndex();
-	unsigned int* ClusterCount();
-	unsigned int* ClusterBegin();
-	vector3d* ClusterRelativeLocation();
+	//unsigned int nSingleSphere();
+	//unsigned int nClusterSphere();
+	//unsigned int NumParticleWithCluster();
+	//unsigned int* ClusterIndex();
+	//unsigned int* ClusterCount();
+	//unsigned int* ClusterBegin();
+	//vector3d* ClusterRelativeLocation();
 
 	double* GetPositionResultPointer(unsigned int pt);
 	double* GetVelocityResultPointer(unsigned int pt);
 // 	unsigned int RealTimeCreating();
 	void AllocParticleResultMemory(unsigned int npart, unsigned int np);
 	void SetCurrentParticlesFromPartResult(std::string path);
-	void SetClusterInformation();
+	//void SetClusterInformation();
 	void AddParticleCreatingCondition(xParticleObject* xpo, xParticleCreateCondition& xpcc);
 	unsigned int ExcuteCreatingCondition(double ct, unsigned int cstep, unsigned int cnp);
 	//static unsigned int GetNumLineParticles(double len, double r0, double r1 = 0);
@@ -63,9 +66,10 @@ private:
 // 	bool one_by_one;
 	unsigned int n_cluster_object;
 	unsigned int n_cluster_each;
-	unsigned int n_single_sphere;
-	unsigned int n_cluster_sphere; // the number of cluster set element
+	//unsigned int n_single_sphere;
+	//unsigned int n_cluster_sphere; // the number of cluster set element
 	unsigned int np;
+	unsigned int ncluster;
 	//unsigned int num_xpo;
 	//unsigned int per_np;
 	//double per_time;
@@ -74,11 +78,11 @@ private:
 
 	double *r_pos;
 	double *r_vel;
-	bool *isCluster;
-	unsigned int *cluster_index;
-	unsigned int *cluster_count;
-	unsigned int *cluster_begin;
-	vector3d* cluster_set_location;
+	//bool *isCluster;
+	//unsigned int *cluster_index;
+	//unsigned int *cluster_count;
+//unsigned int *cluster_begin;
+	//vector3d* rcluster;
 	xMaterialType *r_type;
 };
 

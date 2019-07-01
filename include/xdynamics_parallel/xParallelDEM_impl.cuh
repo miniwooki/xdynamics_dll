@@ -14,10 +14,26 @@ inline __device__ double dot(double3 v1, double3 v2)
 	return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
 }
 
+inline __device__ double dot(double4 v1, double4 v2)
+{
+	return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w;
+}
+
 inline __device__ double3 operator-(double3& v1, double3& v2)
 {
 	return make_double3(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
 }
+
+inline __device__ double4 operator-(double4& v1, double4& v2)
+{
+	return make_double4(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z, v1.w - v2.w);
+}
+
+inline __device__ double4 operator+(double4& v1, double4& v2)
+{
+	return make_double4(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z, v1.w + v2.w);
+}
+
 inline __device__ double3 operator-(double3& v1)
 {
 	return make_double3(-v1.x, -v1.y, -v1.z);
@@ -26,6 +42,11 @@ inline __device__ double3 operator-(double3& v1)
 inline __device__ double3 operator*(double v1, double3& v2)
 {
 	return make_double3(v1 * v2.x, v1 * v2.y, v1 * v2.z);
+}
+
+inline __device__ double4 operator*(double v1, double4& v2)
+{
+	return make_double4(v1 * v2.x, v1 * v2.y, v1 * v2.z, v1 * v2.w);
 }
 
 inline __device__ double3 operator+(double3& v1, double3& v2)
@@ -45,7 +66,17 @@ inline __device__ double3 operator/(double3& v1, double v2)
 	return make_double3(v1.x / v2, v1.y / v2, v1.z / v2);
 }
 
+inline __device__ double4 operator/(double4& v1, double v2)
+{
+	return make_double4(v1.x / v2, v1.y / v2, v1.z / v2, v1.w / v2);
+}
+
 inline __device__ double length(double3 v1)
+{
+	return sqrt(dot(v1, v1));
+}
+
+inline __device__ double length(double4 v1)
 {
 	return sqrt(dot(v1, v1));
 }
@@ -53,6 +84,37 @@ inline __device__ double length(double3 v1)
 inline __device__ double3 cross(double3 a, double3 b)
 {
 	return make_double3(a.y*b.z - a.z*b.y, a.z*b.x - a.x*b.z, a.x*b.y - a.y*b.x);
+}
+
+inline __device__ double4 normalize(double4 v)
+{
+	return v / length(v);
+}
+
+__device__ double3 toGlobal(double3& v, double4& ep)
+{
+	double3 r0 = make_double3(2.0 * (ep.x*ep.x + ep.y*ep.y - 0.5), 2.0 * (ep.y*ep.z - ep.x*ep.w), 2.0 * (ep.y*ep.w + ep.x*ep.z));
+	double3 r1 = make_double3(2.0 * (ep.y*ep.z + ep.x*ep.w), 2.0 * (ep.x*ep.x + ep.z*ep.z - 0.5), 2.0 * (ep.z*ep.w - ep.x*ep.y));
+	double3 r2 = make_double3(2.0 * (ep.y*ep.w - ep.x*ep.z), 2.0 * (ep.z*ep.w + ep.x*ep.y), 2.0 * (ep.x*ep.x + ep.w*ep.w - 0.5));
+	return make_double3
+	(
+		r0.x * v.x + r0.y * v.y + r0.z * v.z,
+		r1.x * v.x + r1.y * v.y + r1.z * v.z,
+		r2.x * v.x + r2.y * v.y + r2.z * v.z
+	);
+}
+
+__device__ double3 toLocal(double3& v, double4& ep)
+{
+	double3 r0 = make_double3(2.0 * (ep.x*ep.x + ep.y*ep.y - 0.5), 2.0 * (ep.y*ep.z - ep.x*ep.w), 2.0 * (ep.y*ep.w + ep.x*ep.z));
+	double3 r1 = make_double3(2.0 * (ep.y*ep.z + ep.x*ep.w), 2.0 * (ep.x*ep.x + ep.z*ep.z - 0.5), 2.0 * (ep.z*ep.w - ep.x*ep.y));
+	double3 r2 = make_double3(2.0 * (ep.y*ep.w - ep.x*ep.z), 2.0 * (ep.z*ep.w + ep.x*ep.y), 2.0 * (ep.x*ep.x + ep.w*ep.w - 0.5));
+	return make_double3
+	(
+		r0.x * v.x + r1.x * v.y + r2.x * v.z,
+		r0.y * v.x + r1.y * v.y + r2.y * v.z,
+		r0.z * v.x + r1.z * v.y + r2.z * v.z
+	);
 }
 
 __device__
@@ -85,7 +147,60 @@ __global__ void vv_update_position_kernel(double4* pos, double3* vel, double3* a
 	pos[id].x += _p.x;
 	pos[id].y += _p.y;
 	pos[id].z += _p.z;
+}
 
+__global__ void vv_update_position_cluster_kernel(
+	double4* pos, double4* cpos, double4* ep, double3* rloc,
+	double3 *vel, double3* acc, double3* omega, double3* alpha, 
+	xClusterInformation* xci, unsigned int np)
+{
+	unsigned int id = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
+	if (id >= np)
+		return;
+	unsigned int neach = 0;
+	unsigned int seach = 0;
+	unsigned int sbegin = 0;
+	for (unsigned int i = 0; i < cte.nClusterObject; i++)
+	{
+		xClusterInformation xc = xci[i];
+		if (id >= xc.sid && id < xc.sid + xc.count * xc.neach)
+		{
+			neach = xc.neach;
+			break;
+		}
+		seach += xc.neach;
+		sbegin += xc.count * xc.neach;
+	}
+		
+	double4 cp = cpos[id];
+	double4 cep = ep[id];
+	double3 w = omega[id];
+	double3 wd = alpha[id];
+	double3 old_p = make_double3(cp.x, cp.y, cp.z);
+	double3 new_p = old_p + cte.dt * vel[id] + cte.half2dt * acc[id];
+	cpos[id] = make_double4(new_p.x, new_p.y, new_p.z, cp.w);
+	double4 ev = make_double4(
+		-cep.y * w.x - cep.z * w.y - cep.w * w.z,
+		cep.x * w.x + cep.w * w.y - cep.z * w.z,
+		-cep.w * w.x + cep.x * w.y + cep.y * w.z,
+		cep.z * w.x - cep.y * w.y + cep.x * w.z
+	);
+	double4 Lpwd = make_double4(
+		-cep.y * wd.x - cep.z * wd.y - cep.w * wd.z,
+		cep.x * wd.x + cep.w * wd.y - cep.z * wd.z,
+		-cep.w * wd.x + cep.x * wd.y + cep.y * wd.z,
+		cep.z * wd.x - cep.y * wd.y + cep.x * wd.z
+	);
+	double4 ea = 0.5 * Lpwd - 0.25 * dot(w, w) * cep;
+	double4 new_ep = ep[id] + cte.dt * ev + cte.half2dt * ea;
+	ep[id] = normalize(new_ep);
+	unsigned int sid = sbegin + id * neach;
+	for (unsigned int j = 0; j < neach; j++)
+	{
+		//unsigned int cid = id * 3;
+		double3 m_pos = new_p + toGlobal(rloc[seach + j], new_ep);
+		pos[sid + j] = make_double4(m_pos.x, m_pos.y, m_pos.z, pos[sid + j].w);
+	}
 }
 
 __global__ void vv_update_velocity_kernel(
@@ -119,6 +234,81 @@ __global__ void vv_update_velocity_kernel(
 	omega[id] = av;
 	acc[id] = a;
 	alpha[id] = in;
+}
+
+__global__ void vv_update_cluster_velocity_kernel(
+	double4* cpos,
+	double4* ep,
+	double3* vel,
+	double3* acc,
+	double3* omega,
+	double3* alpha,
+	double3* force,
+	double3* moment,
+	double3* rloc,
+	double* mass,
+	double3* iner,
+	xClusterInformation* xci,
+	unsigned int np)
+{
+	unsigned int id = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
+	if (id >= np)
+		return;
+	unsigned int neach = 0;
+	unsigned int seach = 0;
+	unsigned int sbegin = 0;
+	for (unsigned int i = 0; i < cte.nClusterObject; i++)
+	{
+		xClusterInformation xc = xci[i];
+		if (id >= xc.sid && id < xc.sid + xc.count * xc.neach)
+		{
+			neach = xc.neach;
+			break;
+		}
+		seach += xc.neach;
+		sbegin += xc.count * xc.neach;
+	}
+	double4 cp = cpos[id];
+	double m = mass[id];
+	double3 v = vel[id];
+	double3 a = acc[id];
+	double3 av = omega[id];
+	double3 aa = alpha[id];
+	double4 e = ep[id];
+	double inv_m = 1.0 / m;
+	//double3 in = (1.0 / iner[id]) * moment[id];
+	double3 in = iner[id];
+	double3 F = make_double3(0, 0, 0);
+	double3 T = make_double3(0, 0, 0);
+	double3 LT = make_double3(0, 0, 0);
+	unsigned int sid = sbegin + id * neach;
+	for (unsigned int j = 0; j < neach; j++)
+	{
+		double3 cpos = make_double3(cp.x, cp.y, cp.z);
+		double3 gp = cpos + toGlobal(rloc[seach + j], e);
+		double3 dr = gp - cpos;
+		double3 _F = force[sid + j];
+		F += _F;
+		T += moment[sid + j];
+		LT += cross(dr, _F);
+		force[sid + j] = make_double3(0, 0, 0);
+		moment[sid + j] = make_double3(0, 0, 0);
+	}
+	F += m * cte.gravity;
+	double3 n_prime = toLocal(T + LT, e);
+	double3 w_prime = toLocal(av, e);
+	double3 Jwp = make_double3(in.x * w_prime.x, in.y * w_prime.y, in.z * w_prime.z);
+	double3 tJwp = make_double3(-av.z * Jwp.y + av.y * Jwp.z, av.z * Jwp.x - av.x * Jwp.z, -av.y * Jwp.x + av.x * Jwp.y);
+	double3 rhs = n_prime - tJwp;
+	double3 wd_prime = make_double3(rhs.x / in.x, rhs.y / in.y, rhs.z / in.z);
+	v += 0.5 * cte.dt * a;
+	av += 0.5 * cte.dt * aa;
+	a = inv_m * F;
+	aa = toGlobal(wd_prime, e);
+	vel[id] = v + 0.5 * cte.dt * a;
+	omega[id] = av + 0.5 * cte.dt * aa;
+	acc[id] = a;
+	alpha[id] = aa;
 }
 
 
@@ -399,6 +589,142 @@ __device__ void calculate_previous_rolling_resistance(
 	Mr += Rij * rf * length(Fn);
 }
 
+__global__ void calcluate_clusters_contact_kernel(
+	double4* pos, double3* vel,
+	double3* omega, double3* force,
+	double3* moment, double* mass, double3* tmax, double* rres,
+	unsigned int* pair_count, unsigned int* pair_id, double2* tsd,
+	unsigned int* sorted_index, unsigned int* cstart,
+	unsigned int* cend, device_contact_property* cp, xClusterInformation* xci, unsigned int np
+)
+{
+	unsigned id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
+
+	if (id >= np)
+		return;
+	unsigned int p_pair_id[MAX_P2P_COUNT];
+	double2 p_tsd[MAX_P2P_COUNT];
+	unsigned int sid = id * MAX_P2P_COUNT;
+	for (unsigned int i = 0; i < MAX_P2P_COUNT; i++)
+	{
+		p_pair_id[i] = pair_id[sid + i];
+		p_tsd[i] = tsd[sid + i];
+	}
+	unsigned int neach = 0;
+	unsigned int seach = 0;
+	unsigned int sbegin = 0;
+	for (unsigned int i = 0; i < cte.nClusterObject; i++)
+	{
+		xClusterInformation xc = xci[i];
+		if (id >= xc.sid && id < xc.sid + xc.count * xc.neach)
+		{
+			neach = xc.neach;
+			break;
+		}
+		seach += xc.neach;
+		sbegin += xc.count * xc.neach;
+	}
+	unsigned int old_count = pair_count[id];
+	unsigned int cid = (id / neach);
+	double4 ipos = pos[id];
+	double4 jpos = make_double4(0, 0, 0, 0);
+	double3 ivel = vel[cid];
+	double3 jvel = make_double3(0, 0, 0);
+	double3 iomega = omega[cid];
+	double3 jomega = make_double3(0, 0, 0);
+	int3 gridPos = calcGridPos(make_double3(ipos.x, ipos.y, ipos.z));
+
+	double ir = ipos.w; double jr = 0;
+	double im = mass[cid]; double jm = 0;
+	double3 Ft = make_double3(0, 0, 0);
+	double3 Fn = make_double3(0, 0, 0);// [id] * cte.gravity;
+	double3 M = make_double3(0, 0, 0);
+	double3 sumF = make_double3(0, 0, 0);
+	double3 sumM = make_double3(0, 0, 0);
+	int3 neighbour_pos = make_int3(0, 0, 0);
+	uint grid_hash = 0;
+	unsigned int start_index = 0;
+	unsigned int end_index = 0;
+	unsigned int new_count = sid;
+	double res = 0.0;
+	double3 tma = make_double3(0.0, 0.0, 0.0);
+	for (int z = -1; z <= 1; z++) {
+		for (int y = -1; y <= 1; y++) {
+			for (int x = -1; x <= 1; x++) {
+				neighbour_pos = make_int3(gridPos.x + x, gridPos.y + y, gridPos.z + z);
+				grid_hash = calcGridHash(neighbour_pos);
+				start_index = cstart[grid_hash];
+				if (start_index != 0xffffffff) {
+					end_index = cend[grid_hash];
+					for (unsigned int j = start_index; j < end_index; j++) {
+						unsigned int k = sorted_index[j];
+						unsigned int di = id >= k ? id - k : k - id;
+						if (id == k || k >= np || (di <= neach))
+							continue;
+						unsigned int ck = (k / neach);
+						jpos = pos[k]; jvel = vel[ck]; jomega = omega[ck];
+						jr = jpos.w; jm = mass[ck];
+						double3 rp = make_double3(jpos.x - ipos.x, jpos.y - ipos.y, jpos.z - ipos.z);
+						double dist = length(rp);
+						double cdist = (ir + jr) - dist;
+						if (cdist > 0) {
+							double2 sd = make_double2(0.0, 0.0);
+							for (unsigned int i = 0; i < old_count; i++)
+							{
+								//unsigned int oid = sid + i;
+								if (p_pair_id[i] == k)
+								{
+									sd = p_tsd[i];
+									break;
+								}
+							}
+							double rcon = ir - 0.5 * cdist;
+
+							double3 unit = rp / dist;
+							double3 rc = ir * unit;
+							double3 rv = jvel + cross(jomega, -jr * unit) - (ivel + cross(iomega, ir * unit));
+							device_force_constant c = getConstant(
+								1, ir, jr, im, jm, cp->Ei, cp->Ej,
+								cp->pri, cp->prj, cp->Gi, cp->Gj,
+								cp->rest, cp->fric, cp->rfric, cp->sratio);
+							switch (1)
+							{
+							case 0:
+								HMCModel(
+									c, ir, jr, cp->Ei, cp->Ej, cp->pri, cp->prj,
+									cp->coh, rcon, cdist, iomega,
+									rv, unit, Ft, Fn, M);
+								break;
+							case 1:
+								DHSModel(
+									c, ir, jr, cp->Ei, cp->Ej, cp->pri, cp->prj,
+									cp->coh, rcon, cdist, iomega, sd.x, sd.y,
+									rv, unit, Ft, Fn, M);
+								break;
+							}
+							calculate_previous_rolling_resistance(
+								cp->rfric, ir, jr, rc, Fn, Ft, res, tma);
+							sumF += Fn + Ft;
+							sumM += M;
+							tsd[new_count] = sd;
+							pair_id[new_count] = k;
+							new_count++;
+						}
+					}
+				}
+			}
+		}
+	}
+	force[id] += sumF;
+	moment[id] += sumM;
+	/*if (new_count - sid > MAX_P2P_COUNT)
+		printf("The total of contact with other particle is over(%d)\n.", new_count - sid);*/
+
+	pair_count[id] = new_count - sid;
+	tmax[id] = tma;
+	rres[id] = res;
+}
+
 template <int TCM>
 __global__ void calculate_p2p_kernel(
 	double4* pos, double3* vel,
@@ -413,7 +739,7 @@ __global__ void calculate_p2p_kernel(
 	if (id >= np)
 		return;
 	unsigned int p_pair_id[MAX_P2P_COUNT];
-	double2 p_tsd[6];
+	double2 p_tsd[MAX_P2P_COUNT];
 	unsigned int sid = id * MAX_P2P_COUNT;
 	for (unsigned int i = 0; i < MAX_P2P_COUNT; i++)
 	{
@@ -599,6 +925,114 @@ __device__ double particle_plane_contact_detection(
 		return r - h;
 	}
 	return -1.0;
+}
+
+__global__ void cluster_plane_contact_kernel(
+	device_plane_info *plane,
+	double4* pos, double3* vel, double3* omega,
+	double3* force, double3* moment,
+	device_contact_property *cp, double* mass,
+	double3* tmax, double* rres,
+	unsigned int* pair_count, unsigned int* pair_id, 
+	double2* tsd, xClusterInformation* xci, unsigned int np)
+{
+	unsigned id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
+
+	if (id >= np)
+		return;
+	unsigned int p_pair_id[3];
+	double2 p_tsd[3];
+	unsigned int sid = id * 3;
+	for (unsigned int i = 0; i < 3; i++)
+	{
+		p_pair_id[i] = pair_id[sid + i];
+		p_tsd[i] = tsd[sid + i];
+	}
+	unsigned int neach = 0;
+	unsigned int seach = 0;
+	unsigned int sbegin = 0;
+	for (unsigned int i = 0; i < cte.nClusterObject; i++)
+	{
+		xClusterInformation xc = xci[i];
+		if (id >= xc.sid && id < xc.sid + xc.count * xc.neach)
+		{
+			neach = xc.neach;
+			break;
+		}
+		seach += xc.neach;
+		sbegin += xc.count * xc.neach;
+	}
+	unsigned int cid = id / neach;
+	unsigned int old_count = pair_count[id];
+	double m = mass[cid];
+	double4 ipos = pos[id];
+	double3 ipos3 = make_double3(ipos.x, ipos.y, ipos.z);
+	double r = ipos.w;
+	double3 ivel = vel[cid];
+	double3 iomega = omega[cid];
+
+	double3 Fn = make_double3(0, 0, 0);
+	double3 Ft = make_double3(0, 0, 0);
+	double3 M = make_double3(0, 0, 0);
+
+	double3 sumF = make_double3(0.0, 0.0, 0.0);
+	double3 sumM = make_double3(0.0, 0.0, 0.0);
+	unsigned int new_count = sid;
+	double res = 0.0;
+	double3 tma = make_double3(0.0, 0.0, 0.0);
+	for (unsigned int k = 0; k < cte.nplane; k++)
+	{
+		device_plane_info pl = plane[k];
+		double3 dp = make_double3(ipos.x, ipos.y, ipos.z) - pl.xw;
+		double3 unit = make_double3(0, 0, 0);
+		double3 wp = make_double3(dot(dp, pl.u1), dot(dp, pl.u2), dot(dp, pl.uw));
+
+		double cdist = particle_plane_contact_detection(pl, ipos3, wp, unit, r);
+		if (cdist > 0) {
+			double2 sd = make_double2(0.0, 0.0);
+			for (unsigned int i = 0; i < old_count; i++)
+			{
+				//unsigned int oid = i;
+				if (p_pair_id[i] == k)
+				{
+					sd = p_tsd[i];
+					break;
+				}
+			}
+			double rcon = r - 0.5 * cdist;
+			double3 rc = r * unit;
+			double3 dv = -(ivel + cross(iomega, rc));
+			device_force_constant c = getConstant(
+				1, r, 0.0, m, 0.0, cp->Ei, cp->Ej,
+				cp->pri, cp->prj, cp->Gi, cp->Gj,
+				cp->rest, cp->fric, cp->rfric, cp->sratio);
+			switch (1)
+			{
+			case 0:
+				HMCModel(
+					c, 0, 0, 0, 0, 0, 0, cp->coh, rcon, cdist,
+					iomega, dv, unit, Ft, Fn, M);
+				break;
+			case 1:
+				DHSModel(
+					c, r, 0, 0, 0, 0, 0, cp->coh, rcon, cdist,
+					iomega, sd.x, sd.y, dv, unit, Ft, Fn, M);
+				break;
+			}
+			calculate_previous_rolling_resistance(
+				cp->rfric, r, 0, rc, Fn, Ft, res, tma);
+			sumF += Fn + Ft;
+			sumM += M;
+			tsd[new_count] = sd;
+			pair_id[new_count] = k;
+			new_count++;
+		}
+	}
+	force[id] += sumF;
+	moment[id] += sumM;
+	pair_count[id] = new_count - sid;
+	tmax[id] += tma;
+	rres[id] += res;
 }
 
 template <int TCM>
@@ -1359,18 +1793,7 @@ __global__ void decide_rolling_friction_moment_kernel(
 //	return M1 + t * D1;
 //}
 
-__device__ double3 toGlobal(double3& v, double4& ep)
-{
-	double3 r0 = make_double3(2.0 * (ep.x*ep.x + ep.y*ep.y - 0.5), 2.0 * (ep.y*ep.z - ep.x*ep.w), 2.0 * (ep.y*ep.w + ep.x*ep.z));
-	double3 r1 = make_double3(2.0 * (ep.y*ep.z + ep.x*ep.w), 2.0 * (ep.x*ep.x + ep.z*ep.z - 0.5), 2.0 * (ep.z*ep.w - ep.x*ep.y));
-	double3 r2 = make_double3(2.0 * (ep.y*ep.w - ep.x*ep.z), 2.0 * (ep.z*ep.w + ep.x*ep.y), 2.0 * (ep.x*ep.x + ep.w*ep.w - 0.5));
-	return make_double3
-	(
-		r0.x * v.x + r0.y * v.y + r0.z * v.z,
-		r1.x * v.x + r1.y * v.y + r1.z * v.z,
-		r2.x * v.x + r2.y * v.y + r2.z * v.z
-	);
-}
+
 
 __global__ void updateMeshObjectData_kernel(
 	device_mesh_mass_info *dpmi, double4* mep, double* vList,

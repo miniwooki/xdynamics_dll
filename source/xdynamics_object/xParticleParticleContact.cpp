@@ -87,21 +87,34 @@ void xParticleParticleContact::cppCollision(
 	double &res, 
 	vector3d &tmax, 
 	vector3d& F, 
-	vector3d& M)
+	vector3d& M,
+	xClusterInformation* xci,
+	unsigned int nco)
 {
-	foreach(xPairData* d, pairs->ParticlePair())
+ 	foreach(xPairData* d, pairs->ParticlePair())
 	{
 		vector3d m_fn = new_vector3d(0, 0, 0);
 		vector3d m_m = new_vector3d(0, 0, 0);
 		vector3d m_ft = new_vector3d(0, 0, 0);
 		unsigned int j = d->id;
+		unsigned int neach = 0;
+		unsigned int ck = 0;
+		unsigned int ci = i;
+		if (nco)
+		{
+			for (unsigned int j = 0; j < nco; j++)
+				if (i >= xci[j].sid && i < xci[j].sid + xci[j].count * xci[j].neach)
+					neach = xci[j].neach;
+			ck = j / neach;
+			ci = i / neach;
+		}
 		double rcon = pos[i].w - 0.5 * d->gab;
 		vector3d u = new_vector3d(d->nx, d->ny, d->nz);
 		vector3d cp = rcon * u;
-		vector3d rv = vel[j] + cross(omega[j], -pos[j].w * u) - (vel[i] + cross(omega[i], pos[i].w * u));
+		vector3d rv = vel[ck] + cross(omega[ck], -pos[j].w * u) - (vel[ci] + cross(omega[ci], pos[i].w * u));
 		xContactParameters c = getContactParameters(
 			pos[i].w, pos[j].w,
-			mass[i], mass[j],
+			mass[ci], mass[ck],
 			mpp.Ei, mpp.Ej,
 			mpp.Pri, mpp.Prj,
 			mpp.Gi, mpp.Gj,
@@ -117,7 +130,9 @@ void xParticleParticleContact::cppCollision(
 	}
 }
 
-void xParticleParticleContact::updateCollisionPair(unsigned int id, xContactPairList& xcpl, double ri, double rj, vector3d& posi, vector3d& posj)
+void xParticleParticleContact::updateCollisionPair(
+	unsigned int id, bool isc, xContactPairList& xcpl, 
+	double ri, double rj, vector3d& posi, vector3d& posj)
 {
 	vector3d rp = posj - posi;
 	double dist = length(rp);
@@ -129,7 +144,7 @@ void xParticleParticleContact::updateCollisionPair(unsigned int id, xContactPair
 		if (xcpl.IsNewParticleContactPair(id))
 		{
 			xPairData *pd = new xPairData;
-			*pd = { PARTICLES, 0, id, 0, 0, cdist, u.x, u.y, u.z };
+			*pd = { PARTICLES, isc, 0, id, 0, 0, cdist, u.x, u.y, u.z };
 			xcpl.insertParticleContactPair(pd);
 		}		
 		else

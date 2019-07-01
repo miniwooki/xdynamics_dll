@@ -289,3 +289,80 @@ void cu_update_meshObjectData(
 		poly,
 		ntriangle);
 }
+
+void cu_clusters_contact(double* pos, double* vel,
+	double* omega, double* force,
+	double* moment, double* mass, double* tmax, double* rres,
+	unsigned int* pair_count, unsigned int *pair_id, double* tsd,
+	unsigned int* sorted_index, unsigned int* cstart,
+	unsigned int* cend, device_contact_property* cp, xClusterInformation* xci, unsigned int np)
+{
+	computeGridSize(np, 256, numBlocks, numThreads);
+	calcluate_clusters_contact_kernel << < numBlocks, numThreads >> > (
+			(double4 *)pos, (double3 *)vel,
+			(double3 *)omega, (double3 *)force,
+			(double3 *)moment, mass, (double3 *)tmax, rres,
+			pair_count, pair_id, (double2 *)tsd,
+			sorted_index, cstart,
+			cend, cp, xci, np);
+}
+
+void cu_cluster_plane_contact(
+	device_plane_info* plan,
+	double* pos, double* vel, double* omega,
+	double* force, double* moment, double* mass,
+	double* tmax, double* rres,
+	unsigned int* pair_count, unsigned int *pair_id, double* tsd, 
+	xClusterInformation* xci, unsigned int np, device_contact_property *cp)
+{
+	computeGridSize(np, 256, numBlocks, numThreads);
+	cluster_plane_contact_kernel << < numBlocks, numThreads >> > (
+		plan, (double4 *)pos, (double3 *)vel, (double3 *)omega,
+		(double3 *)force, (double3 *)moment, cp, mass,
+		(double3 *)tmax, rres,
+		pair_count, pair_id, (double2 *)tsd, xci, np);
+}
+
+void vv_update_cluster_position(
+	double *pos, double *cpos, double* ep,
+	double *rloc, double *vel, double *acc,
+	double* omega, double* alpha,
+	xClusterInformation *xci, unsigned int np)
+{
+	computeGridSize(np, 256, numBlocks, numThreads);
+
+	vv_update_position_cluster_kernel << < numBlocks, numThreads >> > (
+		(double4*)pos, 
+		(double4*)cpos,
+		(double4*)ep, 
+		(double3*)rloc,
+		(double3*)vel,
+		(double3*)acc, 
+		(double3*)omega,
+		(double3*)alpha,
+		xci,
+		np);
+}
+
+void vv_update_cluster_velocity(
+	double* cpos, double* ep, double *vel, double *acc, double *omega,
+	double *alpha, double *force, double *moment, double* rloc,
+	double* mass, double* iner, xClusterInformation* xci, unsigned int np)
+{
+	computeGridSize(np, 256, numBlocks, numThreads);
+	vv_update_cluster_velocity_kernel << <numBlocks, numThreads >> > (
+		(double4*)cpos,
+		(double4*)ep,
+		(double3*)vel,
+		(double3*)acc,
+		(double3*)omega,
+		(double3*)alpha,
+		(double3*)force,
+		(double3*)moment,
+		(double3*)rloc,
+		mass,
+		(double3*)iner,
+		xci,
+		np
+		);
+}

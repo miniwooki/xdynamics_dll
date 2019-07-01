@@ -25,6 +25,8 @@ struct device_dem_parameters
 {
 	bool rollingCondition;
 	unsigned int np;
+	unsigned int nCluster;
+	unsigned int nClusterObject;
 	unsigned int nsphere;
 	unsigned int nplane;
 	unsigned int ncell;
@@ -116,6 +118,12 @@ struct device_force_constant_d
 	double mu;
 };
 
+struct device_cluster_information
+{
+	unsigned int neach;
+	unsigned int ncluster;
+};
+
 void XDYNAMICS_API setDEMSymbolicParameter(device_dem_parameters *h_paras);
 
 void XDYNAMICS_API vv_update_position(double *pos, double *vel, double *acc, unsigned int np);
@@ -181,6 +189,30 @@ void XDYNAMICS_API cu_update_meshObjectData(
 	double *vList, double* sph, double* dlocal, device_triangle_info* poly,
 	device_mesh_mass_info* dpmi, double* ep, unsigned int np);
 
+void XDYNAMICS_API cu_clusters_contact(double* pos, double* vel,
+	double* omega, double* force,
+	double* moment, double* mass, double* tmax, double* rres,
+	unsigned int* pair_count, unsigned int *pair_id, double* tsd,
+	unsigned int* sorted_index, unsigned int* cstart,
+	unsigned int* cend, device_contact_property* cp, xClusterInformation* xci, unsigned int np);
+
+void XDYNAMICS_API cu_cluster_plane_contact(
+	device_plane_info* plan,
+	double* pos, double* vel, double* omega,
+	double* force, double* moment, double* mass,
+	double* tmax, double* rres,
+	unsigned int* pair_count, unsigned int *pair_id, double* tsd, xClusterInformation* xci,
+	unsigned int np, device_contact_property *cp);
+
+void XDYNAMICS_API vv_update_cluster_position(
+	double *pos, double *cpos, double* ep, 
+	double *rloc, double *vel, double *acc, 
+	double* omega, double* alpha, xClusterInformation *xci, unsigned int np);
+
+void XDYNAMICS_API vv_update_cluster_velocity(
+	double* cpos, double* ep, double *vel, double *acc, double *omega,
+	double *alpha, double *force, double *moment, double* rloc,
+	double* mass, double* iner, xClusterInformation *xci, unsigned int np);
 #endif
 
 

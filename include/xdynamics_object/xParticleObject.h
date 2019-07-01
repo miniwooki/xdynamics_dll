@@ -22,8 +22,9 @@ public:
 	vector4d* AllocClusterMemory(unsigned int _np);
 
 	void CopyPosition(double* _pos);
-	void CopyClusterPosition(double* _pos, double* _ep, unsigned int* cindex);
+	void CopyClusterPosition(double* _pos, double* _ep);
 	unsigned int StartIndex() const;
+	unsigned int StartClusterIndex() const;
 	unsigned int NumParticle() const;
 	unsigned int NumCluster() const;
 	unsigned int EachCount() const;

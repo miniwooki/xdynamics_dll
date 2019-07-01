@@ -26,6 +26,7 @@ public:
 
 	unsigned int setupParticlesMeshObjectsContact();
 	void setupParticlesPlanesContact();
+	void setNumClusterObject(unsigned int nc);
 	//double* SphereData();
 	//double* HostSphereData();
 	//float* SphereData_f();
@@ -44,7 +45,8 @@ public:
 		unsigned int *sorted_id,
 		unsigned int *cell_start,
 		unsigned int *cell_end,
-		unsigned int *cluster_index,
+		//unsigned int *cluster_index,
+		xClusterInformation* xci,
 		unsigned int np);
 
 	void update();
@@ -56,7 +58,7 @@ private:
 		unsigned int* sorted_id,
 		unsigned int* cell_start,
 		unsigned int* cell_end,
-		unsigned int* cluster_index,
+		xClusterInformation* xci,
 		unsigned int np);
 
 	void deviceCollision(
@@ -66,6 +68,7 @@ private:
 		unsigned int *sorted_id,
 		unsigned int *cell_start,
 		unsigned int *cell_end,
+		xClusterInformation* xci,
 		unsigned int np);
 
 	void hostCollision(
@@ -75,7 +78,7 @@ private:
 		unsigned int *sorted_id,
 		unsigned int *cell_start,
 		unsigned int *cell_end,
-		unsigned int *cluster_index,
+		xClusterInformation* xci,
 		unsigned int np);
 
 	unsigned int deviceContactCount(
@@ -88,6 +91,7 @@ private:
 		unsigned int np);
 
 	unsigned int ncontact;
+	unsigned int ncobject;
 	//int *d_type_count;
 	//unsigned int *d_old_pair_count;
 	unsigned int *d_pair_count_pp;
@@ -96,6 +100,7 @@ private:
 	unsigned int *d_pair_id_pp;
 	unsigned int *d_pair_id_ppl;
 	unsigned int *d_pair_id_ptri;
+
 	double *d_tsd_pp;
 	double *d_tsd_ppl;
 	double *d_tsd_ptri;

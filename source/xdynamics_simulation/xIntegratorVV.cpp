@@ -27,15 +27,15 @@ int xIntegratorVV::OneStepSimulation(double ct, unsigned int cstep)
 {
 	m_np = xdem->XParticleManager()->ExcuteCreatingCondition(ct, cstep, m_np);
 	this->updatePosition(dpos, dcpos, dvel, dacc, dep, davel, daacc, m_np);
-	dtor->detection(dpos, (nPolySphere ? xcm->ContactParticlesMeshObjects()->SphereData() : NULL), nClusterSphere ? ns : m_np, nPolySphere);
+	dtor->detection(dpos, (nPolySphere ? xcm->ContactParticlesMeshObjects()->SphereData() : NULL), nco ? np : m_np, nPolySphere);
 //	std::cout << "after detection " << std::endl;
 	if (xcm)
 	{
 		xcm->runCollision(
 			dpos, dvel, davel,
 			dmass, diner, dforce, dmoment,
-			dtor->sortedID(), dtor->cellStart(), dtor->cellEnd(),
-			cindex, nClusterSphere ? ns : m_np);
+			dtor->sortedID(), dtor->cellStart(), dtor->cellEnd(), dxci,
+			nco ? np : m_np);
 	}
 	this->updateVelocity(dvel, dacc, dep, davel, daacc, dforce, dmoment, dmass, diner, m_np);
 	return 0;
@@ -46,12 +46,15 @@ void xIntegratorVV::updatePosition(
 	double* ep, double* ev, double* ea, unsigned int np)
 {
 	if (xSimulation::Gpu())
-		vv_update_position(dpos, dvel, dacc,/* ep, ev, ea,*/ np);
+	{
+		if (xDiscreteElementMethodSimulation::np != ns)
+			vv_update_cluster_position(dpos, dcpos, ep, drcloc, dvel, dacc, ev, ea, dxci, ns);
+		else
+			vv_update_position(dpos, dvel, dacc,/* ep, ev, ea,*/ np);
+	}
 	else if (xDiscreteElementMethodSimulation::np != ns)
 	{
-		updateClusterPosition(dpos, dcpos, dvel, dacc, ep, ev, ea,
-			xdem->XParticleManager()->ClusterIndex(), xdem->XParticleManager()->ClusterCount(),
-			xdem->XParticleManager()->ClusterBegin(), xdem->XParticleManager()->ClusterRelativeLocation(), np);
+		updateClusterPosition(dpos, dcpos, dvel, dacc, ep, ev, ea, ns);
 	}
 	else
 	{
@@ -73,12 +76,16 @@ void xIntegratorVV::updateVelocity(
 	double *dmass, double* dinertia, unsigned int np)
 {
 	if (xSimulation::Gpu())
-		vv_update_velocity(dvel, dacc,/* ep,*/ domega, dalpha, dforce, dmoment, dmass, dinertia, np);
+	{
+		if(xDiscreteElementMethodSimulation::np != ns)
+			vv_update_cluster_velocity(dcpos, ep, dvel, dacc,/* ep,*/ domega, dalpha, dforce, dmoment, drcloc, dmass, dinertia, dxci, np);
+		else
+			vv_update_velocity(dvel, dacc,/* ep,*/ domega, dalpha, dforce, dmoment, dmass, dinertia, np);
+	}
+		
 	else if (xDiscreteElementMethodSimulation::np != ns)
 	{
-		updateClusterVelocity(dpos, dcpos, dvel, dacc, dep, domega, dalpha, dforce, dmoment, dmass, dinertia,
-			xdem->XParticleManager()->ClusterIndex(), xdem->XParticleManager()->ClusterCount(),
-			xdem->XParticleManager()->ClusterBegin(), xdem->XParticleManager()->ClusterRelativeLocation(), np);
+		updateClusterVelocity(dpos, dcpos, dvel, dacc, dep, domega, dalpha, dforce, dmoment, dmass, dinertia, np);
 	}
 	else
 	{
@@ -109,8 +116,7 @@ void xIntegratorVV::updateVelocity(
 
 void xIntegratorVV::updateClusterPosition(
 	double *dpos, double* dcpos, double * dvel, double * dacc, 
-	double *ep, double * domega, double * dalpha,
-	unsigned int* cidx, unsigned int* ccnt, unsigned int* cbegin, vector3d* cdata, unsigned int np)
+	double *ep, double * domega, double * dalpha, unsigned int np)
 {
 	vector4d* p = (vector4d*)dcpos;
 	vector3d* v = (vector3d*)dvel;
@@ -118,10 +124,25 @@ void xIntegratorVV::updateClusterPosition(
 	vector3d* w = (vector3d*)domega;
 	vector3d* wd = (vector3d*)dalpha;
 	vector4d* q = (vector4d*)ep;
-	vector3d* rloc = cdata;
+	vector3d* rloc = (vector3d*)drcloc;
 	vector4d* rp = (vector4d*)dpos;
 	double sqt_dt = 0.5 * xSimulation::dt * xSimulation::dt;
 	for (unsigned int i = 0; i < np; i++) {
+		unsigned int neach = 0;
+		unsigned int seach = 0;
+		unsigned int sbegin = 0;
+		for (unsigned int j = 0; j < nco; j++)
+		{
+			xClusterInformation xc = xci[j];
+			if (i >= xc.sid && i < xc.sid + xc.count * xc.neach)
+			{
+				neach = xc.neach;
+				break;
+			}
+			seach += xc.neach;
+			sbegin += xc.count * xc.neach;
+		}
+
 		vector3d old_p = new_vector3d(p[i].x, p[i].y, p[i].z);
 		vector3d new_p = old_p + xSimulation::dt * v[i] + sqt_dt * a[i];
 		p[i] = new_vector4d(new_p.x, new_p.y, new_p.z, p[i].w);
@@ -130,14 +151,15 @@ void xIntegratorVV::updateClusterPosition(
 		vector4d ea = 0.5 * L * wd[i] - 0.25*dot(w[i], w[i]) * q[i];
 		q[i] = q[i] + xSimulation::dt * ev + sqt_dt * ea;
 		q[i] = normalize(q[i]);
-		unsigned int id = cidx[i];
-		unsigned int begin = cbegin[id * 2 + 0];
-		unsigned int loc = cbegin[id * 2 + 1];
-		unsigned int sid = begin + (i - begin) * ccnt[id];
-		for (unsigned int j = 0; j < ccnt[cidx[i]]; j++)
+		double norm = length(q[i]);
+		//unsigned int id = cidx[i];
+		//unsigned int begin = cbegin[id * 2 + 0];
+		//unsigned int loc = cbegin[id * 2 + 1];
+		unsigned int sid = sbegin + i * neach;// begin + (i - begin) * ccnt[id];
+		for (unsigned int j = 0; j < neach; j++)
 		{
 			vector3d cp = new_vector3d(p[i].x, p[i].y, p[i].z);
-			vector3d m_pos = cp + ToGlobal(new_euler_parameters(q[i]), rloc[loc + j]);
+			vector3d m_pos = cp + ToGlobal(new_euler_parameters(q[i]), rloc[seach + j]);
 			rp[sid + j] = new_vector4d(m_pos.x, m_pos.y, m_pos.z, rp[sid + j].w);
 		}
 	}
@@ -155,11 +177,7 @@ void xIntegratorVV::updateClusterVelocity(
 	double * dmoment, 
 	double * dmass, 
 	double * dinertia,
-	unsigned int* cidx, 
-	unsigned int* ccnt, 
-	unsigned int* cbegin,
-	vector3d* cdata,
-	unsigned int np)
+	unsigned int dnp)
 {
 	double inv_m = 0;
 	double inv_i = 0;
@@ -173,21 +191,36 @@ void xIntegratorVV::updateClusterVelocity(
 	vector3d* m = (vector3d*)dmoment;
 	vector4d* q = (vector4d*)ep;
 	vector3d* J = (vector3d*)dinertia;
-	vector3d* rloc = (vector3d*)cdata;
-	vector2ui* cid = (vector2ui*)cidx;
-	for (unsigned int i = 0; i < np; i++) {
-		unsigned int id = cid[i].x;// cidx[i];
-		unsigned int begin = cbegin[id * 2 + 0];
-		unsigned int loc = cbegin[id * 2 + 1];
-		unsigned int sid = begin + (i - begin) * ccnt[id];
+	vector3d* rloc = (vector3d*)drcloc;
+	//vector2ui* cid = (vector2ui*)cidx;
+	for (unsigned int i = 0; i < dnp; i++) {
+		unsigned int neach = 0;
+		unsigned int seach = 0;
+		unsigned int sbegin = 0;
+		for (unsigned int j = 0; j < nco; j++)
+		{
+			xClusterInformation xc = xci[j];
+			if (i >= xc.sid && i < xc.sid + xc.count * xc.neach)
+			{
+				neach = xc.neach;
+				break;
+			}
+			seach += xc.neach;
+			sbegin += xc.count * xc.neach;
+		}
+		unsigned int sid = sbegin + i * neach;
+		//unsigned int id = cid[i].x;// cidx[i];
+		//unsigned int begin = cbegin[id * 2 + 0];
+		//unsigned int loc = cbegin[id * 2 + 1];
+		//unsigned int sid = begin + (i - begin) * ccnt[id];
 		vector3d F = new_vector3d(0.0, 0.0, 0.0);
 		vector3d T = new_vector3d(0.0, 0.0, 0.0);
 		vector3d LT = new_vector3d(0.0, 0.0, 0.0);
 		euler_parameters e = new_euler_parameters(q[i]);
-		for (unsigned int j = 0; j < ccnt[id]; j++)
+		for (unsigned int j = 0; j < neach; j++)
 		{
 			vector3d cpos = new_vector3d(cp[i].x, cp[i].y, cp[i].z);
-			vector3d gp = cpos + ToGlobal(e, rloc[loc + j]);
+			vector3d gp = cpos + ToGlobal(e, rloc[seach + j]);
 			vector3d dr = gp - cpos;
 			F += f[sid + j];
 			//vector3d T_f = cross(dr, f[sid + j]);
@@ -200,8 +233,8 @@ void xIntegratorVV::updateClusterVelocity(
 		F += dmass[i] * xModel::gravity;
 		vector3d n_prime = ToLocal(e, T + LT);
 		vector3d w_prime = ToLocal(e, o[i]);
-		vector3d rhs = n_prime - Tilde(o[i]) * new_vector3d(J[id].x * w_prime.x, J[id].y * w_prime.y, J[id].z * w_prime.z);
-		vector3d wd_prime = new_vector3d(rhs.x / J[id].x, rhs.x / J[id].y, rhs.z / J[id].z);
+		vector3d rhs = n_prime - Tilde(o[i]) * new_vector3d(J[i].x * w_prime.x, J[i].y * w_prime.y, J[i].z * w_prime.z);
+		vector3d wd_prime = new_vector3d(rhs.x / J[i].x, rhs.y / J[i].y, rhs.z / J[i].z);
 		inv_m = 1.0 / dmass[i];
 		v[i] += 0.5 * xSimulation::dt * a[i];
 		o[i] += 0.5 * xSimulation::dt * aa[i];

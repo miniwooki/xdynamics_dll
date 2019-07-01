@@ -32,13 +32,13 @@ protected:
 	bool isSaveMemory;
 	unsigned int np;
 	unsigned int ns;
+	unsigned int nco;
 	unsigned int nPolySphere;
-	unsigned int nClusterSphere;
-	unsigned int nSingleSphere;
+
 	xDiscreteElementMethodModel* xdem;
 	xGridCell* dtor;
 	xContactManager* xcm;
-	unsigned int *cindex;
+	//unsigned int *cindex;
 	double *mass;
 	double *inertia;
 	double *pos;
@@ -50,6 +50,7 @@ protected:
 	double *aacc;
 	double *force;
 	double *moment;
+	double *rcloc;
 
 	double *dmass;
 	double *diner;
@@ -62,8 +63,10 @@ protected:
 	double *daacc;
 	double *dforce;
 	double *dmoment;
+	double *drcloc;
 
-
+	xClusterInformation *xci;
+	xClusterInformation *dxci;
 
 	QList<QString> partList;
 };

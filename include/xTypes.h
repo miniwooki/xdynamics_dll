@@ -202,6 +202,7 @@ typedef struct{ double s0, s1, s2, s3, s4, s5; }double6;
 typedef struct{	bool enable; double alpha, start_point, length; }xWaveDampingData;
 typedef struct{ double diameter, sx, sy, sz, dx, dy, dz, minr, maxr; }xCircleParticleData;
 typedef struct{ unsigned int sid, count, neach, nstep; }xParticleCreateCondition;
+typedef struct { unsigned int sid, count, neach; }xClusterInformation;
 /*typedef struct{ double tstart, dpdt }xObjectMovingCondition;*/
 
 typedef struct 
@@ -222,6 +223,7 @@ typedef struct
 typedef struct
 { 
 	xShapeType type;  
+	bool isc;
 	unsigned int count;
 	unsigned int id; 
 	double delta_s;

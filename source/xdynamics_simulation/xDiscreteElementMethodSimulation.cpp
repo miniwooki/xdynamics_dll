@@ -10,6 +10,8 @@ xDiscreteElementMethodSimulation::xDiscreteElementMethodSimulation()
 	, xdem(NULL)
 	, dtor(NULL)
 	, xcm(NULL)
+	, xci(NULL)
+	, nco(0)
 	, isSaveMemory(false)
 {
 
@@ -25,10 +27,13 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 	xdem = _xdem;
 	double maxRadius = 0;
 	xParticleManager* xpm = xdem->XParticleManager();
-	np = xpm->NumParticleWithCluster();
-	ns = xpm->NumParticle();
-	nSingleSphere = xpm->nSingleSphere();
-	nClusterSphere = ns - xpm->nSingleSphere();
+	//np = xpm->NumParticleWithCluster();
+	np = xpm->NumParticle();
+	ns = xpm->NumCluster();
+	nco = xpm->nClusterObject();
+	if (ns == 0) ns = np;
+	//nSingleSphere = xpm->nSingleSphere();
+	//nClusterSphere = ns - xpm->nSingleSphere();
 	xcm = _xcm;
 // 	if (xpm->RealTimeCreating()/* && !xpm->ChangedParticleModel()*/)
 // 	{
@@ -47,30 +52,31 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 	{
 		nPolySphere = xcm->setupParticlesMeshObjectsContact();
 		xcm->setupParticlesPlanesContact();
-		xcm->allocPairList(ns);
+		xcm->allocPairList(np);
 		if (nPolySphere)
 			maxRadius = xcm->ContactParticlesMeshObjects()->MaxRadiusOfPolySphere();
-		if (xdem->XParticleManager()->NumClusterSet())
-			xdem->XParticleManager()->SetClusterInformation();
+		xcm->setNumClusterObject(nco);
+	/*	if (xdem->XParticleManager()->NumClusterSet())
+			xdem->XParticleManager()->SetClusterInformation();*/
 	}
 
-	allocationMemory(np, ns);
+	allocationMemory(ns, np);
 
-	memset(pos, 0, sizeof(double) * ns * 4);
+	memset(pos, 0, sizeof(double) * np * 4);
 	if (cpos)
 	{
-		memset(cpos, 0, sizeof(double) * np * 4);
-		memset(cindex, 0, sizeof(unsigned int) * ns);
+		memset(cpos, 0, sizeof(double) * ns * 4);
+		//memset(cindex, 0, sizeof(unsigned int) * n);
 	}
 		
-	memset(ep, 0, sizeof(double) * np * 4);
-	memset(vel, 0, sizeof(double) * np * 3);
-	memset(acc, 0, sizeof(double) * np * 3);
-	memset(avel, 0, sizeof(double) * np * 3);
-	memset(aacc, 0, sizeof(double) * np * 3);
-	memset(force, 0, sizeof(double) * ns * 3);
-	memset(moment, 0, sizeof(double) * ns * 3);
-	for (unsigned int i = 0; i < np; i++)
+	memset(ep, 0, sizeof(double) * ns * 4);
+	memset(vel, 0, sizeof(double) * ns * 3);
+	memset(acc, 0, sizeof(double) * ns * 3);
+	memset(avel, 0, sizeof(double) * ns * 3);
+	memset(aacc, 0, sizeof(double) * ns * 3);
+	memset(force, 0, sizeof(double) * np * 3);
+	memset(moment, 0, sizeof(double) * np * 3);
+	for (unsigned int i = 0; i < ns; i++)
 	{
 		//vel[0] = -0.1;
 		acc[i * 3 + 0] = 0.0;// mass[i] * xModel::gravity.x;
@@ -78,9 +84,10 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 		acc[i * 3 + 2] = 0.0;// mass[i] * xModel::gravity.z;
 		ep[i * 4 + 0] = 1.0;
 	}
-	xpm->CopyPosition(pos, cpos, ep, cindex, ns);
+	xpm->CopyPosition(pos, cpos, ep, np);
+	if(xci) xpm->CopyClusterInformation(xci, rcloc);
 	xpm->SetMassAndInertia(mass, inertia);
-	for (unsigned int i = 0; i < ns; i++)
+	for (unsigned int i = 0; i < np; i++)
 	{
 		double r = pos[i * 4 + 3];
 		//vector3d cm = 
@@ -99,7 +106,7 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 		dtor->setWorldOrigin(new_vector3d(-1.0, -1.0, -1.0));
 		dtor->setGridSize(new_vector3ui(128, 128, 128));
 		dtor->setCellSize(maxRadius * 2.0);
-		dtor->initialize(ns + nPolySphere);
+		dtor->initialize(np + nPolySphere);
 	}
 	// 	switch (md->IntegrationType())
 	// 	{
@@ -109,19 +116,28 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 	if (xSimulation::Gpu())
 	{
 		checkCudaErrors(cudaMemcpy(dpos, pos, sizeof(double) * np * 4, cudaMemcpyHostToDevice));
-		//checkCudaErrors(cudaMemcpy(dep, ep, sizeof(double) * np * 4, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(dvel, vel, sizeof(double) * np * 3, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(dacc, acc, sizeof(double) * np * 3, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(davel, avel, sizeof(double) * np * 3, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(daacc, aacc, sizeof(double) * np * 3, cudaMemcpyHostToDevice));
+
+		checkCudaErrors(cudaMemcpy(dep, ep, sizeof(double) * ns * 4, cudaMemcpyHostToDevice));
+		checkCudaErrors(cudaMemcpy(dvel, vel, sizeof(double) * ns * 3, cudaMemcpyHostToDevice));
+		checkCudaErrors(cudaMemcpy(dacc, acc, sizeof(double) * ns * 3, cudaMemcpyHostToDevice));
+		checkCudaErrors(cudaMemcpy(davel, avel, sizeof(double) * ns * 3, cudaMemcpyHostToDevice));
+		checkCudaErrors(cudaMemcpy(daacc, aacc, sizeof(double) * ns * 3, cudaMemcpyHostToDevice));
 		checkCudaErrors(cudaMemcpy(dforce, force, sizeof(double) * np * 3, cudaMemcpyHostToDevice));
 		checkCudaErrors(cudaMemcpy(dmoment, moment, sizeof(double) * np * 3, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(dmass, mass, sizeof(double) * np, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(diner, inertia, sizeof(double) * np, cudaMemcpyHostToDevice));
-		
+		checkCudaErrors(cudaMemcpy(dmass, mass, sizeof(double) * ns, cudaMemcpyHostToDevice));
+		if(ns < np)
+			checkCudaErrors(cudaMemcpy(diner, inertia, sizeof(double) * ns * 3, cudaMemcpyHostToDevice));
+		else
+			checkCudaErrors(cudaMemcpy(diner, inertia, sizeof(double) * np, cudaMemcpyHostToDevice));
+		if (xci)
+		{
+			checkCudaErrors(cudaMemcpy(dcpos, cpos, sizeof(double) * ns * 4, cudaMemcpyHostToDevice));
+			checkCudaErrors(cudaMemcpy(dxci, xci, sizeof(xClusterInformation) * xpm->nClusterObject(), cudaMemcpyHostToDevice));
+			checkCudaErrors(cudaMemcpy(drcloc, rcloc, sizeof(double) * xpm->nClusterEach() * 3, cudaMemcpyHostToDevice));
+		}
+			
 		if (xcm)
 		{
-			
 			if (xcm->ContactParticles())
 				xcm->ContactParticles()->cudaMemoryAlloc(np);
 			if (xcm->ContactParticlesMeshObjects())
@@ -131,6 +147,8 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 		}
 		device_dem_parameters dp;
 		dp.np = np;
+		dp.nCluster = ns < np ? ns : 0;
+		dp.nClusterObject = xpm->nClusterObject();
 		dp.rollingCondition = false;// xmd->RollingCondition();
 		dp.nsphere = 0;
 		if (xcm->ContactParticlesPlanes())
@@ -167,9 +185,11 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 		dmoment = moment;
 		dmass = mass;
 		diner = inertia;
+		dxci = xci;
+		drcloc = rcloc;
 	}
 	if (isSaveMemory)
-		xdem->XParticleManager()->AllocParticleResultMemory(xSimulation::npart, ns);
+		xdem->XParticleManager()->AllocParticleResultMemory(xSimulation::npart, np);
 	//dynamic_cast<neighborhood_cell*>(dtor)->reorderElements(pos, (double*)cm->HostSphereData(), np, nPolySphere);
 	return xDynamicsError::xdynamicsSuccess;
 }
@@ -189,21 +209,21 @@ QString xDiscreteElementMethodSimulation::SaveStepResult(unsigned int pt, double
 		rv = xdem->XParticleManager()->GetVelocityResultPointer(pt);
 		if (xSimulation::Gpu())
 		{
-			checkCudaErrors(cudaMemcpy(rp, dpos, sizeof(double) * ns * 4, cudaMemcpyDeviceToHost));
-			checkCudaErrors(cudaMemcpy(rv, dvel, sizeof(double) * np * 3, cudaMemcpyDeviceToHost));
+			checkCudaErrors(cudaMemcpy(rp, dpos, sizeof(double) * np * 4, cudaMemcpyDeviceToHost));
+			checkCudaErrors(cudaMemcpy(rv, dvel, sizeof(double) * ns * 3, cudaMemcpyDeviceToHost));
 		}
 		else
 		{
-			memcpy(rp, dpos, sizeof(double) * ns * 4);
-			memcpy(rv, dvel, sizeof(double) * np * 3);
+			memcpy(rp, dpos, sizeof(double) * np * 4);
+			memcpy(rv, dvel, sizeof(double) * ns * 3);
 		}
 	}
 	if (xSimulation::Gpu())
 	{
-		checkCudaErrors(cudaMemcpy(pos, dpos, sizeof(double) * ns * 4, cudaMemcpyDeviceToHost));
-		checkCudaErrors(cudaMemcpy(vel, dvel, sizeof(double) * np * 3, cudaMemcpyDeviceToHost));
+		checkCudaErrors(cudaMemcpy(pos, dpos, sizeof(double) * np * 4, cudaMemcpyDeviceToHost));
+		checkCudaErrors(cudaMemcpy(vel, dvel, sizeof(double) * ns * 3, cudaMemcpyDeviceToHost));
 		//checkCudaErrors(cudaMemcpy(ep, dep, sizeof(double) * np * 4, cudaMemcpyDeviceToHost));
-		checkCudaErrors(cudaMemcpy(avel, davel, sizeof(double) * np * 3, cudaMemcpyDeviceToHost));
+		checkCudaErrors(cudaMemcpy(avel, davel, sizeof(double) * ns * 3, cudaMemcpyDeviceToHost));
 	}
 	//char pname[256] = { 0, };
  	QString fname = xModel::path + xModel::name;
@@ -215,8 +235,8 @@ QString xDiscreteElementMethodSimulation::SaveStepResult(unsigned int pt, double
 	if (qf.is_open())
 	{
 		qf.write((char*)&ct, sizeof(double));
-		qf.write((char*)&ns, sizeof(unsigned int));
-		qf.write((char*)pos, sizeof(double) * ns * 4);
+		qf.write((char*)&np, sizeof(unsigned int));
+		qf.write((char*)pos, sizeof(double) * np * 4);
 		qf.write((char*)vel, sizeof(double) * ns * 3);
 		//qf.write((char*)ep, sizeof(double) * np * 4);
 		qf.write((char*)avel, sizeof(double) * ns * 3);
@@ -290,7 +310,7 @@ void xDiscreteElementMethodSimulation::clearMemory()
 	if (inertia) delete[] inertia; inertia = NULL;
 	if (pos) delete[] pos; pos = NULL;
 	if (cpos) delete[] cpos; cpos = NULL;
-	if (cindex) delete[] cindex; cindex = NULL;
+	//if (cindex) delete[] cindex; cindex = NULL;
 	if (ep) delete[] ep; ep = NULL;
 	//if (rot) delete[] rot; rot = NULL;
 	if (vel) delete[] vel; vel = NULL;
@@ -299,12 +319,15 @@ void xDiscreteElementMethodSimulation::clearMemory()
 	if (aacc) delete[] aacc; aacc = NULL;
 	if (force) delete[] force; force = NULL;
 	if (moment) delete[] moment; moment = NULL;
+	if (xci) delete[] xci; xci = NULL;
+	if (rcloc) delete[] rcloc; rcloc = NULL;
 
 	if (xSimulation::Gpu())
 	{
 		if (dmass) checkCudaErrors(cudaFree(dmass)); dmass = NULL;
 		if (diner) checkCudaErrors(cudaFree(diner)); diner = NULL;
 		if (dpos) checkCudaErrors(cudaFree(dpos)); dpos = NULL;
+		if (dcpos) checkCudaErrors(cudaFree(dcpos)); dcpos = NULL;
 		if (dep) checkCudaErrors(cudaFree(dep)); dep = NULL;
 		//if (drot) checkCudaErrors(cudaFree(drot)); drot = NULL;
 		if (dvel) checkCudaErrors(cudaFree(dvel)); dvel = NULL;
@@ -313,6 +336,8 @@ void xDiscreteElementMethodSimulation::clearMemory()
 		if (daacc) checkCudaErrors(cudaFree(daacc)); daacc = NULL;
 		if (dforce) checkCudaErrors(cudaFree(dforce)); dforce = NULL;
 		if (dmoment) checkCudaErrors(cudaFree(dmoment)); dmoment = NULL;
+		if (dxci) checkCudaErrors(cudaFree(dxci)); dxci = NULL;
+		if (drcloc) checkCudaErrors(cudaFree(drcloc)); drcloc = NULL;
 	}
 }
 
@@ -325,7 +350,9 @@ void xDiscreteElementMethodSimulation::allocationMemory(unsigned int np, unsigne
 	{
 		cpos = new double[np * 4];
 		inertia = new double[np * 3];
-		cindex = new unsigned int[rnp];
+		xci = new xClusterInformation[xdem->XParticleManager()->nClusterObject()];
+		rcloc = new double[xdem->XParticleManager()->nClusterEach() * 3];
+	//	cindex = new unsigned int[rnp];
 	}
 	else
 	{
@@ -340,10 +367,14 @@ void xDiscreteElementMethodSimulation::allocationMemory(unsigned int np, unsigne
 	force = new double[rnp * 3];
 	moment = new double[rnp * 3];
 
+
 	if (xSimulation::Gpu())
 	{
 		checkCudaErrors(cudaMalloc((void**)&dmass, sizeof(double) * np));
-		checkCudaErrors(cudaMalloc((void**)&diner, sizeof(double) * np));
+		if(np < rnp)
+			checkCudaErrors(cudaMalloc((void**)&diner, sizeof(double) * np * 3));
+		else
+			checkCudaErrors(cudaMalloc((void**)&diner, sizeof(double) * np));
 		checkCudaErrors(cudaMalloc((void**)&dpos, sizeof(double) * rnp * 4));
 		checkCudaErrors(cudaMalloc((void**)&dep, sizeof(double) * np * 4));
 		checkCudaErrors(cudaMalloc((void**)&dvel, sizeof(double) * np * 3));
@@ -352,5 +383,12 @@ void xDiscreteElementMethodSimulation::allocationMemory(unsigned int np, unsigne
 		checkCudaErrors(cudaMalloc((void**)&daacc, sizeof(double) * np * 3));
 		checkCudaErrors(cudaMalloc((void**)&dforce, sizeof(double) * rnp * 3));
 		checkCudaErrors(cudaMalloc((void**)&dmoment, sizeof(double) * rnp * 3));
+		if (xdem->XParticleManager()->nClusterObject())
+		{
+			checkCudaErrors(cudaMalloc((void**)&dcpos, sizeof(double) * np * 4));
+			checkCudaErrors(cudaMalloc((void**)&dxci, sizeof(xClusterInformation) * xdem->XParticleManager()->nClusterObject()));
+			checkCudaErrors(cudaMalloc((void**)&drcloc, sizeof(double) * xdem->XParticleManager()->nClusterEach() * 3));
+		}
+			
 	}
 }

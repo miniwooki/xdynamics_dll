@@ -16,8 +16,10 @@ public:
 		vector4d *pos, vector3d *vel,
 		vector3d *omega, double *mass, 
 		double &res, vector3d &tmax,
-		vector3d& F, vector3d& M);
-	void updateCollisionPair(unsigned int id, xContactPairList& xcpl, double ri, double rj, vector3d& posi, vector3d& posj);
+		vector3d& F, vector3d& M, xClusterInformation* xci, unsigned int nco);
+	void updateCollisionPair(
+		unsigned int id, bool isc, xContactPairList& xcpl,
+		double ri, double rj, vector3d& posi, vector3d& posj);
 	virtual void cuda_collision(
 		double *pos, double *vel,
 		double *omega, double *mass,
