@@ -39,7 +39,7 @@ public:
 	xParticlePlanesContact* ContactParticlesPlanes();
 
 	bool runCollision(
-		double *pos, double* ep, double *vel,
+		double *pos, double* cpos, double* ep, double *vel,
 		double *ev, double *mass, double* inertia,
 		double *force, double *moment,
 		unsigned int *sorted_id,
@@ -72,7 +72,7 @@ private:
 		unsigned int np);
 
 	void hostCollision(
-		vector4d *pos, vector3d *vel, euler_parameters* ep,
+		vector4d *pos, vector4d* cpos, vector3d *vel, euler_parameters* ep,
 		euler_parameters *ev, double *mass, double *inertia,
 		vector3d *force, vector3d *moment,
 		unsigned int *sorted_id,

@@ -36,9 +36,10 @@ public:
 	void define(unsigned int i, xParticleCubeContact* d);
 	void allocHostMemory(unsigned int n);
 	bool cpplCollision(
-		xContactPairList* pairs, double r, double m,
+		xContactPairList* pairs, unsigned int i, double r, double m,
 		vector3d& p, vector3d& v, vector3d& o, 
-		double &R, vector3d& T, vector3d& F, vector3d& M);
+		double &R, vector3d& T, vector3d& F, vector3d& M,
+		unsigned int nco, xClusterInformation* xci, vector4d* cpos);
 	unsigned int NumContact();// { return ncontact; }
 //	void setNumContact(unsigned int c) { ncontact = c; }
 	//void updateMeshObjectData(xVectorD& q, xVectorD& qd);

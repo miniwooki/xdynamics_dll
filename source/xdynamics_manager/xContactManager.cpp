@@ -173,7 +173,7 @@ xParticlePlanesContact* xContactManager::ContactParticlesPlanes()
 }
 
 bool xContactManager::runCollision(
-	double *pos, double* ep, double *vel, double *ev,
+	double *pos, double* cpos, double* ep, double *vel, double *ev,
 	double *mass, double* inertia, double *force, double *moment,
 	unsigned int *sorted_id, unsigned int *cell_start,
 	unsigned int *cell_end,
@@ -185,6 +185,7 @@ bool xContactManager::runCollision(
 		hostCollision
 		(
 			(vector4d*)pos,
+			(vector4d*)cpos,
 			(vector3d*)vel,
 			(euler_parameters*)ep,
 			(euler_parameters*)ev,
@@ -277,7 +278,7 @@ void xContactManager::updateCollisionPair(
 	for (unsigned int i = 0; i < np; i++)
 	{
 		unsigned int count = 0;
-		unsigned int neach = 0;
+		unsigned int neach = 1;
 		if (ncobject)
 			for (unsigned int j = 0; j < ncobject; j++)
 				if (i >= xci[j].sid && i < xci[j].sid + xci[j].count * xci[j].neach)
@@ -306,7 +307,8 @@ void xContactManager::updateCollisionPair(
 								//unsigned int ck = k / neach;
 								vector3d jp = new_vector3d(pos[k].x, pos[k].y, pos[k].z);
 								double jr = pos[k].w;
-								cpp->updateCollisionPair(k, neach ? 1 : 0, xcpl[i], r, jr, p, jp);
+								unsigned int ck = k / neach;
+								cpp->updateCollisionPair(k, ncobject ? 1 : 0, xcpl[i], r, jr, p, jp);
 							}
 							else if (k >= np)
 							{
@@ -380,6 +382,7 @@ void xContactManager::deviceCollision(
 
 void xContactManager::hostCollision(
 	vector4d *pos, 
+	vector4d *cpos,
 	vector3d *vel, 
 	euler_parameters *ep,
 	euler_parameters *ev,
@@ -421,10 +424,8 @@ void xContactManager::hostCollision(
 		double m = mass[ci];
 		double j = inertia[ci];
 		double r = pos[i].w;
-		if (i > 2 && pairs->PlanePair().size())
-			R = 0;
-		cpplane->cpplCollision(pairs, r, m, p, v, o, R, T, F, M);
-		cpp->cppCollision(pairs, i, pos, vel, ep, ev, mass, R, T, F, M, xci, ncobject);
+		cpplane->cpplCollision(pairs, i, r, m, p, v, o, R, T, F, M, ncobject, xci, cpos);
+		cpp->cppCollision(pairs, i, pos, cpos, vel, ep, ev, mass, R, T, F, M, xci, ncobject);
 		cpmeshes->cppolyCollision(pairs, r, m, p, v, o, R, T, F, M);
 		force[i] += F;
 		moment[i] += M;

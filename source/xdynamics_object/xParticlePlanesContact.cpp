@@ -190,19 +190,35 @@ double xParticlePlanesContact::particle_plane_contact_detection(host_plane_info*
 
 
 bool xParticlePlanesContact::cpplCollision(
-	xContactPairList* pairs, double r, double m, 
+	xContactPairList* pairs, unsigned int i, double r, double m, 
 	vector3d& p, vector3d& v, vector3d& o,
-	double &res, vector3d& tmax, vector3d& F, vector3d& M)
+	double &res, vector3d& tmax, vector3d& F, vector3d& M, 
+	unsigned int nco, xClusterInformation* xci, vector4d* cpos)
 {
+	unsigned int ci = 0;
+	unsigned int neach = 1;
+	vector3d cp = p;
+	if (nco && cpos)
+	{
+		for (unsigned int j = 0; j < nco; j++)
+			if (i >= xci[j].sid && i < xci[j].sid + xci[j].count * xci[j].neach)
+				neach = xci[j].neach;
+		//ck = j / neach;
+		ci = i / neach;
+		cp = new_vector3d(cpos[ci].x, cpos[ci].y, cpos[ci].z);
+	}
 	foreach(xPairData* d, pairs->PlanePair())
 	{
+		
 		vector3d m_fn = new_vector3d(0.0, 0.0, 0.0);
 		vector3d m_m = new_vector3d(0.0, 0.0, 0.0);
 		vector3d m_ft = new_vector3d(0.0, 0.0, 0.0);
 		double rcon = r - 0.5 * d->gab;
 		vector3d u = new_vector3d(d->nx, d->ny, d->nz);
-		vector3d cp = r * u;
-		vector3d dv = -v - cross(o, cp);
+		vector3d cpt = new_vector3d(d->cpx, d->cpy, d->cpz);
+		vector3d dcpr = cpt - cp;
+		//vector3d cp = r * u;
+		vector3d dv = -v - cross(o, dcpr);
 		//unsigned int jjjj = d->id;
 		xContactMaterialParameters cmp = hcmp[d->id];
 		xContactParameters c = getContactParameters(
@@ -217,9 +233,9 @@ bool xParticlePlanesContact::cpplCollision(
 		{
 		case DHS: DHSModel(c, d->gab, d->delta_s, d->dot_s, dv, u, m_fn, m_ft); break;
 		}
-		RollingResistanceForce(c.rfric, r, 0.0, cp, m_fn, m_ft, res, tmax);
+		RollingResistanceForce(c.rfric, r, 0.0, dcpr, m_fn, m_ft, res, tmax);
 		F += m_fn + m_ft;
-		M += cross(cp, m_fn + m_ft);
+		M += cross(dcpr, m_fn + m_ft);
 	}
 	return true;
 }
@@ -238,19 +254,23 @@ void xParticlePlanesContact::updateCollisionPair(
 		vector3d dp = pos - pe->xw;
 		vector3d wp = new_vector3d(dot(dp, pe->u1), dot(dp, pe->u2), dot(dp, pe->uw));
 		vector3d u;
-
+		
 		double cdist = particle_plane_contact_detection(pe, u, pos, wp, r);
 		if (cdist > 0){		
+			vector3d cpt = pos + r * u;
 			if (xcpl.IsNewPlaneContactPair(i))
 			{
 				xPairData *pd = new xPairData;
-				*pd = { PLANE_SHAPE, 0, 0, i, 0, 0, cdist, u.x, u.y, u.z };
+				*pd = { PLANE_SHAPE, 0, 0, i, 0, 0, cpt.x, cpt.y, cpt.z, cdist, u.x, u.y, u.z };
 				xcpl.insertPlaneContactPair(pd);
 			}
 			else
 			{
 				xPairData *pd = xcpl.PlanePair(i);
 				pd->gab = cdist;
+				pd->cpx = cpt.x;
+				pd->cpy = cpt.y;
+				pd->cpz = cpt.z;
 				pd->nx = u.x;
 				pd->ny = u.y;
 				pd->nz = u.z;

@@ -228,6 +228,7 @@ typedef struct
 	unsigned int id; 
 	double delta_s;
 	double dot_s;
+	double cpx, cpy, cpz;
 	double gab, nx, ny, nz; 
 }xPairData;
 

@@ -81,6 +81,7 @@ void xParticleParticleContact::cppCollision(
 	xContactPairList* pairs,
 	unsigned int i, 
 	vector4d *pos,
+	vector4d *cpos,
 	vector3d *vel, 
 	euler_parameters *ep,
 	euler_parameters *ev,
@@ -101,20 +102,27 @@ void xParticleParticleContact::cppCollision(
 		unsigned int neach = 0;
 		unsigned int ck = j;
 		unsigned int ci = i;
-		if (nco)
+		vector3d cpi = new_vector3d(pos[i].x, pos[i].y, pos[i].z);
+		vector3d cpj = new_vector3d(pos[j].x, pos[j].y, pos[j].z);
+		if (nco && cpos)
 		{
 			for (unsigned int j = 0; j < nco; j++)
 				if (i >= xci[j].sid && i < xci[j].sid + xci[j].count * xci[j].neach)
 					neach = xci[j].neach;
 			ck = j / neach;
 			ci = i / neach;
+			cpi = new_vector3d(cpos[ci].x, cpos[ci].y, cpos[ci].z);
+			cpj = new_vector3d(cpos[ck].x, cpos[ck].y, cpos[ck].z);
 		}
 		double rcon = pos[i].w - 0.5 * d->gab;
 		vector3d u = new_vector3d(d->nx, d->ny, d->nz);
-		vector3d cp = rcon * u;
+		vector3d cpt = new_vector3d(d->cpx, d->cpy, d->cpz);
+		vector3d dcpr = cpt - cpi;
+		vector3d dcpr_j = cpt - cpj;
+		//vector3d cp = rcon * u;
 		vector3d wi = ToAngularVelocity(ep[ci], ev[ci]);
 		vector3d wj = ToAngularVelocity(ep[ck], ev[ck]);
-		vector3d rv = vel[ck] + cross(wj, -pos[j].w * u) - (vel[ci] + cross(wi, pos[i].w * u));
+		vector3d rv = vel[ck] + cross(wj, dcpr_j) - (vel[ci] + cross(wi, dcpr));
 		xContactParameters c = getContactParameters(
 			pos[i].w, pos[j].w,
 			mass[ci], mass[ck],
@@ -127,9 +135,9 @@ void xParticleParticleContact::cppCollision(
 		{
 		case DHS: DHSModel(c, d->gab, d->delta_s, d->dot_s, rv, u, m_fn, m_ft); break;
 		}
-		RollingResistanceForce(rolling_factor, pos[i].w, pos[j].w, cp, m_fn, m_ft, res, tmax);
+		RollingResistanceForce(rolling_factor, pos[i].w, pos[j].w, dcpr, m_fn, m_ft, res, tmax);
 		F += m_fn + m_ft;
-		M += cross(cp, m_fn + m_ft);
+		M += cross(dcpr, m_fn + m_ft);
 	}
 }
 
@@ -144,16 +152,20 @@ void xParticleParticleContact::updateCollisionPair(
 	unsigned int rid = 0;
 	if (cdist > 0){
 		vector3d u = rp / dist;
+		vector3d cpt = posi + ri * u;
 		if (xcpl.IsNewParticleContactPair(id))
 		{
 			xPairData *pd = new xPairData;
-			*pd = { PARTICLES, isc, 0, id, 0, 0, cdist, u.x, u.y, u.z };
+			*pd = { PARTICLES, isc, 0, id, 0, 0, cpt.x, cpt.y, cpt.z, cdist, u.x, u.y, u.z };
 			xcpl.insertParticleContactPair(pd);
 		}		
 		else
 		{
 			xPairData *pd = xcpl.ParticlePair(id);
 			pd->gab = cdist;
+			pd->cpx = cpt.x;
+			pd->cpy = cpt.y;
+			pd->cpz = cpt.z;
 			pd->nx = u.x;
 			pd->ny = u.y;
 			pd->nz = u.z;

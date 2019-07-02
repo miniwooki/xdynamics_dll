@@ -32,7 +32,7 @@ int xIntegratorVV::OneStepSimulation(double ct, unsigned int cstep)
 	if (xcm)
 	{
 		xcm->runCollision(
-			dpos, dep, dvel, davel,
+			dpos, dcpos, dep, dvel, davel,
 			dmass, diner, dforce, dmoment,
 			dtor->sortedID(), dtor->cellStart(), dtor->cellEnd(), dxci,
 			nco ? np : m_np);
@@ -234,9 +234,13 @@ void xIntegratorVV::updateClusterVelocity(
 			F += f[sid + j];
 			//vector3d T_f = cross(dr, f[sid + j]);
 			T += m[sid + j];
-			LT += cross(dr, f[sid + j]);
+			//LT += cross(dr, f[sid + j]);
 			f[sid + j] = new_vector3d(0.0, 0.0, 0.0);// dmass[i] * xModel::gravity;
 			m[sid + j] = new_vector3d(0.0, 0.0, 0.0);
+		/*	if (j == 0)
+			{
+				F += new_vector3d(10, 0, 0);
+			}*/
 		}
 		//F = F / 2.0;
 		F += dmass[i] * xModel::gravity;

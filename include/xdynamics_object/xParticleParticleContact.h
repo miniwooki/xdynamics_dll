@@ -13,7 +13,7 @@ public:
 
 	void cppCollision(
 		xContactPairList* pairs, unsigned int i,
-		vector4d *pos, vector3d *vel, euler_parameters* ep,
+		vector4d *pos, vector4d* cpos, vector3d *vel, euler_parameters* ep,
 		euler_parameters *ev, double *mass, 
 		double &res, vector3d &tmax,
 		vector3d& F, vector3d& M, xClusterInformation* xci, unsigned int nco);
