@@ -201,7 +201,7 @@ bool xContactManager::runCollision(
 	else if (xSimulation::Gpu())
 	{
 		deviceCollision(
-			pos, ep, vel, ev,
+			pos, cpos, ep, vel, ev,
 			mass, inertia, force, moment,
 			sorted_id, cell_start, cell_end, xci, np
 		);
@@ -326,21 +326,21 @@ void xContactManager::updateCollisionPair(
 }
 
 void xContactManager::deviceCollision(
-	double *pos, double* ep, double *vel, double *ev,
+	double *pos, double* cpos, double* ep, double *vel, double *ev,
 	double *mass, double* inertia, double *force, double *moment,
 	unsigned int *sorted_id, unsigned int *cell_start,
 	unsigned int *cell_end, xClusterInformation* xci, unsigned int np)
 {
 	if (xci)
 	{
-		cu_clusters_contact(pos, ep, vel, ev, force, moment, mass,
+		cu_clusters_contact(pos, cpos, ep, vel, ev, force, moment, mass,
 			d_Tmax, d_RRes, d_pair_count_pp, d_pair_id_pp, d_tsd_pp, sorted_id,
 			cell_start, cell_end, cpp->DeviceContactProperty(), xci, np);
 		if (cpplane)
 		{
 			if (cpplane->NumContact())
 			{
-				cu_cluster_plane_contact(cpplane->devicePlaneInfo(), pos, ep, vel,
+				cu_cluster_plane_contact(cpplane->devicePlaneInfo(), pos, cpos, ep, vel,
 					ev, force, moment, mass,
 					d_Tmax, d_RRes, d_pair_count_ppl, d_pair_id_ppl, d_tsd_ppl, xci,
 					np, cpplane->DeviceContactProperty());

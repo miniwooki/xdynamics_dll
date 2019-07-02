@@ -62,7 +62,7 @@ private:
 		unsigned int np);
 
 	void deviceCollision(
-		double *pos, double *ep, double *vel,
+		double *pos, double* cpos, double *ep, double *vel,
 		double *ev, double *mass, double* inertia,
 		double *force, double *moment,
 		unsigned int *sorted_id,

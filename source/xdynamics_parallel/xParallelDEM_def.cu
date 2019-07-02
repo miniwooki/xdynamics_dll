@@ -302,7 +302,8 @@ void cu_update_meshObjectData(
 		ntriangle);
 }
 
-void cu_clusters_contact(double* pos, double* ep, double* vel,
+void cu_clusters_contact(
+	double* pos, double* cpos, double* ep, double* vel,
 	double* ev, double* force,
 	double* moment, double* mass, double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd,
@@ -311,7 +312,7 @@ void cu_clusters_contact(double* pos, double* ep, double* vel,
 {
 	computeGridSize(np, 256, numBlocks, numThreads);
 	calcluate_clusters_contact_kernel << < numBlocks, numThreads >> > (
-			(double4 *)pos, (double4 *)ep, (double3 *)vel,
+			(double4 *)pos, (double4* )cpos, (double4 *)ep, (double3 *)vel,
 			(double4 *)ev, (double3 *)force,
 			(double3 *)moment, mass, (double3 *)tmax, rres,
 			pair_count, pair_id, (double2 *)tsd,
@@ -321,7 +322,7 @@ void cu_clusters_contact(double* pos, double* ep, double* vel,
 
 void cu_cluster_plane_contact(
 	device_plane_info* plan,
-	double* pos, double* ep, double* vel, double* ev,
+	double* pos, double* cpos, double* ep, double* vel, double* ev,
 	double* force, double* moment, double* mass,
 	double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd, 
@@ -329,7 +330,7 @@ void cu_cluster_plane_contact(
 {
 	computeGridSize(np, 256, numBlocks, numThreads);
 	cluster_plane_contact_kernel << < numBlocks, numThreads >> > (
-		plan, (double4 *)pos, (double4 *)ep, (double3 *)vel, (double4 *)ev,
+		plan, (double4 *)pos, (double4*)cpos, (double4 *)ep, (double3 *)vel, (double4 *)ev,
 		(double3 *)force, (double3 *)moment, cp, mass,
 		(double3 *)tmax, rres,
 		pair_count, pair_id, (double2 *)tsd, xci, np);

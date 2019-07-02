@@ -192,7 +192,8 @@ void XDYNAMICS_API cu_update_meshObjectData(
 	double *vList, double* sph, double* dlocal, device_triangle_info* poly,
 	device_mesh_mass_info* dpmi, double* ep, unsigned int np);
 
-void XDYNAMICS_API cu_clusters_contact(double* pos, double* ep, double* vel,
+void XDYNAMICS_API cu_clusters_contact(
+	double* pos, double* cpos, double* ep, double* vel,
 	double* omega, double* force,
 	double* moment, double* mass, double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd,
@@ -201,7 +202,7 @@ void XDYNAMICS_API cu_clusters_contact(double* pos, double* ep, double* vel,
 
 void XDYNAMICS_API cu_cluster_plane_contact(
 	device_plane_info* plan,
-	double* pos, double* ep, double* vel, double* omega,
+	double* pos, double* cpos, double* ep, double* vel, double* omega,
 	double* force, double* moment, double* mass,
 	double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd, xClusterInformation* xci,
