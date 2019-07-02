@@ -386,7 +386,7 @@ void xXLSReader::ReadDEMParticle(xDiscreteElementMethodModel* xdem, xObjectManag
 			std::string name = sheet->readStr(rc.x, rc.y++);
 			xShapeType form = static_cast<xShapeType>(static_cast<int>(sheet->readNum(rc.x, rc.y++)));
 			int material = -1;
-			if (form != FROM_SHAPE)
+			if (form != CLUSTER_SHAPE)
 				material = static_cast<int>(sheet->readNum(rc.x, rc.y++));
 			if (form == CUBE_SHAPE)
 			{
@@ -431,21 +431,18 @@ void xXLSReader::ReadDEMParticle(xDiscreteElementMethodModel* xdem, xObjectManag
 					xdem->XParticleManager()->AddParticleCreatingCondition(xpo, xpcc);
 				}
 			}
-			else if (form == FROM_SHAPE)
+			else if (form == CLUSTER_SHAPE)
 			{
 				std::string obj;
-				std::string limit;
 				obj = sheet->readStr(rc.x, rc.y++);
 				xObject* xo = xom->XObject(obj);
-				limit = sheet->readStr(rc.x, rc.y++);
-				if (limit == "number")
-				{
-					unsigned int num = sheet->readNum(rc.x, rc.y++);
-					switch (xo->Shape())
-					{
-					case CLUSTER_SHAPE: xdem->XParticleManager()->CreateClusterParticle(name.c_str(), xo->Material(), num, dynamic_cast<xClusterObject*>(xo)); break;
-					}
-				}
+
+				/*unsigned int num = sheet->readNum(rc.x, rc.y++);*/
+				vector3d loc = new_vector3d(0, 0, 0);
+				vector3i grid = new_vector3i(0, 0, 0);
+				xUtilityFunctions::xsplit(sheet->readStr(rc.x, rc.y++), ",", 3, &loc.x);
+				xUtilityFunctions::xsplit(sheet->readStr(rc.x, rc.y++), ",", 3, &grid.x);
+				xdem->XParticleManager()->CreateClusterParticle(name.c_str(), xo->Material(), loc, grid, dynamic_cast<xClusterObject*>(xo)); break;
 			}
 			else if (form == NO_SHAPE_AND_LIST)
 			{

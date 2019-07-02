@@ -449,15 +449,52 @@ double xUtilityFunctions::FitClusterRadius(vector4d * cpos, unsigned int n)
 {
 	int cnt = 0;
 	double maximum = -FLT_MAX;
+	int m_i = 0;
+	int m_j = 0;
+	vector4d cpi, cpj;
+	vector3d ci, cj;
 	while (cnt + 1 < n)
 	{
-		vector3d b = cpos[cnt];
-		for (int i = cnt; i < n; i++)
+		cpi = cpos[cnt];
+		ci = new_vector3d(cpi.x, cpi.y, cpi.z);
+		for (int i = cnt + 1; i < n; i++)
 		{
-			double dij = 
+			cpj = cpos[i];
+			cj = new_vector3d(cpj.x, cpj.y, cpj.z);
+			double len_c = length(cj - ci);
+			double dij = length((cj - ci) + cpj.w * ((cj - ci) / len_c) + cpi.w * ((cj - ci) / len_c));
+			if (dij > maximum)
+			{
+				maximum = dij;
+				m_i = cnt;
+				m_j = i;
+			}
+		}
+		cnt++;
+	}
+	cpi = cpos[m_i];
+	cpj = cpos[m_j];
+	ci = new_vector3d(cpi.x, cpi.y, cpi.z);
+	cj = new_vector3d(cpj.x, cpj.y, cpj.z);
+	vector3d Pi = ci + cpi.w * ((ci - cj) / length(ci - cj));
+	vector3d Pj = cj + cpj.w * ((cj - ci) / length(cj - ci));
+	vector3d Ca = 0.5 * (Pi + Pj);
+	double Ra = 0.5 * length(Pi - Pj);
+	for (int i = 0; i < n; i++)
+	{
+		if (i == m_i || i == m_j)
+			continue;
+		vector4d CPo = cpos[i];
+		vector3d Co = new_vector3d(CPo.x, CPo.y, CPo.z);
+		vector3d Pa = (Co - Ca) + CPo.w * ((Co - Ca) / length(Co - Ca)); 
+		double len_a = length(Pa);
+		if (len_a > Ra)
+		{
+			Ca = Pa - Ra * ((Ca - Pa) / length(Ca - Pa));
+			Ra = len_a;
 		}
 	}
-	return 0.0;
+	return Ra;
 }
 
 std::string xUtilityFunctions::xstring(QString v)

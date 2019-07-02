@@ -430,8 +430,9 @@ xParticleObject* xParticleManager::CreateCircleParticle(
 }
 
 xParticleObject * xParticleManager::CreateClusterParticle(
-	std::string n, xMaterialType mt, unsigned int _np, xClusterObject * xo)
+	std::string n, xMaterialType mt, vector3d& loc, vector3i& grid, xClusterObject * xo)
 {
+	unsigned int _np = grid.x * grid.y * grid.z;
 	unsigned int neach = xo->NumElement();
 	unsigned int rnp = _np * neach;
 	double rad = xo->ElementRadius();
@@ -457,21 +458,38 @@ xParticleObject * xParticleManager::CreateClusterParticle(
 	double norm = 0;
 	vector3d* rloc = xo->RelativeLocation();
 	xpo->setRelativeLocation(xo->RelativeLocation());
-	for (unsigned int i = 0; i < _np; i++)
+	double c_rad = 0.0;
+	unsigned int cnt = 0;
+	for (int x = 0; x < grid.x; x++)
 	{
-		vector3d cp = new_vector3d(0.0, 0.005 * (i + 1), 0.0);
-		vector3d rot = new_vector3d(180 * frand(), 180 * frand(), 180 * frand());
-		//vector3d rot = new_vector3d(30,0,0);
-		euler_parameters m_ep = EulerAngleToEulerParameters(rot);
-		matrix33d A = GlobalTransformationMatrix(m_ep);
-		for (unsigned int j = 0; j < neach; j++)
+		for (int y = 0; y < grid.y; y++)
 		{
-			vector3d m_pos = cp + A * rloc[j];
-			pos[i * neach + j] = new_vector4d(m_pos.x, m_pos.y, m_pos.z, rad);
+			for (int z = 0; z < grid.z; z++)
+			{
+				vector3d cp = new_vector3d(
+					loc.x + 2.0 * c_rad * x + x * 1e-6,
+					loc.y + 2.0 * c_rad * y + y * 1e-6,
+					loc.z + 2.0 * c_rad * z + z * 1e-6);
+				//vector3d cp = loc + 2.0 * c_rad * new_vector3i(x, y, z);
+				vector3d rot = new_vector3d(180 * frand(), 180 * frand(), 180 * frand());
+				//vector3d rot = new_vector3d(30,0,0);
+				euler_parameters m_ep = EulerAngleToEulerParameters(rot);
+				matrix33d A = GlobalTransformationMatrix(m_ep);
+				for (unsigned int j = 0; j < neach; j++)
+				{
+					vector3d m_pos = cp + A * rloc[j];
+					pos[cnt * neach + j] = new_vector4d(m_pos.x, m_pos.y, m_pos.z, rad);
+				}
+				cpos[cnt] = new_vector4d(cp.x, cp.y, cp.z, rad);
+				ep[cnt] = m_ep;
+				norm = length(new_vector4d(m_ep.e0, m_ep.e1, m_ep.e2, m_ep.e3));
+				if (!c_rad)
+				{
+					c_rad = xUtilityFunctions::FitClusterRadius(pos, neach);
+				}
+				cnt++;
+			}
 		}
-		cpos[i] = new_vector4d(cp.x, cp.y, cp.z, rad);
-		ep[i] = m_ep;
-		norm = length(new_vector4d(m_ep.e0, m_ep.e1, m_ep.e2, m_ep.e3));
 	}
 	xpcos[name] = xpo;
 	xObjectManager::XOM()->addObject(xpo);
