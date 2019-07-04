@@ -33,6 +33,8 @@ xParticleObject::~xParticleObject()
 {
 	if (pos) delete[] pos; pos = NULL;
 	if (cpos) delete[] cpos; cpos = NULL;
+	if (ep) delete[] ep; ep = NULL;
+	//if (relative_loc) delete[] relative_loc; relative_loc = NULL;
 	xpo_count--;
 }
 

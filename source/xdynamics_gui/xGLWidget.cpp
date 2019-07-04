@@ -802,10 +802,10 @@ void xGLWidget::resizeGL(int width, int height)
 		break;
 	case ORTHO_PROJECTION:
 		if (width <= height){
-			glOrtho(-1.0f * c, 1.0f * c, (-1.0f / ratio) * c, (1.0f / ratio) * c, 0.01f, 1000.f);
+			glOrtho(-1.0f * c, 1.0f * c, (-1.0f / ratio) * c, (1.0f / ratio) * c, 0.00001f, 1000.f);
 		}
 		else{
-			glOrtho(-1.0f * c * ratio, 1.0f * c * ratio, -1.0f * c, 1.0f * c, 0.01f, 1000.f);
+			glOrtho(-1.0f * c * ratio, 1.0f * c * ratio, -1.0f * c, 1.0f * c, 0.00001f, 1000.f);
 		}
 		break;
 	}

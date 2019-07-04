@@ -487,6 +487,7 @@ xParticleObject * xParticleManager::CreateClusterParticle(
 				{
 					c_rad = xUtilityFunctions::FitClusterRadius(pos, neach);
 				}
+				//cpos[cnt].w = c_rad;
 				cnt++;
 			}
 		}
@@ -554,13 +555,13 @@ bool xParticleManager::SetMassAndInertia(double *mass, double *inertia)
 				for (unsigned int j = 0; j < xpo->EachCount(); j++)
 				{
 					vector3d dr = rloc[j];
-					J3.x += dr.y * dr.y + dr.z * dr.z;
-					J3.y += dr.x * dr.x + dr.z * dr.z;
-					J3.z += dr.x * dr.x + dr.y * dr.y;
+					J3.x += m * (dr.y * dr.y + dr.z * dr.z);
+					J3.y += m * (dr.x * dr.x + dr.z * dr.z);
+					J3.z += m * (dr.x * dr.x + dr.y * dr.y);
 				}
-				inertia[(i + sid) * 3 + 0] = J + J3.x;
-				inertia[(i + sid) * 3 + 1] = J + J3.y;
-				inertia[(i + sid) * 3 + 2] = J + J3.z;
+				inertia[(i + sid) * 3 + 0] = J3.x;
+				inertia[(i + sid) * 3 + 1] = J3.y;
+				inertia[(i + sid) * 3 + 2] = J3.z;
 				//i += xpo->EachCount() - 1;
 			}
 		}

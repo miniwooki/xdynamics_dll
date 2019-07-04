@@ -160,6 +160,8 @@ void xIntegratorVV::updateClusterPosition(
 		vector4d ea = 0.5 * L * wd[i] - 0.25*dot(w[i], w[i]) * q[i];*/
 		ep[i] = ep[i] + xSimulation::dt * ev[i] + sqt_dt * ea[i];
 		ep[i] = normalize(ep[i]);
+	//	double th = 2.0 * acos(ep[i].e0) * (180.0 / M_PI);
+	//	std::cout << "theta : " << th << std::endl;
 		double norm = length(ep[i]);
 		//unsigned int id = cidx[i];
 		//unsigned int begin = cbegin[id * 2 + 0];
@@ -228,20 +230,13 @@ void xIntegratorVV::updateClusterVelocity(
 		euler_parameters e = new_euler_parameters(ep[i]);
 		for (unsigned int j = 0; j < neach; j++)
 		{
-			vector3d cpos = new_vector3d(cp[i].x, cp[i].y, cp[i].z);
-			vector3d gp = cpos + ToGlobal(e, rloc[seach + j]);
-			vector3d dr = gp - cpos;
 			F += f[sid + j];
-			//vector3d T_f = cross(dr, f[sid + j]);
 			T += m[sid + j];
-			//LT += cross(dr, f[sid + j]);
 			f[sid + j] = new_vector3d(0.0, 0.0, 0.0);// dmass[i] * xModel::gravity;
 			m[sid + j] = new_vector3d(0.0, 0.0, 0.0);
-		/*	if (j == 0)
-			{
-				F += new_vector3d(10, 0, 0);
-			}*/
+			
 		}
+		//T = new_vector3d(0.0, 0.0,-1.0);
 		//F = F / 2.0;
 		F += dmass[i] * xModel::gravity;
 		matrix33d J = { 0, };

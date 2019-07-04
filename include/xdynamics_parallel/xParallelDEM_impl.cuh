@@ -119,10 +119,10 @@ __device__ double3 toLocal(double3& v, double4& ep)
 
 __device__ double3 toAngularVelocity(double4& e, double4& d)
 {
-	double3 o = make_double3(
-		-e.y * d.x + e.x * d.y + e.w * d.z - e.z * d.w,
-		-e.z * d.x - e.w * d.y + e.x * d.z + e.y * d.w,
-		-e.w * d.x - e.z * d.y - e.y * d.z + e.x * d.w
+	double3 o = 2.0 * make_double3(
+		-e.y * d.x + e.x * d.y - e.w * d.z + e.z * d.w,
+		-e.z * d.x + e.w * d.y + e.x * d.z - e.y * d.w,
+		-e.w * d.x - e.z * d.y + e.y * d.z + e.x * d.w
 	);
 	return o;
 }
@@ -244,9 +244,9 @@ __global__ void vv_update_position_cluster_kernel(
 		seach += xc.neach;
 		sbegin += xc.count * xc.neach;
 	}
-		
+	//unsigned int cid = id / neach;
 	double4 cp = cpos[id];
-	double4 cep = ep[id];
+//	double4 cep = ep[id];
 	double4 w = ev[id];
 	double4 wd = ea[id];
 	double3 old_p = make_double3(cp.x, cp.y, cp.z);
@@ -266,7 +266,10 @@ __global__ void vv_update_position_cluster_kernel(
 	);
 	double4 ea = 0.5 * Lpwd - 0.25 * dot(w, w) * cep;*/
 	double4 new_ep = ep[id] + cte.dt * w + cte.half2dt * wd;
-	ep[id] = normalize(new_ep);
+	new_ep = normalize(new_ep);
+	ep[id] = new_ep;
+	//printf("po : %.16f, %.16f, %.16f\n", new_p.x, new_p.y, new_p.z);
+	//printf("ep : %.16f, %.16f, %.16f, %.16f\n", new_ep.x, new_ep.y, new_ep.z, new_ep.w);
 	unsigned int sid = sbegin + id * neach;
 	for (unsigned int j = 0; j < neach; j++)
 	{
@@ -347,7 +350,7 @@ __global__ void vv_update_cluster_velocity_kernel(
 		seach += xc.neach;
 		sbegin += xc.count * xc.neach;
 	}
-	double4 cp = cpos[id];
+	//double4 cp = cpos[id];
 	double m = mass[id];
 	double3 v = vel[id];
 	double3 a = acc[id];
@@ -359,23 +362,20 @@ __global__ void vv_update_cluster_velocity_kernel(
 	double3 in = iner[id];
 	double3 F = make_double3(0, 0, 0);
 	double3 T = make_double3(0, 0, 0);
-	double3 LT = make_double3(0, 0, 0);
 	unsigned int sid = sbegin + id * neach;
 	for (unsigned int j = 0; j < neach; j++)
 	{
-		double3 cpos = make_double3(cp.x, cp.y, cp.z);
-		double3 gp = cpos + toGlobal(rloc[seach + j], e);
-		double3 dr = gp - cpos;
-		double3 _F = force[sid + j];
-		F += _F;
+		//double3 _F = ;
+		F += force[sid + j];
 		T += moment[sid + j];
-		LT += cross(dr, _F);
 		force[sid + j] = make_double3(0, 0, 0);
 		moment[sid + j] = make_double3(0, 0, 0);
 	}
 	F += m * cte.gravity;
-	double3 n_prime = toLocal(T + LT, e);
+	double3 n_prime = toLocal(T, e);
 	double4 m_ea = calculate_uceom(in, e, av, n_prime);
+//	printf("%f, %f, %f\n", T.x, T.y, T.z);
+	//printf("%f, %f, %f, %f\n", m_ea.x, m_ea.y, m_ea.z, m_ea.w);
 	/*double3 w_prime = toLocal(av, e);
 	double3 Jwp = make_double3(in.x * w_prime.x, in.y * w_prime.y, in.z * w_prime.z);
 	double3 tJwp = make_double3(-av.z * Jwp.y + av.y * Jwp.z, av.z * Jwp.x - av.x * Jwp.z, -av.y * Jwp.x + av.x * Jwp.y);
@@ -1054,7 +1054,7 @@ __global__ void cluster_plane_contact_kernel(
 	double3 ipos3 = make_double3(ipos.x, ipos.y, ipos.z);
 	double r = ipos.w;
 	double3 ivel = vel[cid];
-	double3 iomega = toAngularVelocity(ep[id], ev[cid]);
+	double3 iomega = toAngularVelocity(ep[cid], ev[cid]);
 
 	double3 Fn = make_double3(0, 0, 0);
 	double3 Ft = make_double3(0, 0, 0);
@@ -1110,11 +1110,19 @@ __global__ void cluster_plane_contact_kernel(
 				cp->rfric, r, 0, dcpr, Fn, Ft, res, tma);
 			sumF += Fn + Ft;
 			sumM += cross(dcpr, Fn + Ft);
+			printf("po : %.16f, %.16f, %.16f\n", ipos3.x, ipos3.y, ipos3.z);
+			printf("dv : %.16f, %.16f, %.16f\n", dv.x, dv.y, dv.z);
+			printf("w : %.16f, %.16f, %.16f\n", iomega.x, iomega.y, iomega.z);
+			printf("dc : %.16f, %.16f, %.16f\n", dcpr.x, dcpr.y, dcpr.z);
+			printf("ev : %.16f, %.16f, %.16f, %.16f\n", ev[cid].x, ev[cid].y, ev[cid].z, ev[cid].w);
+			/*printf("Fn : %.16f, %.16f, %.16f\n", Fn.x, Fn.y, Fn.z);
+			printf("Ft : %.16f, %.16f, %.16f\n", Ft.x, Ft.y, Ft.z);*/
 			tsd[new_count] = sd;
 			pair_id[new_count] = k;
 			new_count++;
 		}
 	}
+	//printf("%f, %f, %f\n", sumF.x, sumF.y, sumF.z);
 	force[id] += sumF;
 	moment[id] += sumM;
 	pair_count[id] = new_count - sid;
