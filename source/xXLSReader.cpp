@@ -340,7 +340,7 @@ void xXLSReader::ReadJoint(xMultiBodyModel* xmbd, vector2i rc)
 	}
 }
 
-void xXLSReader::ReadForce(xMultiBodyModel* xmbd, vector2i rc)
+void xXLSReader::ReadForce(xMultiBodyModel* xmbd, xDiscreteElementMethodModel* xdem, vector2i rc)
 {
 	vector2i init_rc = rc;
 	while (1)
@@ -348,16 +348,34 @@ void xXLSReader::ReadForce(xMultiBodyModel* xmbd, vector2i rc)
 		if (IsEmptyCell(rc.x, rc.y)) break;
 		std::string name = sheet->readStr(rc.x, rc.y++);
 		xForce::fType type = (xForce::fType)static_cast<int>(sheet->readNum(rc.x, rc.y++));
+	
 		std::string base = sheet->readStr(rc.x, rc.y++);
 		std::string action = sheet->readStr(rc.x, rc.y++);
-		xForce* xf = xmbd->CreateForceElement(name, type, base, action);
-		//xkc->SetupDataFromStructure(ReadJointData(rc.x, rc.y));
-		switch (xf->Type())
+		
+		if (type == xForce::TSDA_LIST_DATA)
 		{
-		case xForce::TSDA: (dynamic_cast<xSpringDamperForce*>(xf))->SetupDataFromStructure(xmbd->XMass(base), xmbd->XMass(action), ReadTSDAData(name, rc.x, rc.y)); break;
-		case xForce::RSDA: break;
-		case xForce::RAXIAL: (dynamic_cast<xRotationalAxialForce*>(xf))->SetupDataFromStructure(xmbd->XMass(base), xmbd->XMass(action), ReadxRotationalAxialForceData(name, rc.x, rc.y)); break;
+			xSpringDamperForce *xf = xdem->CreateForceElement(name, type, base, action);
+			xTSDAData xt = { 0, };// ReadTSDAData(name, rc.x, rc.y);
+			xt.k = sheet->readNum(rc.x, rc.y++);
+			xt.c = sheet->readNum(rc.x, rc.y++);
+			xt.init_l = sheet->readNum(rc.x, rc.y++);
+			std::string fpath = sheet->readStr(rc.x, rc.y);
+			xf->SetupDataFromListData(xt, fpath); 
 		}
+		else
+		{
+			xForce* xf = xmbd->CreateForceElement(name, type, base, action);
+			switch (xf->Type())
+			{
+			case xForce::TSDA: (dynamic_cast<xSpringDamperForce*>(xf))->SetupDataFromStructure(xmbd->XMass(base), xmbd->XMass(action), ReadTSDAData(name, rc.x, rc.y)); break;
+			case xForce::RSDA: break;
+			case xForce::RAXIAL: (dynamic_cast<xRotationalAxialForce*>(xf))->SetupDataFromStructure(xmbd->XMass(base), xmbd->XMass(action), ReadxRotationalAxialForceData(name, rc.x, rc.y)); break;
+			}
+		}
+			
+		//xkc->SetupDataFromStructure(ReadJointData(rc.x, rc.y));
+		
+
 		rc.x++;
 		rc.y = init_rc.y;
 	}
@@ -451,12 +469,13 @@ void xXLSReader::ReadDEMParticle(xDiscreteElementMethodModel* xdem, xObjectManag
 				std::string x;
 				std::string fpath = sheet->readStr(rc.x, rc.y++);
 				vector4d* d = new vector4d[number];
+				double* m = new double[number];
 				std::fstream fs;
 				fs.open(fpath.c_str(), std::ios::in);
 				if (fs.is_open())
 				{
 					for (unsigned int i = 0; i < number; i++)
-						fs >> d[i].x >> d[i].y >> d[i].z >> d[i].w;
+						fs >> d[i].x >> d[i].y >> d[i].z >> d[i].w >> m[i];
 				}
 				else
 				{
@@ -464,8 +483,9 @@ void xXLSReader::ReadDEMParticle(xDiscreteElementMethodModel* xdem, xObjectManag
 				}
 				
 				fs.close();
-				xdem->XParticleManager()->CreateParticleFromList(name.c_str(), (xMaterialType)material, number, d);
+				xdem->XParticleManager()->CreateParticleFromList(name.c_str(), (xMaterialType)material, number, d, m);
 				delete[] d;
+				delete[] m;
 			}
 			if (!IsEmptyCell(rc.x, rc.y))
 			{

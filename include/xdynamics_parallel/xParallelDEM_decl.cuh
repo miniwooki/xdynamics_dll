@@ -27,6 +27,8 @@ struct device_dem_parameters
 	unsigned int np;
 	unsigned int nCluster;
 	unsigned int nClusterObject;
+	unsigned int nTsdaConnection;
+	unsigned int nTsdaConnectionList;
 	unsigned int nsphere;
 	unsigned int nplane;
 	unsigned int ncell;
@@ -217,6 +219,17 @@ void XDYNAMICS_API vv_update_cluster_velocity(
 	double* cpos, double* ep, double *vel, double *acc, double *omega,
 	double *alpha, double *force, double *moment, double* rloc,
 	double* mass, double* iner, xClusterInformation *xci, unsigned int np);
+
+void XDYNAMICS_API cu_calculate_spring_damper_force(
+	double* pos,
+	double* vel,
+	double* force,
+	xSpringDamperConnectionInformation* xsdci,
+	xSpringDamperConnectionData* xsdcd,
+	xSpringDamperCoefficient* xsdkc,
+	double* fl,
+	unsigned int nc);
+
 #endif
 
 

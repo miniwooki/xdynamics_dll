@@ -6,6 +6,7 @@
 // Define vector structure
 typedef struct { int x, y; }vector2i;
 typedef struct { unsigned int x, y; }vector2ui;
+typedef struct { double x, y; }vector2d;
 typedef struct { int x, y, z; }vector3i;
 typedef struct { unsigned int x, y, z; }vector3ui;
 typedef struct { float x, y, z; }vector3f;

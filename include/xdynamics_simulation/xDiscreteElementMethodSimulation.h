@@ -34,6 +34,9 @@ protected:
 	unsigned int ns;
 	unsigned int nco;
 	unsigned int nPolySphere;
+	unsigned int nTsdaConnection;
+	unsigned int nTsdaConnectionList;
+	unsigned int nTsdaConnectionValue;
 
 	xDiscreteElementMethodModel* xdem;
 	xGridCell* dtor;
@@ -67,6 +70,11 @@ protected:
 
 	xClusterInformation *xci;
 	xClusterInformation *dxci;
+
+	xSpringDamperConnectionInformation *dxsdci;
+	xSpringDamperConnectionData *dxsdc_data;
+	xSpringDamperCoefficient *dxsdc_kc;
+	double* dxsd_free_length;
 
 	QList<QString> partList;
 };

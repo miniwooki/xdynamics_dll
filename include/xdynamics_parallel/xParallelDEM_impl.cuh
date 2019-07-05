@@ -1110,11 +1110,11 @@ __global__ void cluster_plane_contact_kernel(
 				cp->rfric, r, 0, dcpr, Fn, Ft, res, tma);
 			sumF += Fn + Ft;
 			sumM += cross(dcpr, Fn + Ft);
-			printf("po : %.16f, %.16f, %.16f\n", ipos3.x, ipos3.y, ipos3.z);
-			printf("dv : %.16f, %.16f, %.16f\n", dv.x, dv.y, dv.z);
-			printf("w : %.16f, %.16f, %.16f\n", iomega.x, iomega.y, iomega.z);
-			printf("dc : %.16f, %.16f, %.16f\n", dcpr.x, dcpr.y, dcpr.z);
-			printf("ev : %.16f, %.16f, %.16f, %.16f\n", ev[cid].x, ev[cid].y, ev[cid].z, ev[cid].w);
+			//printf("po : %.16f, %.16f, %.16f\n", ipos3.x, ipos3.y, ipos3.z);
+			//printf("dv : %.16f, %.16f, %.16f\n", dv.x, dv.y, dv.z);
+			//printf("w : %.16f, %.16f, %.16f\n", iomega.x, iomega.y, iomega.z);
+			//printf("dc : %.16f, %.16f, %.16f\n", dcpr.x, dcpr.y, dcpr.z);
+			//printf("ev : %.16f, %.16f, %.16f, %.16f\n", ev[cid].x, ev[cid].y, ev[cid].z, ev[cid].w);
 			/*printf("Fn : %.16f, %.16f, %.16f\n", Fn.x, Fn.y, Fn.z);
 			printf("Ft : %.16f, %.16f, %.16f\n", Ft.x, Ft.y, Ft.z);*/
 			tsd[new_count] = sd;
@@ -1949,4 +1949,38 @@ __global__ void updateMeshObjectData_kernel(
 	dpi[id].P = P;
 	dpi[id].Q = Q;
 	dpi[id].R = R;
+}
+
+__global__ void calculate_spring_damper_force_kernel(
+	double4* pos,
+	double3* vel,
+	double3* force,
+	xSpringDamperConnectionInformation* xsdci,
+	xSpringDamperConnectionData* xsdcd,
+	xSpringDamperCoefficient* xsdkc,
+	double *fl)
+{
+	unsigned id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
+	if (id >= cte.nTsdaConnection)
+		return;
+	unsigned int i = xsdci[id].id;
+	double4 p = pos[i];
+	double3 ri = make_double3(p.x, p.y, p.z);
+	double3 vi = vel[i];
+	xSpringDamperConnectionInformation xsi = xsdci[id];
+	for (unsigned int j = 0; j < xsi.ntsda; j++)
+	{
+		xSpringDamperConnectionData xsd = xsdcd[xsi.sid + j];
+		xSpringDamperCoefficient kc = xsdkc[xsd.kc_id];
+		double4 pj = pos[xsd.jd];
+		double3 rj = make_double3(pj.x, pj.y, pj.z);
+		double3 vj = vel[xsd.jd];
+		double3 L = rj - ri;
+		double l = length(L);
+		double dl = dot(L, (vj - vi)) / l;
+		double fr = kc.k * (l - fl[xsi.sid + j]) + kc.c * dl;
+		//printf("%d, %d, %f\n", xsd.jd, xsd.kc_id, fl[xsi.sid + j]);
+		double3 Q = (fr / l) * L;
+		force[i] += Q;
+	}
 }

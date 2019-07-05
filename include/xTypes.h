@@ -118,8 +118,8 @@ enum xXlsInputDataType
 	XLS_SHAPE,
 	XLS_MASS, 
 	XLS_JOINT,
-	XLS_FORCE,	
 	XLS_PARTICLE,
+	XLS_FORCE,		
 	XLS_CONTACT,	
 	XLS_INTEGRATOR,
 	XLS_SIMULATION,
@@ -203,6 +203,9 @@ typedef struct{	bool enable; double alpha, start_point, length; }xWaveDampingDat
 typedef struct{ double diameter, sx, sy, sz, dx, dy, dz, minr, maxr; }xCircleParticleData;
 typedef struct{ unsigned int sid, count, neach, nstep; }xParticleCreateCondition;
 typedef struct { unsigned int sid, count, neach; }xClusterInformation;
+typedef struct { unsigned int id, sid, ntsda; }xSpringDamperConnectionInformation;
+typedef struct { unsigned int jd, kc_id; }xSpringDamperConnectionData;
+typedef struct { double k, c; }xSpringDamperCoefficient;
 /*typedef struct{ double tstart, dpdt }xObjectMovingCondition;*/
 
 typedef struct 

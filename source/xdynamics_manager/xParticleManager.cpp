@@ -171,11 +171,12 @@ unsigned int xParticleManager::GetNumCircleParticles(
 }
 
 xParticleObject* xParticleManager::CreateParticleFromList(
-	std::string n, xMaterialType mt, unsigned int _np, vector4d* d)
+	std::string n, xMaterialType mt, unsigned int _np, vector4d* d, double* m)
 {
 	QString name = QString::fromStdString(n);
 	xParticleObject* xpo = new xParticleObject(n);
 	vector4d* pos = xpo->AllocMemory(_np);
+	double* ms = xpo->Mass();
 	xpo->setStartIndex(np);
 	//n_single_sphere += _np;
 	np += _np;
@@ -190,6 +191,7 @@ xParticleObject* xParticleManager::CreateParticleFromList(
 		pos[xpo->StartIndex() + i] = new_vector4d(d[i].x, d[i].y, d[i].z, d[i].w);
 		min_r = min(min_r, d[i].w);
 		max_r = max(max_r, d[i].w);
+		ms[i] = m[i];
 	}
 	xpo->setMinRadius(min_r);
 	xpo->setMaxRadius(max_r);
@@ -568,9 +570,10 @@ bool xParticleManager::SetMassAndInertia(double *mass, double *inertia)
 		else
 		{
 			vector4d* pos = xpo->Position();
+			double* ms = xpo->Mass();
 			for (unsigned int i = 0; i < xpo->NumParticle(); i++)
 			{
-				double m = d * (4.0 / 3.0) * M_PI * pow(pos[i].w, 3.0);
+				double m = ms[i] ? ms[i] : d * (4.0 / 3.0) * M_PI * pow(pos[i].w, 3.0);
 				double J = (2.0 / 5.0) * m * pow(pos[i].w, 2.0);
 				mass[i + sid] = m;
 				inertia[i + sid] = J;

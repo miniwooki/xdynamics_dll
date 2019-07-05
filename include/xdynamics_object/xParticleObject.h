@@ -35,6 +35,7 @@ public:
 	vector4d* ClusterPosition() const;
 	vector4d* EulerParameters() const;
 	vector3d* RelativeLocation() const;
+	double* Mass() const;
 
 	virtual unsigned int create_sph_particles(double ps, unsigned int nlayers, vector3d* p = NULL, xMaterialType* t = NULL);
 	virtual QVector<xCorner> get_sph_boundary_corners();
@@ -62,6 +63,7 @@ private:
 	vector4d* pos;
 	vector4d* cpos;
 	vector4d* ep;
+	double* mass;
 	vector3d *relative_loc;
 };
 

@@ -379,3 +379,24 @@ void vv_update_cluster_velocity(
 		np
 		);
 }
+
+void cu_calculate_spring_damper_force(
+	double* pos,
+	double* vel,
+	double* force,
+	xSpringDamperConnectionInformation* xsdci,
+	xSpringDamperConnectionData* xsdcd,
+	xSpringDamperCoefficient* xsdkc,
+	double* fl,
+	unsigned int nc)
+{
+	computeGridSize(nc, 256, numBlocks, numThreads);
+	calculate_spring_damper_force_kernel << <numBlocks, numThreads >> > (
+		(double4*)pos,
+		(double3*)vel,
+		(double3*)force,
+		xsdci,
+		xsdcd,
+		xsdkc,
+		fl);
+}

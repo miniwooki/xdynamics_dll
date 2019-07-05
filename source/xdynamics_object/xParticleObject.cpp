@@ -11,6 +11,7 @@ xParticleObject::xParticleObject()
 	, pos(NULL)
 	, relative_loc(NULL)
 	, each(1)
+	, mass(0)
 {
 
 }
@@ -24,6 +25,7 @@ xParticleObject::xParticleObject(std::string _name)
 	, pos(NULL)
 	, relative_loc(NULL)
 	, each(1)
+	, mass(0)
 {
 	xObject::id = xpo_count;
 	xpo_count++;
@@ -34,6 +36,7 @@ xParticleObject::~xParticleObject()
 	if (pos) delete[] pos; pos = NULL;
 	if (cpos) delete[] cpos; cpos = NULL;
 	if (ep) delete[] ep; ep = NULL;
+	if (mass) delete[] mass; mass = NULL;
 	//if (relative_loc) delete[] relative_loc; relative_loc = NULL;
 	xpo_count--;
 }
@@ -58,6 +61,8 @@ vector4d* xParticleObject::AllocMemory(unsigned int _np)
 	np = _np;
 	if(!pos)
 		pos = new vector4d[np];
+	if (!mass)
+		mass = new double[np];
 	return pos;
 }
 
@@ -149,6 +154,11 @@ vector4d * xParticleObject::EulerParameters() const
 vector3d * xParticleObject::RelativeLocation() const
 {
 	return relative_loc;
+}
+
+double* xParticleObject::Mass() const
+{
+	return mass;
 }
 
 unsigned int xParticleObject::create_sph_particles(double ps, unsigned int nlayers, vector3d* p, xMaterialType* t)

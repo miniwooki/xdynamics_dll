@@ -9,6 +9,12 @@ xSpringDamperForce::xSpringDamperForce()
 	, f(0.0)
 	, l(0.0)
 	, dl(0.0)
+	, nsdci(0)
+	, nConnection(0)
+	, xsdci(NULL)
+	, connection_data(NULL)
+	, kc_value(NULL)
+	, free_length(NULL)
 {
 
 }
@@ -22,13 +28,22 @@ xSpringDamperForce::xSpringDamperForce(std::string _name)
 	, f(0.0)
 	, l(0.0)
 	, dl(0.0)
+	, nsdci(0)
+	, nConnection(0)
+	, xsdci(NULL)
+	, connection_data(NULL)
+	, kc_value(NULL)
+	, free_length(NULL)
 {
 
 }
 
 xSpringDamperForce::~xSpringDamperForce()
 {
-
+	if (xsdci) delete[] xsdci; xsdci = NULL;
+	if (connection_data) delete[] connection_data; connection_data = NULL;
+	if (kc_value) delete[] kc_value; kc_value = NULL;
+	if (free_length) delete[] free_length; free_length = NULL;
 }
 
 void xSpringDamperForce::SetupDataFromStructure(xPointMass* ip, xPointMass* jp, xTSDAData& d)
@@ -42,6 +57,145 @@ void xSpringDamperForce::SetupDataFromStructure(xPointMass* ip, xPointMass* jp, 
 	init_l = d.init_l;
 	xForce::spi = i_ptr->toLocal(loc_i - i_ptr->Position());
 	xForce::spj = j_ptr->toLocal(loc_j - j_ptr->Position());
+}
+
+void xSpringDamperForce::SetupDataFromListData(xTSDAData&d, std::string data)
+{
+
+	xForce::i_ptr = NULL;
+	xForce::j_ptr = NULL;
+	loc_i = new_vector3d(d.spix, d.spiy, d.spiz);
+	loc_j = new_vector3d(d.spjx, d.spjy, d.spjz);
+	k = d.k;
+	c = d.c;
+	init_l = d.init_l;
+	std::fstream fs;
+	fs.open(data, std::ios::in);
+	unsigned int cnt = 0;
+	std::string ch;
+	std::map<unsigned int, xSpringDamperConnectionInformation> xsdcis;
+	std::list<xSpringDamperConnectionData> clist;
+	std::list<xSpringDamperCoefficient> cvalue;
+	if (fs.is_open())
+	{		
+		unsigned int id = 0;
+		while (!fs.eof())
+		{
+			fs >> ch;
+			if (ch == "kc_value")
+			{
+				xSpringDamperCoefficient xsc = { 0, };
+				fs >> id >> xsc.k >> xsc.c;
+				cvalue.push_back(xsc);
+			}
+			else if (ch == "connection_list")
+			{
+				while (!fs.eof())
+				{
+					xSpringDamperConnectionInformation xsi = { 0, cnt, 0 };
+					xSpringDamperConnectionData xsd = { 0, };
+
+					fs >> xsi.id >> xsi.ntsda;
+					xsdcis[id++] = xsi;
+					unsigned int cid = 0;
+					unsigned int kc = 0;
+					for (unsigned int i = 0; i < xsi.ntsda; i++)
+					{
+						fs >> cid >> kc;
+						xsd.jd = cid;
+						xsd.kc_id = kc;
+						clist.push_back(xsd);
+					}
+					cnt += xsi.ntsda;
+				}				
+			}			
+		}
+	}
+	fs.close();
+	if (!kc_value)
+	{
+		unsigned int ct = 0;
+		kc_value = new xSpringDamperCoefficient[cvalue.size()];
+		foreach(xSpringDamperCoefficient c, cvalue)
+		{
+			kc_value[ct++] = c;
+		}
+	}
+	if (!xsdci)
+	{
+		xsdci = new xSpringDamperConnectionInformation[xsdcis.size()];
+		for (unsigned int i = 0; i < xsdcis.size(); i++)
+		{
+			xsdci[i] = xsdcis[i];
+		}
+	}		
+	if (!connection_data)
+	{
+		connection_data = new xSpringDamperConnectionData[cnt];
+		free_length = new double[cnt];
+		unsigned int ct = 0;
+		foreach(xSpringDamperConnectionData c, clist)
+			connection_data[ct++] = c;
+	}
+	nkcvalue = cvalue.size();
+	nsdci = xsdcis.size();
+	nConnection = cnt;
+}
+
+unsigned int xSpringDamperForce::NumSpringDamperConnection()
+{
+	return nsdci;
+}
+
+unsigned int xSpringDamperForce::NumSpringDamperConnectionList()
+{
+	return nConnection;
+}
+
+unsigned int xSpringDamperForce::NumSpringDamperConnectionValue()
+{
+	return nkcvalue;
+}
+
+xSpringDamperConnectionInformation* xSpringDamperForce::xSpringDamperConnection()
+{
+	return xsdci;
+}
+
+xSpringDamperConnectionData* xSpringDamperForce::xSpringDamperConnectionList()
+{
+	return connection_data;
+}
+
+xSpringDamperCoefficient* xSpringDamperForce::xSpringDamperCoefficientValue()
+{
+	return kc_value;
+}
+
+double* xSpringDamperForce::FreeLength()
+{
+	return free_length;
+}
+
+void xSpringDamperForce::initializeFreeLength(double* pos)
+{
+	vector4d* p = (vector4d*)pos;
+
+	for (unsigned int i = 0; i < nsdci; i++)
+	{
+		unsigned int id = xsdci[i].id;
+		vector3d ri = new_vector3d(p[id].x, p[id].y, p[id].z);
+		vector3d rj = new_vector3d(0, 0, 0);
+		for (unsigned int j = 0; j < xsdci[i].ntsda; j++)
+		{
+			unsigned int sid = xsdci[i].sid + j;
+			xSpringDamperConnectionData *xsd = &connection_data[sid];
+			rj = new_vector3d(p[xsd->jd].x, p[xsd->jd].y, p[xsd->jd].z);
+			vector3d L = rj - ri;
+			double l = length(L);
+			free_length[sid] = l;
+		}
+	}
 }
 
 void xSpringDamperForce::xCalculateForce(const xVectorD& q, const xVectorD& qd)
@@ -89,6 +243,63 @@ void xSpringDamperForce::xCalculateForce(const xVectorD& q, const xVectorD& qd)
 		j_ptr->addEulerParameterMoment(QRj.x, QRj.y, QRj.z, QRj.w);
 		//rhs.plus(jrc, Qj, QRj);
 	}
+}
+
+void xSpringDamperForce::xCalculateForceForDEM(double* pos, double* vel, double* force)
+{
+//	vector3d Q;
+	//vector4d QRi;
+	//vector3d Qj;
+	//vector4d QRj;
+	vector4d* p = (vector4d*)pos;
+	vector3d* v = (vector3d*)vel;
+	vector3d* f = (vector3d*)force;
+	for (unsigned int i = 0; i < nsdci; i++)
+	{
+		unsigned int id = xsdci[i].id;
+		vector3d ri = new_vector3d(p[id].x, p[id].y, p[id].z);
+		vector3d vi = v[id];
+		vector3d rj = new_vector3d(0, 0, 0);
+		vector3d vj = new_vector3d(0, 0, 0);
+		for(unsigned int j = 0 ; j < xsdci[i].ntsda; j++)
+		{
+			unsigned int sid = xsdci[i].sid + j;
+			xSpringDamperConnectionData xsd = connection_data[sid];
+			xSpringDamperCoefficient kc = kc_value[xsd.kc_id];
+			rj = new_vector3d(p[xsd.jd].x, p[xsd.jd].y, p[xsd.jd].z);
+			vj = v[xsd.jd];
+			vector3d L = rj - ri;
+			//L = rj + Aj * spj - ri - Ai * spi;
+			//L = action->getPosition() + action->toGlobal(spj) - base->getPosition() - base->toGlobal(spi);
+			l = length(L);// .length();
+			vector3d dL = vj - vi;
+			//VEC3D dL = action->getVelocity() + B(action->getEV(), spj) * action->getEP() - base->getVelocity() - B(base->getEV(), spi) * base->getEP();
+			double dl = dot(L, dL) / l;
+			double fr = kc.k * (l - free_length[sid]) + kc.c * dl;
+			vector3d Q = (fr / l) * L;
+			f[id] += Q;
+		}
+	}
+	
+	//Qj = -Qi;
+	//matrix34d eee = BMatrix(ej, spj);
+	//QRi = (f / l) * BMatrix(ei, spi) * L;// transpose(B(base->getEP(), spi), L);
+	//QRj = -(f / l) * BMatrix(ej, spj) * L;// transpose(B(action->getEP(), spj), L);
+
+	//if (i)
+	//{
+	//	//int irc = (i - 1) * xModel::OneDOF();
+	//	i_ptr->addAxialForce(Qi.x, Qi.y, Qi.z);
+	//	i_ptr->addEulerParameterMoment(QRi.x, QRi.y, QRi.z, QRi.w);
+	//	//rhs.plus(irc, Qi, QRi);
+	//}
+	//if (j)
+	//{
+	//	//int jrc = (j - 1) * xModel::OneDOF();// action->ID() * 7;
+	//	j_ptr->addAxialForce(Qj.x, Qj.y, Qj.z);
+	//	j_ptr->addEulerParameterMoment(QRj.x, QRj.y, QRj.z, QRj.w);
+	//	//rhs.plus(jrc, Qj, QRj);
+	//}
 }
 
 void xSpringDamperForce::xDerivate(xMatrixD& lhs, const xVectorD& q, const xVectorD& qd, double mul)

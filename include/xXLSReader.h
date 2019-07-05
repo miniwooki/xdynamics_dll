@@ -25,7 +25,7 @@ public:
 	bool Load(const char* n);
 	void ReadMass(xMultiBodyModel* xmbd, vector2i rc);
 	void ReadJoint(xMultiBodyModel* xmbd, vector2i rc);
-	void ReadForce(xMultiBodyModel* xmbd, vector2i rc);
+	void ReadForce(xMultiBodyModel* xmbd, xDiscreteElementMethodModel* xdem, vector2i rc);
 	void ReadKernel(xSmoothedParticleHydrodynamicsModel* xsph, vector2i rc);
 	void ReadDEMParticle(xDiscreteElementMethodModel* xdem, xObjectManager* xom, vector2i rc);
 	void ReadSPHParticle(xSmoothedParticleHydrodynamicsModel* xsph, vector2i rc);

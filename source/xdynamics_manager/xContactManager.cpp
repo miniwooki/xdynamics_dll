@@ -304,11 +304,13 @@ void xContactManager::updateCollisionPair(
 							unsigned int di = i >= k ? i - k : k - i;
 							if (i != k && k < np && !(di <= neach))
 							{
-								//unsigned int ck = k / neach;
-								vector3d jp = new_vector3d(pos[k].x, pos[k].y, pos[k].z);
-								double jr = pos[k].w;
-								unsigned int ck = k / neach;
-								cpp->updateCollisionPair(k, ncobject ? 1 : 0, xcpl[i], r, jr, p, jp);
+								if (cpp)
+								{
+									vector3d jp = new_vector3d(pos[k].x, pos[k].y, pos[k].z);
+									double jr = pos[k].w;
+									unsigned int ck = k / neach;
+									cpp->updateCollisionPair(k, ncobject ? 1 : 0, xcpl[i], r, jr, p, jp);
+								}								
 							}
 							else if (k >= np)
 							{
@@ -333,9 +335,12 @@ void xContactManager::deviceCollision(
 {
 	if (xci)
 	{
-		cu_clusters_contact(pos, cpos, ep, vel, ev, force, moment, mass,
-			d_Tmax, d_RRes, d_pair_count_pp, d_pair_id_pp, d_tsd_pp, sorted_id,
-			cell_start, cell_end, cpp->DeviceContactProperty(), xci, np);
+		if (cpp)
+		{
+			cu_clusters_contact(pos, cpos, ep, vel, ev, force, moment, mass,
+				d_Tmax, d_RRes, d_pair_count_pp, d_pair_id_pp, d_tsd_pp, sorted_id,
+				cell_start, cell_end, cpp->DeviceContactProperty(), xci, np);
+		}
 		if (cpplane)
 		{
 			if (cpplane->NumContact())
@@ -349,10 +354,12 @@ void xContactManager::deviceCollision(
 	}
 	else
 	{
-		cu_calculate_p2p(1, pos, ep, vel, ev, force, moment, mass,
-			d_Tmax, d_RRes, d_pair_count_pp, d_pair_id_pp, d_tsd_pp, sorted_id,
-			cell_start, cell_end, cpp->DeviceContactProperty(), np);
-
+		if (cpp)
+		{
+			cu_calculate_p2p(1, pos, ep, vel, ev, force, moment, mass,
+				d_Tmax, d_RRes, d_pair_count_pp, d_pair_id_pp, d_tsd_pp, sorted_id,
+				cell_start, cell_end, cpp->DeviceContactProperty(), np);
+		}
 		if (cpplane)
 		{
 			if (cpplane->NumContact())
@@ -424,9 +431,12 @@ void xContactManager::hostCollision(
 		double m = mass[ci];
 		double j = inertia[ci];
 		double r = pos[i].w;
-		cpplane->cpplCollision(pairs, i, r, m, p, v, o, R, T, F, M, ncobject, xci, cpos);
-		cpp->cppCollision(pairs, i, pos, cpos, vel, ep, ev, mass, R, T, F, M, xci, ncobject);
-		cpmeshes->cppolyCollision(pairs, r, m, p, v, o, R, T, F, M);
+		if(cpplane)
+			cpplane->cpplCollision(pairs, i, r, m, p, v, o, R, T, F, M, ncobject, xci, cpos);
+		if(cpp)
+			cpp->cppCollision(pairs, i, pos, cpos, vel, ep, ev, mass, R, T, F, M, xci, ncobject);
+		if(cpmeshes)
+			cpmeshes->cppolyCollision(pairs, r, m, p, v, o, R, T, F, M);
 		force[i] += F;
 		moment[i] += M;
 

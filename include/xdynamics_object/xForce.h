@@ -8,7 +8,7 @@
 class xForce
 {
 public:
-	enum fType{ NO_TYPE = -1, TSDA = 0, RSDA, RAXIAL };
+	enum fType{ NO_TYPE = -1, TSDA = 0, RSDA = 1, RAXIAL = 2, TSDA_LIST_DATA = 99 };
 	xForce();
 	xForce(std::string _name, fType _type);
 	virtual ~xForce();
@@ -26,6 +26,7 @@ public:
 	std::string ActionBodyName();
 
 	virtual void xCalculateForce(const xVectorD& q, const xVectorD& qd) = 0;
+	//virtual vector3d xCalculateForceForDEM(vector3d& ip, vector3d& jp, vector3d& iv, vector3d& jv) = 0;
 	virtual void xDerivate(xMatrixD& lhs, const xVectorD& q, const xVectorD& qd, double mul) = 0;
 	virtual void xDerivateVelocity(xMatrixD& lhs, const xVectorD& q, const xVectorD& qd, double mul) = 0;
 
