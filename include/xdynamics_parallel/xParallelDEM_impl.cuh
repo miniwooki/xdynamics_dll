@@ -1957,8 +1957,7 @@ __global__ void calculate_spring_damper_force_kernel(
 	double3* force,
 	xSpringDamperConnectionInformation* xsdci,
 	xSpringDamperConnectionData* xsdcd,
-	xSpringDamperCoefficient* xsdkc,
-	double *fl)
+	xSpringDamperCoefficient* xsdkc)
 {
 	unsigned id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
 	if (id >= cte.nTsdaConnection)
@@ -1978,7 +1977,7 @@ __global__ void calculate_spring_damper_force_kernel(
 		double3 L = rj - ri;
 		double l = length(L);
 		double dl = dot(L, (vj - vi)) / l;
-		double fr = kc.k * (l - fl[xsi.sid + j]) + kc.c * dl;
+		double fr = kc.k * (l - xsd.init_l) + kc.c * dl;
 		//printf("%d, %d, %f\n", xsd.jd, xsd.kc_id, fl[xsi.sid + j]);
 		double3 Q = (fr / l) * L;
 		force[i] += Q;

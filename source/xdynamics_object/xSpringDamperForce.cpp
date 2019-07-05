@@ -193,7 +193,7 @@ void xSpringDamperForce::initializeFreeLength(double* pos)
 			rj = new_vector3d(p[xsd->jd].x, p[xsd->jd].y, p[xsd->jd].z);
 			vector3d L = rj - ri;
 			double l = length(L);
-			free_length[sid] = l;
+			xsd->init_l = l;
 		}
 	}
 }
@@ -275,7 +275,7 @@ void xSpringDamperForce::xCalculateForceForDEM(double* pos, double* vel, double*
 			vector3d dL = vj - vi;
 			//VEC3D dL = action->getVelocity() + B(action->getEV(), spj) * action->getEP() - base->getVelocity() - B(base->getEV(), spi) * base->getEP();
 			double dl = dot(L, dL) / l;
-			double fr = kc.k * (l - free_length[sid]) + kc.c * dl;
+			double fr = kc.k * (l - xsd.init_l) + kc.c * dl;
 			vector3d Q = (fr / l) * L;
 			f[id] += Q;
 		}

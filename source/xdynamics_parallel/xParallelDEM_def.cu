@@ -387,7 +387,6 @@ void cu_calculate_spring_damper_force(
 	xSpringDamperConnectionInformation* xsdci,
 	xSpringDamperConnectionData* xsdcd,
 	xSpringDamperCoefficient* xsdkc,
-	double* fl,
 	unsigned int nc)
 {
 	computeGridSize(nc, 256, numBlocks, numThreads);
@@ -397,6 +396,5 @@ void cu_calculate_spring_damper_force(
 		(double3*)force,
 		xsdci,
 		xsdcd,
-		xsdkc,
-		fl);
+		xsdkc);
 }

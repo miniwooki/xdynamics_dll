@@ -204,7 +204,7 @@ typedef struct{ double diameter, sx, sy, sz, dx, dy, dz, minr, maxr; }xCirclePar
 typedef struct{ unsigned int sid, count, neach, nstep; }xParticleCreateCondition;
 typedef struct { unsigned int sid, count, neach; }xClusterInformation;
 typedef struct { unsigned int id, sid, ntsda; }xSpringDamperConnectionInformation;
-typedef struct { unsigned int jd, kc_id; }xSpringDamperConnectionData;
+typedef struct { unsigned int jd, kc_id; double init_l; }xSpringDamperConnectionData;
 typedef struct { double k, c; }xSpringDamperCoefficient;
 /*typedef struct{ double tstart, dpdt }xObjectMovingCondition;*/
 

@@ -74,7 +74,6 @@ protected:
 	xSpringDamperConnectionInformation *dxsdci;
 	xSpringDamperConnectionData *dxsdc_data;
 	xSpringDamperCoefficient *dxsdc_kc;
-	double* dxsd_free_length;
 
 	QList<QString> partList;
 };

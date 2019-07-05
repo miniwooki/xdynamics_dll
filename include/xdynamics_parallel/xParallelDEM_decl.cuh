@@ -227,7 +227,6 @@ void XDYNAMICS_API cu_calculate_spring_damper_force(
 	xSpringDamperConnectionInformation* xsdci,
 	xSpringDamperConnectionData* xsdcd,
 	xSpringDamperCoefficient* xsdkc,
-	double* fl,
 	unsigned int nc);
 
 #endif

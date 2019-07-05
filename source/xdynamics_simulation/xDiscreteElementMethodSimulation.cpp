@@ -148,7 +148,7 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 			checkCudaErrors(cudaMemcpy(dxsdci, xdem->XSpringDamperForce()->xSpringDamperConnection(), sizeof(xSpringDamperConnectionInformation) * nTsdaConnection, cudaMemcpyHostToDevice));
 			checkCudaErrors(cudaMemcpy(dxsdc_data, xdem->XSpringDamperForce()->xSpringDamperConnectionList(), sizeof(xSpringDamperConnectionData) * nTsdaConnectionList, cudaMemcpyHostToDevice));
 			checkCudaErrors(cudaMemcpy(dxsdc_kc, xdem->XSpringDamperForce()->xSpringDamperCoefficientValue(), sizeof(xSpringDamperCoefficient) * nTsdaConnectionValue, cudaMemcpyHostToDevice));
-			checkCudaErrors(cudaMemcpy(dxsd_free_length, xdem->XSpringDamperForce()->FreeLength(), sizeof(double) * nTsdaConnectionList, cudaMemcpyHostToDevice));
+			//checkCudaErrors(cudaMemcpy(dxsd_free_length, xdem->XSpringDamperForce()->FreeLength(), sizeof(double) * nTsdaConnectionList, cudaMemcpyHostToDevice));
 		}
 			
 		if (xcm)
@@ -209,7 +209,7 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 			dxsdci = xdem->XSpringDamperForce()->xSpringDamperConnection();
 			dxsdc_data = xdem->XSpringDamperForce()->xSpringDamperConnectionList();
 			dxsdc_kc = xdem->XSpringDamperForce()->xSpringDamperCoefficientValue();
-			dxsd_free_length = xdem->XSpringDamperForce()->FreeLength();
+			//dxsd_free_length = xdem->XSpringDamperForce()->FreeLength();
 		}
 	}
 	if (isSaveMemory)
@@ -367,7 +367,7 @@ void xDiscreteElementMethodSimulation::clearMemory()
 		if (dxsdci) checkCudaErrors(cudaFree(dxsdci)); dxsdci = NULL;
 		if (dxsdc_data) checkCudaErrors(cudaFree(dxsdc_data)); dxsdc_data = NULL;
 		if (dxsdc_kc) checkCudaErrors(cudaFree(dxsdc_kc)); dxsdc_kc = NULL;
-		if (dxsd_free_length) checkCudaErrors(cudaFree(dxsd_free_length)); dxsd_free_length = NULL;
+		//if (dxsd_free_length) checkCudaErrors(cudaFree(dxsd_free_length)); dxsd_free_length = NULL;
 	}
 }
 
@@ -428,7 +428,7 @@ void xDiscreteElementMethodSimulation::allocationMemory(unsigned int np, unsigne
 			checkCudaErrors(cudaMalloc((void**)&dxsdci, sizeof(xSpringDamperConnectionInformation)*nTsdaConnection));
 			checkCudaErrors(cudaMalloc((void**)&dxsdc_data, sizeof(xSpringDamperConnectionData)* nTsdaConnectionList));
 			checkCudaErrors(cudaMalloc((void**)&dxsdc_kc, sizeof(xSpringDamperCoefficient) * nTsdaConnectionValue));
-			checkCudaErrors(cudaMalloc((void**)&dxsd_free_length, sizeof(double) * nTsdaConnectionList));
+			//checkCudaErrors(cudaMalloc((void**)&dxsd_free_length, sizeof(double) * nTsdaConnectionList));
 		}		
 	}
 }
