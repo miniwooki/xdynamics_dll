@@ -524,14 +524,20 @@ __device__ double cohesionForce(
 	double coh,
 	double Fn)
 {
-	double cf = 0.f;
+	double cf = 0.0;
 	if (coh) {
-		double req = (ri * rj / (ri + rj));
-		double Eeq = ((1.0 - pri * pri) / Ei) + ((1.0 - prj * prj) / Ej);
-		double rcp = (3.0 * req * (-Fn)) / (4.0 * (1.0 / Eeq));
+		double Req = rj ? (ri * rj) / (ri + rj) : ri;
+		double Eeq = (Ei * Ej) / (Ei*(1 - prj * prj) + Ej * (1 - pri * pri));
+		double c0 = 3.0 * coh * M_PI * Req;
+		double eq = 2.0 * c0 * Fn + c0 * c0;
+		if (eq <= 0)
+			Fn = -0.5 * c0;
+		double a3 = (3.0 * Req) * (Fn + c0 + sqrt(2.0 * c0 * Fn + c0 * c0)) / (4.0 * Eeq);
+		/*double rcp = (3.0 * req * (-Fn)) / (4.0 * (1.0 / Eeq));
 		double rc = pow(rcp, 1.0 / 3.0);
 		double Ac = M_PI * rc * rc;
-		cf = coh * Ac;
+		cf = coh * Ac;*/
+		cf = /*(4.0 * coh_e * a3) / (3.0 * coh_r)*/ -sqrt(8.0 * M_PI * coh * Eeq * a3);
 	}
 	return cf;
 }
@@ -641,7 +647,7 @@ __device__ void DHSModel(
 {
 	double fsn = -c.kn * pow(cdist, 1.5);
 	double fdn = c.vn * dot(dv, unit);
-	double fca = cohesionForce(ir, jr, Ei, Ej, pri, prj, coh, fsn);
+	double fca = -cohesionForce(ir, jr, Ei, Ej, pri, prj, coh, fsn);
 	Fn = (fsn + fca + fdn) * unit;
 	double3 e = dv - dot(dv, unit) * unit;
 	double mag_e = length(e);
@@ -1102,7 +1108,7 @@ __global__ void cluster_plane_contact_kernel(
 				break;
 			case 1:
 				DHSModel(
-					c, r, 0, 0, 0, 0, 0, cp->coh, cdist,
+					c, r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, cdist,
 					iomega, sd.x, sd.y, dv, unit, Ft, Fn);
 				break;
 			}
@@ -1174,8 +1180,10 @@ __global__ void plane_contact_force_kernel(
 		double3 dp = make_double3(ipos.x, ipos.y, ipos.z) - pl.xw;
 		double3 unit = make_double3(0, 0, 0);
 		double3 wp = make_double3(dot(dp, pl.u1), dot(dp, pl.u2), dot(dp, pl.uw));
-
 		double cdist = particle_plane_contact_detection(pl, ipos3, wp, unit, r);
+		//if(cp->coh)
+		//{
+		//}
 		if (cdist > 0) {
 			double2 sd = make_double2(0.0, 0.0);
 			for (unsigned int i = 0; i < old_count; i++)
@@ -1194,6 +1202,7 @@ __global__ void plane_contact_force_kernel(
 				TCM, r, 0.0, m, 0.0, cp->Ei, cp->Ej,
 				cp->pri, cp->prj, cp->Gi, cp->Gj,
 				cp->rest, cp->fric, cp->rfric, cp->sratio);
+
 			switch (TCM)
 			{
 			case 0:
@@ -1203,7 +1212,7 @@ __global__ void plane_contact_force_kernel(
 				break;
 			case 1:
 				DHSModel(
-					c, r, 0, 0, 0, 0, 0, cp->coh, cdist,
+					c, r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, cdist,
 					iomega, sd.x, sd.y, dv, unit, Ft, Fn);
 				break;
 			}
@@ -1216,6 +1225,10 @@ __global__ void plane_contact_force_kernel(
 			pair_id[new_count] = k;
 			new_count++;
 		}
+	/*	else if(cdist < 0 && abs(cdist) > )
+		{
+*/
+//		}
 	}
 	force[id] += sumF;
 	moment[id] += sumM;
@@ -1372,7 +1385,7 @@ __global__ void cylinder_hertzian_contact_force_kernel(
 			break;
 		case 1:
 			DHSModel(
-				c, 0, 0, 0, 0, 0, 0, 0, cdist, iomega, ds.x, ds.y,
+				c, ipos.w, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, cdist, iomega, ds.x, ds.y,
 				dv, unit, Ft, Fn);
 			break;
 		}
@@ -1641,7 +1654,7 @@ __global__ void particle_polygonObject_collision_kernel(
 									break;
 								case 1:
 									DHSModel(
-										c, ir, 0, 0, 0, 0, 0, 0, cdist, iomega, sd.x, sd.y,
+										c, ir, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, cdist, iomega, sd.x, sd.y,
 										dv, unit, Ft, Fn);
 									break;
 								}

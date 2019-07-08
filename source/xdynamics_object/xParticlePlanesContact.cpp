@@ -44,6 +44,7 @@ void xParticlePlanesContact::define(unsigned int id, xParticlePlaneContact* d)
 	cp.stiffness_ratio = d->StiffnessRatio();
 	cp.friction = d->Friction();
 	cp.rolling_friction = d->RollingFactor();
+	cp.cohesion = d->Cohesion();
 	cp.stiffness_multiplyer = d->StiffMultiplyer();
 	xmp = d->MaterialPropertyPair();
 	hcmp[id] = cp;
@@ -113,14 +114,14 @@ double xParticlePlanesContact::particle_plane_contact_detection(host_plane_info*
 	double sqr = r*r;
 
 	// The sphere contacts with the wall face
-	if (abs(wp.z) < r && (wp.x > 0 && wp.x < _pe->l1) && (wp.y > 0 && wp.y < _pe->l2)){
-		vector3d dp = xp - _pe->xw;
-		vector3d uu = _pe->uw / length(_pe->uw);
-		int pp = -xsign(dot(dp, _pe->uw));
-		u = pp * uu;
-		double collid_dist = r - abs(dot(dp, u));
-		return collid_dist;
-	}
+	//if (abs(wp.z) < r && (wp.x > 0 && wp.x < _pe->l1) && (wp.y > 0 && wp.y < _pe->l2)){
+	//	vector3d dp = xp - _pe->xw;
+	//	vector3d uu = _pe->uw / length(_pe->uw);
+	//	int pp = -xsign(dot(dp, _pe->uw));
+	//	u = pp * uu;
+	//	double collid_dist = r - abs(dot(dp, u));
+	//	return collid_dist;
+	//}
 
 	if (wp.x < 0 && wp.y < 0 && (sqa + sqb + sqc) < sqr){
 		vector3d Xsw = xp - _pe->xw;
@@ -183,9 +184,12 @@ double xParticlePlanesContact::particle_plane_contact_detection(host_plane_info*
 		u = -h_star / h;
 		return r - h;
 	}
-
-
-	return -1.0f;
+	vector3d dp = xp - _pe->xw;
+	vector3d uu = _pe->uw / length(_pe->uw);
+	int pp = -xsign(dot(dp, _pe->uw));
+	u = pp * uu;
+	double collid_dist = r - abs(dot(dp, u));
+	return collid_dist;
 }
 
 
@@ -229,10 +233,24 @@ bool xParticlePlanesContact::cpplCollision(
 			xmps[d->id].Gi, xmps[d->id].Gj, 
 			cmp.restitution, cmp.stiffness_ratio,
 			cmp.friction, cmp.rolling_friction, cmp.cohesion);
+		if (d->gab < 0 && abs(d->gab) < abs(c.coh_s))
+		{
+			double f = JKRSeperationForce(c, cmp.cohesion);
+			double cf = cohesionForce(cmp.cohesion, d->gab, c.coh_r, c.coh_e, c.coh_s, f);
+			F -= cf * u;
+			continue;
+		}
+		else if (d->isc && d->gab < 0 && abs(d->gab) > abs(c.coh_s))
+		{
+			d->isc = false;
+			continue;
+		}
 		switch (force_model)
 		{
-		case DHS: DHSModel(c, d->gab, d->delta_s, d->dot_s, dv, u, m_fn, m_ft); break;
+		case DHS: DHSModel(c, d->gab, d->delta_s, d->dot_s, cmp.cohesion, dv, u, m_fn, m_ft); break;
 		}
+		/*if (cmp.cohesion && c.coh_s > d->gab)
+			d->isc = false;*/
 		RollingResistanceForce(c.rfric, r, 0.0, dcpr, m_fn, m_ft, res, tmax);
 		F += m_fn + m_ft;
 		M += cross(dcpr, m_fn + m_ft);
@@ -254,14 +272,15 @@ void xParticlePlanesContact::updateCollisionPair(
 		vector3d dp = pos - pe->xw;
 		vector3d wp = new_vector3d(dot(dp, pe->u1), dot(dp, pe->u2), dot(dp, pe->uw));
 		vector3d u;
-		
+		xContactMaterialParameters cmp = hcmp[i];
+
 		double cdist = particle_plane_contact_detection(pe, u, pos, wp, r);
 		if (cdist > 0){		
 			vector3d cpt = pos + r * u;
 			if (xcpl.IsNewPlaneContactPair(i))
 			{
 				xPairData *pd = new xPairData;
-				*pd = { PLANE_SHAPE, 0, 0, i, 0, 0, cpt.x, cpt.y, cpt.z, cdist, u.x, u.y, u.z };
+				*pd = { PLANE_SHAPE, true, 0, i, 0, 0, cpt.x, cpt.y, cpt.z, cdist, u.x, u.y, u.z };
 				xcpl.insertPlaneContactPair(pd);
 			}
 			else
@@ -278,7 +297,24 @@ void xParticlePlanesContact::updateCollisionPair(
 		}
 		else
 		{
-			xcpl.deletePlanePairData(i);
+			xPairData *pd = xcpl.PlanePair(i);
+			if (pd)
+			{
+				bool isc = pd->isc;
+				if (!isc)
+					xcpl.deletePlanePairData(i);
+				else
+				{
+					vector3d cpt = pos + r * u;
+					pd->gab = cdist;
+					pd->cpx = cpt.x;
+					pd->cpy = cpt.y;
+					pd->cpz = cpt.z;
+					pd->nx = u.x;
+					pd->ny = u.y;
+					pd->nz = u.z;
+				}
+			}			
 		}
 	}
 }

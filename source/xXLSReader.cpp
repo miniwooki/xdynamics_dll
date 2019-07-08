@@ -274,7 +274,7 @@ bool xXLSReader::Load(const char* n)
 	book = xlCreateBook();
 	if (book)
 	{
-		connect_file = QString::fromStdString(n);
+		connect_file = "ddfafa";
 		return book->load(n);
 	}
 	return false;
@@ -667,7 +667,7 @@ void xXLSReader::ReadSimulationCondition(vector2i rc)
 {
 	if (!IsEmptyCell(rc.x, rc.y))
 	{
-		QString dev = ReadStr(rc.x, rc.y++);
+		xstring dev = ReadStr(rc.x, rc.y++);
 		if (dev == "CPU") xSimulation::setCPUDevice();
 		else if (dev == "GPU") xSimulation::setGPUDevice();
 		else xLog::log("Device input error : You have entered an invalid device type.(" + dev.toStdString() + ")");
@@ -691,22 +691,22 @@ void xXLSReader::ReadInputGravity(vector2i rc)
 	}
 }
 
-QString xXLSReader::SetupSheet(int idx)
+xstring xXLSReader::SetupSheet(int idx)
 {
 	if (book)
 	{
 		sheet = book->getSheet(idx);
-		return toWideCharToQString(sheet->name());
+		return sheet->name();
 	}
 	return "";
 }
 
-QString xXLSReader::ReadStr(int r, int c)
+xstring xXLSReader::ReadStr(int r, int c)
 {
 	std::string s;
 	if (sheet)
 		s = sheet->readStr(r, c);
-	return QString::fromStdString(s);
+	return s;
 }
 
 void xXLSReader::setViewExporter(xViewExporter* _xve)

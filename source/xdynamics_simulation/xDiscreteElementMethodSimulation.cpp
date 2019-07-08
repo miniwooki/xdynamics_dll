@@ -85,7 +85,7 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 	memset(moment, 0, sizeof(double) * np * 3);
 	for (unsigned int i = 0; i < ns; i++)
 	{
-		//vel[0] = -0.1;
+		//vel[0] = -0.5;
 		acc[i * 3 + 0] = 0.0;// mass[i] * xModel::gravity.x;
 		acc[i * 3 + 1] = xModel::gravity.y;
 		acc[i * 3 + 2] = 0.0;// mass[i] * xModel::gravity.z;

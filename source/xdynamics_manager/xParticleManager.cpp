@@ -307,6 +307,7 @@ xParticleObject* xParticleManager::CreateCubeParticle(
 	QString name = QString::fromStdString(n);
 	xParticleObject* xpo = new xParticleObject(n);
 	vector4d* pos = xpo->AllocMemory(_np);
+	double* mass = xpo->Mass();
 	xpo->setStartIndex(np);
 	xpo->setMaterialType(mt);
 	//n_single_sphere += _np;
@@ -350,6 +351,7 @@ xParticleObject* xParticleManager::CreateCubeParticle(
 						_z + z * gab.z + ran.z * frand(), r
 						);
 						pos[cnt] = p;
+						mass[cnt] = 0.0;
 					cnt++;
 				}
 			}
@@ -367,6 +369,7 @@ xParticleObject* xParticleManager::CreateCircleParticle(
 	QString name = QString::fromStdString(n);
 	xParticleObject* xpo = new xParticleObject(n);
 	vector4d* pos = xpo->AllocMemory(_np);
+	double* mass = xpo->Mass();
 	xpo->setStartIndex(np);
 	xpo->setMaterialType(mt);
 	//n_single_sphere += _np;
@@ -402,7 +405,8 @@ xParticleObject* xParticleManager::CreateCircleParticle(
 				vector4d new_pp = pp;				
 				new_pp.x = pp.x * cos(th) + pp.z * sin(th);
 				new_pp.z = -pp.x * sin(th) + pp.z * cos(th);
-				pos[xpo->StartIndex() + cnt] = new_pp;
+				pos[cnt] = new_pp;
+				mass[cnt] = 0.0;
 				cnt++;
 				if (cnt == _np)
 				{

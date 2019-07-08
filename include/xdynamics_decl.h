@@ -23,6 +23,8 @@
 
 #include "xTypes.h"
 #include "xdynamics_algebra/xAlgebraType.h"
+#include "xstring.h"
+#include "xmap.hpp"
 
 using namespace std;
 

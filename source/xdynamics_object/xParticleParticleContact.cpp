@@ -131,9 +131,21 @@ void xParticleParticleContact::cppCollision(
 			mpp.Gi, mpp.Gj,
 			restitution, stiffnessRatio,
 			friction, rolling_factor, cohesion);
+		if (d->gab < 0 && abs(d->gab) < abs(c.coh_s))
+		{
+			double f = JKRSeperationForce(c, cohesion);
+			double cf = cohesionForce(cohesion, d->gab, c.coh_r, c.coh_e, c.coh_s, f);
+			F -= cf * u;
+			continue;
+		}
+		else if (d->isc && d->gab < 0 && abs(d->gab) > abs(c.coh_s))
+		{
+			d->isc = false;
+			continue;
+		}
 		switch (force_model)
 		{
-		case DHS: DHSModel(c, d->gab, d->delta_s, d->dot_s, rv, u, m_fn, m_ft); break;
+		case DHS: DHSModel(c, d->gab, d->delta_s, d->dot_s, cohesion, rv, u, m_fn, m_ft); break;
 		}
 		RollingResistanceForce(rolling_factor, pos[i].w, pos[j].w, dcpr, m_fn, m_ft, res, tmax);
 		F += m_fn + m_ft;
@@ -150,18 +162,20 @@ void xParticleParticleContact::updateCollisionPair(
 	double cdist = (ri + rj) - dist;
 	//double rcon = pos[i].w - cdist;
 	unsigned int rid = 0;
+	vector3d u = rp / dist;
 	if (cdist > 0){
-		vector3d u = rp / dist;
+		
 		vector3d cpt = posi + ri * u;
 		if (xcpl.IsNewParticleContactPair(id))
 		{
 			xPairData *pd = new xPairData;
-			*pd = { PARTICLES, isc, 0, id, 0, 0, cpt.x, cpt.y, cpt.z, cdist, u.x, u.y, u.z };
+			*pd = { PARTICLES, true, 0, id, 0, 0, cpt.x, cpt.y, cpt.z, cdist, u.x, u.y, u.z };
 			xcpl.insertParticleContactPair(pd);
 		}		
 		else
 		{
 			xPairData *pd = xcpl.ParticlePair(id);
+			
 			pd->gab = cdist;
 			pd->cpx = cpt.x;
 			pd->cpy = cpt.y;
@@ -173,7 +187,24 @@ void xParticleParticleContact::updateCollisionPair(
 	}
 	else
 	{
-		xcpl.deleteParticlePairData(id);
+		xPairData *pd = xcpl.ParticlePair(id);
+		if (pd)
+		{
+			bool isc = pd->isc;
+			if (!isc)
+				xcpl.deleteParticlePairData(id);
+			else
+			{
+				vector3d cpt = posi + ri * u;
+				pd->gab = cdist;
+				pd->cpx = cpt.x;
+				pd->cpy = cpt.y;
+				pd->cpz = cpt.z;
+				pd->nx = u.x;
+				pd->ny = u.y;
+				pd->nz = u.z;
+			}
+		}
 	}
 }
 

@@ -25,12 +25,13 @@ xDynamicsManager::~xDynamicsManager()
 	qDeleteAll(xmbds);
 	qDeleteAll(xdems);
 	qDeleteAll(xsphs);
-	qDeleteAll(xoms);
+	xoms.delete_all();
+	//qDeleteAll(xoms);
 	qDeleteAll(xcms);
 	xmbds.clear();
 	xdems.clear();
 	xsphs.clear();
-	xoms.clear();
+	//xoms.clear();
 	xcms.clear();
 	xmbd = NULL;
 	xdem = NULL;
@@ -164,12 +165,13 @@ xObjectManager* xDynamicsManager::XObject()
 
 xObjectManager* xDynamicsManager::XObject(std::string& _n)
 {
-	QString n = QString::fromStdString(_n);
-	QStringList keys = xoms.keys();
-	QStringList::const_iterator it = qFind(keys, n);
-	if (it == keys.end() || !keys.size())
+	//QString n = QString::fromStdString(_n);
+	//QStringList keys = xoms.keys();
+	//QStringList::const_iterator it = qFind(keys, n);
+	//if (it == keys.end() || !keys.size())
+	if(xoms.find(_n) == xoms.end())
 		return NULL;
-	return xoms[n];
+	return xoms[_n];
 }
 
 xContactManager* xDynamicsManager::XContact()
@@ -209,13 +211,13 @@ xDynamicsManager::solverType xDynamicsManager::OpenModelXLS(const char* n)
 	{
 		QString file_name = xUtilityFunctions::GetFileName(n);
 		xModel::setModelName(file_name);
-		QString md = xls.SetupSheet(0);
+		xstring md = xls.SetupSheet(0);
 		std::map<xXlsInputDataType, vector2i> xx;
 		int c = 2;
 		while (!xls.IsEmptyCell(0, c))
 		{
 			vector2i d;
-			QString tn = xls.ReadStr(0, c++);
+			xstring tn = xls.ReadStr(0, c++);
 			std::string t = xls.ReadStr(0, c++).toStdString();
 			xUtilityFunctions::xsplit(t, ",", d);
 			d.x -= 1; d.y -= 1;
@@ -326,6 +328,7 @@ xDynamicsManager::solverType xDynamicsManager::OpenModelXLS(const char* n)
 	if (xmbd && xdem) stype = COUPLED_MBD_DEM;
 	else if (xmbd) stype = ONLY_MBD;
 	else if (xdem) stype = ONLY_DEM;
+	//xstring xx = "C:/xdynamics/resource/four_bar3d22.xls";
 	return stype;
 }
 
@@ -337,7 +340,7 @@ void xDynamicsManager::CreateModel(std::string n, modelType t, bool isOnAir /*= 
 	case MBD: xmbds[qname] = new xMultiBodyModel(n); break;
 	case DEM: xdems[qname] = new xDiscreteElementMethodModel(n); break;
 	case SPH: xsphs[qname] = new xSmoothedParticleHydrodynamicsModel(n); break;
-	case OBJECT: xoms[qname] = new xObjectManager(); break;
+	case OBJECT: xoms.insert(n, new xObjectManager()); break;//xoms[n] = new xObjectManager(); break;
 	case CONTACT: xcms[qname] = new xContactManager(); break;
 	}
 

@@ -75,9 +75,10 @@ public:
 	static unsigned int count;
 
 protected:
-	double cohesionForce(double coh_r, double coh_e, double Fn);
+	double cohesionForce(double coh, double cdist, double coh_r, double coh_e, double coh_s, double Fn);
+	double JKRSeperationForce(xContactParameters& c, double coh);
 	void DHSModel(xContactParameters& c, double cdist, double& ds, 
-		double& dots, vector3d& dv, vector3d& unit, vector3d& Fn, vector3d& Ft);
+		double& dots, double coh, vector3d& dv, vector3d& unit, vector3d& Fn, vector3d& Ft);
 	void RollingResistanceForce(
 		double rf, double ir, double jr, vector3d rc,
 		vector3d Fn, vector3d Ft, double& Mr, vector3d& Tmax);

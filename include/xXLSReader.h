@@ -36,8 +36,8 @@ public:
 	void ReadInputGravity(vector2i rc);
 	bool IsEmptyCell(int r, int c);
 
-	QString SetupSheet(int idx);
-	QString ReadStr(int r, int c);
+	xstring SetupSheet(int idx);
+	xstring ReadStr(int r, int c);
 
 	void setViewExporter(xViewExporter* _xve);
 
@@ -59,7 +59,7 @@ private:
 	Book* book;
 	Sheet* sheet;
 	xViewExporter* xve;
-	QString connect_file;
+	xstring connect_file;
 };
 
 #endif

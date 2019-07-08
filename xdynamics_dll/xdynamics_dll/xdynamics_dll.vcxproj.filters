@@ -264,7 +264,7 @@
     <ClCompile Include="..\..\source\xdynamics_object\xClusterObject.cpp">
       <Filter>소스 파일\xdynamics_object\shapeObject</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\xString.cpp">
+    <ClCompile Include="..\..\source\xstring.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
@@ -470,7 +470,10 @@
     <ClInclude Include="..\..\include\xdynamics_object\xClusterObject.h">
       <Filter>헤더 파일\xdynamics_object\shapeObject</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\xString.h">
+    <ClInclude Include="..\..\include\xmap.hpp">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xstring.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

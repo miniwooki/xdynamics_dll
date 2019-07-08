@@ -42,7 +42,7 @@ private:
 	QMap<QString, xMultiBodyModel*> xmbds;
 	QMap<QString, xDiscreteElementMethodModel*> xdems;
 	QMap<QString, xSmoothedParticleHydrodynamicsModel*> xsphs;
-	QMap<QString, xObjectManager*> xoms;
+	xmap<xstring, xObjectManager*> xoms;
 	QMap<QString, xContactManager*> xcms;
 	xMultiBodyModel* xmbd;
 	xDiscreteElementMethodModel* xdem;

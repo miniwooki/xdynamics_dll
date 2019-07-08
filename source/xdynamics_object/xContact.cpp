@@ -123,7 +123,7 @@ xContactParameters xContact::getContactParameters(
 	double Meq = jm ? (im * jm) / (im + jm) : im;
 	double Req = jr ? (ir * jr) / (ir + jr) : ir;
 	double Eeq = (iE * jE) / (iE*(1 - jp*jp) + jE*(1 - ip * ip));
-	cp.coh_e = ((1.0 - ip * ip) / iE) + ((1.0 - jp * jp) / jE);
+	cp.coh_e = 1.0 / (((1.0 - ip * ip) / iE) + ((1.0 - jp * jp) / jE));
 	double lne = log(rest);
 	double beta = 0.0;
 // 	switch (f_type)
@@ -136,9 +136,10 @@ xContactParameters xContact::getContactParameters(
 	cp.vs = cp.vn * ratio;
 	cp.fric = fric;
 	cp.rfric = rfric;
-//		break;
-	//}
 	cp.coh_r = Req;
+	double c1 = (M_PI * M_PI * coh * coh * cp.coh_r) / (cp.coh_e * cp.coh_e);
+	double gs = -(3.0 / 4.0) * pow(c1, 1.0 / 3.0);
+	cp.coh_s = gs;
 	return cp;
 }
 
@@ -152,27 +153,58 @@ void xContact::setRollingFactor(double d)
 	rolling_factor = d;
 }
 
-double xContact::cohesionForce(double coh_r, double coh_e, double Fn)
+double xContact::JKRSeperationForce(xContactParameters& c, double coh)
+{
+	double cf = -(3.0 / 2.0) * M_PI * coh * c.coh_r;
+	return cf;// Fn += -cf * u;
+}
+
+double xContact::cohesionForce(double coh, double cdist, double coh_r, double coh_e, double coh_s, double Fn)
 {
 	double cf = 0.0;
-	if (cohesion){
-		double rcp = (3.0 * coh_r * (-Fn)) / (4.0 * (1.0 / coh_e));
+	if (coh){
+		double c0 = 3.0 * coh * M_PI * coh_r;
+		double ac = (9.0 * coh_r * coh_r * coh * M_PI) / (4.0 * coh_e);
+		double eq = 2.0 * c0 * Fn + c0 * c0;
+		if (eq <= 0)
+			Fn = -0.5 * c0;
+		double a3 = (3.0 * coh_r) * (Fn + c0 + sqrt(2.0 * c0 * Fn + c0 * c0)) / (4.0 * coh_e);
+		//double a3 = (3.0 * coh_r) * c0 / (4.0 * coh_e);
+		/*double c1 = (M_PI * M_PI * coh * coh * coh_r) / (coh_e * coh_e);
+		double gs = -(3.0 / 4.0) * pow(c1, 1.0 / 3.0);*/
+	/*	if (coh_s < cdist)
+		{
+			cf = -(3.0 / 2.0) * M_PI * coh * coh_r;
+		}
+		else
+		{*/
+			cf = /*(4.0 * coh_e * a3) / (3.0 * coh_r)*/ - sqrt(8.0 * M_PI * coh * coh_e * a3);
+		//}
+			
+		/*double rcp = (3.0 * coh_r * (-Fn)) / (4.0 * (1.0 / coh_e));
 		double rc = pow(rcp, 1.0 / 3.0);
 		double Ac = M_PI * rc * rc;
-		cf = cohesion * Ac;
+		cf = coh * Ac;*/
 	}
 	return cf;
 }
 
 void xContact::DHSModel(
-	xContactParameters& c, double cdist, double& ds, double& dots, 
+	xContactParameters& c, double cdist, double& ds, double& dots, double coh,
 	vector3d& dv, vector3d& unit, vector3d& Fn, vector3d& Ft/*, vector3d& M*/)
 {
 	//vector3d Fn, Ft;
 	double fsn = (-c.kn * pow(cdist, 1.5));
-	double fca = cohesionForce(c.coh_r, c.coh_e, fsn);
 	double fsd = c.vn * dot(dv, unit);
-	Fn = (fsn + fca + fsd) * unit;
+	double fco = -cohesionForce(coh, cdist, c.coh_r, c.coh_e, c.coh_s, fsn + fsd);
+	//double sum_f = fsn + fsd;
+	////double fsd = 0.0;
+	//if (coh)
+	//{
+	//	sum_f = cohesionForce(coh, cdist, c.coh_r, c.coh_e, c.coh_s, sum_f);
+	//}
+	
+	Fn = (fsn + fsd + fco) * unit;
 	vector3d e = dv - dot(dv, unit) * unit;
 	double mag_e = length(e);
 	if (mag_e){
@@ -220,6 +252,10 @@ void xContact::cudaMemoryAlloc(unsigned int np)
 		mpp.Ei, mpp.Ej, mpp.Pri, mpp.Prj, mpp.Gi, mpp.Gj,
 		restitution, friction, rolling_factor, cohesion, stiffnessRatio, stiff_multiplyer
 	};
+	if (cohesion)
+	{
+
+	}
 	checkCudaErrors(cudaMalloc((void**)&dcp, sizeof(device_contact_property)));
 	checkCudaErrors(cudaMemcpy(dcp, &hcp, sizeof(device_contact_property), cudaMemcpyHostToDevice));
 }

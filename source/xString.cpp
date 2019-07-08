@@ -1,8 +1,7 @@
 #include "xstring.h"
+
 //#include "xstringList.h"
 //#include "xdynamics_algebra/xUtilityFunctions.h"
-
-using namespace xdyn;
 
 xstring::xstring()
 	: wc(NULL)
@@ -15,13 +14,14 @@ xstring::xstring(const char* _wc)
 	: wc(NULL)
 	, len(0)
 {
-	len = ((int)strnlen_s(_wc, sizeof(_wc)));
+	len = ((int)strnlen_s(_wc, 255)) + 1;
 	if (len)
 	{
 		//wc = SysAllocStringLen(NULL, len);
 		wc = new char[len];
+		memset(wc, 0, sizeof(char) * len);
 		strcpy_s(wc, len, _wc);
-	}	
+	}
 }
 
 xstring::xstring(const xstring& _xs)
@@ -29,14 +29,30 @@ xstring::xstring(const xstring& _xs)
 {
 	if (len)
 	{
-		//wc = SysAllocStringLen(NULL, len);
+		wc = new char[len];// SysAllocStringLen(NULL, len);
+		memset(wc, 0, sizeof(char) * len);
 		strcpy_s(wc, len, _xs.text());
 	}
 }
 
+xstring::xstring(const std::string & s)
+{
+	const char* c = s.c_str();
+	len = s.size() + 1;
+	if (len)
+	{
+		wc = new char[len];// wc = SysAllocStringLen(NULL, len);
+		memset(wc, 0, sizeof(char) * len);
+		strcpy_s(wc, len, c);
+	}		
+	
+}
+
 xstring::~xstring()
 {
-	delete[] wc; wc = NULL;// SysFreeString(wc);
+	//std::cout << "delete - " << wc << std::endl;
+	if(wc) 
+		delete[] wc; wc = NULL;// SysFreeString(wc);
 }
 
 void xstring::operator=(const xstring& _xs)
@@ -47,9 +63,8 @@ void xstring::operator=(const xstring& _xs)
 	if (len)
 	{
 		wc = new char[len];// wc = SysAllocStringLen(NULL, len);
+		strcpy_s(wc, len, _xs.text());
 	}
-		
-	strcpy_s(wc, len, _xs.text());
 }
 
 bool xstring::operator==(const char* _wc)
@@ -57,23 +72,52 @@ bool xstring::operator==(const char* _wc)
 	return !strcmp(wc, _wc);
 }
 
+bool xstring::operator==(const xstring& s)
+{
+	return !strcmp(wc, s.text());
+}
+
+bool xstring::operator!=(const xstring& _xs)
+{
+	return strcmp(wc, _xs.text());
+}
+
+xstring xstring::operator+=(const char* _wc)
+{
+	xstring o = *this + _wc;
+	return o;
+}
+
+xstring operator+ (const char* c, const xstring& s)
+{
+	int _len = s.size() + (int)strnlen_s(c, 255);
+	char *_wc = new char[_len + 1];// SysAllocStringLen(NULL, _len);
+	memset(_wc, 0, _len);
+	strcpy_s(_wc, _len, c);
+	strcat_s(_wc, _len + 1, s.text());
+	xstring _xs(_wc);
+	delete[] _wc;// SysFreeString(_wc);
+	return _xs;
+}
+
 xstring xstring::operator+(const xstring& _ixs)
 {
 	int _len = len + _ixs.size();
-	char *_wc = new char[len];// SysAllocStringLen(NULL, _len);
-	strcpy_s(_wc, len, wc);
-	strcat_s(_wc, _len, _ixs.text());
+	char *_wc = new char[_len + 1];// SysAllocStringLen(NULL, _len);
+	strcpy_s(_wc, _len, wc);
+	strcat_s(_wc, _len + 1, _ixs.text());
 	xstring _xs(_wc);
 	delete[] _wc;// SysFreeString(_wc);
- 	return _xs;
+	return _xs;
 }
 
 xstring xstring::operator+(const char* _iwc)
 {
-	int _len = len + (int)strnlen_s(_iwc, sizeof(_iwc));
-	char *_wc = new char[_len];// SysAllocStringLen(NULL, _len);
-	strcpy_s(_wc, len, wc);
-	strcat_s(_wc, _len, _iwc);
+	int _len = len + (int)strnlen_s(_iwc, 255);
+	char *_wc = new char[_len + 1];// SysAllocStringLen(NULL, _len);
+	memset(_wc, 0, _len);
+	strcpy_s(_wc, _len, wc);
+	strcat_s(_wc, _len + 1, _iwc);
 	xstring _xs(_wc);
 	delete[] _wc;// SysFreeString(_wc);
 	return _xs;
@@ -91,65 +135,52 @@ int xstring::size() const
 
 void xstring::split(const char* c, int n, int* data)
 {
-	//n = _n_split(c);
-	//xstringList* slist = new xstringList;
-	//_setupBuffer_int(n);
-	string s = wc;
-	basic_string<char>::size_type start = 0, end;
-	static const basic_string<char>::size_type npos = -1;
-	int len = (int)strnlen_s(c, sizeof(c));
-	for (int i = 0; i < n; i++)
-	{
-		end = s.find(c, start);
-		data[i] = atoi(s.substr(start, end - start).c_str());
-		start = end + len;
-	}
-	
+	//std::string s = c;
+	std::vector<std::string> d = _n_split(std::string(wc), *c);
+	for (size_t i = 0; i < n; i++)
+		data[i] = atoi(d.at(i).c_str());
 }
 
 void xstring::split(const char* c, int n, double* data)
 {
-	
-	//_setupBuffer_double(n);
-	string s = wc;
-	basic_string<char>::size_type start = 0, end;
-	static const basic_string<char>::size_type npos = -1;
-	int len = (int)strnlen_s(c, sizeof(c));
-	for (int i = 0; i < n; i++)
+	std::vector<std::string> d = _n_split(std::string(wc), *c);
+	for (size_t i = 0; i < n; i++)
+		data[i] = atof(d.at(i).c_str());
+}
+
+std::string xstring::toStdString()
+{
+	std::string ws = wc;
+	return ws;
+}
+
+const std::string xstring::toStdString() const
+{
+	std::string ws = wc;
+	return ws;
+}
+
+std::vector<std::string> xstring::_n_split(const std::string& s, const char c)
+{
+	size_t start_pos = 0;
+	size_t search_pos = 0;
+	std::vector<std::string> result;
+	while (start_pos < s.size())
 	{
-		end = s.find(c, start);
-		data[i] = atof(s.substr(start, end - start).c_str());
-		start = end + len;
+		search_pos = s.find_first_of(c, start_pos);
+		std::string tmp_str;
+		if (search_pos == std::string::npos)
+		{
+			search_pos = s.size();
+			tmp_str = s.substr(start_pos, search_pos - start_pos);
+			result.push_back(tmp_str);
+			break;
+		}
+		tmp_str = s.substr(start_pos, search_pos - start_pos);
+		if (!tmp_str.empty())
+			result.push_back(tmp_str);
+		start_pos = search_pos + 1;
 	}
-}
-
-std::string xstring::toWString()
-{
-	std::string ws = wc;
-	return ws;
-}
-
-const std::string xstring::toWString() const
-{
-	std::string ws = wc;
-	return ws;
-}
-
-int xstring::_n_split(const char* c)
-{
- 	int n = 0;
-// 	wstring s = wc;
-// 	basic_string<char>::size_type start = 0, end;
-// 	static const basic_string<char>::size_type npos = -1;
-// 	int len = (int)wcslen(c);
-// 	while (1)
-// 	{
-// 		end = s.find(c, start);
-// 		start = end + len;
-// 		n++;
-// 		if (end == npos)
-// 			break;
-// 	}
- 	return n;
+	return result;
 }
 

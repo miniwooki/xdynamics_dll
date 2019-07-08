@@ -227,7 +227,7 @@
     <ClCompile Include="..\..\source\xdynamics_simulation\xSimulation.cpp" />
     <ClCompile Include="..\..\source\xdynamics_simulation\xSmoothedParticleHydrodynamicsSimulation.cpp" />
     <ClCompile Include="..\..\source\xLog.cpp" />
-    <ClCompile Include="..\..\source\xString.cpp" />
+    <ClCompile Include="..\..\source\xstring.cpp" />
     <ClCompile Include="..\..\source\xViewExporter.cpp" />
     <ClCompile Include="..\..\source\xXLSReader.cpp" />
     <ClCompile Include="..\..\source\xObjectManager.cpp" />
@@ -312,7 +312,8 @@
     <ClInclude Include="..\..\include\xdynamics_simulation\xSimulation.h" />
     <ClInclude Include="..\..\include\xdynamics_simulation\xSmoothedParticleHydrodynamicsSimulation.h" />
     <ClInclude Include="..\..\include\xLog.h" />
-    <ClInclude Include="..\..\include\xString.h" />
+    <ClInclude Include="..\..\include\xmap.hpp" />
+    <ClInclude Include="..\..\include\xstring.h" />
     <ClInclude Include="..\..\include\xTypes.h" />
     <ClInclude Include="..\..\include\xViewExporter.h" />
     <ClInclude Include="..\..\include\xXLSReader.h" />
