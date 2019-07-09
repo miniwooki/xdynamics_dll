@@ -238,6 +238,7 @@ typedef struct
 typedef struct  
 {
 	xShapeType type;
+	bool isc;
 	unsigned int count;
 	unsigned int id;
 	double delta_s;

@@ -96,6 +96,7 @@ struct device_contact_property
 	double fric;
 	double rfric;
 	double coh;
+	//double coh_s;
 	double sratio;
 	double amp;
 };
@@ -209,6 +210,16 @@ void XDYNAMICS_API cu_cluster_plane_contact(
 	double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd, xClusterInformation* xci,
 	unsigned int np, device_contact_property *cp);
+
+void XDYNAMICS_API cu_cluster_meshes_contact(
+	device_triangle_info *dpi, device_mesh_mass_info* dpmi,
+	double* pos, double* cpos, double *ep, double* vel, double* ev,
+	double* force, double* moment,
+	device_contact_property *cp, double* mass,
+	double* tmax, double* rres,
+	unsigned int* pair_count, unsigned int* pair_id,
+	double* tsd, unsigned int* sorted_index, unsigned int* cstart, unsigned int* cend,
+	xClusterInformation* xci, unsigned int np);
 
 void XDYNAMICS_API vv_update_cluster_position(
 	double *pos, double *cpos, double* ep, 

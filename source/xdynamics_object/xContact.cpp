@@ -252,10 +252,16 @@ void xContact::cudaMemoryAlloc(unsigned int np)
 		mpp.Ei, mpp.Ej, mpp.Pri, mpp.Prj, mpp.Gi, mpp.Gj,
 		restitution, friction, rolling_factor, cohesion, stiffnessRatio, stiff_multiplyer
 	};
-	if (cohesion)
+	/*if (cohesion)
 	{
+		double Meq = jm ? (im * jm) / (im + jm) : im;
+		double Req = jr ? (ir * jr) / (ir + jr) : ir;
+		double Eeq = 1.0 / (((1.0 - ip * ip) / iE) + ((1.0 - jp * jp) / jE));
 
-	}
+		double c1 = (M_PI * M_PI * coh * coh * cp.coh_r) / (cp.coh_e * cp.coh_e);
+		double gs = -(3.0 / 4.0) * pow(c1, 1.0 / 3.0);
+		cp.coh_s = gs;
+	}*/
 	checkCudaErrors(cudaMalloc((void**)&dcp, sizeof(device_contact_property)));
 	checkCudaErrors(cudaMemcpy(dcp, &hcp, sizeof(device_contact_property), cudaMemcpyHostToDevice));
 }

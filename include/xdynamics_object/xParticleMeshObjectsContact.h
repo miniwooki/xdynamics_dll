@@ -47,6 +47,10 @@ public:
 		xContactPairList* pairs, double r, double m,
 		vector3d& p, vector3d& v, vector3d& o,
 		double &res, vector3d &tmax, vector3d& F, vector3d& M);
+	void particle_triangle_contact_force(
+		xTrianglePairData* d, double r, double m,
+		vector3d& p, vector3d& v, vector3d& o,
+		double &res, vector3d &tmax, vector3d& F, vector3d& M);
 	unsigned int NumContact() { return ncontact; }
 	unsigned int NumContactObjects() { return nPobjs; }
 	void setNumContact(unsigned int c) { ncontact = c; }
@@ -55,7 +59,8 @@ public:
 	void getMeshContactForce();
 	bool updateCollisionPair(
 		unsigned int id, xContactPairList& xcpl, double r, 
-		vector3d pos, vector3d& ocpt, vector3d& ounit, vector3i& ctype);
+		vector3d pos, unsigned int &oid, vector3d& ocpt, vector3d& ounit, vector3i& ctype);
+	void updateCollisionPairLineOrVertex(double r, vector3d& pos, unsigned int& oid, vector3d& ocpt, vector3d& ounit, xContactPairList& xcpl);
 	virtual void cudaMemoryAlloc(unsigned int np);
 	virtual void cuda_collision(
 		double *pos, double *vel, double *omega,

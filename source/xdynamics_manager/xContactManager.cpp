@@ -275,19 +275,22 @@ void xContactManager::updateCollisionPair(
 	xClusterInformation* xci,
 	unsigned int np)
 {
+	unsigned int klist[200] = { 0, };
 	for (unsigned int i = 0; i < np; i++)
 	{
 		unsigned int count = 0;
 		unsigned int neach = 1;
+		unsigned int kcount = 0;
 		if (ncobject)
 			for (unsigned int j = 0; j < ncobject; j++)
 				if (i >= xci[j].sid && i < xci[j].sid + xci[j].count * xci[j].neach)
 					neach = xci[j].neach;
 		vector3d p = new_vector3d(pos[i].x, pos[i].y, pos[i].z);
 		double r = pos[i].w;
-		if(cpplane)
+		if (cpplane)
 			cpplane->updateCollisionPair(xcpl[i], r, p);
 		vector3i gp = xGridCell::getCellNumber(p.x, p.y, p.z);
+		unsigned int old_id = 0;
 		vector3d old_cpt = new_vector3d(0.0, 0.0, 0.0);
 		vector3d old_unit = new_vector3d(0.0, 0.0, 0.0);
 		vector3i ctype = new_vector3i(0, 0, 0);
@@ -310,20 +313,29 @@ void xContactManager::updateCollisionPair(
 									double jr = pos[k].w;
 									unsigned int ck = k / neach;
 									cpp->updateCollisionPair(k, ncobject ? 1 : 0, xcpl[i], r, jr, p, jp);
-								}								
+								}
 							}
 							else if (k >= np)
 							{
-								if (cpmeshes->updateCollisionPair(k - np, xcpl[i], r, p, old_cpt, old_unit, ctype))
+								if (cpmeshes->updateCollisionPair(k - np, xcpl[i], r, p, old_id, old_cpt, old_unit, ctype))
 									count++;
+								klist[kcount++] = k;
 							}
 						}
 					}
 				}
 			}
 		}
-		/*if (count > 1)
-			std::cout << "mesh contact overlab occured." << std::endl;*/
+		if (count > 1)
+			std::cout << "mesh contact overlab occured." << std::endl;
+		/*if (cpmeshes && count == 0)
+		{
+			for (unsigned int k = 0; k < kcount; k++)
+			{
+				cpmeshes->updateCollisionPair(1, klist[k], xcpl[i], r, p, old_id, old_cpt, old_unit, ctype);
+			}
+			
+		}*/
 	}
 }
 
@@ -349,6 +361,18 @@ void xContactManager::deviceCollision(
 					ev, force, moment, mass,
 					d_Tmax, d_RRes, d_pair_count_ppl, d_pair_id_ppl, d_tsd_ppl, xci,
 					np, cpplane->DeviceContactProperty());
+			}
+		}
+		if (cpmeshes)
+		{
+			if (cpmeshes->NumContactObjects())
+			{
+				cpmeshes->updateMeshMassData();
+				cu_cluster_meshes_contact(cpmeshes->deviceTrianglesInfo(), cpmeshes->devicePolygonObjectMassInfo(),
+					pos, cpos, ep, vel, ev, force, moment, cpmeshes->DeviceContactProperty(), mass,
+					d_Tmax, d_RRes, d_pair_count_ptri, d_pair_id_ptri, d_tsd_ptri,
+					sorted_id, cell_start, cell_end, xci, np);
+				cpmeshes->getMeshContactForce();
 			}
 		}
 	}

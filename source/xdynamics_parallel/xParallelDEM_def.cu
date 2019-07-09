@@ -336,6 +336,48 @@ void cu_cluster_plane_contact(
 		pair_count, pair_id, (double2 *)tsd, xci, np);
 }
 
+void cu_cluster_meshes_contact(
+	device_triangle_info * dpi, 
+	device_mesh_mass_info * dpmi,
+	double * pos,
+	double * cpos,
+	double * ep,
+	double * vel,
+	double * ev,
+	double * force,
+	double * moment,
+	device_contact_property * cp,
+	double * mass, 
+	double * tmax,
+	double * rres, 
+	unsigned int * pair_count, 
+	unsigned int * pair_id, 
+	double * tsd,
+	unsigned int * sorted_index,
+	unsigned int * cstart, 
+	unsigned int * cend, 
+	xClusterInformation * xci, 
+	unsigned int np)
+{
+	computeGridSize(np, 256, numBlocks, numThreads);
+	cluster_meshes_contact_kernel << <numBlocks, numThreads >> > (
+		dpi, dpmi,
+		(double4*)pos,
+		(double4*)cpos,
+		(double4*)ep,
+		(double3*)vel,
+		(double4*)ev,
+		(double3*)force,
+		(double3*)moment,
+		cp, mass,
+		(double3*)tmax,
+		rres,
+		pair_count, pair_id,
+		(double2*)tsd, sorted_index,
+		cstart, cend,
+		xci, np);
+}
+
 void vv_update_cluster_position(
 	double *pos, double *cpos, double* ep,
 	double *rloc, double *vel, double *acc,
