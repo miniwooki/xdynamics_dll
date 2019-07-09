@@ -29,6 +29,7 @@ struct device_dem_parameters
 	unsigned int nClusterObject;
 	unsigned int nTsdaConnection;
 	unsigned int nTsdaConnectionList;
+	unsigned int nTsdaConnectionBodyData;
 	unsigned int nsphere;
 	unsigned int nplane;
 	unsigned int ncell;
@@ -76,9 +77,26 @@ struct device_mesh_mass_info
 	double3 moment;
 };
 
+struct device_body_info
+{
+	double3 pos;
+	double3 vel;
+	double3 force;
+	double3 moment;
+	double4 ep;
+};
+
+struct device_tsda_connection_body_data
+{
+	unsigned int id;
+	unsigned int kc_id;
+	unsigned int body_id;
+	double3 rpos;
+};
+
 struct device_cylinder_info
 {
-	double len, rbase, rtop;
+	double3 len_rr;// len, rbase, rtop;
 	double3 pbase;
 	double3 ptop;
 	double3 origin;
@@ -238,7 +256,11 @@ void XDYNAMICS_API cu_calculate_spring_damper_force(
 	xSpringDamperConnectionInformation* xsdci,
 	xSpringDamperConnectionData* xsdcd,
 	xSpringDamperCoefficient* xsdkc,
-	unsigned int nc);
+	xSpringDamperBodyConnectionInfo* xsdb,
+	xSpringDamperBodyConnectionData* xsdbd,
+	unsigned int nc,
+	unsigned int nb,
+	unsigned int nbd);
 
 #endif
 

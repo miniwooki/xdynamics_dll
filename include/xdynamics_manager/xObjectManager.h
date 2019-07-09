@@ -8,6 +8,7 @@
 #include "xdynamics_object/xCubeObject.h"
 #include "xdynamics_object/xPlaneObject.h"
 #include "xdynamics_object/xMeshObject.h"
+#include "xdynamics_object/xCylinderObject.h"
 #include "xdynamics_object/xClusterObject.h"
 
 class xParticleManager;
@@ -28,6 +29,7 @@ public:
 	xCubeObject* CreateCubeShapeObject(std::string _name, int _xmt);
 	xMeshObject* CreateMeshShapeObject(std::string _name, int _xmt);
 	xClusterObject* CreateClusterShapeObject(std::string _name, int _xmt);
+	xCylinderObject* CreateCylinderShapeObject(std::string _name, int _xmt);
 
 	void CreateSPHBoundaryParticles(xParticleManager* xpm);
 

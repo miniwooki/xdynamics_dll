@@ -24,6 +24,8 @@ public:
 	void ExportResults(std::fstream& of);
 	void EnableSaveResultToMemory(bool b);
 	void updateObjectFromMBD();
+	double* HostPosition();
+	double* HostVelocity();
 
 protected:
 	void clearMemory();
@@ -37,6 +39,8 @@ protected:
 	unsigned int nTsdaConnection;
 	unsigned int nTsdaConnectionList;
 	unsigned int nTsdaConnectionValue;
+	unsigned int nTsdaConnectionBody;
+	unsigned int nTsdaConnectionBodyData;
 
 	xDiscreteElementMethodModel* xdem;
 	xGridCell* dtor;
@@ -74,6 +78,9 @@ protected:
 	xSpringDamperConnectionInformation *dxsdci;
 	xSpringDamperConnectionData *dxsdc_data;
 	xSpringDamperCoefficient *dxsdc_kc;
+	/*xSpringDamperBodyConnectionInfo *dxsdc_body;
+	xSpringDamperBodyConnectionData *dxsdc_body_data;*/
+	device_tsda_connection_body_data *dxsd_cbd;
 
 	QList<QString> partList;
 };

@@ -129,6 +129,15 @@ bool xDynamicsSimulator::xInitialize(
 				xLog::log("The initialization of smoothed particle hydrodynamics mode was succeeded.");
 		}
 	}
+	if (xdem && xmbd)
+	{
+		xSpringDamperForce *xsdf = xdm->XDEMModel()->XSpringDamperForce();
+		if (xsdf)
+		{
+			xsdf->SetDEMParticlePosition(xdem->HostPosition(), xdem->HostVelocity());
+			xmbd->SetDEMSpringDamper(xsdf);
+		}
+	}
 // 	xuf::DeleteFileByEXT(xuf::xstring(xModel::path) + xuf::xstring(xModel::name), "bin");
 // 	xuf::DeleteFileByEXT(xuf::xstring(xModel::path) + xuf::xstring(xModel::name), "bpm");
 // 	xuf::DeleteFileByEXT(xuf::xstring(xModel::path) + xuf::xstring(xModel::name), "bkc");

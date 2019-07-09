@@ -19,6 +19,7 @@ public:
 	//integratorType IntegrationType();
 	//void setIntegrationType(integratorType _type);
 	bool Initialized();
+	void SetDEMSpringDamper(xSpringDamperForce* dem_t);
 	//bool initialize(xMultiBodyModel* xmbd);
 	//bool OneStepAnalysis(double ct, unsigned int cstep);
 	//void setImplicitTolerance(double _eps);
@@ -59,6 +60,7 @@ protected:
 	xPointMass* xpm;
 
 	xMultiBodyModel* xmbd;
+	xSpringDamperForce* dem_tsda;
 };
 
 #endif

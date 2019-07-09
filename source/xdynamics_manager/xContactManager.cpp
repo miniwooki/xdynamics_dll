@@ -68,6 +68,7 @@ xContact* xContactManager::CreateContactPair(
 	case PARTICLE_CUBE:	c = new xParticleCubeContact(n, o1, o2); break;
 	case PARTICLE_PANE:	c = new xParticlePlaneContact(n); break;
 	case PARTICLE_MESH_SHAPE: c = new xParticleMeshObjectContact(n, o1, o2); cpmesh[c->Name()] = dynamic_cast<xParticleMeshObjectContact*>(c); break;
+	case PARTICLE_CYLINDER: c = new xParticleCylinderContact(n, o1, o2); break;
 	}
 	xMaterialPair mpp =
 	{

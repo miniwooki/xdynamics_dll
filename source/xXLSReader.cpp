@@ -206,6 +206,28 @@ xContactParameterData xXLSReader::ReadContactData(std::string& _name, int r, int
 	return d;
 }
 
+xCylinderObjectData xXLSReader::ReadCylinderObjectData(std::string& _name, int mat, int r, int& c)
+{
+	xCylinderObjectData d = { 0, };
+	d.length = sheet->readNum(r, c++);
+	d.r_top = sheet->readNum(r, c++);
+	d.r_bottom = sheet->readNum(r, c++);
+	double *ptr = &d.p0x;
+	std::string x;
+	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 0);
+	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 3);
+	if (xve)
+	{
+		int t = VCYLINDER;
+		xve->Write((char*)&t, sizeof(int));
+		unsigned int ns = static_cast<unsigned int>(_name.size());
+		xve->Write((char*)&ns, sizeof(unsigned int));
+		xve->Write((char*)_name.c_str(), sizeof(char)*ns);
+		xve->Write((char*)&d, sizeof(xCylinderObjectData));
+	}
+	return d;
+}
+
 xTSDAData xXLSReader::ReadTSDAData(std::string& _name, int r, int& c)
 {
 	xTSDAData d = { 0, };
@@ -360,7 +382,7 @@ void xXLSReader::ReadForce(xMultiBodyModel* xmbd, xDiscreteElementMethodModel* x
 			xt.c = sheet->readNum(rc.x, rc.y++);
 			xt.init_l = sheet->readNum(rc.x, rc.y++);
 			std::string fpath = sheet->readStr(rc.x, rc.y);
-			xf->SetupDataFromListData(xt, fpath); 
+			xf->SetupDataFromListData(xt, fpath);
 		}
 		else
 		{
@@ -573,6 +595,11 @@ void xXLSReader::ReadShapeObject(xObjectManager* xom, vector2i rc)
 			{
 				xPlaneObject* xpo = xom->CreatePlaneShapeObject(name, material);
 				xpo->SetupDataFromStructure(ReadPlaneObjectData(name, material, rc.x, rc.y));
+			}
+			else if (form == xShapeType::CYLINDER_SHAPE)
+			{
+				xCylinderObject* xco = xom->CreateCylinderShapeObject(name, material);
+				xco->SetupDataFromStructure(ReadCylinderObjectData(name, material, rc.x, rc.y));
 			}
 			else if (form == xShapeType::CLUSTER_SHAPE)
 			{

@@ -105,6 +105,19 @@ xClusterObject * xObjectManager::CreateClusterShapeObject(std::string _name, int
 	return xco;
 }
 
+xCylinderObject* xObjectManager::CreateCylinderShapeObject(std::string _name, int _xmt)
+{
+	QString name = QString::fromStdString(_name);
+	xCylinderObject* xco = new xCylinderObject(_name);
+	xMaterial xm = GetMaterialConstant(_xmt);
+	xco->setMaterialType((xMaterialType)_xmt);
+	xco->setDensity(xm.density);
+	xco->setYoungs(xm.youngs);
+	xco->setPoisson(xm.poisson);
+	objects[name] = xco;
+	return xco;
+}
+
 void xObjectManager::CreateSPHBoundaryParticles(xParticleManager* xpm)
 {
 // 	foreach(xObject *xo, XObjects())

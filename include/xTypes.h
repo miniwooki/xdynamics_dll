@@ -45,6 +45,7 @@
 #define FLUID_SHEAR_MODULUS 0.0
 
 #include <QtCore/QString>
+//#include <string>
 
 enum xMaterialType
 {	
@@ -89,7 +90,8 @@ enum xContactPairType
 	PARTICLE_CUBE = 15,
 	PARTICLE_PANE = 16,
 	PARTICLE_MESH_SHAPE = 32,
-	PLANE_MESH_SHAPE = 22 
+	PLANE_MESH_SHAPE = 22,
+	PARTICLE_CYLINDER = 40
 };
 
 enum xShapeType
@@ -139,6 +141,7 @@ enum xViewObjectType
 	VPLANE, 
 	VLINE,
 	VCUBE, 
+	VCYLINDER,
 	VMESH, 
 	VPARTICLE, 
 	VTSDA,
@@ -206,6 +209,8 @@ typedef struct { unsigned int sid, count, neach; }xClusterInformation;
 typedef struct { unsigned int id, sid, ntsda; }xSpringDamperConnectionInformation;
 typedef struct { unsigned int jd, kc_id; double init_l; }xSpringDamperConnectionData;
 typedef struct { double k, c; }xSpringDamperCoefficient;
+typedef struct { QString cbody; unsigned int sid, nconnection; }xSpringDamperBodyConnectionInfo;
+typedef struct{ unsigned int ci, kc_id; double rx, ry, rz; }xSpringDamperBodyConnectionData;
 /*typedef struct{ double tstart, dpdt }xObjectMovingCondition;*/
 
 typedef struct 

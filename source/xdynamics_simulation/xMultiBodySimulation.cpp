@@ -1,4 +1,5 @@
 #include "xdynamics_simulation/xMultiBodySimulation.h"
+
 #include <sstream>
 
 xMultiBodySimulation::xMultiBodySimulation()
@@ -10,6 +11,7 @@ xMultiBodySimulation::xMultiBodySimulation()
 	, isInitilize(false)
 	, xpm(NULL)
 	, lagMul(NULL)
+	, dem_tsda(NULL)
 {
 
 }
@@ -23,6 +25,17 @@ xMultiBodySimulation::~xMultiBodySimulation()
 bool xMultiBodySimulation::Initialized()
 {
 	return isInitilize;
+}
+
+void xMultiBodySimulation::SetDEMSpringDamper(xSpringDamperForce* dem_t)
+{
+	dem_tsda = dem_t;
+	for (unsigned int i = 0; i < dem_tsda->NumSpringDamperBodyConnection(); i++)
+	{
+		xSpringDamperBodyConnectionInfo info = dem_tsda->xSpringDamperBodyConnectionInformation()[i];
+		xPointMass* pm = xmbd->XMass(info.cbody.toStdString());
+		dem_tsda->ConvertGlobalToLocalOfBodyConnectionPosition(i, pm);
+	}
 }
 
 void xMultiBodySimulation::SaveStepResult(unsigned int part, double ct)
@@ -212,6 +225,17 @@ void xMultiBodySimulation::ConstructForceVector(xVectorD& v)
 	vector4d m;
 	//xPointMass* xpm = xmbd->BeginPointMass();
 	unsigned int j = 0;
+	/*if (dem_tsda)
+	{
+		for (unsigned int i = 0; i < dem_tsda->NumSpringDamperBodyConnection(); i++)
+		{
+			xSpringDamperBodyConnectionInfo info = dem_tsda->xSpringDamperBodyConnectionInformation()[i];
+			xPointMass* pm = xmbd->XMass(info.cbody.toStdString());
+			dem_tsda->xCalculateForceFromDEM(i, pm, q, qd);
+		}
+
+	}*/
+		
 	foreach(xForce* xf, xmbd->Forces())
 	{
 		xf->xCalculateForce(q, qd);

@@ -9,6 +9,8 @@
 #include <QtCore/QStringList>
 #include <map>
 
+static xDynamicsManager* xdmanager;
+
 xDynamicsManager::xDynamicsManager()
 	: xModel("Model1")
 	, xmbd(NULL)
@@ -18,6 +20,7 @@ xDynamicsManager::xDynamicsManager()
 	, xcm(NULL)
 {
 	CreateModel(xModel::name.toStdString(), OBJECT);
+	xdmanager = this;
 }
 
 xDynamicsManager::~xDynamicsManager()
@@ -40,6 +43,11 @@ xDynamicsManager::~xDynamicsManager()
 	xcm = NULL;
 	xSimulation::initialize();
 	xObject::initialize();
+}
+
+xDynamicsManager* xDynamicsManager::This()
+{
+	return xdmanager;
 }
 
 bool xDynamicsManager::getSimulatorFromCommand(int argc, char* argv[])

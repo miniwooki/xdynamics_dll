@@ -1279,43 +1279,43 @@ __device__ float particle_cylinder_contact_detection(
 		_cp = cy->pbase + t * ab;
 		dist = length(p - _cp);
 		u = (_cp - p) / dist;
-		cp = _cp - cy->rbase * u;
-		return cy->rtop + pt.w - dist;
+		cp = _cp - cy->len_rr.z * u;
+		return cy->len_rr.y + pt.w - dist;
 	}
 	else {
 
 		_cp = cy->pbase + t * ab;
 		dist = length(p - _cp);
-		if (dist < cy->rbase) {
+		if (dist < cy->len_rr.z) {
 			double3 OtoCp = cy->origin - _cp;
 			double OtoCp_ = length(OtoCp);
 			u = OtoCp / OtoCp_;
-			cp = _cp - cy->rbase * u;
-			return cy->len * 0.5 + pt.w - OtoCp_;
+			cp = _cp - cy->len_rr.z * u;
+			return cy->len_rr.x * 0.5 + pt.w - OtoCp_;
 		}
 		double3 A_1 = makeTFM_1(cy->ep);
 		double3 A_2 = makeTFM_2(cy->ep);
 		double3 A_3 = makeTFM_3(cy->ep);
 		double3 _at = p - cy->ptop;
 		double3 at = toLocal(A_1, A_2, A_3, _at);
-		double r = length(at);
+		//double r = length(at);
 		cp = cy->ptop;
-		if (abs(at.y) > cy->len) {
+		if (abs(at.y) > cy->len_rr.x) {
 			_at = p - cy->pbase;
 			at = toLocal(A_1, A_2, A_3, _at);
 			cp = cy->pbase;
 		}
 		double pi = atan(at.x / at.z);
 		if (pi < 0 && at.z < 0) {
-			_cp.x = cy->rbase * sin(-pi);
+			_cp.x = cy->len_rr.z * sin(-pi);
 		}
 		else if (pi > 0 && at.x < 0 && at.z < 0) {
-			_cp.x = cy->rbase * sin(-pi);
+			_cp.x = cy->len_rr.z * sin(-pi);
 		}
 		else {
-			_cp.x = cy->rbase * sin(pi);
+			_cp.x = cy->len_rr.z * sin(pi);
 		}
-		_cp.z = cy->rbase * cos(pi);
+		_cp.z = cy->len_rr.z * cos(pi);
 		if (at.z < 0 && _cp.z > 0) {
 			_cp.z = -_cp.z;
 		}
@@ -2182,6 +2182,40 @@ __global__ void calculate_spring_damper_force_kernel(
 	unsigned id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
 	if (id >= cte.nTsdaConnection)
 		return;
+	unsigned int i = xsdci[id].id;
+	double4 p = pos[i];
+	double3 ri = make_double3(p.x, p.y, p.z);
+	double3 vi = vel[i];
+	xSpringDamperConnectionInformation xsi = xsdci[id];
+	for (unsigned int j = 0; j < xsi.ntsda; j++)
+	{
+		xSpringDamperConnectionData xsd = xsdcd[xsi.sid + j];
+		xSpringDamperCoefficient kc = xsdkc[xsd.kc_id];
+		double4 pj = pos[xsd.jd];
+		double3 rj = make_double3(pj.x, pj.y, pj.z);
+		double3 vj = vel[xsd.jd];
+		double3 L = rj - ri;
+		double l = length(L);
+		double dl = dot(L, (vj - vi)) / l;
+		double fr = kc.k * (l - xsd.init_l) + kc.c * dl;
+		//printf("%d, %d, %f\n", xsd.jd, xsd.kc_id, fl[xsi.sid + j]);
+		double3 Q = (fr / l) * L;
+		force[i] += Q;
+	}
+}
+
+__global__ void calculate_spring_damper_connecting_body_force_kernel(
+	double4* pos,
+	double3* vel,
+	double3* force,
+	xSpringDamperBodyConnectionInfo* xsdbci,
+	xSpringDamperBodyConnectionData* xsdbcd,
+	xSpringDamperCoefficient* xsdkc)
+{
+	unsigned id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
+	if (id >= cte.nTsdaConnectionBodyData)
+		return;
+	unsigned int sid = 
 	unsigned int i = xsdci[id].id;
 	double4 p = pos[i];
 	double3 ri = make_double3(p.x, p.y, p.z);

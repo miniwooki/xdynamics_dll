@@ -8,6 +8,7 @@
 #include "xdynamics_object/xParticleCubeContact.h"
 #include "xdynamics_object/xParticleMeshObjectsContact.h"
 #include "xdynamics_object/xParticlePlanesContact.h"
+#include "xdynamics_object/xParticleCylinderContact.h"
 
 class xObject;
 class xContact;

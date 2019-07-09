@@ -1,4 +1,5 @@
 #include "xdynamics_object/xSpringDamperForce.h"
+#include "xdynamics_manager/xDynamicsManager.h"
 
 xSpringDamperForce::xSpringDamperForce()
 	: xForce()
@@ -15,6 +16,8 @@ xSpringDamperForce::xSpringDamperForce()
 	, connection_data(NULL)
 	, kc_value(NULL)
 	, free_length(NULL)
+	, connection_body_info(NULL)
+	, connection_body_data(NULL)
 {
 
 }
@@ -34,6 +37,8 @@ xSpringDamperForce::xSpringDamperForce(std::string _name)
 	, connection_data(NULL)
 	, kc_value(NULL)
 	, free_length(NULL)
+	, connection_body_info(NULL)
+	, connection_body_data(NULL)
 {
 
 }
@@ -42,6 +47,8 @@ xSpringDamperForce::~xSpringDamperForce()
 {
 	if (xsdci) delete[] xsdci; xsdci = NULL;
 	if (connection_data) delete[] connection_data; connection_data = NULL;
+	if (connection_body_info) delete[] connection_body_info; connection_body_info = NULL;
+	if (connection_body_data) delete[] connection_body_data; connection_body_data = NULL;
 	if (kc_value) delete[] kc_value; kc_value = NULL;
 	if (free_length) delete[] free_length; free_length = NULL;
 }
@@ -108,7 +115,39 @@ void xSpringDamperForce::SetupDataFromListData(xTSDAData&d, std::string data)
 					}
 					cnt += xsi.ntsda;
 				}				
-			}			
+			}	
+			else if (ch == "body_connection_list")
+			{
+				std::string ch;
+				unsigned int cnt = 0;
+				fs >> nBodyConnection;
+				connection_body_info = new xSpringDamperBodyConnectionInfo[nBodyConnection];
+				QList<xSpringDamperBodyConnectionData> bc_list;
+				for (unsigned int i = 0; i < nBodyConnection; i++)
+				{
+					fs >> ch >> ch;
+					connection_body_info[i].cbody = QString::fromStdString(ch);
+					connection_body_info[i].sid = cnt;
+					fs >> ch >> connection_body_info[i].nconnection;
+					for (unsigned int j = 0; j < connection_body_info[i].nconnection; j++)
+					{
+						xSpringDamperBodyConnectionData d = { 0, };
+						fs >> d.ci >> d.kc_id >> d.rx >> d.ry >> d.rz;
+						bc_list.push_back(d);
+					}
+					cnt = bc_list.size();
+				}
+				cnt = 0;
+				nBodyConnectionData = bc_list.size();
+				if (nBodyConnectionData)
+				{
+					connection_body_data = new xSpringDamperBodyConnectionData[nBodyConnectionData];
+					foreach(xSpringDamperBodyConnectionData d, bc_list)
+					{
+						connection_body_data[cnt++] = d;
+					}
+				}
+			}
 		}
 	}
 	fs.close();
@@ -142,6 +181,21 @@ void xSpringDamperForce::SetupDataFromListData(xTSDAData&d, std::string data)
 	nConnection = cnt;
 }
 
+void xSpringDamperForce::ConvertGlobalToLocalOfBodyConnectionPosition(unsigned int i, xPointMass* pm)
+{
+	unsigned int sid = connection_body_info[i].sid;
+	xSpringDamperBodyConnectionData *d = NULL;
+	for (unsigned int i = 0; i < connection_body_info[i].nconnection; i++)
+	{
+		d = &connection_body_data[sid + i];
+		vector3d loc = new_vector3d(d->rx, d->ry, d->rz);
+		vector3d new_loc = pm->toLocal(loc - pm->Position());
+		d->rx = new_loc.x;
+		d->ry = new_loc.y;
+		d->rz = new_loc.z;
+	}
+}
+
 unsigned int xSpringDamperForce::NumSpringDamperConnection()
 {
 	return nsdci;
@@ -157,6 +211,16 @@ unsigned int xSpringDamperForce::NumSpringDamperConnectionValue()
 	return nkcvalue;
 }
 
+unsigned int xSpringDamperForce::NumSpringDamperBodyConnection()
+{
+	return nBodyConnection;
+}
+
+unsigned int xSpringDamperForce::NumSpringDamperBodyConnectionData()
+{
+	return nBodyConnectionData;
+}
+
 xSpringDamperConnectionInformation* xSpringDamperForce::xSpringDamperConnection()
 {
 	return xsdci;
@@ -170,6 +234,16 @@ xSpringDamperConnectionData* xSpringDamperForce::xSpringDamperConnectionList()
 xSpringDamperCoefficient* xSpringDamperForce::xSpringDamperCoefficientValue()
 {
 	return kc_value;
+}
+
+xSpringDamperBodyConnectionInfo* xSpringDamperForce::xSpringDamperBodyConnectionInformation()
+{
+	return connection_body_info;
+}
+
+xSpringDamperBodyConnectionData* xSpringDamperForce::XSpringDamperBodyConnectionDataList()
+{
+	return connection_body_data;
 }
 
 double* xSpringDamperForce::FreeLength()
@@ -269,36 +343,107 @@ void xSpringDamperForce::xCalculateForceForDEM(double* pos, double* vel, double*
 			rj = new_vector3d(p[xsd.jd].x, p[xsd.jd].y, p[xsd.jd].z);
 			vj = v[xsd.jd];
 			vector3d L = rj - ri;
-			//L = rj + Aj * spj - ri - Ai * spi;
-			//L = action->getPosition() + action->toGlobal(spj) - base->getPosition() - base->toGlobal(spi);
-			l = length(L);// .length();
+			l = length(L);
 			vector3d dL = vj - vi;
-			//VEC3D dL = action->getVelocity() + B(action->getEV(), spj) * action->getEP() - base->getVelocity() - B(base->getEV(), spi) * base->getEP();
 			double dl = dot(L, dL) / l;
 			double fr = kc.k * (l - xsd.init_l) + kc.c * dl;
 			vector3d Q = (fr / l) * L;
 			f[id] += Q;
 		}
+	};
+	for (unsigned int i = 0; i < nBodyConnection; i++)
+	{
+		xSpringDamperBodyConnectionInfo info = connection_body_info[i];
+		xPointMass* pm = xDynamicsManager::This()->XMBDModel()->XMass(info.cbody.toStdString());
+		vector3d ri = pm->Position();
+		vector3d rj = new_vector3d(0, 0, 0);
+		vector3d vi = pm->Velocity();
+		vector3d vj = new_vector3d(0, 0, 0);
+		euler_parameters ei = pm->EulerParameters();
+		euler_parameters edi = pm->DEulerParameters();
+		matrix33d Ai = GlobalTransformationMatrix(ei);
+		unsigned int sid = connection_body_info[i].sid;
+		xSpringDamperBodyConnectionData d = { 0, };
+		vector4d* dem_pos = (vector4d*)pos;
+		vector3d* dem_vel = (vector3d*)vel;
+		for (unsigned int i = 0; i < connection_body_info[i].nconnection; i++)
+		{
+			d = connection_body_data[sid + i];
+			xSpringDamperCoefficient kc = kc_value[d.kc_id];
+			vector4d d_pos = dem_pos[d.ci];
+			rj = new_vector3d(d_pos.x, d_pos.y, d_pos.z);
+			vj = dem_vel[d.ci];
+			vector3d lp = new_vector3d(d.rx, d.ry, d.rz);
+			L = rj - ri - Ai * lp;
+			l = length(L);
+			vector3d dL = vj - vi - BMatrix(edi, lp) * ei;
+			dl = dot(L, dL) / l;
+			double fr = kc.k * (l - init_l) + kc.c * dl;
+			vector3d Qi = (fr / l) * L;
+			vector3d Qj = -Qi;
+			vector4d QRi = (fr / l) * BMatrix(ei, spi) * L;
+			pm->addAxialForce(Qi.x, Qi.y, Qi.z);
+			pm->addEulerParameterMoment(QRi.x, QRi.y, QRi.z, QRi.w);
+			f[d.ci] = Qj;
+		}
 	}
-	
-	//Qj = -Qi;
-	//matrix34d eee = BMatrix(ej, spj);
-	//QRi = (f / l) * BMatrix(ei, spi) * L;// transpose(B(base->getEP(), spi), L);
-	//QRj = -(f / l) * BMatrix(ej, spj) * L;// transpose(B(action->getEP(), spj), L);
+}
 
-	//if (i)
+void xSpringDamperForce::xCalculateForceFromDEM(unsigned int ci, xPointMass* pm, const xVectorD& q, const xVectorD& qd)
+{
+	//vector3d Qi;
+	//vector4d QRi;
+	//vector3d Qj;
+	//vector4d QRj;
+	////unsigned int si = i * xModel::OneDOF();
+	////unsigned int sj = j * xModel::OneDOF();
+	//vector3d ri = pm->Position();// new_vector3d(q(si + 0), q(si + 1), q(si + 2));
+	//vector3d rj = new_vector3d(0, 0, 0);
+	////vector3d rj = new_vector3d(q(sj + 0), q(sj + 1), q(sj + 2));
+	//vector3d vi = pm->Velocity();// new_vector3d(qd(si + 0), qd(si + 1), qd(si + 2));
+	//vector3d vj = new_vector3d(0, 0, 0);
+	////vector3d vj = new_vector3d(qd(sj + 0), qd(sj + 1), qd(sj + 2));
+	//euler_parameters ei = pm->EulerParameters();// new_euler_parameters(q(si + 3), q(si + 4), q(si + 5), q(si + 6));
+	////euler_parameters ej = new_euler_parameters(q(sj + 3), q(sj + 4), q(sj + 5), q(sj + 6));
+	//euler_parameters edi = pm->DEulerParameters();// new_euler_parameters(qd(si + 3), qd(si + 4), qd(si + 5), qd(si + 6));
+	////euler_parameters edj = new_euler_parameters(qd(sj + 3), qd(sj + 4), qd(sj + 5), qd(sj + 6));
+	//matrix33d Ai = GlobalTransformationMatrix(ei);
+	////matrix33d Aj = GlobalTransformationMatrix(ej);
+	//unsigned int sid = connection_body_info[ci].sid;
+	//xSpringDamperBodyConnectionData d = { 0, };
+	//vector4d* dem_pos = (vector4d*)dem_particle_position;
+	//vector3d* dem_vel = (vector3d*)dem_particle_velocity;
+	//for (unsigned int i = 0; i < connection_body_info[ci].nconnection; i++)
 	//{
-	//	//int irc = (i - 1) * xModel::OneDOF();
-	//	i_ptr->addAxialForce(Qi.x, Qi.y, Qi.z);
-	//	i_ptr->addEulerParameterMoment(QRi.x, QRi.y, QRi.z, QRi.w);
-	//	//rhs.plus(irc, Qi, QRi);
+	//	d = connection_body_data[sid + i];
+	//	vector4d d_pos = dem_pos[d.ci];
+	//	rj = new_vector3d(d_pos.x, d_pos.y, d_pos.z);
+	//	vj = dem_vel[d.ci];
+	//	vector3d lp = new_vector3d(d.rx, d.ry, d.rz);
+	//	L = rj - ri - Ai * lp;
+	//	l = length(L);
+	//	vector3d dL = vj - vi - BMatrix(edi, lp) * ei;
+	//	dl = dot(L, dL) / l;
+	//	f = k * (l - init_l) + c * dl;
+	//	Qi = (f / l) * L;
+	//	Qj = -Qi;
+	//	//matrix34d eee = BMatrix(ej, spj);
+	//	QRi = (f / l) * BMatrix(ei, spi) * L;// transpose(B(base->getEP(), spi), L);
+	//	pm->addAxialForce(Qi.x, Qi.y, Qi.z);
+	//	pm->addEulerParameterMoment(QRi.x, QRi.y, QRi.z, QRi.w);
+	//	//QRj = -(f / l) * BMatrix(ej, spj) * L;// transpose(B(action->getEP(), spj), L);
 	//}
-	//if (j)
-	//{
-	//	//int jrc = (j - 1) * xModel::OneDOF();// action->ID() * 7;
-	//	j_ptr->addAxialForce(Qj.x, Qj.y, Qj.z);
-	//	j_ptr->addEulerParameterMoment(QRj.x, QRj.y, QRj.z, QRj.w);
-	//	//rhs.plus(jrc, Qj, QRj);
+	//	//int irc = (i - 1) * xModel::OneDOF();
+	////i_ptr->addAxialForce(Qi.x, Qi.y, Qi.z);
+	////i_ptr->addEulerParameterMoment(QRi.x, QRi.y, QRi.z, QRi.w);
+	////	//rhs.plus(irc, Qi, QRi);
+	////
+	////if (j)
+	////{
+	////	//int jrc = (j - 1) * xModel::OneDOF();// action->ID() * 7;
+	////	j_ptr->addAxialForce(Qj.x, Qj.y, Qj.z);
+	////	j_ptr->addEulerParameterMoment(QRj.x, QRj.y, QRj.z, QRj.w);
+	////	//rhs.plus(jrc, Qj, QRj);
 	//}
 }
 

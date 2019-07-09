@@ -12,19 +12,25 @@ public:
 
 	void SetupDataFromStructure(xPointMass* ip, xPointMass* jp, xTSDAData& d);
 	void SetupDataFromListData(xTSDAData&d, std::string data);
+	void ConvertGlobalToLocalOfBodyConnectionPosition(unsigned int i, xPointMass* pm);
 
 	unsigned int NumSpringDamperConnection();
 	unsigned int NumSpringDamperConnectionList();
 	unsigned int NumSpringDamperConnectionValue();
+	unsigned int NumSpringDamperBodyConnection();
+	unsigned int NumSpringDamperBodyConnectionData();
 
 	xSpringDamperConnectionInformation* xSpringDamperConnection();
 	xSpringDamperConnectionData* xSpringDamperConnectionList();
 	xSpringDamperCoefficient* xSpringDamperCoefficientValue();
+	xSpringDamperBodyConnectionInfo* xSpringDamperBodyConnectionInformation();
+	xSpringDamperBodyConnectionData* XSpringDamperBodyConnectionDataList();
 	double* FreeLength();
 	void initializeFreeLength(double* p);
 
 	virtual void xCalculateForce(const xVectorD& q, const xVectorD& qd);
 	void xCalculateForceForDEM(double* pos, double* vel, double* force);
+	void xCalculateForceFromDEM(unsigned int ci, xPointMass* pm, const xVectorD& q, const xVectorD& qd);
 	virtual void xDerivate(xMatrixD& lhs, const xVectorD& q, const xVectorD& qd, double mul);
 	virtual void xDerivateVelocity(xMatrixD& lhs, const xVectorD& q, const xVectorD& qd, double mul);
 
@@ -43,10 +49,16 @@ private:
 	unsigned int nsdci;
 	unsigned int nkcvalue;
 	unsigned int nConnection;
+	unsigned int nBodyConnection;
+	unsigned int nBodyConnectionData;
 	xSpringDamperCoefficient *kc_value;
 	xSpringDamperConnectionInformation* xsdci;
 	xSpringDamperConnectionData *connection_data;
+	xSpringDamperBodyConnectionInfo *connection_body_info;
+	xSpringDamperBodyConnectionData *connection_body_data;
 	double *free_length;
+	/*double *dem_particle_position;
+	double *dem_particle_velocity;*/
 };
 
 #endif

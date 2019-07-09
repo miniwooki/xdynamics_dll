@@ -20,6 +20,8 @@ public:
 	xDynamicsManager();
 	~xDynamicsManager();
 
+	static xDynamicsManager* This();
+
 	bool getSimulatorFromCommand(int argc, char* argv[]);
 	void CreateModel(std::string str, modelType t, bool isOnAir = true);
 

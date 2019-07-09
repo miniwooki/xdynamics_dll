@@ -42,7 +42,10 @@ int xIntegratorVV::OneStepSimulation(double ct, unsigned int cstep)
 		if (xSimulation::Cpu())
 			xdem->XSpringDamperForce()->xCalculateForceForDEM(dpos, dvel, dforce);
 		else if (xSimulation::Gpu())
-			cu_calculate_spring_damper_force(dpos, dvel, dforce, dxsdci, dxsdc_data, dxsdc_kc, nTsdaConnection);
+			cu_calculate_spring_damper_force(
+				dpos, dvel, dforce, dxsdci, dxsdc_data, dxsdc_kc, 
+				dxsdc_body, dxsdc_body_data, 
+				nTsdaConnection, nTsdaConnectionBody, nTsdaConnectionBodyData);
 	}
 	this->updateVelocity(dvel, dacc, dep, davel, daacc, dforce, dmoment, dmass, diner, m_np);
 	return 0;

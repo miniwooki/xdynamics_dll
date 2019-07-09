@@ -52,6 +52,7 @@ private:
 	xListParticleData ReadListParticleData(std::string& _name, int r, int& c);
 	xCircleParticleData ReadCircleParticleData(std::string& _name, int r, int& c);
 	xContactParameterData ReadContactData(std::string& _name, int r, int& c);
+	xCylinderObjectData ReadCylinderObjectData(std::string& _name, int mat, int r, int& c);
 	xTSDAData ReadTSDAData(std::string& _name, int r, int& c);
 	xRotationalAxialForceData ReadxRotationalAxialForceData(std::string& _name, int r, int& c);
 	//xSPHPlaneObjectData ReadSPHPlaneParticleData(std::string& _name, int r, int& c);
