@@ -2204,36 +2204,63 @@ __global__ void calculate_spring_damper_force_kernel(
 	}
 }
 
+__device__ double3 BMatrix_mul(double4 e, double3 s, double4 v)
+{
+	double4 B0 = make_double4(2 * (2 * s.x*e.x + e.z*s.z - e.w*s.y), 2 * (2 * s.x*e.y + e.w*s.z + e.z*s.y), 2 * (e.y*s.y + e.x*s.z), 2 * (e.y*s.z - e.x*s.y));
+	double4 B1 = make_double4(2 * (2 * s.y*e.x - e.y*s.z + e.w*s.x), 2 * (s.x*e.z - e.x*s.z), 2 * (2 * s.y*e.z + e.w*s.z + e.y*s.x), 2 * (e.z*s.z + e.x*s.x));
+	double4 B2 = make_double4(2 * (2 * s.z*e.x - e.z*s.x + e.y*s.y), 2 * (s.x*e.w + e.x*s.y), 2 * (e.w*s.y - e.x*s.x), 2 * (2 * s.z*e.w + e.z*s.y + e.y*s.x));
+	return make_double3(dot(B0, v), dot(B1, v), dot(B2,v));
+}
+
+__device__ double4 BMatrix_mul_t(double4 e, double3 s, double3 v)
+{
+	double4 B0 = make_double4(2 * (2 * s.x*e.x + e.z*s.z - e.w*s.y), 2 * (2 * s.x*e.y + e.w*s.z + e.z*s.y), 2 * (e.y*s.y + e.x*s.z), 2 * (e.y*s.z - e.x*s.y));
+	double4 B1 = make_double4(2 * (2 * s.y*e.x - e.y*s.z + e.w*s.x), 2 * (s.x*e.z - e.x*s.z), 2 * (2 * s.y*e.z + e.w*s.z + e.y*s.x), 2 * (e.z*s.z + e.x*s.x));
+	double4 B2 = make_double4(2 * (2 * s.z*e.x - e.z*s.x + e.y*s.y), 2 * (s.x*e.w + e.x*s.y), 2 * (e.w*s.y - e.x*s.x), 2 * (2 * s.z*e.w + e.z*s.y + e.y*s.x));
+	return make_double4(
+		B0.x * v.x + B1.x * v.y + B2.x * v.z,
+		B0.y * v.x + B1.y * v.y + B2.y * v.z,
+		B0.z * v.x + B1.z * v.y + B2.z * v.z,
+		B0.w * v.x + B1.w * v.y + B2.w * v.z);// (B1, v), dot(B2, v));
+}
+
 __global__ void calculate_spring_damper_connecting_body_force_kernel(
 	double4* pos,
 	double3* vel,
 	double3* force,
-	xSpringDamperBodyConnectionInfo* xsdbci,
-	xSpringDamperBodyConnectionData* xsdbcd,
+	device_body_info* xsdbi,
+	device_tsda_connection_body_data* xsdbcd,
 	xSpringDamperCoefficient* xsdkc)
 {
 	unsigned id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
 	if (id >= cte.nTsdaConnectionBodyData)
 		return;
-	unsigned int sid = 
-	unsigned int i = xsdci[id].id;
-	double4 p = pos[i];
-	double3 ri = make_double3(p.x, p.y, p.z);
-	double3 vi = vel[i];
-	xSpringDamperConnectionInformation xsi = xsdci[id];
-	for (unsigned int j = 0; j < xsi.ntsda; j++)
-	{
-		xSpringDamperConnectionData xsd = xsdcd[xsi.sid + j];
-		xSpringDamperCoefficient kc = xsdkc[xsd.kc_id];
-		double4 pj = pos[xsd.jd];
-		double3 rj = make_double3(pj.x, pj.y, pj.z);
-		double3 vj = vel[xsd.jd];
-		double3 L = rj - ri;
-		double l = length(L);
-		double dl = dot(L, (vj - vi)) / l;
-		double fr = kc.k * (l - xsd.init_l) + kc.c * dl;
-		//printf("%d, %d, %f\n", xsd.jd, xsd.kc_id, fl[xsi.sid + j]);
-		double3 Q = (fr / l) * L;
-		force[i] += Q;
-	}
+	device_tsda_connection_body_data cdata = xsdbcd[id];
+	device_body_info dbi = xsdbi[cdata.body_id];
+	//unsigned int pid = xsdbcd[id].id;
+
+	//unsigned int i = xsdci[id].id;
+	double4 rj4 = pos[cdata.id];
+	double3 rj = make_double3(rj4.x, rj4.y, rj4.z);
+	double3 ri = dbi.pos;//make_double3(p.x, p.y, p.z);
+	double3 vj = vel[cdata.id];
+	double3 vi = dbi.vel;
+
+	xSpringDamperCoefficient kc = xsdkc[cdata.kc_id];
+	double3 L = rj - ri - toGlobal(cdata.rpos, dbi.ep);
+	double3 dL = vj - vi - BMatrix_mul(dbi.ed, cdata.rpos, dbi.ep);
+	double l = length(L);
+	double dl = dot(L, dL) / l;
+	double fr = kc.k * (l - cdata.init_l) + kc.c * dl;
+	//printf("%d, %d, %f\n", xsd.jd, xsd.kc_id, fl[xsi.sid + j]);
+	double3 Q = (fr / l) * L;
+	xsdbi[cdata.body_id].force += Q;
+	//vector3d Qi = (fr / l) * L;
+	force[cdata.id] += -Q;
+	//vector3d Qj = -Qi;
+	xsdbi[cdata.body_id].moment = xsdbi[cdata.body_id].moment + (fr / l) * BMatrix_mul_t(dbi.ep, cdata.rpos, L);// *L;
+	/*pm->addAxialForce(Qi.x, Qi.y, Qi.z);
+	pm->addEulerParameterMoment(QRi.x, QRi.y, QRi.z, QRi.w);
+	f[d.ci] = Qj;*/
+	//xSpringDamperConnectionInformation xsi = xsdci[id];
 }

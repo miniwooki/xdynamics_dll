@@ -82,8 +82,9 @@ struct device_body_info
 	double3 pos;
 	double3 vel;
 	double3 force;
-	double3 moment;
+	double4 moment;
 	double4 ep;
+	double4 ed;
 };
 
 struct device_tsda_connection_body_data
@@ -91,6 +92,7 @@ struct device_tsda_connection_body_data
 	unsigned int id;
 	unsigned int kc_id;
 	unsigned int body_id;
+	double init_l;
 	double3 rpos;
 };
 
@@ -258,9 +260,7 @@ void XDYNAMICS_API cu_calculate_spring_damper_force(
 	xSpringDamperCoefficient* xsdkc,
 	xSpringDamperBodyConnectionInfo* xsdb,
 	xSpringDamperBodyConnectionData* xsdbd,
-	unsigned int nc,
-	unsigned int nb,
-	unsigned int nbd);
+	unsigned int nc);
 
 #endif
 

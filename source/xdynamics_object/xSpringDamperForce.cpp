@@ -381,7 +381,7 @@ void xSpringDamperForce::xCalculateForceForDEM(double* pos, double* vel, double*
 			double fr = kc.k * (l - init_l) + kc.c * dl;
 			vector3d Qi = (fr / l) * L;
 			vector3d Qj = -Qi;
-			vector4d QRi = (fr / l) * BMatrix(ei, spi) * L;
+			vector4d QRi = (fr / l) * BMatrix(ei, lp) * L;
 			pm->addAxialForce(Qi.x, Qi.y, Qi.z);
 			pm->addEulerParameterMoment(QRi.x, QRi.y, QRi.z, QRi.w);
 			f[d.ci] = Qj;
