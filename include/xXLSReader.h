@@ -43,7 +43,7 @@ public:
 
 private:
 	bool _IsEmptyCell(int cid);
-	xPointMassData ReadPointMassData(std::string& _name, int r, int& c);
+	xPointMassData ReadPointMassData(std::string& _name, int r, int& c, bool v = true);
 	xJointData ReadJointData(std::string& _name, int r, int& c);
 	xLineObjectData ReadLineObjectData(std::string& _name, int mat, int r, int& c);
 	xPlaneObjectData ReadPlaneObjectData(std::string& _name, int mat, int r, int& c);

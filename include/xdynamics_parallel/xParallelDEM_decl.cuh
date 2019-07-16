@@ -25,6 +25,7 @@ struct device_dem_parameters
 {
 	bool rollingCondition;
 	unsigned int np;
+	unsigned int nmp;
 	unsigned int nCluster;
 	unsigned int nClusterObject;
 	unsigned int nTsdaConnection;
@@ -258,8 +259,18 @@ void XDYNAMICS_API cu_calculate_spring_damper_force(
 	xSpringDamperConnectionInformation* xsdci,
 	xSpringDamperConnectionData* xsdcd,
 	xSpringDamperCoefficient* xsdkc,
-	xSpringDamperBodyConnectionInfo* xsdb,
-	xSpringDamperBodyConnectionData* xsdbd,
+	unsigned int nc);
+
+void XDYNAMICS_API cu_calculate_spring_damper_connecting_body_force(
+	double* pos,
+	double* vel,
+	double* ep,
+	double* ev,
+	double* mass,
+	double* force,
+	double* moment,
+	device_tsda_connection_body_data* xsdbcd,
+	xSpringDamperCoefficient* xsdkc,
 	unsigned int nc);
 
 #endif

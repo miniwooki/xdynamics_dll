@@ -1,6 +1,7 @@
 #include "xdynamics_simulation/xDiscreteElementMethodSimulation.h"
 #include "xdynamics_algebra/xGridCell.h"
 #include "xdynamics_object/xSpringDamperForce.h"
+#include "xdynamics_manager/xDynamicsManager.h"
 //#include <QtCore/QFile>
 #include <fstream>
 #include <cuda_runtime.h>
@@ -15,6 +16,7 @@ xDiscreteElementMethodSimulation::xDiscreteElementMethodSimulation()
 	, dxsdci(NULL)
 	, dxsdc_data(NULL)
 	, nco(0)
+	, nMassParticle(0)
 	, nTsdaConnection(0)
 	, nTsdaConnectionList(0)
 	, nTsdaConnectionValue(0)
@@ -37,23 +39,11 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 	np = xpm->NumParticle();
 	ns = xpm->NumCluster();
 	nco = xpm->nClusterObject();
+	nMassParticle = xpm->NumMassParticle();
 	if (ns == 0) ns = np;
 	//nSingleSphere = xpm->nSingleSphere();
 	//nClusterSphere = ns - xpm->nSingleSphere();
 	xcm = _xcm;
-// 	if (xpm->RealTimeCreating()/* && !xpm->ChangedParticleModel()*/)
-// 	{
-// 		if (xpm->OneByOneCreating())
-// 			per_np = static_cast<unsigned int>((1.0 / xpm->NumCreatingPerSecond()) / simulation::dt);
-// 		else
-// 		{
-// 			per_np = static_cast<unsigned int>((pm->TimeCreatingPerGroup() + 1e-9) / simulation::dt);
-// 			//pm->setCreatingPerGroupIterator();
-// 		}
-// 
-// 	}
-// 	else
-// 		per_np = 0;
 	if (xcm)
 	{
 		nPolySphere = xcm->setupParticlesMeshObjectsContact();
@@ -85,7 +75,7 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 	memset(moment, 0, sizeof(double) * np * 3);
 	for (unsigned int i = 0; i < ns; i++)
 	{
-		vel[0] = -0.1;
+		//vel[0] = -0.1;
 		acc[i * 3 + 0] = 0.0;// mass[i] * xModel::gravity.x;
 		acc[i * 3 + 1] = xModel::gravity.y;
 		acc[i * 3 + 2] = 0.0;// mass[i] * xModel::gravity.z;
@@ -120,7 +110,7 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 	// 	case dem_integrator::VELOCITY_VERLET: itor = new velocity_verlet; break;
 	// 	}
 	if (xdem->XSpringDamperForce())
-		xdem->XSpringDamperForce()->initializeFreeLength(pos);
+		xdem->XSpringDamperForce()->initializeFreeLength(pos, ep);
 	if (xSimulation::Gpu())
 	{
 		checkCudaErrors(cudaMemcpy(dpos, pos, sizeof(double) * np * 4, cudaMemcpyHostToDevice));
@@ -136,7 +126,7 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 		if(ns < np)
 			checkCudaErrors(cudaMemcpy(diner, inertia, sizeof(double) * ns * 3, cudaMemcpyHostToDevice));
 		else
-			checkCudaErrors(cudaMemcpy(diner, inertia, sizeof(double) * np, cudaMemcpyHostToDevice));
+			checkCudaErrors(cudaMemcpy(diner, inertia, sizeof(double) * ((np - nMassParticle) + nMassParticle * 3), cudaMemcpyHostToDevice));
 		if (xci)
 		{
 			checkCudaErrors(cudaMemcpy(dcpos, cpos, sizeof(double) * ns * 4, cudaMemcpyHostToDevice));
@@ -148,8 +138,36 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 			checkCudaErrors(cudaMemcpy(dxsdci, xdem->XSpringDamperForce()->xSpringDamperConnection(), sizeof(xSpringDamperConnectionInformation) * nTsdaConnection, cudaMemcpyHostToDevice));
 			checkCudaErrors(cudaMemcpy(dxsdc_data, xdem->XSpringDamperForce()->xSpringDamperConnectionList(), sizeof(xSpringDamperConnectionData) * nTsdaConnectionList, cudaMemcpyHostToDevice));
 			checkCudaErrors(cudaMemcpy(dxsdc_kc, xdem->XSpringDamperForce()->xSpringDamperCoefficientValue(), sizeof(xSpringDamperCoefficient) * nTsdaConnectionValue, cudaMemcpyHostToDevice));
-			checkCudaErrors(cudaMemcpy(dxsdc_body, xdem->XSpringDamperForce()->xSpringDamperBodyConnectionInformation(), sizeof(xSpringDamperBodyConnectionInfo) * nTsdaConnectionBody, cudaMemcpyHostToDevice));
-			checkCudaErrors(cudaMemcpy(dxsdc_body_data, xdem->XSpringDamperForce()->XSpringDamperBodyConnectionDataList(), sizeof(xSpringDamperBodyConnectionData) * nTsdaConnectionBodyData, cudaMemcpyHostToDevice));
+			if (nTsdaConnectionBodyData)
+			{
+				dxsdc_body = xdem->XSpringDamperForce()->xSpringDamperBodyConnectionInformation();
+				dxsdc_body_data = xdem->XSpringDamperForce()->XSpringDamperBodyConnectionDataList();
+				device_tsda_connection_body_data *htcbd = new device_tsda_connection_body_data[nTsdaConnectionBodyData];
+
+				for (unsigned int i = 0; i < nTsdaConnectionBody; i++)
+				{
+					unsigned int sid = dxsdc_body[i].sid;
+					xParticleObject* xpo = dynamic_cast<xParticleObject*>(xDynamicsManager::This()->XObject()->XObject(dxsdc_body[i].cbody.toStdString()));
+					unsigned int mid = xpo->MassIndex();
+					for (unsigned int j = 0; j < dxsdc_body[i].nconnection; j++)
+					{
+						unsigned int jid = sid + j;
+						unsigned int ci = dxsdc_body_data[jid].ci;
+						vector3d par_p = new_vector3d(pos[ci * 4 + 0], pos[ci * 4 + 1], pos[ci * 4 + 2]);
+						vector3d rel_p = new_vector3d(dxsdc_body_data[jid].rx, dxsdc_body_data[jid].ry, dxsdc_body_data[jid].rz);
+						euler_parameters e = new_euler_parameters(ep[mid * 4 + 0], ep[mid * 4 + 1], ep[mid * 4 + 2], ep[mid * 4 + 3]);
+						vector3d r_pos = ToLocal(e, rel_p - par_p);
+						htcbd[jid] = {
+							dxsdc_body_data[jid].ci, dxsdc_body_data[jid].kc_id,
+							mid, length(par_p - rel_p), r_pos.x, r_pos.y, r_pos.z
+						};
+					}
+				}
+				checkCudaErrors(cudaMemcpy(dxsd_cbd, htcbd, sizeof(device_tsda_connection_body_data) * nTsdaConnectionBodyData, cudaMemcpyHostToDevice));
+				delete[] htcbd;
+			}
+		/*	checkCudaErrors(cudaMemcpy(dxsdc_body, xdem->XSpringDamperForce()->xSpringDamperBodyConnectionInformation(), sizeof(xSpringDamperBodyConnectionInfo) * nTsdaConnectionBody, cudaMemcpyHostToDevice));
+			checkCudaErrors(cudaMemcpy(dxsdc_body_data, xdem->XSpringDamperForce()->XSpringDamperBodyConnectionDataList(), sizeof(xSpringDamperBodyConnectionData) * nTsdaConnectionBodyData, cudaMemcpyHostToDevice));*/
 		}
 			
 		if (xcm)
@@ -163,6 +181,7 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 		}
 		device_dem_parameters dp;
 		dp.np = np;
+		dp.nmp = nMassParticle;
 		dp.nCluster = ns < np ? ns : 0;
 		dp.nClusterObject = xpm->nClusterObject();
 		dp.rollingCondition = false;// xmd->RollingCondition();
@@ -210,8 +229,9 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 			dxsdci = xdem->XSpringDamperForce()->xSpringDamperConnection();
 			dxsdc_data = xdem->XSpringDamperForce()->xSpringDamperConnectionList();
 			dxsdc_kc = xdem->XSpringDamperForce()->xSpringDamperCoefficientValue();
-			dxsdc_body = xdem->XSpringDamperForce()->xSpringDamperBodyConnectionInformation();
-			dxsdc_body_data = xdem->XSpringDamperForce()->XSpringDamperBodyConnectionDataList();
+			//dxsdc_body = xdem->XSpringDamperForce()->xSpringDamperBodyConnectionInformation();
+			/*if(nTsdaConnectionBodyData)
+				dxsd_cbd = xdem->XSpringDamperForce()->XSpringDamperBodyConnectionDataList();*/
 			//dxsd_free_length = xdem->XSpringDamperForce()->FreeLength();
 		}
 	}
@@ -301,14 +321,57 @@ void xDiscreteElementMethodSimulation::updateObjectFromMBD()
 		xcm->update();
 }
 
-double* xDiscreteElementMethodSimulation::HostPosition()
+double* xDiscreteElementMethodSimulation::Position()
 {
-	return pos;
+	return dpos;
 }
 
-double* xDiscreteElementMethodSimulation::HostVelocity()
+double* xDiscreteElementMethodSimulation::Velocity()
 {
-	return vel;
+	return dvel;
+}
+
+void xDiscreteElementMethodSimulation::SpringDamperForce()
+{
+	if (xSimulation::Gpu())
+	{
+		cu_calculate_spring_damper_force(dpos, dvel, dforce, dxsdci, dxsdc_data, dxsdc_kc, nTsdaConnectionList);
+		if (nTsdaConnectionBodyData)
+		{
+			/*device_body_info *dbi;
+			device_body_info *hbi = new device_body_info[nTsdaConnectionBody];
+			checkCudaErrors(cudaMalloc((void**)&dbi, sizeof(device_body_info) * nTsdaConnectionBody));
+			for (unsigned int i = 0; i < nTsdaConnectionBody; i++)
+			{
+				xParticleObject* xpo = dynamic_cast<xParticleObject*>(xDynamicsManager::This()->XObject()->XObject(dxsdc_body[i].cbody.toStdString()));
+				unsigned int mid = xpo->MassIndex();
+				euler_parameters ep = pm->EulerParameters();
+				euler_parameters ed = pm->DEulerParameters();
+				hbi[i] = {
+					pm->Position().x, pm->Position().y, pm->Position().z,
+					pm->Velocity().x, pm->Velocity().y, pm->Velocity().z,
+					ep.e0, ep.e1, ep.e2, ep.e3,
+					ed.e0, ed.e1, ed.e2, ed.e3,
+					0, 0, 0,
+					0, 0, 0 };
+			}
+			checkCudaErrors(cudaMemcpy(dbi, hbi, sizeof(device_body_info)*nTsdaConnectionBody, cudaMemcpyHostToDevice));*/
+			cu_calculate_spring_damper_connecting_body_force(
+				dpos, dvel, dforce, dxsd_cbd, dxsdc_kc, nTsdaConnectionBodyData);
+			/*checkCudaErrors(cudaMemcpy(hbi, dbi, sizeof(device_body_info)*nTsdaConnectionBody, cudaMemcpyDeviceToHost));
+			for (unsigned int i = 0; i < nTsdaConnectionBody; i++)
+			{
+				xPointMass* pm = xDynamicsManager::This()->XMBDModel()->XMass(dxsdc_body[i].cbody.toStdString());
+				pm->addAxialForce(hbi[i].force.x, hbi[i].force.y, hbi[i].force.z);
+				pm->addEulerParameterMoment(hbi[i].moment.x, hbi[i].moment.y, hbi[i].moment.z, hbi[i].moment.w);
+			}
+			delete[] hbi;*/
+		}		
+	}
+	else
+	{
+		xdem->XSpringDamperForce()->xCalculateForceForDEM(dpos, dvel, dep, davel, dmass, dforce, dmoment);
+	}
 }
 
 // vector4d xDiscreteElementMethodSimulation::GlobalSphereInertiaForce(const euler_parameters& ev, const double j, const euler_parameters& ep)
@@ -380,8 +443,8 @@ void xDiscreteElementMethodSimulation::clearMemory()
 		if (dxsdci) checkCudaErrors(cudaFree(dxsdci)); dxsdci = NULL;
 		if (dxsdc_data) checkCudaErrors(cudaFree(dxsdc_data)); dxsdc_data = NULL;
 		if (dxsdc_kc) checkCudaErrors(cudaFree(dxsdc_kc)); dxsdc_kc = NULL;
-		if (dxsdc_body) checkCudaErrors(cudaFree(dxsdc_body)); dxsdc_body = NULL;
-		if (dxsdc_body_data) checkCudaErrors(cudaFree(dxsdc_body_data)); dxsdc_body_data = NULL;
+		//if (dxsdc_body) checkCudaErrors(cudaFree(dxsdc_body)); dxsdc_body = NULL;
+		if (dxsd_cbd) checkCudaErrors(cudaFree(dxsd_cbd)); dxsd_cbd = NULL;
 		//if (dxsd_free_length) checkCudaErrors(cudaFree(dxsd_free_length)); dxsd_free_length = NULL;
 	}
 }
@@ -401,7 +464,7 @@ void xDiscreteElementMethodSimulation::allocationMemory(unsigned int np, unsigne
 	}
 	else
 	{
-		inertia = new double[np];
+		inertia = new double[(np - nMassParticle) + nMassParticle * 3];
 	}
 	ep = new double[np * 4];
 	//rot = new double[np * 4];
@@ -418,7 +481,7 @@ void xDiscreteElementMethodSimulation::allocationMemory(unsigned int np, unsigne
 		if(np < rnp)
 			checkCudaErrors(cudaMalloc((void**)&diner, sizeof(double) * np * 3));
 		else
-			checkCudaErrors(cudaMalloc((void**)&diner, sizeof(double) * np));
+			checkCudaErrors(cudaMalloc((void**)&diner, sizeof(double) * ((np - nMassParticle) + nMassParticle * 3)));
 		checkCudaErrors(cudaMalloc((void**)&dpos, sizeof(double) * rnp * 4));
 		checkCudaErrors(cudaMalloc((void**)&dep, sizeof(double) * np * 4));
 		checkCudaErrors(cudaMalloc((void**)&dvel, sizeof(double) * np * 3));
@@ -444,8 +507,8 @@ void xDiscreteElementMethodSimulation::allocationMemory(unsigned int np, unsigne
 			checkCudaErrors(cudaMalloc((void**)&dxsdci, sizeof(xSpringDamperConnectionInformation)*nTsdaConnection));
 			checkCudaErrors(cudaMalloc((void**)&dxsdc_data, sizeof(xSpringDamperConnectionData)* nTsdaConnectionList));
 			checkCudaErrors(cudaMalloc((void**)&dxsdc_kc, sizeof(xSpringDamperCoefficient) * nTsdaConnectionValue));
-			checkCudaErrors(cudaMalloc((void**)&dxsdc_body, sizeof(xSpringDamperBodyConnectionInfo) * nTsdaConnectionBody));
-			checkCudaErrors(cudaMalloc((void**)&dxsdc_body_data, sizeof(xSpringDamperBodyConnectionData) * nTsdaConnectionBodyData));
+			if(nTsdaConnectionBodyData)
+				checkCudaErrors(cudaMalloc((void**)&dxsd_cbd, sizeof(device_tsda_connection_body_data) * nTsdaConnectionBodyData));
 			//checkCudaErrors(cudaMalloc((void**)&dxsd_free_length, sizeof(double) * nTsdaConnectionList));
 		}		
 	}

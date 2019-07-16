@@ -231,7 +231,7 @@ void xMultiBodySimulation::ConstructForceVector(xVectorD& v)
 		{
 			xSpringDamperBodyConnectionInfo info = dem_tsda->xSpringDamperBodyConnectionInformation()[i];
 			xPointMass* pm = xmbd->XMass(info.cbody.toStdString());
-			dem_tsda->xCalculateForceFromDEM(i, pm, q, qd);
+			dem_tsda->xCalculateForceFromDEM(i, pm, dem_pos, dem_vel);
 		}
 
 	}*/

@@ -29,6 +29,7 @@ public:
 	unsigned int nClusterObject();
 	unsigned int NumCluster();
 	unsigned int nClusterEach();
+	unsigned int NumMassParticle();
 	//unsigned int nSingleSphere();
 	//unsigned int nClusterSphere();
 	//unsigned int NumParticleWithCluster();
@@ -55,6 +56,7 @@ public:
 	xParticleObject* CreateCubeParticle(std::string n, xMaterialType mt, unsigned int _np, xCubeParticleData& d);
 	xParticleObject* CreateCircleParticle(std::string n, xMaterialType mt, unsigned int _np, xCircleParticleData& d);
 	xParticleObject* CreateClusterParticle(std::string n, xMaterialType mt, vector3d& loc, vector3i& grid, xClusterObject* xo);
+	xParticleObject* CreateMassParticle(std::string n, xMaterialType mt, double rad, xPointMassData& d);
 //	xParticleObject* CreateSPHParticles(xObject* xobj, double ps, unsigned int nlayer);
 //	xParticleObject* CreateBoundaryParticles(xObject* xobj, double lx, double ly, double lz, double ps);
 	//xParticleObject* CreateSPHLineParticle(std::string n, xMa)
@@ -70,6 +72,7 @@ private:
 	//unsigned int n_cluster_sphere; // the number of cluster set element
 	unsigned int np;
 	unsigned int ncluster;
+	unsigned int n_mass_particle;
 	//unsigned int num_xpo;
 	//unsigned int per_np;
 	//double per_time;
@@ -85,5 +88,6 @@ private:
 	//vector3d* rcluster;
 	xMaterialType *r_type;
 };
+
 
 #endif

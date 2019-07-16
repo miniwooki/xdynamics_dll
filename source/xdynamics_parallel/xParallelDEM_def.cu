@@ -440,3 +440,28 @@ void cu_calculate_spring_damper_force(
 		xsdcd,
 		xsdkc);
 }
+
+void cu_calculate_spring_damper_connecting_body_force(
+	double* pos,
+	double* vel,
+	double* ep,
+	double* ev,
+	double* mass,
+	double* force,
+	double* moment,
+	device_tsda_connection_body_data* xsdbcd,
+	xSpringDamperCoefficient* xsdkc,
+	unsigned int nc)
+{
+	computeGridSize(nc, 256, numBlocks, numThreads);
+	calculate_spring_damper_connecting_body_force_kernel << <numBlocks, numThreads >> > (
+		(double4*)pos,
+		(double3*)vel,
+		(double4*)ep,
+		(double4*)ev,
+		mass,
+		(double3*)force,
+		(double3*)moment,
+		xsdbcd,
+		xsdkc);
+}

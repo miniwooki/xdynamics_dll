@@ -9,6 +9,7 @@ xParticleManager::xParticleManager()
 	, r_vel(NULL)
 	, n_cluster_object(0)
 	, n_cluster_each(0)
+	, n_mass_particle(0)
 	/*, isCluster(NULL)
 	, cluster_index(NULL)
 	, cluster_count(NULL)
@@ -38,6 +39,11 @@ xParticleManager::~xParticleManager()
 unsigned int xParticleManager::NumParticle()
 {
 	return np;
+}
+
+unsigned int xParticleManager::NumMassParticle()
+{
+	return n_mass_particle;
 }
 
 //unsigned int xParticleManager::NumClusterSet()
@@ -435,6 +441,35 @@ xParticleObject* xParticleManager::CreateCircleParticle(
 	return xpo;
 }
 
+
+xParticleObject* xParticleManager::CreateMassParticle(
+	std::string n, xMaterialType mt, double rad, xPointMassData& d)
+{
+	QString name = QString::fromStdString(n);
+	xParticleObject* xpo = new xParticleObject(n);
+	vector4d* pos = xpo->AllocMemory(1);
+	vector3d* iner = xpo->AllocInertiaMemory(1);
+	double* mass = xpo->Mass();
+	xpo->setStartIndex(np);
+	xpo->setMaterialType(mt);
+	xpo->setShapeForm(NO_SHAPE_AND_MASS);
+	//n_single_sphere += _np;
+	np += 1;
+	n_mass_particle += 1;
+	xMaterial xm = GetMaterialConstant(mt);
+	xpo->setDensity(xm.density);
+	xpo->setYoungs(xm.youngs);
+	xpo->setPoisson(xm.poisson);
+	xpo->setMinRadius(rad);
+	xpo->setMaxRadius(rad);
+	pos[0] = new_vector4d(d.px, d.py, d.pz, rad);
+	iner[0] = new_vector3d(d.ixx, d.iyy, d.izz);
+	mass[0] = d.mass;
+	xpcos[name] = xpo;
+	xObjectManager::XOM()->addObject(xpo);
+	return xpo;
+}
+
 xParticleObject * xParticleManager::CreateClusterParticle(
 	std::string n, xMaterialType mt, vector3d& loc, vector3i& grid, xClusterObject * xo)
 {
@@ -571,19 +606,50 @@ bool xParticleManager::SetMassAndInertia(double *mass, double *inertia)
 				//i += xpo->EachCount() - 1;
 			}
 		}
-		else
+		else if(xpo->ShapeForm() != NO_SHAPE_AND_MASS)
 		{
 			vector4d* pos = xpo->Position();
 			double* ms = xpo->Mass();
+			xpo->setMassIndex(c);
+		//	vector3d* J = xpo->Inertia();
 			for (unsigned int i = 0; i < xpo->NumParticle(); i++)
 			{
-				double m = ms[i] ? ms[i] : d * (4.0 / 3.0) * M_PI * pow(pos[i].w, 3.0);
-				double J = (2.0 / 5.0) * m * pow(pos[i].w, 2.0);
-				mass[i + sid] = m;
-				inertia[i + sid] = J;
-			}			
+			//	if (xpo->ShapeForm() != NO_SHAPE_AND_MASS)
+			//	{
+					double m = ms[i] ? ms[i] : d * (4.0 / 3.0) * M_PI * pow(pos[i].w, 3.0);
+					double J = (2.0 / 5.0) * m * pow(pos[i].w, 2.0);
+					mass[i + sid] = m;
+					inertia[i + sid] = J;
+			//	}	
+					c++;
+			}	
+			
 		}	
 	}
+	foreach(xParticleObject* xpo, xpcos)
+	{
+
+		if (xpo->ShapeForm() == NO_SHAPE_AND_MASS)
+		{
+			vector4d* pos = xpo->Position();
+			double* ms = xpo->Mass();
+			vector3d* J = xpo->Inertia();
+			unsigned int sid = xpo->StartIndex();
+			unsigned int jid = np - n_mass_particle;
+			xpo->setMassIndex(c);
+			for (unsigned int i = 0; i < xpo->NumParticle(); i++)
+			{
+				if (xpo->ShapeForm() == NO_SHAPE_AND_MASS)
+				{
+					mass[i + sid] = ms[i];
+					inertia[jid + i * 3 + 0] = J[i].x;
+					inertia[jid + i * 3 + 1] = J[i].y;
+					inertia[jid + i * 3 + 2] = J[i].z;
+				}
+			}
+		}
+	}
+
 	return true;
 }
 

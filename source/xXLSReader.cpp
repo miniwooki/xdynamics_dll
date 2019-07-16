@@ -35,7 +35,7 @@ bool xXLSReader::IsEmptyCell(int r, int c)
 	return _IsEmptyCell(cid);
 }
 
-xPointMassData xXLSReader::ReadPointMassData(std::string& _name, int r, int& c)
+xPointMassData xXLSReader::ReadPointMassData(std::string& _name, int r, int& c, bool v)
 {
 	xPointMassData d = { 0, };
 	double *ptr = &d.mass;
@@ -46,7 +46,7 @@ xPointMassData xXLSReader::ReadPointMassData(std::string& _name, int r, int& c)
 	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 7);
 	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 4, ptr + 10);
 	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 14);
-	if (xve)
+	if (xve && v)
 	{
 		int t = VMARKER;
 		xve->Write((char*)&t, sizeof(int));
@@ -483,6 +483,12 @@ void xXLSReader::ReadDEMParticle(xDiscreteElementMethodModel* xdem, xObjectManag
 				xUtilityFunctions::xsplit(sheet->readStr(rc.x, rc.y++), ",", 3, &loc.x);
 				xUtilityFunctions::xsplit(sheet->readStr(rc.x, rc.y++), ",", 3, &grid.x);
 				xdem->XParticleManager()->CreateClusterParticle(name.c_str(), xo->Material(), loc, grid, dynamic_cast<xClusterObject*>(xo)); break;
+			}
+			else if (form == NO_SHAPE_AND_MASS)
+			{
+				double rad = sheet->readNum(rc.x, rc.y++);
+				xPointMassData pm = ReadPointMassData(name, rc.x, rc.y, false);
+				xdem->XParticleManager()->CreateMassParticle(name, (xMaterialType)material, rad, pm);
 			}
 			else if (form == NO_SHAPE_AND_LIST)
 			{

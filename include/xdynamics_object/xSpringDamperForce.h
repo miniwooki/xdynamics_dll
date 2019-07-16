@@ -26,11 +26,11 @@ public:
 	xSpringDamperBodyConnectionInfo* xSpringDamperBodyConnectionInformation();
 	xSpringDamperBodyConnectionData* XSpringDamperBodyConnectionDataList();
 	double* FreeLength();
-	void initializeFreeLength(double* p);
+	void initializeFreeLength(double* p,double* ep);
 
 	virtual void xCalculateForce(const xVectorD& q, const xVectorD& qd);
-	void xCalculateForceForDEM(double* pos, double* vel, double* force);
-	void xCalculateForceFromDEM(unsigned int ci, xPointMass* pm, const xVectorD& q, const xVectorD& qd);
+	void xCalculateForceForDEM(double* pos, double* vel, double* ep, double* ev, double* ms, double* force, double* moment);
+	void xCalculateForceFromDEM(unsigned int ci, xPointMass* pm, const double* pos, const double* vel);
 	virtual void xDerivate(xMatrixD& lhs, const xVectorD& q, const xVectorD& qd, double mul);
 	virtual void xDerivateVelocity(xMatrixD& lhs, const xVectorD& q, const xVectorD& qd, double mul);
 

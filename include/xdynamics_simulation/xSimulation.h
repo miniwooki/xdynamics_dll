@@ -29,6 +29,7 @@ public:
 	static void setMBDSolverType(MBDSolverType mst);
 	static void setDEMSolverType(DEMSolverType dst);
 	static void setSPHSolverType(SPHSolverType sst);
+	void setDEMPositionVelocity(double* p, double *v);
 
 	static double start_time;
 	static double et;
@@ -42,6 +43,8 @@ public:
 	static MBDSolverType mbd_solver_type;
 	static DEMSolverType dem_solver_type;
 	static SPHSolverType sph_solver_type;
+	double* dem_pos;
+	double* dem_vel;
 };
 
 #endif

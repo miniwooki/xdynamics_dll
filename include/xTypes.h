@@ -107,6 +107,7 @@ enum xShapeType
 	CIRCLE_SHAPE = 23,
 	CYLINDER_SHAPE = 27,
 	CLUSTER_SHAPE = 28,
+	NO_SHAPE_AND_MASS = 98,
 	NO_SHAPE_AND_LIST = 99,
 	FROM_SHAPE = 999,
 	OBJECT = 100 
@@ -210,7 +211,7 @@ typedef struct { unsigned int id, sid, ntsda; }xSpringDamperConnectionInformatio
 typedef struct { unsigned int jd, kc_id; double init_l; }xSpringDamperConnectionData;
 typedef struct { double k, c; }xSpringDamperCoefficient;
 typedef struct { QString cbody; unsigned int sid, nconnection; }xSpringDamperBodyConnectionInfo;
-typedef struct{ unsigned int ci, kc_id; double rx, ry, rz; }xSpringDamperBodyConnectionData;
+typedef struct{ unsigned int ci, kc_id; double init_l, rx, ry, rz; }xSpringDamperBodyConnectionData;
 /*typedef struct{ double tstart, dpdt }xObjectMovingCondition;*/
 
 typedef struct 

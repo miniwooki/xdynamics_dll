@@ -26,6 +26,7 @@ int xIntegratorVV::Initialize(xDiscreteElementMethodModel* _xdem, xContactManage
 int xIntegratorVV::OneStepSimulation(double ct, unsigned int cstep)
 {
 	m_np = xdem->XParticleManager()->ExcuteCreatingCondition(ct, cstep, m_np);
+
 	this->updatePosition(dpos, dcpos, dvel, dacc, dep, davel, daacc, m_np);
 	dtor->detection(dpos, (nPolySphere ? xcm->ContactParticlesMeshObjects()->SphereData() : NULL), nco ? np : m_np, nPolySphere);
 //	std::cout << "after detection " << std::endl;
@@ -36,16 +37,13 @@ int xIntegratorVV::OneStepSimulation(double ct, unsigned int cstep)
 			dmass, diner, dforce, dmoment,
 			dtor->sortedID(), dtor->cellStart(), dtor->cellEnd(), dxci,
 			nco ? np : m_np);
-	}
+	}	
 	if (xdem->XSpringDamperForce())
 	{
-		if (xSimulation::Cpu())
-			xdem->XSpringDamperForce()->xCalculateForceForDEM(dpos, dvel, dforce);
-		else if (xSimulation::Gpu())
-			cu_calculate_spring_damper_force(
-				dpos, dvel, dforce, dxsdci, dxsdc_data, dxsdc_kc, 
-				dxsdc_body, dxsdc_body_data, 
-				nTsdaConnection, nTsdaConnectionBody, nTsdaConnectionBodyData);
+		/*if (xSimulation::Cpu())
+			xdem->XSpringDamperForce()->xCalculateForceForDEM(dpos, dvel, dep, davel, dmass, dforce, dmoment);
+		else if (xSimulation::Gpu())*/
+			SpringDamperForce();
 	}
 	this->updateVelocity(dvel, dacc, dep, davel, daacc, dforce, dmoment, dmass, diner, m_np);
 	return 0;
@@ -115,7 +113,19 @@ void xIntegratorVV::updateVelocity(
 		vector3d* m = (vector3d*)dmoment;
 		for (unsigned int i = 0; i < np; i++){
 			matrix33d J = { 0, };
-			J.a00 = dinertia[i]; J.a11 = dinertia[i]; J.a22 = dinertia[i];
+			if (i >= np - nMassParticle)
+			{
+				unsigned int sid = np - nMassParticle;
+				unsigned int j = i - (np - nMassParticle);
+				J.a00 = dinertia[sid + j * 3 + 0];
+				J.a11 = dinertia[sid + j * 3 + 1];
+				J.a22 = dinertia[sid + j * 3 + 2];
+			}
+			else
+			{
+				J.a00 = dinertia[i]; J.a11 = dinertia[i]; J.a22 = dinertia[i];
+			}
+				
 			vector3d n_prime = ToLocal(ep[i], m[i]);
 			euler_parameters m_ea = CalculateUCEOM(J, ep[i], ev[i], n_prime);
 			inv_m = 1.0 / dmass[i];

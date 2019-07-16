@@ -25,6 +25,7 @@ public:
 	//void setImplicitTolerance(double _eps);
 	void SaveStepResult(unsigned int part, double ct);
 	void ExportResults(std::fstream& of);
+	
 	virtual int Initialize(xMultiBodyModel* xmbd);
 	virtual int OneStepSimulation(double ct, unsigned int cstep) = 0;
 

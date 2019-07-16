@@ -127,6 +127,16 @@ __device__ double3 toAngularVelocity(double4& e, double4& d)
 	return o;
 }
 
+__device__ double3 toEulerGlobalMoment(double4& e, double4& d)
+{
+	double3 o = 0.5 * make_double3(
+		-e.y * d.x + e.x * d.y - e.w * d.z + e.z * d.w,
+		-e.z * d.x + e.w * d.y + e.x * d.z - e.y * d.w,
+		-e.w * d.x - e.z * d.y + e.y * d.z + e.x * d.w
+	);
+	return o;
+}
+
 __device__
 uint calcGridHash(int3 gridPos)
 {
@@ -301,8 +311,21 @@ __global__ void vv_update_velocity_kernel(
 	double4 av = ev[id];
 	//double3 aa = alpha[id];
 	double3 a = (1.0 / m) * (force[id] + m * cte.gravity);
-	double in = iner[id];
-	double3 J = make_double3(in, in, in);
+	double3 J = make_double3(0, 0, 0);
+	if (i >= np - cte.nmp)
+	{
+		unsigned int sid = np - cte.nmp;
+		unsigned int j = id - (np - cte.nmp);
+		J.x = iner[sid + j * 3 + 0];
+		J.y = iner[sid + j * 3 + 1];
+		J.z = iner[sid + j * 3 + 2];
+	}
+	else
+	{
+		double in = iner[id];
+		J = make_double3(in, in, in);
+	}
+	
 	double3 n_prime = toLocal(moment[id], e);
 	double4 m_ea = calculate_uceom(J, e, av, n_prime);
 	/*if(length(force[id]) > 0)
@@ -2227,8 +2250,11 @@ __device__ double4 BMatrix_mul_t(double4 e, double3 s, double3 v)
 __global__ void calculate_spring_damper_connecting_body_force_kernel(
 	double4* pos,
 	double3* vel,
+	double4* ep,
+	double4* ev,
+	double* mass,
 	double3* force,
-	device_body_info* xsdbi,
+	double3* moment,
 	device_tsda_connection_body_data* xsdbcd,
 	xSpringDamperCoefficient* xsdkc)
 {
@@ -2236,29 +2262,33 @@ __global__ void calculate_spring_damper_connecting_body_force_kernel(
 	if (id >= cte.nTsdaConnectionBodyData)
 		return;
 	device_tsda_connection_body_data cdata = xsdbcd[id];
-	device_body_info dbi = xsdbi[cdata.body_id];
+//	device_body_info dbi = xsdbi[cdata.body_id];
 	//unsigned int pid = xsdbcd[id].id;
 
 	//unsigned int i = xsdci[id].id;
 	double4 rj4 = pos[cdata.id];
+	double4 ri4 = pos[cdata.body_id];
 	double3 rj = make_double3(rj4.x, rj4.y, rj4.z);
-	double3 ri = dbi.pos;//make_double3(p.x, p.y, p.z);
+	double3 ri = make_double3(ri4.x, ri4.y, ri4.z);
 	double3 vj = vel[cdata.id];
-	double3 vi = dbi.vel;
+	double3 vi = vel[cdata.body_id];
+	double4 e = ep[cdata.body_id];
+	double4 ed = ev[cdata.body_id];
 
 	xSpringDamperCoefficient kc = xsdkc[cdata.kc_id];
-	double3 L = rj - ri - toGlobal(cdata.rpos, dbi.ep);
-	double3 dL = vj - vi - BMatrix_mul(dbi.ed, cdata.rpos, dbi.ep);
+	double3 L = rj - ri - toGlobal(cdata.rpos, e);
+	double3 dL = vj - vi - BMatrix_mul(ed, cdata.rpos, e);
 	double l = length(L);
 	double dl = dot(L, dL) / l;
 	double fr = kc.k * (l - cdata.init_l) + kc.c * dl;
 	//printf("%d, %d, %f\n", xsd.jd, xsd.kc_id, fl[xsi.sid + j]);
 	double3 Q = (fr / l) * L;
-	xsdbi[cdata.body_id].force += Q;
+	double4 QRi = (fr / l) * BMatrix_mul_t(e, cdata.rpos, L);
+	force[cdata.body_id] += Q;
 	//vector3d Qi = (fr / l) * L;
 	force[cdata.id] += -Q;
 	//vector3d Qj = -Qi;
-	xsdbi[cdata.body_id].moment = xsdbi[cdata.body_id].moment + (fr / l) * BMatrix_mul_t(dbi.ep, cdata.rpos, L);// *L;
+	moment[cdata.body_id] = moment[cdata.body_id] + toEulerGlobalMoment(e, QRi);// *L;
 	/*pm->addAxialForce(Qi.x, Qi.y, Qi.z);
 	pm->addEulerParameterMoment(QRi.x, QRi.y, QRi.z, QRi.w);
 	f[d.ci] = Qj;*/

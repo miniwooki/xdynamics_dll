@@ -101,3 +101,9 @@ void xSimulation::setSPHSolverType(SPHSolverType sst)
 {
 	sph_solver_type = sst;
 }
+
+void xSimulation::setDEMPositionVelocity(double* p, double *v)
+{
+	dem_pos = p;
+	dem_vel = v;
+}

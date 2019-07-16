@@ -24,8 +24,9 @@ public:
 	void ExportResults(std::fstream& of);
 	void EnableSaveResultToMemory(bool b);
 	void updateObjectFromMBD();
-	double* HostPosition();
-	double* HostVelocity();
+	double* Position();
+	double* Velocity();
+	void SpringDamperForce();
 
 protected:
 	void clearMemory();
@@ -35,6 +36,7 @@ protected:
 	unsigned int np;
 	unsigned int ns;
 	unsigned int nco;
+	unsigned int nMassParticle;
 	unsigned int nPolySphere;
 	unsigned int nTsdaConnection;
 	unsigned int nTsdaConnectionList;
@@ -78,8 +80,8 @@ protected:
 	xSpringDamperConnectionInformation *dxsdci;
 	xSpringDamperConnectionData *dxsdc_data;
 	xSpringDamperCoefficient *dxsdc_kc;
-	/*xSpringDamperBodyConnectionInfo *dxsdc_body;
-	xSpringDamperBodyConnectionData *dxsdc_body_data;*/
+	xSpringDamperBodyConnectionInfo *dxsdc_body;
+	xSpringDamperBodyConnectionData *dxsdc_body_data;
 	device_tsda_connection_body_data *dxsd_cbd;
 
 	QList<QString> partList;

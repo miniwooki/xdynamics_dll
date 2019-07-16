@@ -17,14 +17,17 @@ public:
 	void setMaxRadius(double _mr);
 	void setShapeForm(xShapeType xst);
 	void setRelativeLocation(vector3d* rl);
+	void setMassIndex(unsigned _mid);
 
 	vector4d* AllocMemory(unsigned int _np);
+	vector3d* AllocInertiaMemory(unsigned int _np);
 	vector4d* AllocClusterMemory(unsigned int _np);
 
 	void CopyPosition(double* _pos);
 	void CopyClusterPosition(double* _pos, double* _ep);
 	unsigned int StartIndex() const;
 	unsigned int StartClusterIndex() const;
+	unsigned int MassIndex() const;
 	unsigned int NumParticle() const;
 	unsigned int NumCluster() const;
 	unsigned int EachCount() const;
@@ -36,6 +39,7 @@ public:
 	vector4d* EulerParameters() const;
 	vector3d* RelativeLocation() const;
 	double* Mass() const;
+	vector3d* Inertia() const;
 
 	virtual unsigned int create_sph_particles(double ps, unsigned int nlayers, vector3d* p = NULL, xMaterialType* t = NULL);
 	virtual QVector<xCorner> get_sph_boundary_corners();
@@ -54,6 +58,7 @@ private:
 	xShapeType form;
 	unsigned int sid;
 	unsigned int csid;
+	unsigned int mid;
 	unsigned int np;
 	unsigned int cnp;
 	unsigned int each;
@@ -64,6 +69,7 @@ private:
 	vector4d* cpos;
 	vector4d* ep;
 	double* mass;
+	vector3d* inertia;
 	vector3d *relative_loc;
 };
 
