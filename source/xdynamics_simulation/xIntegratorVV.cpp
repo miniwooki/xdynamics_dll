@@ -111,24 +111,30 @@ void xIntegratorVV::updateVelocity(
 		euler_parameters* ea = (euler_parameters*)dea;
 		vector3d* f = (vector3d*)dforce;
 		vector3d* m = (vector3d*)dmoment;
+		vector3d* iner = (vector3d*)dinertia;
 		for (unsigned int i = 0; i < np; i++){
-			matrix33d J = { 0, };
-			if (i >= np - nMassParticle)
+			matrix33d J = { iner[i].x, 0, 0, 0, iner[i].y, 0, 0, 0, iner[i].z };
+			//std::cout << "J3 : [" << J.a00 << ", " << J.a11 << ", " << J.a22 << std::endl;
+			/*if (i >= np - nMassParticle)
 			{
 				unsigned int sid = np - nMassParticle;
 				unsigned int j = i - (np - nMassParticle);
 				J.a00 = dinertia[sid + j * 3 + 0];
 				J.a11 = dinertia[sid + j * 3 + 1];
 				J.a22 = dinertia[sid + j * 3 + 2];
+				std::cout << "J3_ID : " << sid + j * 3 << std::endl;
+				
 			}
 			else
 			{
 				J.a00 = dinertia[i]; J.a11 = dinertia[i]; J.a22 = dinertia[i];
-			}
+			}*/
 				
 			vector3d n_prime = ToLocal(ep[i], m[i]);
 			euler_parameters m_ea = CalculateUCEOM(J, ep[i], ev[i], n_prime);
+			//std::cout << "euler_acc : [" << m_ea.e0 << ", " << m_ea.e1 << ", " << m_ea.e2 << ", " << m_ea.e3 << "]" << std::endl;
 			inv_m = 1.0 / dmass[i];
+		//	std::cout << "inverse mass : " << inv_m << std::endl;
 			//inv_i = 1.0 / dinertia[i];
 			v[i] += 0.5 * xSimulation::dt * a[i];
 			ev[i] += 0.5 * xSimulation::dt * ea[i];

@@ -24,7 +24,7 @@ public:
 	vector4d* AllocClusterMemory(unsigned int _np);
 
 	void CopyPosition(double* _pos);
-	void CopyMassAndInertia(double* _mass, double* _inertia);
+	void CopyMassAndInertia(double* _mass, vector3d* _inertia);
 	void CopyClusterPosition(double* _pos, double* _ep);
 	unsigned int StartIndex() const;
 	unsigned int StartClusterIndex() const;

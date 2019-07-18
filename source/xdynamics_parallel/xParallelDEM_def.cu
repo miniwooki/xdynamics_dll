@@ -61,7 +61,7 @@ void vv_update_velocity(
 		(double3 *)force,
 		(double3 *)moment,
 		mass,
-		iner,
+		(double3 *)iner,
 		np);
 }
 

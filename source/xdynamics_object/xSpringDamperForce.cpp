@@ -378,7 +378,9 @@ void xSpringDamperForce::xCalculateForceForDEM(
 			vector3d dL = vj - vi;
 			double dl = dot(L, dL) / l;
 			double fr = kc.k * (l - xsd.init_l) + kc.c * dl;
+			//std::cout << "tsda_dem - " << i << " : " << xsd.jd << " & " << l << " & " << dl << " => " << fr << std::endl;
 			vector3d Q = (fr / l) * L;
+
 			f[id] += Q;
 		}
 	};

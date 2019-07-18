@@ -619,10 +619,7 @@ bool xParticleManager::CopyMassAndInertia(double * mass, double * inertia)
 {
 	foreach(xParticleObject* xpo, xpcos)
 	{
-		xpo->CopyMassAndInertia(mass, inertia);
-		//xpo->CopyPosition(pos);
-		/*if (cpos && xpo->ShapeForm() == CLUSTER_SHAPE)
-			xpo->CopyClusterPosition(cpos, ep);*/
+		xpo->CopyMassAndInertia(mass, (vector3d* )inertia);
 	}
 	return false;
 }

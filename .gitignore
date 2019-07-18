@@ -10,6 +10,7 @@
 *.pdb
 *.idp
 *.idb
+*.opendb
 *.db
 *.suo
 *.v12.suo
@@ -85,5 +86,8 @@ fastlane/readme.md
 *.idb
 *.pdb
 *.xml
-*.txt
 *.pptx
+*.iobj
+
+*.ipdb
+bin/release/x64/xdynamics_r.iobj

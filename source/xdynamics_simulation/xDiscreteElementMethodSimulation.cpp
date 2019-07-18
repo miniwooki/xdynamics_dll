@@ -124,10 +124,10 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 		checkCudaErrors(cudaMemcpy(dforce, force, sizeof(double) * np * 3, cudaMemcpyHostToDevice));
 		checkCudaErrors(cudaMemcpy(dmoment, moment, sizeof(double) * np * 3, cudaMemcpyHostToDevice));
 		checkCudaErrors(cudaMemcpy(dmass, mass, sizeof(double) * ns, cudaMemcpyHostToDevice));
-		if(ns < np)
-			checkCudaErrors(cudaMemcpy(diner, inertia, sizeof(double) * ns * 3, cudaMemcpyHostToDevice));
-		else
-			checkCudaErrors(cudaMemcpy(diner, inertia, sizeof(double) * ((np - nMassParticle) + nMassParticle * 3), cudaMemcpyHostToDevice));
+		//if(ns < np)
+		checkCudaErrors(cudaMemcpy(diner, inertia, sizeof(double) * ns * 3, cudaMemcpyHostToDevice));
+		/*else
+			checkCudaErrors(cudaMemcpy(diner, inertia, sizeof(double) * ((np - nMassParticle) + nMassParticle * 3), cudaMemcpyHostToDevice));*/
 		if (xci)
 		{
 			checkCudaErrors(cudaMemcpy(dcpos, cpos, sizeof(double) * ns * 4, cudaMemcpyHostToDevice));
@@ -475,19 +475,20 @@ void xDiscreteElementMethodSimulation::allocationMemory(unsigned int np, unsigne
 {
 	clearMemory();
 	mass = new double[np];
+	inertia = new double[np * 3];
 	pos = new double[rnp * 4];
 	if (np < rnp)
 	{
 		cpos = new double[np * 4];
-		inertia = new double[np * 3];
+		
 		xci = new xClusterInformation[xdem->XParticleManager()->nClusterObject()];
 		rcloc = new double[xdem->XParticleManager()->nClusterEach() * 3];
 	//	cindex = new unsigned int[rnp];
 	}
-	else
-	{
-		inertia = new double[(np - nMassParticle) + nMassParticle * 3];
-	}
+	//else
+	//{
+	//	inertia = new double[(np - nMassParticle) + nMassParticle * 3];
+	//}
 	ep = new double[np * 4];
 	//rot = new double[np * 4];
 	vel = new double[np * 3];
@@ -500,10 +501,11 @@ void xDiscreteElementMethodSimulation::allocationMemory(unsigned int np, unsigne
 	if (xSimulation::Gpu())
 	{
 		checkCudaErrors(cudaMalloc((void**)&dmass, sizeof(double) * np));
-		if(np < rnp)
-			checkCudaErrors(cudaMalloc((void**)&diner, sizeof(double) * np * 3));
+		checkCudaErrors(cudaMalloc((void**)&diner, sizeof(double) * np * 3));
+		/*if(np < rnp)
+			
 		else
-			checkCudaErrors(cudaMalloc((void**)&diner, sizeof(double) * ((np - nMassParticle) + nMassParticle * 3)));
+			checkCudaErrors(cudaMalloc((void**)&diner, sizeof(double) * ((np - nMassParticle) + nMassParticle * 3)));*/
 		checkCudaErrors(cudaMalloc((void**)&dpos, sizeof(double) * rnp * 4));
 		checkCudaErrors(cudaMalloc((void**)&dep, sizeof(double) * np * 4));
 		checkCudaErrors(cudaMalloc((void**)&dvel, sizeof(double) * np * 3));

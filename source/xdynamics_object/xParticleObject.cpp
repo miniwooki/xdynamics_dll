@@ -98,12 +98,13 @@ void xParticleObject::CopyPosition(double* _pos)
 	memcpy(_pos + sid * 4, pos, sizeof(vector4d) * np);
 }
 
-void xParticleObject::CopyMassAndInertia(double * _mass, double* _inertia)
+void xParticleObject::CopyMassAndInertia(double * _mass, vector3d* _inertia)
 {
 	unsigned int _np = shape == CLUSTER_SHAPE ? cnp : np;
 	unsigned int _sid = shape == CLUSTER_SHAPE ? csid : sid;
 	memcpy(_mass + _sid, mass, sizeof(double) * _np);
-	if (shape != NO_SHAPE_AND_MASS)
+	memcpy(_inertia + _sid, inertia, sizeof(vector3d) * _np);
+	/*if (shape != NO_SHAPE_AND_MASS)
 	{
 		for (unsigned int i = 0; i < _np; i++)
 		{
@@ -113,8 +114,7 @@ void xParticleObject::CopyMassAndInertia(double * _mass, double* _inertia)
 	else
 	{
 		memcpy(_inertia + _sid, inertia, sizeof(double) * _np * 3);
-	}
-	
+	}*/
 }
 
 void xParticleObject::CopyClusterPosition(double* _pos, double *_ep)

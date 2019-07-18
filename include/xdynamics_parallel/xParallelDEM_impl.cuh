@@ -298,7 +298,7 @@ __global__ void vv_update_velocity_kernel(
 	double3* force,
 	double3* moment,
 	double* mass,
-	double* iner,
+	double3* iner,
 	unsigned int np)
 {
 	unsigned int id = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
@@ -311,8 +311,8 @@ __global__ void vv_update_velocity_kernel(
 	double4 av = ev[id];
 	//double3 aa = alpha[id];
 	double3 a = (1.0 / m) * (force[id] + m * cte.gravity);
-	double3 J = make_double3(0, 0, 0);
-	if (id >= np - cte.nmp)
+	double3 J = iner[id];// make_double3(0, 0, 0);
+	/*if (id >= np - cte.nmp)
 	{
 		unsigned int sid = np - cte.nmp;
 		unsigned int j = id - (np - cte.nmp);
@@ -324,7 +324,7 @@ __global__ void vv_update_velocity_kernel(
 	{
 		double in = iner[id];
 		J = make_double3(in, in, in);
-	}
+	}*/
 	
 	double3 n_prime = toLocal(moment[id], e);
 	double4 m_ea = calculate_uceom(J, e, av, n_prime);
