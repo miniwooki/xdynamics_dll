@@ -215,6 +215,7 @@ xParticleObject* xParticleManager::CreateParticleFromList(
 	xpo->setDensity(xm.density);
 	xpo->setYoungs(xm.youngs);
 	xpo->setPoisson(xm.poisson);
+	
 	setCriticalMaterial(xm.density, xm.youngs, xm.poisson);
 	double min_r = d[0].w;
 	double max_r = d[0].w;
@@ -227,6 +228,7 @@ xParticleObject* xParticleManager::CreateParticleFromList(
 	}
 	xpo->setMinRadius(min_r);
 	xpo->setMaxRadius(max_r);
+	SetMassAndInertia(xpo);
 	xpcos[name] = xpo;
 	xObjectManager::XOM()->addObject(xpo);
 	return xpo;
@@ -484,6 +486,7 @@ xParticleObject* xParticleManager::CreateMassParticle(
 	xpo->setMaterialType(mt);
 	xpo->setShapeForm(NO_SHAPE_AND_MASS);
 	//n_single_sphere += _np;
+	xpo->setMassIndex(np);
 	np += 1;
 	n_mass_particle += 1;
 	xMaterial xm = GetMaterialConstant(mt);
@@ -672,7 +675,7 @@ bool xParticleManager::SetMassAndInertia(xParticleObject* xpo)
 	{
 		double m = d * (4.0 / 3.0) * M_PI * pow(pos[i].w, 3.0);
 		double J = (2.0 / 5.0) * m * pow(pos[i].w, 2.0);
-		mass[i] = m;
+		mass[i] = mass[i] ? mass[i] : m;
 		inertia[i] = new_vector3d(J, J, J);
 		//	}	
 		c++;
