@@ -19,8 +19,10 @@ public:
 	//unsigned int NumClusterSet();
 	bool CopyPosition(
 		double *pos, double* cpos, double* ep, unsigned int inp);
+	bool CopyMassAndInertia(double* mass, double* inertia);
 	void CopyClusterInformation(xClusterInformation* xci, double* rcloc);
-	bool SetMassAndInertia(double *mass, double *inertia);
+	bool SetClusterMassAndInertia(xParticleObject* xpo);
+	bool SetMassAndInertia(xParticleObject* xpo);
 	QMap<QString, xParticleObject*>& XParticleObjects();
 	xParticleObject* XParticleObject(QString& ws);
 	void ExportParticleDataForView(std::string path);
@@ -30,6 +32,9 @@ public:
 	unsigned int NumCluster();
 	unsigned int nClusterEach();
 	unsigned int NumMassParticle();
+	double CriticalDensity();
+	double CriticalPoisson();
+	double CriticalYoungs();
 	//unsigned int nSingleSphere();
 	//unsigned int nClusterSphere();
 	//unsigned int NumParticleWithCluster();
@@ -63,6 +68,7 @@ public:
 	//xParticleObject* CreateSPHPlaneParticleObject(std::string n, xMaterialType mt, xSPHPlaneObjectData& d);
 
 private:
+	void setCriticalMaterial(double d, double y, double p);
 	//void create_sph_particles_with_plane_shape(double dx, double dy, double lx, double ly, double lz, double ps);
 // 	bool is_realtime_creating;
 // 	bool one_by_one;
@@ -81,6 +87,9 @@ private:
 
 	double *r_pos;
 	double *r_vel;
+	double minimum_particle_density;
+	double maximum_youngs_modulus;
+	double minimum_poisson_ratio;
 	//bool *isCluster;
 	//unsigned int *cluster_index;
 	//unsigned int *cluster_count;

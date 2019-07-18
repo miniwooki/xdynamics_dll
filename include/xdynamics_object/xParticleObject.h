@@ -20,10 +20,11 @@ public:
 	void setMassIndex(unsigned _mid);
 
 	vector4d* AllocMemory(unsigned int _np);
-	vector3d* AllocInertiaMemory(unsigned int _np);
+	//vector3d* AllocInertiaMemory(unsigned int _np);
 	vector4d* AllocClusterMemory(unsigned int _np);
 
 	void CopyPosition(double* _pos);
+	void CopyMassAndInertia(double* _mass, double* _inertia);
 	void CopyClusterPosition(double* _pos, double* _ep);
 	unsigned int StartIndex() const;
 	unsigned int StartClusterIndex() const;

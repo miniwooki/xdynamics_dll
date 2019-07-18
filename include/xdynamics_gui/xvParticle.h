@@ -19,6 +19,7 @@ class xvParticle : public xvGlew
 		int mat;
 		unsigned int sid;
 		unsigned int np;
+		unsigned int cnp;
 		double min_rad;
 		double max_rad;
 	};

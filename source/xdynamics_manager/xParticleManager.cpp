@@ -10,6 +10,9 @@ xParticleManager::xParticleManager()
 	, n_cluster_object(0)
 	, n_cluster_each(0)
 	, n_mass_particle(0)
+	, minimum_particle_density(FLT_MAX)
+	, maximum_youngs_modulus(-FLT_MAX)
+	, minimum_poisson_ratio(FLT_MAX)
 	/*, isCluster(NULL)
 	, cluster_index(NULL)
 	, cluster_count(NULL)
@@ -44,6 +47,21 @@ unsigned int xParticleManager::NumParticle()
 unsigned int xParticleManager::NumMassParticle()
 {
 	return n_mass_particle;
+}
+
+double xParticleManager::CriticalDensity()
+{
+	return minimum_particle_density;
+}
+
+double xParticleManager::CriticalPoisson()
+{
+	return minimum_poisson_ratio;
+}
+
+double xParticleManager::CriticalYoungs()
+{
+	return maximum_youngs_modulus;
 }
 
 //unsigned int xParticleManager::NumClusterSet()
@@ -176,6 +194,13 @@ unsigned int xParticleManager::GetNumCircleParticles(
 	return cnt;
 }
 
+void xParticleManager::setCriticalMaterial(double d, double y, double p)
+{
+	if (minimum_particle_density > d) minimum_particle_density = d;
+	if (maximum_youngs_modulus < y) maximum_youngs_modulus = y;
+	if (minimum_poisson_ratio > p) minimum_poisson_ratio = p;
+}
+
 xParticleObject* xParticleManager::CreateParticleFromList(
 	std::string n, xMaterialType mt, unsigned int _np, vector4d* d, double* m)
 {
@@ -190,6 +215,7 @@ xParticleObject* xParticleManager::CreateParticleFromList(
 	xpo->setDensity(xm.density);
 	xpo->setYoungs(xm.youngs);
 	xpo->setPoisson(xm.poisson);
+	setCriticalMaterial(xm.density, xm.youngs, xm.poisson);
 	double min_r = d[0].w;
 	double max_r = d[0].w;
 	for (unsigned int i = 0; i < _np; i++)
@@ -313,7 +339,7 @@ xParticleObject* xParticleManager::CreateCubeParticle(
 	QString name = QString::fromStdString(n);
 	xParticleObject* xpo = new xParticleObject(n);
 	vector4d* pos = xpo->AllocMemory(_np);
-	double* mass = xpo->Mass();
+	//double* mass = xpo->Mass();
 	xpo->setStartIndex(np);
 	xpo->setMaterialType(mt);
 	//n_single_sphere += _np;
@@ -324,7 +350,8 @@ xParticleObject* xParticleManager::CreateCubeParticle(
 	xpo->setPoisson(xm.poisson);
 	xpo->setMinRadius(d.minr);
 	xpo->setMaxRadius(d.maxr);
-
+	setCriticalMaterial(xm.density, xm.youngs, xm.poisson);
+	SetMassAndInertia(xpo);
 	if (d.minr == d.maxr)
 	{
 		double r = d.minr;
@@ -357,7 +384,7 @@ xParticleObject* xParticleManager::CreateCubeParticle(
 						_z + z * gab.z + ran.z * frand(), r
 						);
 						pos[cnt] = p;
-						mass[cnt] = 0.0;
+						//mass[cnt] = 0.0;
 					cnt++;
 				}
 			}
@@ -375,7 +402,8 @@ xParticleObject* xParticleManager::CreateCircleParticle(
 	QString name = QString::fromStdString(n);
 	xParticleObject* xpo = new xParticleObject(n);
 	vector4d* pos = xpo->AllocMemory(_np);
-	double* mass = xpo->Mass();
+	//double* mass = xpo->Mass();
+	
 	xpo->setStartIndex(np);
 	xpo->setMaterialType(mt);
 	//n_single_sphere += _np;
@@ -386,6 +414,8 @@ xParticleObject* xParticleManager::CreateCircleParticle(
 	xpo->setPoisson(xm.poisson);
 	xpo->setMinRadius(d.minr);
 	xpo->setMaxRadius(d.maxr);
+	setCriticalMaterial(xm.density, xm.youngs, xm.poisson);
+	SetMassAndInertia(xpo);
 	double r = d.maxr;
 	double cr = 0.5 * d.diameter;
 	unsigned int nr = static_cast<unsigned int>(cr / (2.0 * r)) - 1;
@@ -412,7 +442,7 @@ xParticleObject* xParticleManager::CreateCircleParticle(
 				new_pp.x = pp.x * cos(th) + pp.z * sin(th);
 				new_pp.z = -pp.x * sin(th) + pp.z * cos(th);
 				pos[cnt] = new_pp;
-				mass[cnt] = 0.0;
+			//	mass[cnt] = 0.0;
 				cnt++;
 				if (cnt == _np)
 				{
@@ -448,7 +478,7 @@ xParticleObject* xParticleManager::CreateMassParticle(
 	QString name = QString::fromStdString(n);
 	xParticleObject* xpo = new xParticleObject(n);
 	vector4d* pos = xpo->AllocMemory(1);
-	vector3d* iner = xpo->AllocInertiaMemory(1);
+	vector3d* iner = xpo->Inertia();
 	double* mass = xpo->Mass();
 	xpo->setStartIndex(np);
 	xpo->setMaterialType(mt);
@@ -462,6 +492,7 @@ xParticleObject* xParticleManager::CreateMassParticle(
 	xpo->setPoisson(xm.poisson);
 	xpo->setMinRadius(rad);
 	xpo->setMaxRadius(rad);
+	setCriticalMaterial(xm.density, xm.youngs, xm.poisson);
 	pos[0] = new_vector4d(d.px, d.py, d.pz, rad);
 	iner[0] = new_vector3d(d.ixx, d.iyy, d.izz);
 	mass[0] = d.mass;
@@ -490,8 +521,13 @@ xParticleObject * xParticleManager::CreateClusterParticle(
 	xpo->setMinRadius(rad);
 	xpo->setMaxRadius(rad);
 	xpo->setEachCount(neach);
+	setCriticalMaterial(xm.density, xm.youngs, xm.poisson);
 	vector4d* pos = xpo->AllocMemory(rnp);
 	vector4d* cpos = xpo->AllocClusterMemory(_np);
+	double* mass = xpo->Mass();
+	vector3d* inertia = xpo->Inertia();
+	//vector3d* inertia = xpo->AllocInertiaMemory(_np);
+	
 	euler_parameters* ep = (euler_parameters*)xpo->EulerParameters();
 	//n_cluster_sphere += _np;
 	ncluster += _np;
@@ -501,6 +537,7 @@ xParticleObject * xParticleManager::CreateClusterParticle(
 	xpo->setRelativeLocation(xo->RelativeLocation());
 	double c_rad = 0.0;
 	unsigned int cnt = 0;
+	SetClusterMassAndInertia(xpo);
 	for (int x = 0; x < grid.x; x++)
 	{
 		for (int y = 0; y < grid.y; y++)
@@ -574,59 +611,76 @@ bool xParticleManager::CopyPosition(
 	return true;
 }
 
-bool xParticleManager::SetMassAndInertia(double *mass, double *inertia)
+
+bool xParticleManager::CopyMassAndInertia(double * mass, double * inertia)
 {
-	unsigned int c = 0;
 	foreach(xParticleObject* xpo, xpcos)
 	{
-		double d = xpo->Density();
-		//vector4d* v = xpo->Position();
-		unsigned int sid = xpo->StartIndex();
-		if (xpo->ShapeForm() == CLUSTER_SHAPE)
-		{
-			vector4d* cpos = xpo->ClusterPosition();
-			vector3d* rloc = xpo->RelativeLocation();
-			for (unsigned int i = 0; i < xpo->NumCluster(); i++)
-			{
-				double m = d * (4.0 / 3.0) * M_PI * pow(cpos[i].w, 3.0);
-				mass[i + sid] = m * xpo->EachCount();
-				double J = (2.0 / 5.0) * m * pow(cpos[i].w, 2.0);
-				vector3d J3 = new_vector3d(0, 0, 0);
-				vector3d m_pos = new_vector3d(cpos[i].x, cpos[i].y, cpos[i].z);
-				for (unsigned int j = 0; j < xpo->EachCount(); j++)
-				{
-					vector3d dr = rloc[j];
-					J3.x += m * (dr.y * dr.y + dr.z * dr.z);
-					J3.y += m * (dr.x * dr.x + dr.z * dr.z);
-					J3.z += m * (dr.x * dr.x + dr.y * dr.y);
-				}
-				inertia[(i + sid) * 3 + 0] = J3.x;
-				inertia[(i + sid) * 3 + 1] = J3.y;
-				inertia[(i + sid) * 3 + 2] = J3.z;
-				//i += xpo->EachCount() - 1;
-			}
-		}
-		else if(xpo->ShapeForm() != NO_SHAPE_AND_MASS)
-		{
-			vector4d* pos = xpo->Position();
-			double* ms = xpo->Mass();
-			xpo->setMassIndex(c);
-		//	vector3d* J = xpo->Inertia();
-			for (unsigned int i = 0; i < xpo->NumParticle(); i++)
-			{
-			//	if (xpo->ShapeForm() != NO_SHAPE_AND_MASS)
-			//	{
-					double m = ms[i] ? ms[i] : d * (4.0 / 3.0) * M_PI * pow(pos[i].w, 3.0);
-					double J = (2.0 / 5.0) * m * pow(pos[i].w, 2.0);
-					mass[i + sid] = m;
-					inertia[i + sid] = J;
-			//	}	
-					c++;
-			}	
-			
-		}	
+		xpo->CopyMassAndInertia(mass, inertia);
+		//xpo->CopyPosition(pos);
+		/*if (cpos && xpo->ShapeForm() == CLUSTER_SHAPE)
+			xpo->CopyClusterPosition(cpos, ep);*/
 	}
-	foreach(xParticleObject* xpo, xpcos)
+	return false;
+}
+
+bool xParticleManager::SetClusterMassAndInertia(xParticleObject* xpo)
+{
+	unsigned int c = 0;
+	/*foreach(xParticleObject* xpo, xpcos)
+	{*/
+	double* mass = xpo->Mass();
+	vector3d* inertia = xpo->Inertia();
+	double d = xpo->Density();
+	//vector4d* v = xpo->Position();
+	unsigned int sid = xpo->StartIndex();
+	vector4d* cpos = xpo->ClusterPosition();
+	vector3d* rloc = xpo->RelativeLocation();
+
+	for (unsigned int i = 0; i < xpo->NumCluster(); i++)
+	{
+		double m = d * (4.0 / 3.0) * M_PI * pow(cpos[i].w, 3.0);
+		mass[i] = m * xpo->EachCount();
+		double J = (2.0 / 5.0) * m * pow(cpos[i].w, 2.0);
+		vector3d J3 = new_vector3d(0, 0, 0);
+		vector3d m_pos = new_vector3d(cpos[i].x, cpos[i].y, cpos[i].z);
+		for (unsigned int j = 0; j < xpo->EachCount(); j++)
+		{
+			vector3d dr = rloc[j];
+			J3.x += m * (dr.y * dr.y + dr.z * dr.z);
+			J3.y += m * (dr.x * dr.x + dr.z * dr.z);
+			J3.z += m * (dr.x * dr.x + dr.y * dr.y);
+		}
+		inertia[i] = J3;
+		c++;
+	}
+	xpo->setMassIndex(c);
+	//}
+	return false;
+}
+
+bool xParticleManager::SetMassAndInertia(xParticleObject* xpo)
+{
+	unsigned int c = 0;
+
+	double d = xpo->Density();
+	vector4d* pos = xpo->Position();
+	double* mass = xpo->Mass();
+	vector3d* inertia = xpo->Inertia();
+	
+	for (unsigned int i = 0; i < xpo->NumParticle(); i++)
+	{
+		double m = d * (4.0 / 3.0) * M_PI * pow(pos[i].w, 3.0);
+		double J = (2.0 / 5.0) * m * pow(pos[i].w, 2.0);
+		mass[i] = m;
+		inertia[i] = new_vector3d(J, J, J);
+		//	}	
+		c++;
+	}
+	xpo->setMassIndex(c);
+		//}	
+	//}
+	/*foreach(xParticleObject* xpo, xpcos)
 	{
 
 		if (xpo->ShapeForm() == NO_SHAPE_AND_MASS)
@@ -648,7 +702,7 @@ bool xParticleManager::SetMassAndInertia(double *mass, double *inertia)
 				}
 			}
 		}
-	}
+	}*/
 
 	return true;
 }
@@ -658,10 +712,12 @@ void xParticleManager::ExportParticleDataForView(std::string path)
 	std::fstream of;
 	of.open(path, std::ios::out | std::ios::binary);
 	of.write((char*)&np, sizeof(unsigned int));
+	//double* m_mass = new double[np];
 	foreach(xParticleObject* po, xpcos)
 	{
 		unsigned int _sid = po->StartIndex();
 		unsigned int _np = po->NumParticle();
+		unsigned int _cnp = po->NumCluster();
 		double d[2] = { po->MinRadius(), po->MaxRadius() };
 		double* _pos = (double *)po->Position();
 		int mat = po->Material();
@@ -671,9 +727,14 @@ void xParticleManager::ExportParticleDataForView(std::string path)
 		of.write((char*)&mat, sizeof(int));
 		of.write((char*)&_sid, sizeof(unsigned int));
 		of.write((char*)&_np, sizeof(unsigned int));
+		of.write((char*)&_cnp, sizeof(unsigned int));
 		of.write((char*)&d, sizeof(double) * 2);
 		of.write((char*)_pos, sizeof(double) * _np * 4);
+		of.write((char*)po->Mass(), sizeof(double) * (_cnp ? _cnp : _np));
+		//memcpy(m_mass + _sid, po->Mass(), sizeof(double) * (_cnp ? _cnp : _np));
 	}
+	//of.write((char*)m_mass, sizeof(double) * np);
+	//delete[] m_mass;
 	of.close();
 }
 

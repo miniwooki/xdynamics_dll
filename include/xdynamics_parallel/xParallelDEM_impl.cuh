@@ -312,7 +312,7 @@ __global__ void vv_update_velocity_kernel(
 	//double3 aa = alpha[id];
 	double3 a = (1.0 / m) * (force[id] + m * cte.gravity);
 	double3 J = make_double3(0, 0, 0);
-	if (i >= np - cte.nmp)
+	if (id >= np - cte.nmp)
 	{
 		unsigned int sid = np - cte.nmp;
 		unsigned int j = id - (np - cte.nmp);
@@ -918,7 +918,7 @@ __global__ void calculate_p2p_kernel(
 						double3 rp = make_double3(jpos.x - ipos.x, jpos.y - ipos.y, jpos.z - ipos.z);
 						double dist = length(rp);
 						double cdist = (ir + jr) - dist;
-						double coh_s = 0.0;
+						double coh_s = -FLT_MAX;
 						if (cp->coh)
 							coh_s = limit_cohesion_depth(ir, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh);
 						double2 sd = make_double2(0.0, 0.0);
@@ -959,6 +959,7 @@ __global__ void calculate_p2p_kernel(
 	}
 	force[id] += sumF;
 	moment[id] += sumM;
+	//printf("new_count, sid - %d, %d", new_count - sid);
 	if (new_count - sid > MAX_P2P_COUNT)
 		printf("The total of contact with other particle is over(%d)\n.", new_count - sid);
 	
@@ -1205,11 +1206,12 @@ __global__ void plane_contact_force_kernel(
 	double3 sumF = make_double3(0.0, 0.0, 0.0);
 	double3 sumM = make_double3(0.0, 0.0, 0.0);
 	unsigned int new_count = sid;
-	double coh_s = 0.0;
+	
 	double res = 0.0;
 	double3 tma = make_double3(0.0, 0.0, 0.0);
 	for (unsigned int k = 0; k < cte.nplane; k++)
 	{
+		double coh_s = -FLT_MAX;
 		device_plane_info pl = plane[k];
 		double3 dp = make_double3(ipos.x, ipos.y, ipos.z) - pl.xw;
 		double3 unit = make_double3(0, 0, 0);

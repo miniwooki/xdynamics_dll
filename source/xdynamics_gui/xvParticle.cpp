@@ -201,6 +201,7 @@ bool xvParticle::defineFromViewFile(QString path)
 	unsigned int _np = 0;
 	qf.read((char*)&_np, sizeof(unsigned int));
 	double* d_pos = NULL;
+	double* d_mass = NULL;
 	while (!qf.atEnd())
 	{
 		qf.read((char*)&ns, sizeof(int));
@@ -212,10 +213,12 @@ bool xvParticle::defineFromViewFile(QString path)
 		qf.read((char*)&(pgds[name].mat), sizeof(int));
 		qf.read((char*)&(pgds[name].sid), sizeof(unsigned int));
 		qf.read((char*)&(pgds[name].np), sizeof(unsigned int));
+		qf.read((char*)&(pgds[name].cnp), sizeof(unsigned int));
 		qf.read((char*)&(pgds[name].min_rad), sizeof(double));
 		qf.read((char*)&(pgds[name].max_rad), sizeof(double));
 		resizePositionMemory(np, np + pgds[name].np);
 		d_pos = new double[pgds[name].np * 4];
+		d_mass = new double[pgds[name].cnp ? pgds[name].cnp : pgds[name].np];
 		qf.read((char*)d_pos, sizeof(double) * pgds[name].np * 4);
 		for (unsigned int i = 0; i < pgds[name].np; i++)
 		{
@@ -224,8 +227,10 @@ bool xvParticle::defineFromViewFile(QString path)
 			pos[(np + i) * 4 + 2] = (float)d_pos[i * 4 + 2];
 			pos[(np + i) * 4 + 3] = (float)d_pos[i * 4 + 3];
 		}
+		qf.read((char*)d_mass, sizeof(double) * (pgds[name].cnp ? pgds[name].cnp : pgds[name].np));
 		np += pgds[name].np;
 		delete[] d_pos;
+		delete[] d_mass;
 		delete[] _name;
 	}
 	color = new float[np * 4];

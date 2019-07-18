@@ -13,6 +13,7 @@ xDiscreteElementMethodSimulation::xDiscreteElementMethodSimulation()
 	, dtor(NULL)
 	, xcm(NULL)
 	, xci(NULL)
+	, xpm(NULL)
 	, dxsdci(NULL)
 	, dxsdc_data(NULL)
 	, nco(0)
@@ -34,7 +35,8 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 {
 	xdem = _xdem;
 	double maxRadius = 0;
-	xParticleManager* xpm = xdem->XParticleManager();
+	double minRadius = FLT_MAX;
+	xpm = xdem->XParticleManager();
 	//np = xpm->NumParticleWithCluster();
 	np = xpm->NumParticle();
 	ns = xpm->NumCluster();
@@ -83,16 +85,15 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 	}
 	xpm->CopyPosition(pos, cpos, ep, np);
 	if(xci) xpm->CopyClusterInformation(xci, rcloc);
-	xpm->SetMassAndInertia(mass, inertia);
+	xpm->CopyMassAndInertia(mass, inertia);
 	for (unsigned int i = 0; i < np; i++)
 	{
 		double r = pos[i * 4 + 3];
 		//vector3d cm = 
-		if (r > maxRadius)
-			maxRadius = r;
+		if (r > maxRadius) maxRadius = r;
+		if (r < minRadius) minRadius = r;
 	}
-	
-
+	double new_dt = CriticalTimeStep(minRadius);
 	dtor = new xNeiborhoodCell;
 	// 	switch (md->SortType())
 	// 	{
@@ -289,6 +290,15 @@ QString xDiscreteElementMethodSimulation::SaveStepResult(unsigned int pt, double
 		qf.write((char*)avel, sizeof(double) * ns * 4);
 	}
 	qf.close();
+//	double total_energy = 0.0;
+	//vector4d *p = (vector4d*)pos;
+	//vector3d *v = (vector3d*)vel;
+	//for (unsigned int i = 0; i < np; i++)
+	//{
+	//	double mv = length(v[i]);
+	//	total_energy += 0.5 * mass[i] * mv * mv;// +mass[i] * length(xModel::gravity) * p[i].y;
+	//}
+	//std::cout << "total_energy : " << total_energy << std::endl;
 	/*qf.open(QIODevice::WriteOnly);*/
 	partList.push_back(fname);
 	//vector4d* h_sphere = xcm->ContactParticlesMeshObjects()->GetCurrentSphereData();
@@ -313,6 +323,18 @@ void xDiscreteElementMethodSimulation::ExportResults(std::fstream& of)
 void xDiscreteElementMethodSimulation::EnableSaveResultToMemory(bool b)
 {
 	isSaveMemory = b;
+}
+
+double xDiscreteElementMethodSimulation::CriticalTimeStep(double min_rad)
+{
+	double rho = xpm->CriticalDensity();
+	double E = xpm->CriticalYoungs();
+	double p = xpm->CriticalPoisson();
+	double dt_raleigh = M_PI * min_rad * sqrt(rho * 2.0 * (1 + p) / E) / (0.1631 * (p + 0.8766));
+	double dt_hertz = 2.87 * pow(pow(rho * (4.0 / 3.0) * M_PI * pow(min_rad, 3.0), 2.0) / (min_rad * E * E * 1.0), 0.2);
+	double dt_cundall = 0.2 * M_PI * sqrt(rho * (4.0 / 3.0) * M_PI * min_rad * min_rad * 3.0 * (1.0 + 2.0 * p) / (E * 0.01));
+	double min_dt = dt_raleigh < dt_hertz ? (dt_raleigh < dt_cundall ? dt_raleigh : dt_cundall) : (dt_hertz < dt_cundall ? dt_hertz : dt_cundall);
+	return 0.2 * min_dt;
 }
 
 void xDiscreteElementMethodSimulation::updateObjectFromMBD()
@@ -357,7 +379,7 @@ void xDiscreteElementMethodSimulation::SpringDamperForce()
 			}
 			checkCudaErrors(cudaMemcpy(dbi, hbi, sizeof(device_body_info)*nTsdaConnectionBody, cudaMemcpyHostToDevice));*/
 			cu_calculate_spring_damper_connecting_body_force(
-				dpos, dvel, dforce, dxsd_cbd, dxsdc_kc, nTsdaConnectionBodyData);
+				dpos, dvel, dep, davel, dmass, dforce, dmoment, dxsd_cbd, dxsdc_kc, nTsdaConnectionBodyData);
 			/*checkCudaErrors(cudaMemcpy(hbi, dbi, sizeof(device_body_info)*nTsdaConnectionBody, cudaMemcpyDeviceToHost));
 			for (unsigned int i = 0; i < nTsdaConnectionBody; i++)
 			{

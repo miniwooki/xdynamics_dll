@@ -23,6 +23,7 @@ public:
 	QString SaveStepResult(unsigned int pt, double ct);
 	void ExportResults(std::fstream& of);
 	void EnableSaveResultToMemory(bool b);
+	double CriticalTimeStep(double min_rad);
 	void updateObjectFromMBD();
 	double* Position();
 	double* Velocity();
@@ -46,6 +47,7 @@ protected:
 
 	xDiscreteElementMethodModel* xdem;
 	xGridCell* dtor;
+	xParticleManager* xpm;
 	xContactManager* xcm;
 	//unsigned int *cindex;
 	double *mass;

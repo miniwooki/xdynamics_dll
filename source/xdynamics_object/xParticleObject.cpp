@@ -68,16 +68,18 @@ vector4d* xParticleObject::AllocMemory(unsigned int _np)
 		pos = new vector4d[np];
 	if (!mass)
 		mass = new double[np];
+	if (!inertia)
+		inertia = new vector3d[np];
 	return pos;
 }
 
-vector3d* xParticleObject::AllocInertiaMemory(unsigned int _np)
-{
-	if (inertia)
-		delete[] inertia;
-	inertia = new vector3d[_np];
-	return inertia;
-}
+//vector3d* xParticleObject::AllocInertiaMemory(unsigned int _np)
+//{
+//	if (inertia)
+//		delete[] inertia;
+//	inertia = new vector3d[_np];
+//	return inertia;
+//}
 
 vector4d* xParticleObject::AllocClusterMemory(unsigned int _np)
 {
@@ -94,6 +96,25 @@ vector4d* xParticleObject::AllocClusterMemory(unsigned int _np)
 void xParticleObject::CopyPosition(double* _pos)
 {
 	memcpy(_pos + sid * 4, pos, sizeof(vector4d) * np);
+}
+
+void xParticleObject::CopyMassAndInertia(double * _mass, double* _inertia)
+{
+	unsigned int _np = shape == CLUSTER_SHAPE ? cnp : np;
+	unsigned int _sid = shape == CLUSTER_SHAPE ? csid : sid;
+	memcpy(_mass + _sid, mass, sizeof(double) * _np);
+	if (shape != NO_SHAPE_AND_MASS)
+	{
+		for (unsigned int i = 0; i < _np; i++)
+		{
+			_inertia[i] = inertia[i].x;
+		}
+	}
+	else
+	{
+		memcpy(_inertia + _sid, inertia, sizeof(double) * _np * 3);
+	}
+	
 }
 
 void xParticleObject::CopyClusterPosition(double* _pos, double *_ep)
