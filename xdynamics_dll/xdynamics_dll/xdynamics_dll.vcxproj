@@ -1,0 +1,337 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{27E4D486-530E-4F77-A6CA-07554FC14BD2}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>xdynamics_dll</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 10.1.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>xdynamics_d</TargetName>
+    <OutDir>..\..\bin\debug\x64\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>..\..\bin\release\x64\</OutDir>
+    <TargetName>xdynamics_r</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;XDYNAMICS_DLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>ADD_;WIN32;WIN64;_DEBUG;_WINDOWS;_USRDLL;XDYNAMICS_DLL_EXPORTS;LAPACK_COMPLEX_STRUCTURE;HAVE_LAPACK_CONFIG_H;_USE_MATH_DEFINES;QT_CORE_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>C:\xdynamics\include;$(LAPACK_64)\inc;C:\xDynamics\extern\libxl-3.8.4.0\include_cpp;$(USING_QT_VERSION)\include;$(USING_CUDA_SAMPLE_VERSION)\common\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4819</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(LAPACK_64)\lib;C:\xDynamics\extern\libxl-3.8.4.0\lib64;C:\xdynamics\lib;$(USING_QT_VERSION)\lib;$(USING_CUDA_VERSION)\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>cudart.lib;Qt5Cored.lib;libxl.lib;liblapacke.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <CudaCompile>
+      <CodeGeneration>compute_30,sm_30;compute_35,sm_35;compute_52,sm_52</CodeGeneration>
+      <TargetMachinePlatform>64</TargetMachinePlatform>
+      <MaxRegCount>0</MaxRegCount>
+      <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>
+    </CudaCompile>
+    <CudaLink>
+      <GPUDebugInfo>true</GPUDebugInfo>
+    </CudaLink>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;XDYNAMICS_DLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;LAPACK_COMPLEX_STRUCTURE;HAVE_LAPACK_CONFIG_H;_USE_MATH_DEFINES;QT_CORE_LIB;_CRT_SECURE_NO_WARNINGS;NDEBUG;_WINDOWS;_USRDLL;XDYNAMICS_DLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>C:\xdynamics\include;$(LAPACK_64)\inc;C:\xDynamics\extern\libxl-3.8.4.0\include_cpp;$(USING_QT_VERSION)\include;$(USING_CUDA_SAMPLE_VERSION)\common\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4819</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(LAPACK_64)\lib;C:\xDynamics\extern\libxl-3.8.4.0\lib64;C:\xdynamics\lib;$(USING_QT_VERSION)\lib;$(USING_CUDA_VERSION)\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>cudart.lib;Qt5Core.lib;libxl.lib;liblapacke.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <CudaCompile>
+      <CodeGeneration>compute_30,sm_30;compute_35,sm_35;compute_52,sm_52</CodeGeneration>
+      <TargetMachinePlatform>64</TargetMachinePlatform>
+    </CudaCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\source\xDynamicsError.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_algebra\xAlgebraMath.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_algebra\xAlgebraType.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_algebra\xGridCell.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_algebra\xNeiborhoodCell.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_algebra\xParabolaPredictor.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_algebra\xSmoothCell.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_algebra\xUtilityFunction.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_global.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_manager\xContactManager.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_manager\xDiscreteElementMethodModel.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_manager\xDynamicsManager.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_manager\xModel.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_manager\xMultiBodyModel.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_manager\xParticleManager.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_manager\xResultManager.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_manager\xSmoothedParticleHydrodynamicsModel.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xClusterObject.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xContact.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xContactPairList.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xCubeObject.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xCubicSplineKernel.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xCylinderObject.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xDrivingConstraint.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xForce.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xKernelFunction.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xKinematicConstraint.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xLineObject.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xMeshObject.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xObject.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xParticleCubeContact.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xParticleCylinderContact.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xParticleMeshObjectContact.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xParticleMeshObjectsContact.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xParticleObject.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xParticleParticleContact.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xParticlePlaneContact.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xParticlePlanesContact.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xPlaneObject.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xPointMass.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xQuadraticKernel.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xQuinticKernel.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xRevoluteConstraint.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xSphericalConstraint.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xSpringDamperForce.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xTranslationConstraint.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xUniversalConstraint.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xRotationalAxialForce.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xWendlandKernel.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_simulation\xDiscreteElementMethodSimulation.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_simulation\xDynamicSimulator.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_simulation\xIncompressibleSPH.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_simulation\xIntegratorHHT.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_simulation\xIntegratorRK4.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_simulation\xIntegratorVV.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_simulation\xKinematicAnalysis.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_simulation\xMultiBodySimulation.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_simulation\xSimulation.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_simulation\xSmoothedParticleHydrodynamicsSimulation.cpp" />
+    <ClCompile Include="..\..\source\xLog.cpp" />
+    <ClCompile Include="..\..\source\xstring.cpp" />
+    <ClCompile Include="..\..\source\xViewExporter.cpp" />
+    <ClCompile Include="..\..\source\xXLSReader.cpp" />
+    <ClCompile Include="..\..\source\xObjectManager.cpp" />
+    <ClCompile Include="dllmain.cpp">
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsManaged>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsManaged>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsManaged>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\xdynamics.h" />
+    <ClInclude Include="..\..\include\xDynamicsError.h" />
+    <ClInclude Include="..\..\include\xdynamics_algebra\xAlgebraMath.h" />
+    <ClInclude Include="..\..\include\xdynamics_algebra\xAlgebraType.h" />
+    <ClInclude Include="..\..\include\xdynamics_algebra\xGridCell.h" />
+    <ClInclude Include="..\..\include\xdynamics_algebra\xNeiborhoodCell.h" />
+    <ClInclude Include="..\..\include\xdynamics_algebra\xParaboalPredictor.h" />
+    <ClInclude Include="..\..\include\xdynamics_algebra\xSmoothCell.h" />
+    <ClInclude Include="..\..\include\xdynamics_algebra\xUtilityFunctions.h" />
+    <ClInclude Include="..\..\include\xdynamics_decl.h" />
+    <ClInclude Include="..\..\include\xdynamics_global.h" />
+    <ClInclude Include="..\..\include\xdynamics_manager\xContactManager.h" />
+    <ClInclude Include="..\..\include\xdynamics_manager\XDiscreteElementMethodModel.h" />
+    <ClInclude Include="..\..\include\xdynamics_manager\xDynamicsManager.h" />
+    <ClInclude Include="..\..\include\xdynamics_manager\xModel.h" />
+    <ClInclude Include="..\..\include\xdynamics_manager\xMultiBodyModel.h" />
+    <ClInclude Include="..\..\include\xdynamics_manager\xObjectManager.h" />
+    <ClInclude Include="..\..\include\xdynamics_manager\xParticleMananger.h" />
+    <ClInclude Include="..\..\include\xdynamics_manager\xResultManager.h" />
+    <ClInclude Include="..\..\include\xdynamics_manager\xResultStorage.h" />
+    <ClInclude Include="..\..\include\xdynamics_manager\xSmoothedParticleHydrodynamicsModel.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xClusterObject.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xConatct.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xContactPairList.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xCubeObject.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xCubicSplineKernel.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xCylinderObject.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xDrivingConstraint.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xForce.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xKernelFunction.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xKinematicConstraint.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xLineObject.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xMeshObject.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xObject.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xParticleCubeContact.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xParticleCylinderContact.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xParticleMeshObjectContact.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xParticleMeshObjectsContact.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xParticleObject.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xParticleParticleContact.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xParticlePlaneContact.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xParticlePlanesContact.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xPlaneObject.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xPointMass.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xQuadraticKernel.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xQuinticKernel.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xRevoluteConstraint.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xRotationalAxialForce.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xSphericalConstraint.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xSpringDamperForce.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xTranslationConstraint.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xUniversalConstraint.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xWendlandKernel.h" />
+    <ClInclude Include="..\..\include\xdynamics_parallel\xParallelDEM_impl.cuh">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_simulation\xDiscreteElementMethodSimulation.h" />
+    <ClInclude Include="..\..\include\xdynamics_simulation\xDynamicsSimulator.h" />
+    <ClInclude Include="..\..\include\xdynamics_simulation\xIncompressibleSPH.h" />
+    <ClInclude Include="..\..\include\xdynamics_simulation\xIngegratorVV.h" />
+    <ClInclude Include="..\..\include\xdynamics_simulation\xIntegratorHHT.h" />
+    <ClInclude Include="..\..\include\xdynamics_simulation\xIntegratorRK4.h" />
+    <ClInclude Include="..\..\include\xdynamics_simulation\xKinematicAnalysis.h" />
+    <ClInclude Include="..\..\include\xdynamics_simulation\xMultiBodySimulation.h" />
+    <ClInclude Include="..\..\include\xdynamics_simulation\xSimulation.h" />
+    <ClInclude Include="..\..\include\xdynamics_simulation\xSmoothedParticleHydrodynamicsSimulation.h" />
+    <ClInclude Include="..\..\include\xLog.h" />
+    <ClInclude Include="..\..\include\xmap.hpp" />
+    <ClInclude Include="..\..\include\xstring.h" />
+    <ClInclude Include="..\..\include\xTypes.h" />
+    <ClInclude Include="..\..\include\xViewExporter.h" />
+    <ClInclude Include="..\..\include\xXLSReader.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\xdynamics_parallel\xParallelDEM_decl.cuh" />
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="..\..\source\xdynamics_parallel\xParallelDEM_def.cu">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </CudaCompile>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 10.1.targets" />
+  </ImportGroup>
+</Project>

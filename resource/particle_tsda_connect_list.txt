@@ -1,0 +1,15 @@
+kc_value 2
+0 10 0.1
+1 5000 1
+
+connection_list 3
+0 1 1 0 
+1 2 0 0 2 0
+2 1 1 0
+
+mass_particle_connection_list 1
+connection_mass_particle wheel
+connection_number 3
+0 1 0 0.002 0
+1 1 0.001 0.002 0
+2 1 0.002 0.002 0

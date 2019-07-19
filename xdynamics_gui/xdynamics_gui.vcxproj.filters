@@ -1,0 +1,267 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Form Files">
+      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
+      <Extensions>ui</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
+      <Extensions>moc;h;cpp</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Header Files\widget">
+      <UniqueIdentifier>{a77cb45e-c3f5-412d-9223-3a269c37fe1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\plot">
+      <UniqueIdentifier>{c5dfef23-b8d3-4bdf-b15d-983cef6abe65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\chart">
+      <UniqueIdentifier>{c43f461a-9455-4775-908b-8db95e6ff0b9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="xdynamics_gui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xGLWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xvAnimationController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xvMarker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xvObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xvParticle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xvShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xCommandWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xvPlane.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xAnimationTool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xvCube.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xModelNavigator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xvMeshObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xSimulationThread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xSimulationWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xvCylinder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xNewDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xCommandLine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xLineEditWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xPointMassWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xChartAxis.cpp">
+      <Filter>Source Files\chart</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xChartView.cpp">
+      <Filter>Source Files\chart</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xChartSpline.cpp">
+      <Filter>Source Files\chart</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xCallOut.cpp">
+      <Filter>Source Files\chart</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xChartControl.cpp">
+      <Filter>Source Files\chart</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xChartWindow.cpp">
+      <Filter>Source Files\chart</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xChartDatabase.cpp">
+      <Filter>Source Files\chart</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="xdynamics_gui.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="..\include\xdynamics_gui\xGLWidget.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="..\include\xdynamics_gui\xCommandWindow.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="..\include\xdynamics_gui\xAnimationTool.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="..\include\xdynamics_gui\xModelNavigator.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="..\include\xdynamics_gui\xSimulationThread.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="..\include\xdynamics_gui\xNewDialog.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="..\include\xdynamics_gui\xLineEditWidget.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="..\include\xdynamics_gui\xSimulationWidget.h">
+      <Filter>Header Files\widget</Filter>
+    </QtMoc>
+    <QtMoc Include="..\include\xdynamics_gui\xPointMassWidget.h">
+      <Filter>Header Files\widget</Filter>
+    </QtMoc>
+    <QtMoc Include="..\include\xdynamics_gui\xChartControl.h">
+      <Filter>Header Files\plot</Filter>
+    </QtMoc>
+    <QtMoc Include="..\include\xdynamics_gui\xChartView.h">
+      <Filter>Header Files\plot</Filter>
+    </QtMoc>
+    <QtMoc Include="..\include\xdynamics_gui\xChartWindow.h">
+      <Filter>Header Files\plot</Filter>
+    </QtMoc>
+    <QtMoc Include="..\include\xdynamics_gui\xChartDatabase.h">
+      <Filter>Header Files\plot</Filter>
+    </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="xdynamics_gui.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="wcube.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="wsimulation.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="wplane.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="wparticles.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="wview.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="wpointmass.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+  </ItemGroup>
+  <ItemGroup>
+    <QtRcc Include="xdynamics_gui.qrc">
+      <Filter>Resource Files</Filter>
+    </QtRcc>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\xdynamics_gui\xvObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xdynamics_gui\xvAnimationController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xdynamics_gui\xvMarker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xdynamics_gui\xvGlew.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xdynamics_gui\xvMath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xdynamics_gui\xvParticle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xdynamics_gui\xvShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xdynamics_gui\xvPlane.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xdynamics_gui\xvCube.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_wcube.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xdynamics_gui\xvMeshObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_wsimulation.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_wplane.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xdynamics_gui\xvCylinder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_xnew.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xdynamics_gui\xCommandLine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_wparticles.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_wview.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_wpointmass.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xdynamics_gui\xChartAxis.h">
+      <Filter>Header Files\plot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xdynamics_gui\xCallOut.h">
+      <Filter>Header Files\plot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xdynamics_gui\xChartSpline.h">
+      <Filter>Header Files\plot</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
