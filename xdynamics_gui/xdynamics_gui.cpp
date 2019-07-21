@@ -791,7 +791,7 @@ void xdynamics_gui::xRunSimulationThread(double dt, unsigned int st, double et)
 	setupAnimationTool();
 	sThread = new xSimulationThread;
 	sThread->xInitialize(xdm, dt, st, et);
-	setupMeshSphere();
+	//setupMeshSphere();
 	//xcw->write(xCommandWindow::CMD_INFO, QString("%1, %1, %1").arg(dt).arg(st).arg(et));
 	//xcw->write(xCommandWindow::CMD_INFO, "Thread Initialize Done.");
 	xvAnimationController::allocTimeMemory(xSimulation::npart);

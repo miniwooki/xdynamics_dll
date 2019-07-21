@@ -353,7 +353,7 @@ xParticleObject* xParticleManager::CreateCubeParticle(
 	xpo->setMinRadius(d.minr);
 	xpo->setMaxRadius(d.maxr);
 	setCriticalMaterial(xm.density, xm.youngs, xm.poisson);
-	SetMassAndInertia(xpo);
+	
 	if (d.minr == d.maxr)
 	{
 		double r = d.minr;
@@ -393,6 +393,7 @@ xParticleObject* xParticleManager::CreateCubeParticle(
 		}
 	}
 	//xpo->set
+	SetMassAndInertia(xpo);
 	xpcos[name] = xpo;
 	xObjectManager::XOM()->addObject(xpo);
 	return xpo;

@@ -314,11 +314,17 @@ __global__ void vv_update_velocity_kernel(
 	double3 J = iner[id];// make_double3(0, 0, 0);
 	double3 n_prime = toLocal(moment[id], e);
 	double4 m_ea = calculate_uceom(J, e, av, n_prime);
-	/*if(length(force[id]) > 0)
-		printf("[%f, %f, %f]\n", force[id].x, force[id].y, force[id].z);*/
+	//if(length(force[id]) > 0)
+	//printf("[%f, %f, %f]\n", moment[id].x, moment[id].y, moment[id].z);
 	//double3 in = (1.0 / iner[id]) * moment[id];
+	
 	v += 0.5 * cte.dt * (acc[id] + a);
 	av = av + 0.5 * cte.dt * (ea[id] + m_ea);
+	/*printf("force = [%f, %f, %f]\n", force[id].x, force[id].y, force[id].z);
+	printf("a = [%f, %f, %f]\n", a.x, a.y, a.z);
+	printf("m_ea = [%f, %f, %f, %f]\n", m_ea.x, m_ea.y, m_ea.z, m_ea.w);
+	printf("v = [%f, %f, %f]\n", v.x, v.y, v.z);
+	printf("av = [%f, %f, %f]\n", av.x, av.y, av.z);*/
 	force[id] = make_double3(0.0, 0.0, 0.0); 
 	moment[id] = make_double3(0.0, 0.0, 0.0);
 	vel[id] = v;
@@ -503,6 +509,7 @@ __device__ device_force_constant getConstant(
 		break;
 	}
 	case 1: {
+		//printf("rest : %f, Meq : %f", rest, Meq);
 		double beta = (M_PI / log(rest));
 		dfc.kn = (4.0 / 3.0) * Eeq * sqrt(Req);
 		dfc.vn = sqrt((4.0 * Meq * dfc.kn) / (1.0 + beta * beta));
@@ -621,7 +628,6 @@ __device__ double cohesionForce(
 __device__ double limit_cohesion_depth(
 	double ir, double jr, double iE, double jE, double ip, double jp, double coh)
 {
-	
 	double Req = jr ? (ir * jr) / (ir + jr) : ir;
 	double Eeq = 1.0 / (((1.0 - ip * ip) / iE) + ((1.0 - jp * jp) / jE));
 	double c1 = (M_PI * M_PI * coh * coh * Req) / (Eeq * Eeq);
@@ -906,7 +912,8 @@ __global__ void calculate_p2p_kernel(
 						double cdist = (ir + jr) - dist;
 						double coh_s = -FLT_MAX;
 						if (cp->coh)
-							coh_s = limit_cohesion_depth(ir, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh);
+							coh_s = limit_cohesion_depth(ir, jr, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh);
+						printf("cdist : %f, coh_s : %f\n", cdist, coh_s);
 						double2 sd = make_double2(0.0, 0.0);
 						double3 unit = rp / dist;
 						if (cdist > 0) {
@@ -929,8 +936,9 @@ __global__ void calculate_p2p_kernel(
 							pair_id[new_count] = k;
 							new_count++;
 						}
-						else if (cdist < 0 && cdist < coh_s)
+						else if (cdist <= 0 && cdist < coh_s)
 						{
+							
 							double f = JKR_seperation_force(ir, jr, cp->coh);
 							double cf = cohesionForce(ir, jr, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, f);
 							sumF = sumF - cf * unit;
@@ -1238,6 +1246,8 @@ __global__ void plane_contact_force_kernel(
 			new_count++;
 		}
 	}
+	//printf("sumF = [%f, %f, %f]\n", sumF.x, sumF.y, sumF.z);
+	//printf("sumM = [%f, %f, %f]\n", sumM.x, sumM.y, sumM.z);
 	force[id] += sumF;
 	moment[id] += sumM;
 	if (new_count - sid > 3)
@@ -1738,10 +1748,6 @@ __global__ void particle_polygonObject_collision_kernel(
 						{
 							k -= cte.np;
 							int t = -1;
-							//unsigned int pidx = dpi[k].id;
-							//device_contact_property cmp = cp[pidx];
-							//device_mesh_mass_info pmi = dpmi[pidx];
-							//double3 po2cp = cpt - pmi.origin;
 							double cdist = ir - length(ipos - closestPtPointTriangle(dpi[k], ipos, ir, t));
 							if (cdist > 0)
 							{
@@ -1760,7 +1766,7 @@ __global__ void particle_polygonObject_collision_kernel(
 	}
 	double res = 0.0;
 	double3 tma = make_double3(0.0, 0.0, 0.0);
-	printf("tlp : [%d - %d - %d]\n", nct, ncl, ncp);
+	//printf("tlp : [%d - %d - %d]\n", nct, ncl, ncp);
 	for (unsigned int k = 0; k < nct; k++)
 		particle_triangle_contact_force(ctriangle[k], 0, dpi, cp, dpmi, ipos, ivel, iomega, old_count, p_pair_id, p_tsd, pair_id, tsd, ir, im, sum_force, sum_moment, res, tma, new_count);
 	if(!nct)

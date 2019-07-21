@@ -280,7 +280,7 @@ void xContactManager::updateCollisionPair(
 	xClusterInformation* xci,
 	unsigned int np)
 {
-	unsigned int klist[200] = { 0, };
+	//unsigned int klist[200] = { 0, };
 	for (unsigned int i = 0; i < np; i++)
 	{
 		unsigned int count = 0;
@@ -328,7 +328,7 @@ void xContactManager::updateCollisionPair(
 							{
 								if (cpmeshes->updateCollisionPair(k - np, xcpl[i], r, p, old_id, old_cpt, old_unit, ctype))
 									count++;
-								klist[kcount++] = k;
+							//	klist[kcount++] = k;
 							}
 						}
 					}

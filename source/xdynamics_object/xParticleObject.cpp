@@ -64,12 +64,15 @@ void xParticleObject::setEachCount(unsigned int ec)
 vector4d* xParticleObject::AllocMemory(unsigned int _np)
 {
 	np = _np;
-	if(!pos)
-		pos = new vector4d[np];
-	if (!mass)
-		mass = new double[np];
-	if (!inertia)
-		inertia = new vector3d[np];
+	/*if(!pos)*/
+	pos = new vector4d[np];
+	//if (!mass)
+	mass = new double[np];
+	//if (!inertia)
+	inertia = new vector3d[np];
+	memset(pos, 0, sizeof(vector4d) * np);
+	memset(mass, 0, sizeof(double) * np);
+	memset(inertia, 0, sizeof(vector3d) * np);
 	return pos;
 }
 
@@ -88,8 +91,9 @@ vector4d* xParticleObject::AllocClusterMemory(unsigned int _np)
 	{
 		cpos = new vector4d[_np];
 		ep = new vector4d[_np];
-	}
-		
+		memset(cpos, 0, sizeof(vector4d) * _np);
+		memset(ep, 0, sizeof(vector4d) * _np);
+	}		
 	return cpos;
 }
 
