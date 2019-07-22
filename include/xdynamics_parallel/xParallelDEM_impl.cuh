@@ -913,7 +913,7 @@ __global__ void calculate_p2p_kernel(
 						double coh_s = -FLT_MAX;
 						if (cp->coh)
 							coh_s = limit_cohesion_depth(ir, jr, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh);
-						printf("cdist : %f, coh_s : %f\n", cdist, coh_s);
+					//	printf("cdist : %f, coh_s : %f\n", cdist, coh_s);
 						double2 sd = make_double2(0.0, 0.0);
 						double3 unit = rp / dist;
 						if (cdist > 0) {
@@ -936,7 +936,7 @@ __global__ void calculate_p2p_kernel(
 							pair_id[new_count] = k;
 							new_count++;
 						}
-						else if (cdist <= 0 && cdist < coh_s)
+						else if (cdist <= 0 && abs(cdist) < abs(coh_s))
 						{
 							
 							double f = JKR_seperation_force(ir, jr, cp->coh);
@@ -1213,6 +1213,7 @@ __global__ void plane_contact_force_kernel(
 		double cdist = particle_plane_contact_detection(pl, ipos3, wp, unit, r);
 		if (cp->coh)
 			coh_s = limit_cohesion_depth(r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh);
+		//printf("coh : %f, coh_s : %f", cp->coh, coh_s);
 		double2 sd = make_double2(0.0, 0.0);
 		if (cdist > 0) {
 			
@@ -1236,7 +1237,7 @@ __global__ void plane_contact_force_kernel(
 			pair_id[new_count] = k;
 			new_count++;
 		}
-		else if(cdist < 0 && cdist < coh_s)
+		else if(cdist <= 0 && abs(cdist) < abs(coh_s))
 		{
 			double f = JKR_seperation_force(r, 0, cp->coh);
 			double cf = cohesionForce(r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, f);
@@ -1588,30 +1589,44 @@ __device__ void particle_triangle_contact_force(
 	double3& sum_moment,
 	double& res,
 	double3& tma,
+	double coh_s,
 	unsigned int& new_count)
 {
+	device_triangle_info tri = dpi[k];
+	double3 qp = tri.Q - tri.P;
+	double3 rp = tri.R - tri.P;
+	//	double rcon = r - 0.5 * cdist;
+	double3 unit = -cross(qp, rp);
+	//double3 dcpr = cpt - make_double3(icpos.x, icpos.y, icpos.z);
+	//double3 dcpr_j = cpt - make_double3(jcpos.x, jcpos.y, jcpos.z);
+	unit = unit / length(unit);
+	double2 sd = make_double2(0.0, 0.0);
 	unsigned int pidx = dpi[k].id;
 	device_contact_property cmp = cp[pidx];
 	device_mesh_mass_info pmi = dpmi[pidx];
 	double3 cpt = closestPtPointTriangle(dpi[k], ipos, r, t);
 	double3 po2cp = cpt - pmi.origin;
 	double cdist = r - length(ipos - cpt);
+	if (cdist <= 0 && abs(cdist) < abs(coh_s))
+	{
+		double f = JKR_seperation_force(r, 0, cp->coh);
+		double cf = cohesionForce(r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, f);
+		sum_force = sum_force - cf * unit;
+		tsd[new_count] = sd;
+		pair_id[new_count] = k;
+		new_count++;
+		return;
+	}
+	
 	double3 Fn = make_double3(0.0, 0.0, 0.0);
 	double3 Ft = make_double3(0, 0, 0);
-	device_triangle_info tri = dpi[k];
-	double3 qp = tri.Q - tri.P;
-	double3 rp = tri.R - tri.P;
-//	double rcon = r - 0.5 * cdist;
-	double3 unit = -cross(qp, rp);
-	//double3 dcpr = cpt - make_double3(icpos.x, icpos.y, icpos.z);
-	//double3 dcpr_j = cpt - make_double3(jcpos.x, jcpos.y, jcpos.z);
-	unit = unit / length(unit);
-	double2 sd = make_double2(0.0, 0.0);
+	
 	for (unsigned int i = 0; i < old_count; i++)
 		if (p_pair_id[i] == k){	sd = p_tsd[i]; break; }
 	double3 rc = r * unit;
 	double3 dv = pmi.vel + cross(pmi.omega, po2cp) - (ivel + cross(iomega, rc));
 	device_force_constant c = getConstant(1, r, 0, m, 0, cmp.Ei, cmp.Ej, cmp.pri, cmp.prj, cmp.Gi, cmp.Gj, cmp.rest, cmp.fric, cmp.rfric, cmp.sratio);
+	
 	switch (1)
 	{
 	case 1:	DHSModel( c, r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, cdist, iomega, sd.x, sd.y, dv, unit, Ft, Fn); break;
@@ -1734,6 +1749,8 @@ __global__ void particle_polygonObject_collision_kernel(
 	unsigned int nct = 0;
 	unsigned int ncl = 0;
 	unsigned int ncp = 0;
+	double coh_s = 0;
+	
 	for (int z = -1; z <= 1; z++) {
 		for (int y = -1; y <= 1; y++) {
 			for (int x = -1; x <= 1; x++) {
@@ -1749,7 +1766,18 @@ __global__ void particle_polygonObject_collision_kernel(
 							k -= cte.np;
 							int t = -1;
 							double cdist = ir - length(ipos - closestPtPointTriangle(dpi[k], ipos, ir, t));
+							if (cp->coh)
+								coh_s = limit_cohesion_depth(ir, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh);
 							if (cdist > 0)
+							{
+								switch (t)
+								{
+								case 2: ctriangle[nct++] = k; break;
+								case 1: cline[ncl++] = k; break;
+								case 0: cpoint[ncp++] = k; break;
+								}
+							}
+							else if(cdist <= 0 && abs(cdist) < abs(coh_s))
 							{
 								switch (t)
 								{
@@ -1768,13 +1796,13 @@ __global__ void particle_polygonObject_collision_kernel(
 	double3 tma = make_double3(0.0, 0.0, 0.0);
 	//printf("tlp : [%d - %d - %d]\n", nct, ncl, ncp);
 	for (unsigned int k = 0; k < nct; k++)
-		particle_triangle_contact_force(ctriangle[k], 0, dpi, cp, dpmi, ipos, ivel, iomega, old_count, p_pair_id, p_tsd, pair_id, tsd, ir, im, sum_force, sum_moment, res, tma, new_count);
+		particle_triangle_contact_force(ctriangle[k], 0, dpi, cp, dpmi, ipos, ivel, iomega, old_count, p_pair_id, p_tsd, pair_id, tsd, ir, im, sum_force, sum_moment, res, tma, coh_s, new_count);
 	if(!nct)
 		for(unsigned int k = 0; k < ncl; k++)
-			particle_triangle_contact_force(cline[k], 1, dpi, cp, dpmi, ipos, ivel, iomega, old_count, p_pair_id, p_tsd, pair_id, tsd, ir, im, sum_force, sum_moment, res, tma, new_count);
+			particle_triangle_contact_force(cline[k], 1, dpi, cp, dpmi, ipos, ivel, iomega, old_count, p_pair_id, p_tsd, pair_id, tsd, ir, im, sum_force, sum_moment, res, tma, coh_s, new_count);
 	if(!nct && !ncl)
 		for (unsigned int k = 0; k < ncp; k++)
-			particle_triangle_contact_force(cpoint[k], 2, dpi, cp, dpmi, ipos, ivel, iomega, old_count, p_pair_id, p_tsd, pair_id, tsd, ir, im, sum_force, sum_moment, res, tma, new_count);
+			particle_triangle_contact_force(cpoint[k], 2, dpi, cp, dpmi, ipos, ivel, iomega, old_count, p_pair_id, p_tsd, pair_id, tsd, ir, im, sum_force, sum_moment, res, tma, coh_s, new_count);
 
 	force[id] += sum_force;
 	moment[id] += sum_moment;
