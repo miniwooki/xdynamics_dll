@@ -2,13 +2,14 @@
 #define XPARTICLECYLINDERCONTACT_H
 
 #include "xdynamics_object/xConatct.h"
+#include "xdynamics_object/xCylinderObject.h"
 //#include "xdynamics_object/xParticlePlaneContact.h"
 #include <QtCore/QMap>
 #include <QtCore/QString>
 
 //class xPlaneObject;
 class xParticleObject;
-class xCylinderObject;
+//class xCylinderObject;
 
 class XDYNAMICS_API xParticleCylinderContact : public xContact
 {

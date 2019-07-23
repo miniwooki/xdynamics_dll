@@ -162,6 +162,15 @@ unsigned int xParticleManager::GetNumCubeParticles(
 	return ndim.x * ndim.y * ndim.z;
 }
 
+unsigned int xParticleManager::GetNumLineParticles(double sx, double sy, double sz, double ex, double ey, double ez, double min_radius, double max_radius)
+{
+	unsigned int n = 0;
+	vector3d dp = new_vector3d(ex - sx, ey - sy, ez - sz);
+	double len = length(dp);
+	n = floor(len / (2.0 * max_radius));
+	return n;
+}
+
 unsigned int xParticleManager::GetNumPlaneParticles(double dx, unsigned int ny, double dz, double min_radius, double max_radius)
 {
 	vector3ui ndim;
@@ -199,6 +208,47 @@ void xParticleManager::setCriticalMaterial(double d, double y, double p)
 	if (minimum_particle_density > d) minimum_particle_density = d;
 	if (maximum_youngs_modulus < y) maximum_youngs_modulus = y;
 	if (minimum_poisson_ratio > p) minimum_poisson_ratio = p;
+}
+
+xParticleObject * xParticleManager::CreateLineParticle(std::string n, xMaterialType mt, unsigned int _np, xLineParticleData & d)
+{
+	QString name = QString::fromStdString(n);
+	xParticleObject* xpo = new xParticleObject(n);
+	vector4d* pos = xpo->AllocMemory(_np);
+	//double* mass = xpo->Mass();
+	xpo->setStartIndex(np);
+	xpo->setMaterialType(mt);
+	//n_single_sphere += _np;
+	np += _np;
+	xMaterial xm = GetMaterialConstant(mt);
+	xpo->setDensity(xm.density);
+	xpo->setYoungs(xm.youngs);
+	xpo->setPoisson(xm.poisson);
+	xpo->setMinRadius(d.minr);
+	xpo->setMaxRadius(d.maxr);
+	setCriticalMaterial(xm.density, xm.youngs, xm.poisson);
+
+	if (d.minr == d.maxr)
+	{
+		double r = d.minr;
+		double diameter = 2.0 * r;
+		vector3d sp = new_vector3d(d.sx, d.sy, d.sz);
+		vector3d ep = new_vector3d(d.ex, d.ey, d.ez);
+		vector3d dp = ep - sp;
+		vector3d dir = dp / length(dp);
+		double gab = length(dp) - (diameter * (_np - 1));
+		double space = gab / _np;
+		for (unsigned int i = 0; i < _np; i++)
+		{
+			vector3d p = sp + i * (diameter + space) * dir;
+			pos[i] = new_vector4d(p.x, p.y, p.z, r);
+		}
+	}
+	//xpo->set
+	SetMassAndInertia(xpo);
+	xpcos[name] = xpo;
+	xObjectManager::XOM()->addObject(xpo);
+	return xpo;
 }
 
 xParticleObject* xParticleManager::CreateParticleFromList(

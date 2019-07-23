@@ -23,6 +23,8 @@ public:
 	bool define(vector3d& min, vector3d& max);
 	empty_part empty_part_type();
 	empty_part empty_part_type() const;
+	double cylinder_thickness();
+	double cylinder_thickness() const;
 	vector3d top_position();
 	vector3d top_position() const;
 	vector3d bottom_position();
@@ -42,6 +44,7 @@ public:
 private:
 	//xPlaneObject *planes;
 	empty_part empty;
+	double thickness;
 	vector3d len_rr;// len, rbase, rtop;
 	vector3d pbase;
 	vector3d ptop;

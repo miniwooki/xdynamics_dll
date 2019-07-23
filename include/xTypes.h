@@ -191,6 +191,7 @@ typedef struct{ double p0x, p0y, p0z, p1x, p1y, p1z, p2x, p2y, p2z, p3x, p3y, p3
 //typedef struct{ double dx, dy, lx, ly, lz; }xSPHPlaneObjectData;
 typedef struct{ double p0x, p0y, p0z, p1x, p1y, p1z; }xCubeObjectData;
 typedef struct{ double dx, dy, dz, lx, ly, lz, minr, maxr; }xCubeParticleData;
+typedef struct { double sx, sy, sz, ex, ey, ez, minr, maxr; }xLineParticleData;
 typedef struct{ unsigned int number; }xListParticleData;
 typedef struct{ double rest, rto, mu, coh, rf; }xContactParameterData;
 typedef struct{ double mass, ixx, iyy, izz, ixy, ixz, iyz, px, py, pz, e0, e1, e2, e3, vx, vy, vz; }xPointMassData;
@@ -218,6 +219,7 @@ typedef struct
 {
 	double length;
 	double r_top, r_bottom;
+	double thickness;
 	double p0x, p0y, p0z;
 	double p1x, p1y, p1z;
 	int empty;

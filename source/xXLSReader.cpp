@@ -164,6 +164,18 @@ xCubeParticleData xXLSReader::ReadCubeParticleData(std::string& _name, int r, in
 	return d;
 }
 
+xLineParticleData xXLSReader::ReadLineParticleData(std::string & _name, int r, int & c)
+{
+	xLineParticleData d = { 0, };
+	double* ptr = &d.sx;
+	std::string x;
+	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 0);
+	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 3);
+	d.minr = sheet->readNum(r, c++);
+	d.maxr = sheet->readNum(r, c++);
+	return d;
+}
+
 xListParticleData xXLSReader::ReadListParticleData(std::string& _name, int r, int& c)
 {
 	xListParticleData d = { 0 };
@@ -212,6 +224,7 @@ xCylinderObjectData xXLSReader::ReadCylinderObjectData(std::string& _name, int m
 	d.length = sheet->readNum(r, c++);
 	d.r_top = sheet->readNum(r, c++);
 	d.r_bottom = sheet->readNum(r, c++);
+	d.thickness = sheet->readNum(r, c++);
 	double *ptr = &d.p0x;
 	std::string x;
 	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 0);
@@ -441,6 +454,12 @@ void xXLSReader::ReadDEMParticle(xDiscreteElementMethodModel* xdem, xObjectManag
 			else if (form == PLANE_SHAPE)
 			{
 
+			}
+			else if (form == LINE_SHAPE)
+			{
+				xLineParticleData d = ReadLineParticleData(name, rc.x, rc.y);
+				unsigned int np = xdem->XParticleManager()->GetNumLineParticles(d.sx, d.sy, d.sz, d.ex, d.ey, d.ez, d.minr, d.maxr);
+				xdem->XParticleManager()->CreateLineParticle(name, (xMaterialType)material, np, d);
 			}
 			else if (form == CIRCLE_SHAPE)
 			{

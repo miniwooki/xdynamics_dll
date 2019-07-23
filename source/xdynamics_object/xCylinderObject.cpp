@@ -3,6 +3,7 @@
 xCylinderObject::xCylinderObject()
 	: xPointMass(CYLINDER_SHAPE)
 	, empty(NO_EMPTY_PART)
+	, thickness(0)
 {
 	memset(&len_rr.x, 0, sizeof(double) * 9);
 }
@@ -10,6 +11,7 @@ xCylinderObject::xCylinderObject()
 xCylinderObject::xCylinderObject(std::string _name)
 	: xPointMass(_name, CYLINDER_SHAPE)
 	, empty(NO_EMPTY_PART)
+	, thickness(0)
 {
 	memset(&len_rr.x, 0, sizeof(double) * 9);
 }
@@ -35,6 +37,16 @@ bool xCylinderObject::define(vector3d& min, vector3d& max)
 
 xCylinderObject::empty_part xCylinderObject::empty_part_type() { return empty; }
 xCylinderObject::empty_part xCylinderObject::empty_part_type() const { return empty; }
+
+double xCylinderObject::cylinder_thickness()
+{
+	return thickness;
+}
+
+double xCylinderObject::cylinder_thickness() const
+{
+	return thickness;
+}
 
 vector3d xCylinderObject::top_position() { return ptop; }
 
@@ -65,6 +77,7 @@ void xCylinderObject::SetupDataFromStructure(xCylinderObjectData& d)
 	pbase = xPointMass::toLocal(pbase - xPointMass::pos);
 	ptop = xPointMass::toLocal(ptop - xPointMass::pos);
 	empty = (empty_part)d.empty;
+	thickness = d.thickness;
 }
 
 unsigned int xCylinderObject::create_sph_particles(double ps, unsigned int nlayers, vector3d* p /*= NULL*/, xMaterialType* t /*= NULL*/)

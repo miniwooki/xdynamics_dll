@@ -105,72 +105,58 @@ bool xvCylinder::define()
 
 	double angle = (15 * (M_PI / 180));
 	int iter = (int)(360 / 15);
-	//vector3d mp = new_vector3d(0.0, 0.1, 0.25);
-	
-	//vector3d a = 
-	vector3d to = new_vector3d(data.p1x - data.p0x, data.p1y - data.p0y, data.p1z - data.p0z);
-	data.length = length(to);
-	double h_len = data.length * 0.5;
-	vector3d u = to / length(to);							//x
-	vector3d pu = new_vector3d(-u.y, u.x, u.z);// cross(u, new_vector3d(1.0 - u.x, 1.0 - u.y, 1.0 - u.z));	//y
-	vector3d qu = cross(u, pu);					
-	
-	//vector3d u0 = new_vector3d(0.0, 0.0, 1.0);
-	//double theta = 0.5 * (M_PI * 0.5  - acos(dot(u, u0)));
-	
-	//double e0 = cos(theta);
-	//vector3d e123 = sin(theta) * pu;
-	//euler_parameters e = new_euler_parameters(e0, e123.x, e123.y, e123.z);
-	//matrix33d A = GlobalTransformationMatrix(e);
-	matrix33d A = { u.x, pu.x, qu.x, u.y, pu.y, qu.y, u.z, pu.z, qu.z };
-	//glPushMatrix();
-//	vector3d p0, p1;
-// 	p0 = A * new_vector3d(h_len, 0.0, 0.0);
-// 	glBegin(GL_POINT);
-// 	glVertex3d(p0.x, p0.y, p0.z);
-// 	glEnd();
-	glBegin(GL_LINE_STRIP);
+
+	int one = data.thickness ? 1 : 0;
+	for (unsigned int i = 0; i <= one; i++)
 	{
- 		
-		for (int i = 0; i < iter + 1; i++){
-			double rad = angle * i;
-			vector3d q = A * new_vector3d(h_len, sin(rad) * data.r_top, cos(rad) * data.r_top);
-			xVertex(q.x, q.y, q.z);
+		double t = i * data.thickness;
+		int empty = data.empty;
+		double bottom_t = i * (empty == 2 ? 0.0 : t);
+		double top_t = i * (empty == 1 ? 0.0 : t);
+		vector3d to = new_vector3d(
+			data.p1x - data.p0x,
+			data.p1y - data.p0y,
+			data.p1z - data.p0z);
+		data.length = length(to);
+		double h_len = data.length * 0.5;
+		vector3d u = to / length(to);
+		vector3d pu = new_vector3d(-u.y, u.x, u.z);
+		vector3d qu = cross(u, pu);
+
+		matrix33d A = { u.x, pu.x, qu.x, u.y, pu.y, qu.y, u.z, pu.z, qu.z };
+		double radius = data.r_top + t;
+		glBegin(GL_LINE_STRIP);
+		{
+			for (int i = 0; i < iter + 1; i++) {
+				double rad = angle * i;
+				vector3d q = A * new_vector3d(h_len + top_t, sin(rad) * radius, cos(rad) * radius);
+				xVertex(q.x, q.y, q.z);
+			}
 		}
-	}
-	glEnd();
-	//glPopMatrix();
-//	glPushMatrix();
-// 	p1 = A * new_vector3d(-h_len, 0.0, 0.0);
-// 	glBegin(GL_POINT);
-// 	glVertex3d(p1.x, p1.y, p1.z);
-// 	glEnd();
-	glBegin(GL_LINE_STRIP);
-	{
-		
-		for (int i = 0; i < iter + 1; i++){
-			double rad = angle * i;
-			vector3d q = A * new_vector3d(-h_len, sin(-rad) * data.r_bottom, cos(-rad) * data.r_bottom);
-			xVertex(q.x, q.y, q.z);
+		glEnd();
+		glBegin(GL_LINE_STRIP);
+		{
+
+			for (int i = 0; i < iter + 1; i++) {
+				double rad = angle * i;
+				vector3d q = A * new_vector3d(-h_len - bottom_t, sin(-rad) * radius, cos(-rad) * radius);
+				xVertex(q.x, q.y, q.z);
+			}
 		}
-	}
-	glEnd();
-	//glPopMatrix();
-// 	glPushMatrix();
-	glBegin(GL_QUAD_STRIP);
-	{
-		for (int i = 0; i < iter + 1; i++){
-			double rad = angle * i;
-			vector3d q1 = A * new_vector3d(h_len, sin(rad) * data.r_top, cos(rad) * data.r_top);
-			vector3d q2 = A * new_vector3d(-h_len, sin(rad) * data.r_bottom, cos(rad) * data.r_bottom);
-			xVertex(q2.x, q2.y, q2.z);
-			xVertex(q1.x, q1.y, q1.z);
+		glEnd();
+		glBegin(GL_QUAD_STRIP);
+		{
+			for (int i = 0; i < iter + 1; i++) {
+				double rad = angle * i;
+				vector3d q1 = A * new_vector3d(h_len + top_t, sin(rad) * radius, cos(rad) * radius);
+				vector3d q2 = A * new_vector3d(-h_len - bottom_t, sin(rad) * radius, cos(rad) * radius);
+				xVertex(q2.x, q2.y, q2.z);
+				xVertex(q1.x, q1.y, q1.z);
+			}
 		}
+		glEnd();
 	}
-	glEnd();
-// 	glPopMatrix();
+	
 	glEndList();
-	//xvObject::setGlobalMinMax(pos + local_min);
-	//xvObject::setGlobalMinMax(pos + local_max);
 	return true;
 }

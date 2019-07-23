@@ -53,10 +53,12 @@ public:
 	unsigned int ExcuteCreatingCondition(double ct, unsigned int cstep, unsigned int cnp);
 	//static unsigned int GetNumLineParticles(double len, double r0, double r1 = 0);
 	static unsigned int GetNumCubeParticles(double dx, double dy, double dz, double min_radius, double max_radius);
+	static unsigned int GetNumLineParticles(double sx, double sy, double sz, double ex, double ey, double ez, double min_radius, double max_radius);
 	static unsigned int GetNumPlaneParticles(double dx, unsigned int ny, double dy, double min_radius, double max_radius);
 	static unsigned int GetNumCircleParticles(double d, double min_radius, double max_radius);
 //	static unsigned int GetNumSPHPlaneParticles(double dx, double dy, double ps);
 
+	xParticleObject* CreateLineParticle(std::string n, xMaterialType mt, unsigned int _np, xLineParticleData& d);
 	xParticleObject* CreateParticleFromList(std::string n, xMaterialType mt, unsigned int _np, vector4d* d, double *m);
 	xParticleObject* CreateCubeParticle(std::string n, xMaterialType mt, unsigned int _np, xCubeParticleData& d);
 	xParticleObject* CreateCircleParticle(std::string n, xMaterialType mt, unsigned int _np, xCircleParticleData& d);

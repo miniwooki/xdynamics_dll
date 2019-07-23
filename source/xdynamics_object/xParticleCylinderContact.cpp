@@ -29,7 +29,7 @@ xParticleCylinderContact::xParticleCylinderContact(std::string _name, xObject* o
 		p_ptr = dynamic_cast<xParticleObject*>(o1);
 	}
 	hci = { c_ptr->cylinder_length(), c_ptr->cylinder_bottom_radius(), c_ptr->cylinder_top_radius(), c_ptr->bottom_position(), c_ptr->top_position() };
-	empty_cylinder_part = c_ptr->
+	empty_cylinder_part = c_ptr->empty_part_type();
 }
 
 xParticleCylinderContact::~xParticleCylinderContact()
@@ -235,6 +235,7 @@ double xParticleCylinderContact::particle_cylinder_contact_detection(
 	vector3d p = new_vector3d(pt.x, pt.y, pt.z);
 	double t = dot(p - cyl_base, ab) / dot(ab, ab);
 	vector3d _cp = new_vector3d(0.0, 0.0, 0.0);
+	// radial contact
 	if (t >= 0 && t <= 1) {
 		_cp = cyl_base + t * ab;
 		dist = length(p - _cp);
@@ -246,21 +247,24 @@ double xParticleCylinderContact::particle_cylinder_contact_detection(
 		double gab = 0;
 		u = (_cp - p) / dist;
 		cp = _cp - hci.len_rr.z * u;
+		// inner radial contact
 		if (dist < hci.len_rr.z)
 		{
 			isInnerContact = true;
 			u = -u;
 			gab = dist + r - hci.len_rr.y;
 		}
-		else		
+		else//outer radial contact		
 			gab = hci.len_rr.y + r - dist;
 		return gab;
 	}
-	else {
+	else {//external top or bottom contact
 
 		_cp = cyl_base + t * ab;
 		dist = length(p - _cp);
-		if (dist < hci.len_rr.z) {
+		double thick = c_ptr->cylinder_thickness();
+		int one = thick ? 1 : 0;
+		if (dist < hci.len_rr.z + thick && dist > one * hci.len_rr.z) {
 			vector3d OtoCp = c_ptr->Position() - _cp;
 			double OtoCp_ = length(OtoCp);
 			u = OtoCp / OtoCp_;
@@ -322,6 +326,10 @@ double xParticleCylinderContact::particle_cylinder_inner_base_or_top_contact_det
 	double gab = -1.0;
 	_cp = cyl_base + t * ab;
 	dist = length(p - _cp);
+	if (empty_cylinder_part == xCylinderObject::TOP_CIRCLE && t > 0.6)
+		return 0.0;
+	if (empty_cylinder_part == xCylinderObject::BOTTOM_CIRCLE && t < 0.4)
+		return 0.0;
 	if (dist < hci.len_rr.z) {
 		vector3d OtoCp = cyl_pos - _cp;
 		double OtoCp_ = length(OtoCp);
