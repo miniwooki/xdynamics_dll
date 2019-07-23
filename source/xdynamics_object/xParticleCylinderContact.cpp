@@ -29,6 +29,7 @@ xParticleCylinderContact::xParticleCylinderContact(std::string _name, xObject* o
 		p_ptr = dynamic_cast<xParticleObject*>(o1);
 	}
 	hci = { c_ptr->cylinder_length(), c_ptr->cylinder_bottom_radius(), c_ptr->cylinder_top_radius(), c_ptr->bottom_position(), c_ptr->top_position() };
+	empty_cylinder_part = c_ptr->
 }
 
 xParticleCylinderContact::~xParticleCylinderContact()

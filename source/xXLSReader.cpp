@@ -216,6 +216,10 @@ xCylinderObjectData xXLSReader::ReadCylinderObjectData(std::string& _name, int m
 	std::string x;
 	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 0);
 	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 3);
+	x = sheet->readStr(r, c++);
+	if (x == "top") d.empty = xCylinderObject::TOP_CIRCLE;
+	else if (x == "bottom") d.empty = xCylinderObject::BOTTOM_CIRCLE;
+	else if (x == "radial") d.empty = xCylinderObject::RADIAL_WALL;
 	if (xve)
 	{
 		int t = VCYLINDER;

@@ -9,8 +9,9 @@
 
 class XDYNAMICS_API xCylinderObject : public xPointMass
 {
-	enum empty_part{TOP_CIRCLE, BOTTOM_CIRCLE, RADIAL_WALL};
+	
 public:
+	enum empty_part { NO_EMPTY_PART = 0, TOP_CIRCLE, BOTTOM_CIRCLE, RADIAL_WALL };
 	xCylinderObject();
 	xCylinderObject(std::string _name);
 	xCylinderObject(const xCylinderObject& _cube);
@@ -20,6 +21,8 @@ public:
 	//device_plane_info* deviceCubeInfo() { return dpi; }
 
 	bool define(vector3d& min, vector3d& max);
+	empty_part empty_part_type();
+	empty_part empty_part_type() const;
 	vector3d top_position();
 	vector3d top_position() const;
 	vector3d bottom_position();

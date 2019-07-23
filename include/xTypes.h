@@ -220,6 +220,7 @@ typedef struct
 	double r_top, r_bottom;
 	double p0x, p0y, p0z;
 	double p1x, p1y, p1z;
+	int empty;
 }xCylinderObjectData;
 
 typedef struct 

@@ -68,14 +68,12 @@ private:
 	//xMaterialPair* xmps;
 	//'//host_cylinder_info* hpi;
 	//bool isInerContact;
+	xCylinderObject::empty_part empty_cylinder_part;
 	xParticleObject* p_ptr;
 	xCylinderObject* c_ptr;
 	host_cylinder_info hci;
 	device_cylinder_info* dci;
-	//QMap<unsigned int, xPlaneObject*> pair_ip;
-
-	//device_plane_info *hpmi;
-	//device_mesh_mass_info *dpmi;
+	
 };
 
 #endif
