@@ -159,6 +159,17 @@ double xContact::JKRSeperationForce(xContactParameters& c, double coh)
 	return cf;// Fn += -cf * u;
 }
 
+double xContact::cohesionSeperationDepth(double coh, double ir, double jr, double ip, double jp, double iE, double jE)
+{
+	double coh_r = jr ? (ir * jr) / (ir + jr) : ir;
+	double Eeq = (iE * jE) / (iE*(1 - jp * jp) + jE * (1 - ip * ip));
+	double coh_e = 1.0 / (((1.0 - ip * ip) / iE) + ((1.0 - jp * jp) / jE));
+	double c1 = (M_PI * M_PI * coh * coh * coh_r) / (coh_e * coh_e);
+	double gs = -(3.0 / 4.0) * pow(c1, 1.0 / 3.0);
+	//cp.coh_s = gs;
+	return gs;
+}
+
 double xContact::cohesionForce(double coh, double cdist, double coh_r, double coh_e, double coh_s, double Fn)
 {
 	double cf = 0.0;

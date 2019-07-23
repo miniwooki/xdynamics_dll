@@ -70,6 +70,7 @@ void xParticlePlanesContact::define(unsigned int id, xParticleCubeContact* d)
 		cp.restitution = d->Restitution();
 		cp.stiffness_ratio = d->StiffnessRatio();
 		cp.friction = d->Friction();
+		cp.cohesion = d->Cohesion();
 		cp.rolling_friction = d->RollingFactor();
 		cp.stiffness_multiplyer = d->StiffMultiplyer();
 		xmp = d->MaterialPropertyPair();

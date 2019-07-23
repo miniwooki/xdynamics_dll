@@ -9,6 +9,7 @@
 
 class XDYNAMICS_API xCylinderObject : public xPointMass
 {
+	enum empty_part{TOP_CIRCLE, BOTTOM_CIRCLE, RADIAL_WALL};
 public:
 	xCylinderObject();
 	xCylinderObject(std::string _name);
@@ -37,6 +38,7 @@ public:
 
 private:
 	//xPlaneObject *planes;
+	empty_part empty;
 	vector3d len_rr;// len, rbase, rtop;
 	vector3d pbase;
 	vector3d ptop;

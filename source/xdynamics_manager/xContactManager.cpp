@@ -313,7 +313,7 @@ void xContactManager::updateCollisionPair(
 						unsigned int eid = cell_end[hash];
 						for (unsigned int j = sid; j < eid; j++) {
 							unsigned int k = sorted_id[j];
-							unsigned int di = i >= k ? i - k : k - i;
+							unsigned int di = neach == 1 ? 2 : (i >= k ? i - k : k - i);
 							if (i != k && k < np && !(di <= neach))
 							{
 								if (cpp)

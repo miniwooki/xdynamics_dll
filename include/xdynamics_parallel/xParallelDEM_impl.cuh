@@ -542,13 +542,19 @@ __device__ double cohesionForce(
 {
 	double cf = 0.0;
 	if (coh) {
-		double Req = rj ? (ri * rj) / (ri + rj) : ri;
-		double Eeq = (Ei * Ej) / (Ei*(1 - prj * prj) + Ej * (1 - pri * pri));
+		double Req = rj ? (ri * rj) / (ri + rj) : ri/*(ri * ri) / (ri + ri)*/;
+		double Eeq = 1.0 / (((1.0 - pri * pri) / Ei) + ((1.0 - prj * prj) / Ej));// (Ei * Ej) / (Ei*(1.0 - prj * prj) + Ej * (1.0 - pri * pri));
 		double c0 = 3.0 * coh * M_PI * Req;
 		double eq = 2.0 * c0 * Fn + c0 * c0;
+		//printf("\nPrevious_Fn : %f, Previous_eq : %.16f", Fn, eq);
 		if (eq <= 0)
+		{
 			Fn = -0.5 * c0;
-		double a3 = (3.0 * Req) * (Fn + c0 + sqrt(2.0 * c0 * Fn + c0 * c0)) / (4.0 * Eeq);
+		//	eq = 2.0 * c0 * Fn + c0 * c0;
+		}			
+		
+		double a3 = (3.0 * Req) * (Fn + c0 + sqrt(abs(2.0 * c0 * Fn + c0 * c0))) / (4.0 * Eeq);
+		//printf("\nFn : %f, c0 : %f, Req : %f, Eeq : %f, eq : %f, a3 : %f\n", Fn, c0, Req, Eeq, eq, 2.0 * c0 * Fn + c0 * c0);
 		/*double rcp = (3.0 * req * (-Fn)) / (4.0 * (1.0 / Eeq));
 		double rc = pow(rcp, 1.0 / 3.0);
 		double Ac = M_PI * rc * rc;
@@ -910,7 +916,7 @@ __global__ void calculate_p2p_kernel(
 						double3 rp = make_double3(jpos.x - ipos.x, jpos.y - ipos.y, jpos.z - ipos.z);
 						double dist = length(rp);
 						double cdist = (ir + jr) - dist;
-						double coh_s = -FLT_MAX;
+						double coh_s = 0;
 						if (cp->coh)
 							coh_s = limit_cohesion_depth(ir, jr, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh);
 					//	printf("cdist : %f, coh_s : %f\n", cdist, coh_s);
@@ -938,9 +944,10 @@ __global__ void calculate_p2p_kernel(
 						}
 						else if (cdist <= 0 && abs(cdist) < abs(coh_s))
 						{
-							
+						//	printf("cdist : %f, coh_s : %f\n", cdist, coh_s);
 							double f = JKR_seperation_force(ir, jr, cp->coh);
-							double cf = cohesionForce(ir, jr, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, f);
+							double cf = cohesionForce(ir,jr, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, f);
+							//printf("f : %f, cf : %f\n", f, cf);
 							sumF = sumF - cf * unit;
 							tsd[new_count] = sd;
 							pair_id[new_count] = k;
@@ -970,9 +977,10 @@ __device__ double particle_plane_contact_detection(
 	double sqa = wp.x * wp.x;
 	double sqb = wp.y * wp.y;
 	double sqc = wp.z * wp.z;
-	double sqr = r * r;
+	double sqr = 1.5 * r * r;
 
-	if (abs(wp.z) < r && (wp.x > 0 && wp.x < pe.l1) && (wp.y > 0 && wp.y < pe.l2)) {
+	//double h = 0;
+	if (abs(wp.z) < 1.5 * r && (wp.x > 0 && wp.x < pe.l1) && (wp.y > 0 && wp.y < pe.l2)) {
 		double3 dp = xp - pe.xw;
 		double3 uu = pe.uw / length(pe.uw);
 		int pp = -sign(dot(dp, pe.uw));// dp.dot(pe.UW()));
@@ -1205,7 +1213,7 @@ __global__ void plane_contact_force_kernel(
 	double3 tma = make_double3(0.0, 0.0, 0.0);
 	for (unsigned int k = 0; k < cte.nplane; k++)
 	{
-		double coh_s = -FLT_MAX;
+		double coh_s = 0;
 		device_plane_info pl = plane[k];
 		double3 dp = make_double3(ipos.x, ipos.y, ipos.z) - pl.xw;
 		double3 unit = make_double3(0, 0, 0);
@@ -1213,10 +1221,13 @@ __global__ void plane_contact_force_kernel(
 		double cdist = particle_plane_contact_detection(pl, ipos3, wp, unit, r);
 		if (cp->coh)
 			coh_s = limit_cohesion_depth(r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh);
-		//printf("coh : %f, coh_s : %f", cp->coh, coh_s);
+		//printf("cdist : %f\n", cdist);
+		//printf("coh : %f, coh_s : %f\n", cp->coh, coh_s);
+		//printf("Ei*/ : %f, Ej : %f, pri : %f, pri : %f", c.kn, c.vn, c.ks, c.vs);
 		double2 sd = make_double2(0.0, 0.0);
 		if (cdist > 0) {
 			
+			//printf("plane contact. - %f", cdist);
 			for (unsigned int i = 0; i < old_count; i++)
 				if (p_pair_id[i] == k){ sd = p_tsd[i]; break; }
 			
@@ -1239,8 +1250,10 @@ __global__ void plane_contact_force_kernel(
 		}
 		else if(cdist <= 0 && abs(cdist) < abs(coh_s))
 		{
+			//printf("plane seperation cohesion contact. - %f", cdist);
 			double f = JKR_seperation_force(r, 0, cp->coh);
 			double cf = cohesionForce(r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, f);
+			//printf("f : %f, cf : %f\n", f, cf);
 			sumF = sumF - cf * unit;
 			tsd[new_count] = sd;
 			pair_id[new_count] = k;
@@ -1916,7 +1929,7 @@ __global__ void cluster_meshes_contact_kernel(
 	}
 	double res = 0.0;
 	double3 tma = make_double3(0.0, 0.0, 0.0);
-	printf("tlp : [%d - %d - %d]\n", nct, ncl, ncp);
+	//printf("tlp : [%d - %d - %d]\n", nct, ncl, ncp);
 	for (unsigned int k = 0; k < nct; k++)
 		cluster_triangle_contact_force(ctriangle[k], 0, dpi, cp, dpmi, ipos, icpos, ivel, iomega, old_count, p_pair_id, p_tsd, pair_id, tsd, ir, im, sum_force, sum_moment, res, tma, new_count);
 	if (!nct)

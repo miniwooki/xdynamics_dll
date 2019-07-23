@@ -266,9 +266,6 @@ double xParticleCylinderContact::particle_cylinder_contact_detection(
 			cp = _cp - hci.len_rr.z * u;
 			return hci.len_rr.x * 0.5 + r - OtoCp_;
 		}
-		/*vector3d A_1 = makeTFM_1(hci.ep);
-		vector3d A_2 = makeTFM_2(hci.ep);
-		vector3d A_3 = makeTFM_3(hci.ep);*/
 		vector3d _at = p - cyl_top;
 		vector3d at = c_ptr->toLocal(_at);
 		//double r = length(at);

@@ -75,6 +75,7 @@ public:
 	static unsigned int count;
 
 protected:
+	double cohesionSeperationDepth(double coh, double ir, double jr, double ip, double jp, double Ei, double Ej);
 	double cohesionForce(double coh, double cdist, double coh_r, double coh_e, double coh_s, double Fn);
 	double JKRSeperationForce(xContactParameters& c, double coh);
 	void DHSModel(xContactParameters& c, double cdist, double& ds, 

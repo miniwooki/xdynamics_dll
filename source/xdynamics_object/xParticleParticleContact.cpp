@@ -138,11 +138,11 @@ void xParticleParticleContact::cppCollision(
 			F -= cf * u;
 			continue;
 		}
-		else if (d->isc && d->gab < 0 && abs(d->gab) > abs(c.coh_s))
-		{
-			d->isc = false;
-			continue;
-		}
+		//else if (d->isc && d->gab < 0 && abs(d->gab) > abs(c.coh_s))
+		//{
+		//	d->isc = false;
+		//	continue;
+		//}
 		switch (force_model)
 		{
 		case DHS: DHSModel(c, d->gab, d->delta_s, d->dot_s, cohesion, rv, u, m_fn, m_ft); break;
@@ -187,15 +187,15 @@ void xParticleParticleContact::updateCollisionPair(
 	}
 	else
 	{
-		xPairData *pd = xcpl.ParticlePair(id);
-		if (pd)
+		double coh_s = cohesionSeperationDepth(cohesion, ri, rj, mpp.Pri, mpp.Prj, mpp.Ei, mpp.Ej);
+		if (abs(cdist) < abs(coh_s))
 		{
-			bool isc = pd->isc;
-			if (!isc)
-				xcpl.deleteParticlePairData(id);
-			else
+			xPairData *pd = xcpl.ParticlePair(id);
+			vector3d cpt = posi + (ri + coh_s * 0.5) * u;
+			if (pd)
 			{
-				vector3d cpt = posi + ri * u;
+				xPairData *pd = xcpl.ParticlePair(id);
+				
 				pd->gab = cdist;
 				pd->cpx = cpt.x;
 				pd->cpy = cpt.y;
@@ -203,6 +203,22 @@ void xParticleParticleContact::updateCollisionPair(
 				pd->nx = u.x;
 				pd->ny = u.y;
 				pd->nz = u.z;
+			}
+			else
+			{
+				xPairData *pd = new xPairData;
+				*pd = { PARTICLES, true, 0, id, 0, 0, cpt.x, cpt.y, cpt.z, cdist, u.x, u.y, u.z };
+				xcpl.insertParticleContactPair(pd);
+			}
+		}
+		else
+		{
+			xPairData *pd = xcpl.ParticlePair(id);
+			if (pd)
+			{
+				//bool isc = pd->isc;
+				//if (!isc)
+				xcpl.deleteParticlePairData(id);
 			}
 		}
 	}
