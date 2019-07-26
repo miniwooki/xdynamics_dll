@@ -103,6 +103,11 @@ double xObject::Volume() const
 	return vol;
 }
 
+bool xObject::MovingObject() const
+{
+	return is_moving_object;
+}
+
 void xObject::setDensity(double _d)
 {
 	d = _d;
@@ -116,6 +121,11 @@ void xObject::setYoungs(double _y)
 void xObject::setPoisson(double _p)
 {
 	p = _p;
+}
+
+void xObject::setMovingObject(bool ismo)
+{
+	is_moving_object = ismo;
 }
 
 xShapeType xObject::Shape() const

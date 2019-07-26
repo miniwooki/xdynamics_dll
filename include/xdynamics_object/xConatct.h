@@ -56,11 +56,21 @@ public:
 		double fric, double rfric, double coh);
 	// 		contactForce_type cft, double rest, double ratio, double fric);
 	void setMaterialPair(xMaterialPair _mpp);// { mpp = _mpp; }
-
-	virtual void collision(
-		double r, double m, 
-		vector3d& pos, vector3d& vel, 
-		vector3d& omega, vector3d& fn, vector3d& ft);
+	/*void collision(
+		xContactPairList* pairs, unsigned int i, double ri, double rj,
+		double mi, double mj, vector3d& pos, vector3d& vel, vector3d& omega, 
+		double &res, vector3d& tmax, vector3d& F, vector3d& M, 
+		unsigned int nco, xClusterInformation* xci, vector4d* cpos);*/
+	/*static void collision(
+		xPairData* d, double ri, double rj,
+		double mi, double mj,
+		vector3d& pi, vector3d& pj,
+		vector3d& vi, vector3d& vj,
+		vector3d& oi, vector3d& oj,
+		vector3d& F, vector3d& M,
+		double& res, vector3d& tmax,
+		xContactMaterialParameters& cmp,
+		xMaterialPair* xmps);*/
 	//virtual void updateCollisionPair(unsigned int id, xContactPairList& xcpl, double r, vector3d pos, double rj = 0, vector3d posj = new_vector3d(0.0, 0.0, 0.0)) = 0;
 	virtual void cuda_collision(
 		double *pos, double *vel,
@@ -75,6 +85,7 @@ public:
 	static unsigned int count;
 
 protected:
+	
 	double cohesionSeperationDepth(double coh, double ir, double jr, double ip, double jp, double Ei, double Ej);
 	double cohesionForce(double coh, double cdist, double coh_r, double coh_e, double coh_s, double Fn);
 	double JKRSeperationForce(xContactParameters& c, double coh);

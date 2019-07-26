@@ -984,7 +984,7 @@ __device__ double particle_plane_contact_detection(
 		double3 dp = xp - pe.xw;
 		double3 uu = pe.uw / length(pe.uw);
 		int pp = -sign(dot(dp, pe.uw));// dp.dot(pe.UW()));
-		u = pp * uu;
+		u = -uu;
 		double collid_dist = r - abs(dot(dp, u));// dp.dot(u));
 		return collid_dist;
 	}

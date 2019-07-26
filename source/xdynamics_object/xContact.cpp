@@ -159,6 +159,60 @@ double xContact::JKRSeperationForce(xContactParameters& c, double coh)
 	return cf;// Fn += -cf * u;
 }
 
+//void xContact::collision(
+//	xPairData* d, double ri, double rj,
+//	double mi, double mj,
+//	vector3d& pi, vector3d& pj,
+//	vector3d& vi, vector3d& vj,
+//	vector3d& oi, vector3d& oj,
+//	vector3d& F, vector3d& M,
+//	double& res, vector3d& tmax,
+//	xContactMaterialParameters& cmp,
+//	xMaterialPair* xmps)
+//{
+//	vector3d m_fn = new_vector3d(0.0, 0.0, 0.0);
+//	vector3d m_m = new_vector3d(0.0, 0.0, 0.0);
+//	vector3d m_ft = new_vector3d(0.0, 0.0, 0.0);
+//	double rcon = ri - 0.5 * d->gab;
+//	vector3d u = new_vector3d(d->nx, d->ny, d->nz);
+//	vector3d cpt = new_vector3d(d->cpx, d->cpy, d->cpz);
+//	vector3d dcpr = cpt - pi;
+//	vector3d dcpr_j = cpt - pj;
+//	//vector3d cp = r * u;
+//	vector3d dv = vj + cross(oj, dcpr_j) - (vi + cross(oi, dcpr));
+//	//unsigned int jjjj = d->id;
+//	//xContactMaterialParameters cmp = hcmp[d->id];
+//	xContactParameters c = getContactParameters(
+//		ri, rj,
+//		mi, mj,
+//		xmps[d->id].Ei, xmps[d->id].Ej,
+//		xmps[d->id].Pri, xmps[d->id].Prj,
+//		xmps[d->id].Gi, xmps[d->id].Gj,
+//		cmp.restitution, cmp.stiffness_ratio,
+//		cmp.friction, cmp.rolling_friction, cmp.cohesion);
+//	if (d->gab < 0 && abs(d->gab) < abs(c.coh_s))
+//	{
+//		double f = JKRSeperationForce(c, cmp.cohesion);
+//		double cf = cohesionForce(cmp.cohesion, d->gab, c.coh_r, c.coh_e, c.coh_s, f);
+//		F -= cf * u;
+//		return;//continue;
+//	}
+//	else if (d->isc && d->gab < 0 && abs(d->gab) > abs(c.coh_s))
+//	{
+//		d->isc = false;
+//		return;
+//	}
+//	switch (force_model)
+//	{
+//	case DHS: DHSModel(c, d->gab, d->delta_s, d->dot_s, cmp.cohesion, dv, u, m_fn, m_ft); break;
+//	}
+//	/*if (cmp.cohesion && c.coh_s > d->gab)
+//		d->isc = false;*/
+//	RollingResistanceForce(c.rfric, ri, rj, dcpr, m_fn, m_ft, res, tmax);
+//	F += m_fn + m_ft;
+//	M += cross(dcpr, m_fn + m_ft);
+//}
+
 double xContact::cohesionSeperationDepth(double coh, double ir, double jr, double ip, double jp, double iE, double jE)
 {
 	double coh_r = jr ? (ir * jr) / (ir + jr) : ir;
@@ -277,10 +331,30 @@ void xContact::cudaMemoryAlloc(unsigned int np)
 	checkCudaErrors(cudaMemcpy(dcp, &hcp, sizeof(device_contact_property), cudaMemcpyHostToDevice));
 }
 
-void xContact::collision(double r, double m, vector3d& pos, vector3d& vel, vector3d& omega, vector3d& fn, vector3d& ft)
-{
-
-}
+//void xContact::collision(
+//	xContactPairList* pairs, unsigned int i, double ri, double rj,
+//	double mi, double mj, vector3d& pos, vector3d& vel, vector3d& omega,
+//	double &res, vector3d& tmax, vector3d& F, vector3d& M,
+//	unsigned int nco, xClusterInformation* xci, vector4d* cpos)
+//{
+//	unsigned int ci = 0;
+//	unsigned int neach = 1;
+//	vector3d cp = pos;
+//	if (nco && cpos)
+//	{
+//		for (unsigned int j = 0; j < nco; j++)
+//			if (i >= xci[j].sid && i < xci[j].sid + xci[j].count * xci[j].neach)
+//				neach = xci[j].neach;
+//		//ck = j / neach;
+//		ci = i / neach;
+//		cp = new_vector3d(cpos[ci].x, cpos[ci].y, cpos[ci].z);
+//	}
+//	foreach(xPairData* d, pairs->PlanePair())
+//	{
+//
+//		
+//	}
+//}
 
 double xContact::StiffMultiplyer() const
 {

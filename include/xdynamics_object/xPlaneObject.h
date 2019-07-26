@@ -27,6 +27,8 @@ public:
 	vector3d MinPoint() const;// { return minp; }
 	vector3d MaxPoint() const;// { return maxp; }
 
+	vector3d LocalPoint(unsigned int i);
+
 	void SetupDataFromStructure(xPlaneObjectData& d);
 
 	virtual unsigned int create_sph_particles(double ps, unsigned int nlayers, vector3d* p = NULL, xMaterialType* t = NULL);
@@ -46,6 +48,8 @@ private:
 	vector3d w2;
 	vector3d w3;
 	vector3d w4;
+
+	vector3d local_point[4];
 
 	xPlaneObjectData data;
 };

@@ -201,6 +201,7 @@
     <ClCompile Include="..\..\source\xdynamics_object\xObject.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xParticleCubeContact.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xParticleCylinderContact.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xParticleCylindersContact.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xParticleMeshObjectContact.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xParticleMeshObjectsContact.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xParticleObject.cpp" />
@@ -285,6 +286,7 @@
     <ClInclude Include="..\..\include\xdynamics_object\xObject.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xParticleCubeContact.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xParticleCylinderContact.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xParticleCylindersContact.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xParticleMeshObjectContact.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xParticleMeshObjectsContact.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xParticleObject.h" />

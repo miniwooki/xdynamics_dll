@@ -8,7 +8,8 @@
 #include "xdynamics_object/xParticleCubeContact.h"
 #include "xdynamics_object/xParticleMeshObjectsContact.h"
 #include "xdynamics_object/xParticlePlanesContact.h"
-#include "xdynamics_object/xParticleCylinderContact.h"
+//#include "xdynamics_object/xParticleCylinderContact.h"
+#include "xdynamics_object/xParticleCylindersContact.h"
 
 #include <QtCore/qlist.h>
 
@@ -29,6 +30,7 @@ public:
 
 	unsigned int setupParticlesMeshObjectsContact();
 	void setupParticlesPlanesContact();
+	void setupParticlesCylindersContact();
 	void setNumClusterObject(unsigned int nc);
 	//double* SphereData();
 	//double* HostSphereData();
@@ -116,12 +118,13 @@ private:
 	double* RRes;
 	QMap<QString, xContact*> cots;
 	QMap<QString, xParticleMeshObjectContact*> cpmesh;
+	//QMap<QString, xParticleCylinderContact*> cpcylinder;
 	xContactPairList* xcpl;
 	//QMap<QString, contact_particles_polygonObject*> cppos;
 	xParticlePlanesContact* cpplane;
 	xParticleParticleContact* cpp;
 	xParticleMeshObjectsContact* cpmeshes;
-	QList<xParticleCylinderContact*> cpcylinders;
+	xParticleCylindersContact* cpcylinders;
 	//contact_particles_particles* cpp;
 	//contact_particles_polygonObjects* cppoly;
 };

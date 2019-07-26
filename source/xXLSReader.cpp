@@ -332,7 +332,7 @@ void xXLSReader::ReadMass(xMultiBodyModel* xmbd, vector2i rc)
 			xObject *obj = xObjectManager::XOM()->XObject(name);
 			xPointMass* xpm = NULL;
 			xpm = xmbd->CreatePointMass(name);
-
+			if (obj) obj->setMovingObject(true);
 			xPointMassData xpmd = ReadPointMassData(name, rc.x++, rc.y);
 			xpm->SetDataFromStructure(xmbd->NumMass(), xpmd);
 // 			if (xpm->Shape() == MESH_SHAPE)

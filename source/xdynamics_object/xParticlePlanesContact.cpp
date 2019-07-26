@@ -95,6 +95,33 @@ void xParticlePlanesContact::allocHostMemory(unsigned int n)
 	if(!xmps) xmps = new xMaterialPair[nplanes];
 }
 
+void xParticlePlanesContact::updataPlaneObjectData()
+{
+	QMapIterator<unsigned int, xPlaneObject*> it(pair_ip);
+	while (it.hasNext())
+	{
+		it.next();
+		unsigned int id = it.key();
+		xPlaneObject* p = it.value();
+		if (p->MovingObject())
+		{
+			host_plane_info new_hpi = { 0, };
+			new_hpi.xw = p->Position() + p->toGlobal(p->LocalPoint(0));
+			new_hpi.w2 = p->Position() + p->toGlobal(p->LocalPoint(1));
+			new_hpi.w3 = p->Position() + p->toGlobal(p->LocalPoint(2));
+			new_hpi.w4 = p->Position() + p->toGlobal(p->LocalPoint(3));
+			new_hpi.pa = new_hpi.w2 - new_hpi.xw;
+			new_hpi.pb = new_hpi.w4 - new_hpi.xw;
+			new_hpi.l1 = length(new_hpi.pa);// .length();
+			new_hpi.l2 = length(new_hpi.pb);// .length();
+			new_hpi.u1 = new_hpi.pa / new_hpi.l1;
+			new_hpi.u2 = new_hpi.pb / new_hpi.l2;
+			new_hpi.uw = cross(new_hpi.u1, new_hpi.u2);
+			checkCudaErrors(cudaMemcpy(dpi + id, &new_hpi, sizeof(device_plane_info), cudaMemcpyHostToDevice));
+		}
+	}
+}
+
 device_plane_info* xParticlePlanesContact::devicePlaneInfo()
 {
 	return dpi;
@@ -188,7 +215,7 @@ double xParticlePlanesContact::particle_plane_contact_detection(host_plane_info*
 	vector3d dp = xp - _pe->xw;
 	vector3d uu = _pe->uw / length(_pe->uw);
 	int pp = -xsign(dot(dp, _pe->uw));
-	u = pp * uu;
+	u = -uu;
 	double collid_dist = r - abs(dot(dp, u));
 	return collid_dist;
 }
@@ -261,6 +288,11 @@ bool xParticlePlanesContact::cpplCollision(
 unsigned int xParticlePlanesContact::NumContact()
 {
 	return nplanes;
+}
+
+xContactMaterialParameters & xParticlePlanesContact::ContactMaterialParameters(unsigned int id)
+{
+	return hcmp[id];
 }
 
 void xParticlePlanesContact::updateCollisionPair(

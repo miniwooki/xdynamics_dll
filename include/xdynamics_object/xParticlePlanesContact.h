@@ -35,6 +35,7 @@ public:
 	void define(unsigned int i, xParticlePlaneContact* d);
 	void define(unsigned int i, xParticleCubeContact* d);
 	void allocHostMemory(unsigned int n);
+	void updataPlaneObjectData();
 	bool cpplCollision(
 		xContactPairList* pairs, unsigned int i, double r, double m,
 		vector3d& p, vector3d& v, vector3d& o, 
@@ -43,6 +44,7 @@ public:
 	unsigned int NumContact();// { return ncontact; }
 //	void setNumContact(unsigned int c) { ncontact = c; }
 	//void updateMeshObjectData(xVectorD& q, xVectorD& qd);
+	xContactMaterialParameters& ContactMaterialParameters(unsigned int id);
 	void updateCollisionPair(xContactPairList& xcpl, double r, vector3d pos);
 	virtual void cudaMemoryAlloc(unsigned int np);
 	virtual void cuda_collision(

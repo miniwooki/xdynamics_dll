@@ -22,6 +22,7 @@ public:
 	void setDensity(double _d);
 	void setYoungs(double _y);
 	void setPoisson(double _p);
+	void setMovingObject(bool ismo);
 	void setShapeType(xShapeType xst);
 	void setMaterialType(xMaterialType xmt);
 	void setConnectedGeometryName(QString n);
@@ -31,6 +32,7 @@ public:
 	double Poisson() const;// { return p; }
 	double Shear() const;
 	double Volume() const;
+	bool MovingObject() const;
 	xShapeType Shape() const;
 	xMaterialType Material() const;
 
@@ -44,6 +46,7 @@ protected:
 	QString connected_geometry_name;
 	xShapeType shape;
 	xMaterialType material;
+	bool is_moving_object;
 	int id;
 // 	static unsigned int count;
 // 	dimension_type dim;

@@ -72,7 +72,7 @@ xContact* xContactManager::CreateContactPair(
 	case PARTICLE_CUBE:	c = new xParticleCubeContact(n, o1, o2); break;
 	case PARTICLE_PANE:	c = new xParticlePlaneContact(n); break;
 	case PARTICLE_MESH_SHAPE: c = new xParticleMeshObjectContact(n, o1, o2); cpmesh[c->Name()] = dynamic_cast<xParticleMeshObjectContact*>(c); break;
-	case PARTICLE_CYLINDER: c = new xParticleCylinderContact(n, o1, o2); cpcylinders.push_back(dynamic_cast<xParticleCylinderContact*>(c)); break;
+	case PARTICLE_CYLINDER: c = new xParticleCylinderContact(n, o1, o2); break;
 	}
 	xMaterialPair mpp =
 	{
@@ -104,6 +104,28 @@ unsigned int xContactManager::setupParticlesMeshObjectsContact()
 		n = cpmeshes->define(cpmesh);
 	}
 	return n;
+}
+
+void xContactManager::setupParticlesCylindersContact()
+{
+	unsigned int n = 0;
+	foreach(xContact* xc, cots)
+		if (xc->PairType() == xContactPairType::PARTICLE_CYLINDER)
+			n++;
+	if (!n) return;
+	if (n && !cpcylinders)
+		cpcylinders = new xParticleCylindersContact;
+	cpcylinders->allocHostMemory(n);
+	unsigned int cnt = 0;
+	foreach(xContact* xc, cots)
+	{
+		if (xc->PairType() == xContactPairType::PARTICLE_CYLINDER)
+		{
+			cpcylinders->define(cnt, dynamic_cast<xParticleCylinderContact*>(xc));
+			cnt++;//	case xContactPairType::PARTICLE_CUBE: cpplane->define(n, dynamic_cast<xParticleCubeContact*>(xc)); n += 6; break;
+		}
+	}
+
 }
 
 void xContactManager::setNumClusterObject(unsigned int nc)
@@ -220,6 +242,10 @@ void xContactManager::update()
 	{
 		cpmeshes->updateMeshObjectData();
 	}
+	if (cpplane)
+	{
+		cpplane->updataPlaneObjectData();
+	}
 	// 	if (cppoly)
 	// 	{
 	// 		model::isSinglePrecision ?
@@ -294,10 +320,13 @@ void xContactManager::updateCollisionPair(
 		double r = pos[i].w;
 		if (cpplane)
 			cpplane->updateCollisionPair(xcpl[i], r, p);
-		foreach(xParticleCylinderContact* xpcyl, cpcylinders)
-		{
-			xpcyl->updateCollisionPair(xcpl[i], r, p);
-		}
+		if (cpcylinders)
+			cpcylinders->updateCollisionPair(xcpl[i], r, p);
+		//foreach(xParticleCylinderContact* xpcyl, cpcylinders)
+		//{
+		//	xpcyl->updateCollisionPair(xcpl[i], r, p);
+		//		//break;
+		//}
 		vector3i gp = xGridCell::getCellNumber(p.x, p.y, p.z);
 		unsigned int old_id = 0;
 		vector3d old_cpt = new_vector3d(0.0, 0.0, 0.0);
@@ -464,14 +493,15 @@ void xContactManager::hostCollision(
 		double m = mass[ci];
 		double j = inertia[ci];
 		double r = pos[i].w;
+
 		if(cpplane)
 			cpplane->cpplCollision(pairs, i, r, m, p, v, o, R, T, F, M, ncobject, xci, cpos);
 		if(cpp)
 			cpp->cppCollision(pairs, i, pos, cpos, vel, ep, ev, mass, R, T, F, M, xci, ncobject);
 		if(cpmeshes)
-			cpmeshes->cppolyCollision(pairs, r, m, p, v, o, R, T, F, M);
-		foreach(xParticleCylinderContact* xpcyl, cpcylinders)
-			xpcyl->pcylCollision(pairs, i, r, m, p, v, o, R, T, F, M, ncobject, xci, cpos);
+			cpmeshes->cppolyCollision(pairs, i, r, m, p, v, o, R, T, F, M, ncobject, xci, cpos);
+		if(cpcylinders)
+			cpcylinders->pcylCollision(pairs, i, r, m, p, v, o, R, T, F, M, ncobject, xci, cpos);
 			
 		force[i] += F;
 		moment[i] += M;

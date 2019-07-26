@@ -129,7 +129,8 @@ void xIntegratorVV::updateVelocity(
 			{
 				J.a00 = dinertia[i]; J.a11 = dinertia[i]; J.a22 = dinertia[i];
 			}*/
-				
+			std::cout << "force : [" << f[i].x << " " << f[i].y << " " << f[i].z << "]" << std::endl;
+			std::cout << "moment : [" << m[i].x << " " << m[i].y << " " << m[i].z << "]" << std::endl;
 			vector3d n_prime = ToLocal(ep[i], m[i]);
 			euler_parameters m_ea = CalculateUCEOM(J, ep[i], ev[i], n_prime);
 			//std::cout << "euler_acc : [" << m_ea.e0 << ", " << m_ea.e1 << ", " << m_ea.e2 << ", " << m_ea.e3 << "]" << std::endl;

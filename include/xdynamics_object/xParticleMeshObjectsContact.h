@@ -44,9 +44,10 @@ public:
 	unsigned int NumSphereData();
 	unsigned int define(QMap<QString, xParticleMeshObjectContact*>& cppos);
 	bool cppolyCollision(
-		xContactPairList* pairs, double r, double m,
+		xContactPairList* pairs, unsigned int i, double r, double m,
 		vector3d& p, vector3d& v, vector3d& o,
-		double &res, vector3d &tmax, vector3d& F, vector3d& M);
+		double &res, vector3d &tmax, vector3d& F, vector3d& M,
+		unsigned int nco, xClusterInformation* xci, vector4d* cpos);
 	void particle_triangle_contact_force(
 		xTrianglePairData* d, double r, double m,
 		vector3d& p, vector3d& v, vector3d& o,

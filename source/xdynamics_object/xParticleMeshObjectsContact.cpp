@@ -157,11 +157,12 @@ void xParticleMeshObjectsContact::particle_triangle_contact_force(
 	host_mesh_mass_info hmmi = hpmi[j];
 	double rcon = r - 0.5 * d->gab;
 	vector3d u = new_vector3d(d->nx, d->ny, d->nz);
-	vector3d rc = r * u;
+	//vector3d rc = r * u;
+	vector3d dcpr = new_vector3d(d->cpx, d->cpy, d->cpz) - p;
 	vector3d po2cp = new_vector3d(d->cpx - hmmi.px, d->cpy - hmmi.py, d->cpz - hmmi.pz);
 	vector3d mvel = new_vector3d(hmmi.vx, hmmi.vy, hmmi.vz);
 	vector3d momega = new_vector3d(hmmi.ox, hmmi.oy, hmmi.oz);
-	vector3d rv = mvel + cross(momega, po2cp) - (v + cross(o, rc));
+	vector3d rv = mvel + cross(momega, po2cp) - (v + cross(o, dcpr));
 	xContactMaterialParameters cmp = hcp[j];
 	xContactParameters c = getContactParameters(
 		r, 0.0,
@@ -175,10 +176,10 @@ void xParticleMeshObjectsContact::particle_triangle_contact_force(
 	{
 	case DHS: DHSModel(c, d->gab, d->delta_s, d->dot_s, cmp.cohesion, rv, u, m_fn, m_ft); break;
 	}
-	RollingResistanceForce(c.rfric, r, 0.0, rc, m_fn, m_ft, res, tmax);
+	RollingResistanceForce(c.rfric, r, 0.0, dcpr, m_fn, m_ft, res, tmax);
 	vector3d nforce = m_fn + m_ft;
 	F += nforce;
-	M += cross(rc, nforce);
+	M += cross(dcpr, nforce);
 	hpmi[j].fx += -nforce.x;
 	hpmi[j].fy += -nforce.y;
 	hpmi[j].fz += -nforce.z;
@@ -189,55 +190,33 @@ void xParticleMeshObjectsContact::particle_triangle_contact_force(
 }
 
 bool xParticleMeshObjectsContact::cppolyCollision(
-	xContactPairList* pairs, double r, double m,
+	xContactPairList* pairs, unsigned int i, double r, double m,
 	vector3d& p, vector3d& v, vector3d& o,
-	double &res, vector3d &tmax, vector3d& F, vector3d& M)
+	double &res, vector3d &tmax, vector3d& F, vector3d& M,
+	unsigned int nco, xClusterInformation* xci, vector4d* cpos)
 {
+	unsigned int ci = 0;
+	unsigned int neach = 1;
+	vector3d cp = p;
+	if (nco && cpos)
+	{
+		for (unsigned int j = 0; j < nco; j++)
+			if (i >= xci[j].sid && i < xci[j].sid + xci[j].count * xci[j].neach)
+				neach = xci[j].neach;
+		//ck = j / neach;
+		ci = i / neach;
+		cp = new_vector3d(cpos[ci].x, cpos[ci].y, cpos[ci].z);
+	}
+	
 	foreach(xTrianglePairData* d, pairs->TrianglePair())
 	{
-		particle_triangle_contact_force(d, r, m, p, v, o, res, tmax, F, M);
-		/*vector3d m_fn = new_vector3d(0.0, 0.0, 0.0);
-		vector3d m_m = new_vector3d(0, 0, 0);
-		vector3d m_ft = new_vector3d(0, 0, 0);
-		unsigned int j = hpi[d->id].id;
-		host_mesh_mass_info hmmi = hpmi[j];
-		double rcon = r - 0.5 * d->gab;
-		vector3d u = new_vector3d(d->nx, d->ny, d->nz);
-		vector3d rc = r * u;
-		vector3d po2cp = new_vector3d(d->cpx - hmmi.px, d->cpy - hmmi.py, d->cpz - hmmi.pz);
-		vector3d mvel = new_vector3d(hmmi.vx, hmmi.vy, hmmi.vz);
-		vector3d momega = new_vector3d(hmmi.ox, hmmi.oy, hmmi.oz);
-		vector3d rv = mvel + cross(momega, po2cp) - (v + cross(o, rc));
-		xContactMaterialParameters cmp = hcp[j];
-		xContactParameters c = getContactParameters(
-			r, 0.0,
-			m, 0.0,
-			xmps[j].Ei, xmps[j].Ej,
-			xmps[j].Pri, xmps[j].Prj,
-			xmps[j].Gi, xmps[j].Gj,
-			cmp.restitution, cmp.stiffness_ratio,
-			cmp.friction, cmp.rolling_friction, cmp.cohesion);
-		switch (force_model)
-		{
-		case DHS: DHSModel(c, d->gab, d->delta_s, d->dot_s, cmp.cohesion, rv, u, m_fn, m_ft); break;
-		}
-		RollingResistanceForce(c.rfric, r, 0.0, rc, m_fn, m_ft, res, tmax);
-		vector3d nforce = m_fn + m_ft;
-		F += nforce;
-		M += cross(rc, nforce);
-		hpmi[j].fx += -nforce.x;
-		hpmi[j].fy += -nforce.y;
-		hpmi[j].fz += -nforce.z;
-		vector3d tmoment = -cross(po2cp, nforce);
-		hpmi[j].mx = tmoment.x;
-		hpmi[j].my = tmoment.y;
-		hpmi[j].mz = tmoment.z;*/
+		particle_triangle_contact_force(d, r, m, cp, v, o, res, tmax, F, M);
 	}
 	if (!pairs->TrianglePair().size())
 	{
 		foreach(xTrianglePairData* d, pairs->TriangleLinePair())
 		{
-			particle_triangle_contact_force(d, r, m, p, v, o, res, tmax, F, M);
+			particle_triangle_contact_force(d, r, m, cp, v, o, res, tmax, F, M);
 		}
 			
 	}
@@ -245,7 +224,7 @@ bool xParticleMeshObjectsContact::cppolyCollision(
 	{
 		foreach(xTrianglePairData* d, pairs->TrianglePointPair())
 		{
-			particle_triangle_contact_force(d, r, m, p, v, o, res, tmax, F, M);
+			particle_triangle_contact_force(d, r, m, cp, v, o, res, tmax, F, M);
 		}
 	}
 		

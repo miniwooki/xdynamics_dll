@@ -477,7 +477,11 @@ xParticleObject* xParticleManager::CreateCircleParticle(
 	unsigned int cnt = 0;
 	unsigned int k = 0;
 	bool isStopCreating = false;
-	
+	vector3d u = new_vector3d(d.dx, d.dy, d.dz);
+	vector3d pu = new_vector3d(-u.y, u.x, u.z);
+	vector3d qu = cross(u, pu);
+	vector3d sp = new_vector3d(d.sx, d.sy, d.sz);
+	matrix33d A = { u.x, pu.x, qu.x, u.y, pu.y, qu.y, u.z, pu.z, qu.z };
 	while (1)
 	{
 		
@@ -490,11 +494,12 @@ xParticleObject* xParticleManager::CreateCircleParticle(
 			dth = ((2.0 * M_PI) / npr);
 			for (unsigned int j = 0; j < npr; j++)
 			{
-				vector4d pp = new_vector4d(d.sx + _r * cos(dth * j), d.sy, d.sz + _r * sin(dth * j), r);
-				vector4d new_pp = pp;				
+				vector3d pp = new_vector3d(_r * cos(dth * j), 0, _r * sin(dth * j));
+				vector4d new_pp = new_vector4d(pp.x, pp.y, pp.z, r);				
 				new_pp.x = pp.x * cos(th) + pp.z * sin(th);
 				new_pp.z = -pp.x * sin(th) + pp.z * cos(th);
-				pos[cnt] = new_pp;
+				vector3d gpp = sp + A * pp;
+				pos[cnt] = new_vector4d(gpp.x, gpp.y, gpp.z, r);
 			//	mass[cnt] = 0.0;
 				cnt++;
 				if (cnt == _np)

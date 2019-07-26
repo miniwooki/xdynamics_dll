@@ -49,6 +49,10 @@ bool xPlaneObject::define(vector3d& p0, vector3d& p1, vector3d& p2, vector3d& p3
 	u1 = pa / l1;
 	u2 = pb / l2;
 	uw = cross(u1, u2);
+	local_point[0] = toLocal(xw - xPointMass::pos);
+	local_point[1] = toLocal(w2 - xPointMass::pos);
+	local_point[2] = toLocal(w3 - xPointMass::pos);
+	local_point[3] = toLocal(w4 - xPointMass::pos);
 	return true;
 }
 
@@ -87,6 +91,11 @@ vector3d xPlaneObject::W3() const { return w3; }
 vector3d xPlaneObject::W4() const { return w4; }
 vector3d xPlaneObject::MinPoint() const { return minp; }
 vector3d xPlaneObject::MaxPoint() const { return maxp; }
+
+vector3d xPlaneObject::LocalPoint(unsigned int i)
+{
+	return local_point[i];
+}
 
 void xPlaneObject::SetupDataFromStructure(xPlaneObjectData& d)
 {
