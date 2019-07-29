@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
 			//xdm.xRunResultWorld(argv[2]);
 		//}
 		//return 0;
-		xdm->OpenModelXLS("C:/xDynamics/resource/cluster_test.xls");
+		xdm->OpenModelXLS("C:/xdynamics/resource/sphere_drop.xls");
 		//xdm->OpenModelXLS(L"C:/xDynamics/resource/four_bar3d.xls");
 	}
 	

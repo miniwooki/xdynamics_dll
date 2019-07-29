@@ -148,6 +148,12 @@ struct device_cluster_information
 	unsigned int ncluster;
 };
 
+struct device_triangle_contact_info
+{
+	unsigned int id;
+	double3 cpt;
+};
+
 void XDYNAMICS_API setDEMSymbolicParameter(device_dem_parameters *h_paras);
 
 void XDYNAMICS_API vv_update_position(

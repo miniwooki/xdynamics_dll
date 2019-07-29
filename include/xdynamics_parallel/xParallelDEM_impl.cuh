@@ -314,17 +314,9 @@ __global__ void vv_update_velocity_kernel(
 	double3 J = iner[id];// make_double3(0, 0, 0);
 	double3 n_prime = toLocal(moment[id], e);
 	double4 m_ea = calculate_uceom(J, e, av, n_prime);
-	//if(length(force[id]) > 0)
-	//printf("[%f, %f, %f]\n", moment[id].x, moment[id].y, moment[id].z);
-	//double3 in = (1.0 / iner[id]) * moment[id];
 	
 	v += 0.5 * cte.dt * (acc[id] + a);
 	av = av + 0.5 * cte.dt * (ea[id] + m_ea);
-	/*printf("force = [%f, %f, %f]\n", force[id].x, force[id].y, force[id].z);
-	printf("a = [%f, %f, %f]\n", a.x, a.y, a.z);
-	printf("m_ea = [%f, %f, %f, %f]\n", m_ea.x, m_ea.y, m_ea.z, m_ea.w);
-	printf("v = [%f, %f, %f]\n", v.x, v.y, v.z);
-	printf("av = [%f, %f, %f]\n", av.x, av.y, av.z);*/
 	force[id] = make_double3(0.0, 0.0, 0.0); 
 	moment[id] = make_double3(0.0, 0.0, 0.0);
 	vel[id] = v;
@@ -389,13 +381,7 @@ __global__ void vv_update_cluster_velocity_kernel(
 	F += m * cte.gravity;
 	double3 n_prime = toLocal(T, e);
 	double4 m_ea = calculate_uceom(in, e, av, n_prime);
-//	printf("%f, %f, %f\n", T.x, T.y, T.z);
-	//printf("%f, %f, %f, %f\n", m_ea.x, m_ea.y, m_ea.z, m_ea.w);
-	/*double3 w_prime = toLocal(av, e);
-	double3 Jwp = make_double3(in.x * w_prime.x, in.y * w_prime.y, in.z * w_prime.z);
-	double3 tJwp = make_double3(-av.z * Jwp.y + av.y * Jwp.z, av.z * Jwp.x - av.x * Jwp.z, -av.y * Jwp.x + av.x * Jwp.y);
-	double3 rhs = n_prime - tJwp;
-	double3 wd_prime*/// = make_double3(rhs.x / in.x, rhs.y / in.y, rhs.z / in.z);
+
 	v += 0.5 * cte.dt * a;
 	av = av + 0.5 * cte.dt * aa;
 	a = inv_m * F;
@@ -1513,18 +1499,18 @@ __device__ double3 closestPtPointTriangle(
 	double va = d3 * d6 - d5 * d4;
 	double vb = d5 * d2 - d1 * d6;
 	double vc = d1 * d4 - d3 * d2;
-
+	double3 cpt = make_double3(0, 0, 0);
 	//if (ct == 2)
 	//{
-		if (d1 <= 0.0 && d2 <= 0.0) { ct = 0; return a; }
-		if (d3 >= 0.0 && d4 <= d3) { ct = 0; return b; }
-		if (d6 >= 0.0 && d5 <= d6) { ct = 0; return c; }
+		if (d1 <= 0.0 && d2 <= 0.0) { ct = 0; cpt = a; }
+		if (d3 >= 0.0 && d4 <= d3) { ct = 0; cpt = b; }
+		if (d6 >= 0.0 && d5 <= d6) { ct = 0; cpt = c; }
 //	}
 //	else if (ct == 1)
 	//{
-		if (vc <= 0.0 && d1 >= 0.0 && d3 <= 0.0) { ct = 1; return a + (d1 / (d1 - d3)) * ab; }
-		if (vb <= 0.0 && d2 >= 0.0 && d6 <= 0.0) { ct = 1; return a + (d2 / (d2 - d6)) * ac; }
-		if (va <= 0.0 && (d4 - d3) >= 0.0 && (d5 - d6) >= 0.0) { ct = 1; return b + ((d4 - d3) / ((d4 - d3) + (d5 - d6))) * (c - b); }
+		if (vc <= 0.0 && d1 >= 0.0 && d3 <= 0.0) { ct = 1; cpt = a + (d1 / (d1 - d3)) * ab; }
+		if (vb <= 0.0 && d2 >= 0.0 && d6 <= 0.0) { ct = 1; cpt = a + (d2 / (d2 - d6)) * ac; }
+		if (va <= 0.0 && (d4 - d3) >= 0.0 && (d5 - d6) >= 0.0) { ct = 1; cpt = b + ((d4 - d3) / ((d4 - d3) + (d5 - d6))) * (c - b); }
 //	}	
 	//else if (ct == 0)
 	//{
@@ -1533,14 +1519,13 @@ __device__ double3 closestPtPointTriangle(
 			double denom = 1.0 / (va + vb + vc);
 			double3 v = vb * denom * ab;
 			double3 w = vc * denom * ac;
-			double3 _cpt = a + v + w;
+			cpt = a + v + w;
 			//double _dist = pr - length(p - _cpt);
 			ct = 2;
 			//if (_dist > 0) return _cpt;
-			return _cpt; 
 		}
 	//}
-	return make_double3(0, 0, 0);
+		return cpt;
 }
 
 __device__ bool checkConcave(device_triangle_info* dpi, unsigned int* tid, unsigned int kid, double4* dsph, unsigned int cnt)
@@ -1565,25 +1550,27 @@ __device__ bool checkConcave(device_triangle_info* dpi, unsigned int* tid, unsig
 	return false;
 }
 
-__device__ bool checkOverlab(int3 ctype, double3 p, double3 c, double3 u0, double3 u1)
+__device__ bool checkOverlab(/*int3 ctype,*/ double3 p, double3 c/*double3 u0, double3 u1*/)
 {
-	bool b_over = false;
-	if (p.x >= c.x - 1e-9 && p.x <= c.x + 1e-9) b_over = true;
-	if (p.y >= c.y - 1e-9 && p.y <= c.y + 1e-9) b_over = true;
-	if (p.z >= c.z - 1e-9 && p.z <= c.z + 1e-9) b_over = true;
+	bool b_over0 = false;
+	bool b_over1 = false;
+	bool b_over2 = false;
+	if (p.x >= c.x - 1e-9 && p.x <= c.x + 1e-9) b_over0 = true;
+	if (p.y >= c.y - 1e-9 && p.y <= c.y + 1e-9) b_over1 = true;
+	if (p.z >= c.z - 1e-9 && p.z <= c.z + 1e-9) b_over2 = true;
 
-	if (/*(ctype.y || ctype.z) &&*/ !b_over)
-	{
-		if (u0.x >= u1.x - 1e-9 && u0.x <= u1.x + 1e-9)
-			if (u0.y >= u1.y - 1e-9 && u0.y <= u1.y + 1e-9)
-				if (u0.z >= u1.z - 1e-9 && u0.z <= u1.z + 1e-9)
-					b_over = true;
-	}
-	return b_over;
+	//if (/*(ctype.y || ctype.z) &&*/ !b_over)
+	//{
+	//	if (u0.x >= u1.x - 1e-9 && u0.x <= u1.x + 1e-9)
+	//		if (u0.y >= u1.y - 1e-9 && u0.y <= u1.y + 1e-9)
+	//			if (u0.z >= u1.z - 1e-9 && u0.z <= u1.z + 1e-9)
+	//				b_over = true;
+	//}
+	return (b_over0 && b_over1 && b_over2);
 }
 
 __device__ void particle_triangle_contact_force(
-	unsigned int k,
+	device_triangle_contact_info& dtci,
 	int t,
 	device_triangle_info* dpi,
 	device_contact_property *cp,
@@ -1605,7 +1592,7 @@ __device__ void particle_triangle_contact_force(
 	double coh_s,
 	unsigned int& new_count)
 {
-	device_triangle_info tri = dpi[k];
+	device_triangle_info tri = dpi[dtci.id];
 	double3 qp = tri.Q - tri.P;
 	double3 rp = tri.R - tri.P;
 	//	double rcon = r - 0.5 * cdist;
@@ -1614,19 +1601,19 @@ __device__ void particle_triangle_contact_force(
 	//double3 dcpr_j = cpt - make_double3(jcpos.x, jcpos.y, jcpos.z);
 	unit = unit / length(unit);
 	double2 sd = make_double2(0.0, 0.0);
-	unsigned int pidx = dpi[k].id;
+	unsigned int pidx = dpi[dtci.id].id;
 	device_contact_property cmp = cp[pidx];
 	device_mesh_mass_info pmi = dpmi[pidx];
-	double3 cpt = closestPtPointTriangle(dpi[k], ipos, r, t);
-	double3 po2cp = cpt - pmi.origin;
-	double cdist = r - length(ipos - cpt);
+	//double3 cpt = closestPtPointTriangle(dpi[dtci.id], ipos, r, t);
+	double3 po2cp = dtci.cpt - pmi.origin;
+	double cdist = r - length(ipos - dtci.cpt);
 	if (cdist <= 0 && abs(cdist) < abs(coh_s))
 	{
 		double f = JKR_seperation_force(r, 0, cp->coh);
 		double cf = cohesionForce(r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, f);
 		sum_force = sum_force - cf * unit;
 		tsd[new_count] = sd;
-		pair_id[new_count] = k;
+		pair_id[new_count] = dtci.id;
 		new_count++;
 		return;
 	}
@@ -1635,7 +1622,7 @@ __device__ void particle_triangle_contact_force(
 	double3 Ft = make_double3(0, 0, 0);
 	
 	for (unsigned int i = 0; i < old_count; i++)
-		if (p_pair_id[i] == k){	sd = p_tsd[i]; break; }
+		if (p_pair_id[i] == dtci.id){ sd = p_tsd[i]; break; }
 	double3 rc = r * unit;
 	double3 dv = pmi.vel + cross(pmi.omega, po2cp) - (ivel + cross(iomega, rc));
 	device_force_constant c = getConstant(1, r, 0, m, 0, cmp.Ei, cmp.Ej, cmp.pri, cmp.prj, cmp.Gi, cmp.Gj, cmp.rest, cmp.fric, cmp.rfric, cmp.sratio);
@@ -1650,7 +1637,7 @@ __device__ void particle_triangle_contact_force(
 	dpmi[pidx].force += -(Fn + Ft);// +make_double3(1.0, 5.0, 9.0);
 	dpmi[pidx].moment += -cross(po2cp, Fn + Ft);
 	tsd[new_count] = sd;
-	pair_id[new_count] = k;
+	pair_id[new_count] = dtci.id;
 	new_count++;
 }
 
@@ -1751,19 +1738,19 @@ __global__ void particle_polygonObject_collision_kernel(
 	double3 sum_moment = make_double3(0, 0, 0);
 	unsigned int new_count = sid;
 
-	double3 previous_cpt = make_double3(0.0, 0.0, 0.0);
-	double3 previous_unit = make_double3(0.0, 0.0, 0.0);
+	
 	unsigned int start_index = 0;
 	unsigned int end_index = 0;
 	int3 ctype = make_int3(0, 0, 0);
-	unsigned int ctriangle[5] = { 0, };
-	unsigned int cline[5] = { 0, };
-	unsigned int cpoint[5] = { 0, };
+	device_triangle_contact_info ctriangle[20] = { 0, };
+	device_triangle_contact_info cline[20] = { 0, };
+	device_triangle_contact_info cpoint[20] = { 0, };
 	unsigned int nct = 0;
 	unsigned int ncl = 0;
 	unsigned int ncp = 0;
 	double coh_s = 0;
-	
+	double3 previous_line_cpt = make_double3(0.0, 0.0, 0.0);
+	double3 previous_point_cpt = make_double3(0.0, 0.0, 0.0);
 	for (int z = -1; z <= 1; z++) {
 		for (int y = -1; y <= 1; y++) {
 			for (int x = -1; x <= 1; x++) {
@@ -1778,25 +1765,39 @@ __global__ void particle_polygonObject_collision_kernel(
 						{
 							k -= cte.np;
 							int t = -1;
-							double cdist = ir - length(ipos - closestPtPointTriangle(dpi[k], ipos, ir, t));
+							double3 cpt = closestPtPointTriangle(dpi[k], ipos, ir, t);
+							double cdist = ir - length(ipos - cpt);
 							if (cp->coh)
 								coh_s = limit_cohesion_depth(ir, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh);
 							if (cdist > 0)
 							{
+								//printf("cidst : %f, contact_type : %d\n", cdist, t);
+								if (t == 1)
+								{
+									if (checkOverlab(previous_line_cpt, cpt))
+										continue;
+									previous_line_cpt = cpt;
+								}
+								else if (t == 0)
+								{
+									if (checkOverlab(previous_point_cpt, cpt))
+										continue;
+									previous_point_cpt = cpt;
+								}
 								switch (t)
 								{
-								case 2: ctriangle[nct++] = k; break;
-								case 1: cline[ncl++] = k; break;
-								case 0: cpoint[ncp++] = k; break;
+								case 2: ctriangle[nct++] = { k, cpt }; break;
+								case 1: cline[ncl++] = { k, cpt }; break;
+								case 0: cpoint[ncp++] = { k, cpt }; break;
 								}
 							}
 							else if(cdist <= 0 && abs(cdist) < abs(coh_s))
 							{
 								switch (t)
 								{
-								case 2: ctriangle[nct++] = k; break;
-								case 1: cline[ncl++] = k; break;
-								case 0: cpoint[ncp++] = k; break;
+								case 2: ctriangle[nct++] = { k, cpt }; break;
+								case 1: cline[ncl++] = { k, cpt }; break;
+								case 0: cpoint[ncp++] = { k, cpt }; break;
 								}
 							}
 						}
@@ -1810,12 +1811,32 @@ __global__ void particle_polygonObject_collision_kernel(
 	//printf("tlp : [%d - %d - %d]\n", nct, ncl, ncp);
 	for (unsigned int k = 0; k < nct; k++)
 		particle_triangle_contact_force(ctriangle[k], 0, dpi, cp, dpmi, ipos, ivel, iomega, old_count, p_pair_id, p_tsd, pair_id, tsd, ir, im, sum_force, sum_moment, res, tma, coh_s, new_count);
-	if(!nct)
-		for(unsigned int k = 0; k < ncl; k++)
+	if (!nct)
+	{
+		//double3 previous_cpt = make_double3(0.0, 0.0, 0.0);
+		//double3 previous_unit = make_double3(0.0, 0.0, 0.0);
+		for (unsigned int k = 0; k < ncl; k++)
+		{
+			//if (checkOverlab(previous_cpt, cline[k].cpt))
+			//	continue;
+			//previous_cpt = cline[k].cpt;
 			particle_triangle_contact_force(cline[k], 1, dpi, cp, dpmi, ipos, ivel, iomega, old_count, p_pair_id, p_tsd, pair_id, tsd, ir, im, sum_force, sum_moment, res, tma, coh_s, new_count);
-	if(!nct && !ncl)
+		}
+	}
+		
+	if (!nct && !ncl)
+	{
+		//printf("ncp : %d\n", ncp);
+		//double3 previous_cpt = make_double3(0.0, 0.0, 0.0);
 		for (unsigned int k = 0; k < ncp; k++)
+		{
+			//if (checkOverlab(previous_cpt, cpoint[k].cpt))
+			//	continue;
+		//	previous_cpt = cpoint[k].cpt;
 			particle_triangle_contact_force(cpoint[k], 2, dpi, cp, dpmi, ipos, ivel, iomega, old_count, p_pair_id, p_tsd, pair_id, tsd, ir, im, sum_force, sum_moment, res, tma, coh_s, new_count);
+		}			
+	}
+		
 
 	force[id] += sum_force;
 	moment[id] += sum_moment;

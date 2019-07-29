@@ -39,12 +39,7 @@ int xIntegratorVV::OneStepSimulation(double ct, unsigned int cstep)
 			nco ? np : m_np);
 	}	
 	if (xdem->XSpringDamperForce())
-	{
-		/*if (xSimulation::Cpu())
-			xdem->XSpringDamperForce()->xCalculateForceForDEM(dpos, dvel, dep, davel, dmass, dforce, dmoment);
-		else if (xSimulation::Gpu())*/
 			SpringDamperForce();
-	}
 	this->updateVelocity(dvel, dacc, dep, davel, daacc, dforce, dmoment, dmass, diner, m_np);
 	return 0;
 }
@@ -114,23 +109,8 @@ void xIntegratorVV::updateVelocity(
 		vector3d* iner = (vector3d*)dinertia;
 		for (unsigned int i = 0; i < np; i++){
 			matrix33d J = { iner[i].x, 0, 0, 0, iner[i].y, 0, 0, 0, iner[i].z };
-			//std::cout << "J3 : [" << J.a00 << ", " << J.a11 << ", " << J.a22 << std::endl;
-			/*if (i >= np - nMassParticle)
-			{
-				unsigned int sid = np - nMassParticle;
-				unsigned int j = i - (np - nMassParticle);
-				J.a00 = dinertia[sid + j * 3 + 0];
-				J.a11 = dinertia[sid + j * 3 + 1];
-				J.a22 = dinertia[sid + j * 3 + 2];
-				std::cout << "J3_ID : " << sid + j * 3 << std::endl;
-				
-			}
-			else
-			{
-				J.a00 = dinertia[i]; J.a11 = dinertia[i]; J.a22 = dinertia[i];
-			}*/
-			std::cout << "force : [" << f[i].x << " " << f[i].y << " " << f[i].z << "]" << std::endl;
-			std::cout << "moment : [" << m[i].x << " " << m[i].y << " " << m[i].z << "]" << std::endl;
+			//std::cout << "force : [" << f[i].x << " " << f[i].y << " " << f[i].z << "]" << std::endl;
+		//	std::cout << "moment : [" << m[i].x << " " << m[i].y << " " << m[i].z << "]" << std::endl;
 			vector3d n_prime = ToLocal(ep[i], m[i]);
 			euler_parameters m_ea = CalculateUCEOM(J, ep[i], ev[i], n_prime);
 			//std::cout << "euler_acc : [" << m_ea.e0 << ", " << m_ea.e1 << ", " << m_ea.e2 << ", " << m_ea.e3 << "]" << std::endl;

@@ -41,6 +41,7 @@ xContactManager::~xContactManager()
 	if (Tmax) delete[] Tmax; Tmax = NULL;
 	if (RRes) delete[] RRes; RRes = NULL;
 	if (xcpl) delete[] xcpl; xcpl = NULL;
+	if (cpcylinders) delete cpcylinders; cpcylinders = NULL;
 	//if (cpcylinders.size())
 	//{
 	//	qDeleteAll(cpcylinders);
@@ -246,12 +247,6 @@ void xContactManager::update()
 	{
 		cpplane->updataPlaneObjectData();
 	}
-	// 	if (cppoly)
-	// 	{
-	// 		model::isSinglePrecision ?
-	// 			cppoly->updatePolygonObjectData_f() :
-	// 			cppoly->updatePolygonObjectData();
-	// 	}
 }
 
 void xContactManager::allocPairList(unsigned int np)
@@ -306,7 +301,6 @@ void xContactManager::updateCollisionPair(
 	xClusterInformation* xci,
 	unsigned int np)
 {
-	//unsigned int klist[200] = { 0, };
 	for (unsigned int i = 0; i < np; i++)
 	{
 		unsigned int count = 0;
@@ -322,15 +316,10 @@ void xContactManager::updateCollisionPair(
 			cpplane->updateCollisionPair(xcpl[i], r, p);
 		if (cpcylinders)
 			cpcylinders->updateCollisionPair(xcpl[i], r, p);
-		//foreach(xParticleCylinderContact* xpcyl, cpcylinders)
-		//{
-		//	xpcyl->updateCollisionPair(xcpl[i], r, p);
-		//		//break;
-		//}
 		vector3i gp = xGridCell::getCellNumber(p.x, p.y, p.z);
 		unsigned int old_id = 0;
-		vector3d old_cpt = new_vector3d(0.0, 0.0, 0.0);
-		vector3d old_unit = new_vector3d(0.0, 0.0, 0.0);
+		vector3d old_cpt = new_vector3d(FLT_MAX, FLT_MAX, FLT_MAX);
+		vector3d old_unit = new_vector3d(FLT_MAX, FLT_MAX, FLT_MAX);
 		vector3i ctype = new_vector3i(0, 0, 0);
 		for (int z = -1; z <= 1; z++) {
 			for (int y = -1; y <= 1; y++) {
@@ -357,7 +346,6 @@ void xContactManager::updateCollisionPair(
 							{
 								if (cpmeshes->updateCollisionPair(k - np, xcpl[i], r, p, old_id, old_cpt, old_unit, ctype))
 									count++;
-							//	klist[kcount++] = k;
 							}
 						}
 					}
@@ -366,14 +354,6 @@ void xContactManager::updateCollisionPair(
 		}
 		if (count > 1)
 			std::cout << "mesh contact overlab occured." << std::endl;
-		/*if (cpmeshes && count == 0)
-		{
-			for (unsigned int k = 0; k < kcount; k++)
-			{
-				cpmeshes->updateCollisionPair(1, klist[k], xcpl[i], r, p, old_id, old_cpt, old_unit, ctype);
-			}
-			
-		}*/
 	}
 }
 
@@ -450,15 +430,15 @@ void xContactManager::deviceCollision(
 }
 
 void xContactManager::hostCollision(
-	vector4d *pos, 
+	vector4d *pos,
 	vector4d *cpos,
-	vector3d *vel, 
+	vector3d *vel,
 	euler_parameters *ep,
 	euler_parameters *ev,
-	double *mass, 
+	double *mass,
 	double* inertia,
-	vector3d *force, 
-	vector3d *moment, 
+	vector3d *force,
+	vector3d *moment,
 	unsigned int *sorted_id,
 	unsigned int *cell_start,
 	unsigned int *cell_end,
@@ -478,9 +458,9 @@ void xContactManager::hostCollision(
 				{
 					neach = xci[j].neach;
 					ci = i / neach;
-				}					
+				}
 			}
-		}			
+		}
 		vector3d F = new_vector3d(0.0, 0.0, 0.0);
 		vector3d M = new_vector3d(0.0, 0.0, 0.0);
 		double R = 0;
@@ -489,20 +469,20 @@ void xContactManager::hostCollision(
 		vector3d p = new_vector3d(pos[i].x, pos[i].y, pos[i].z);
 		vector3d v = vel[ci];
 		vector3d o = ToAngularVelocity(ep[ci], ev[ci]);
-	
+
 		double m = mass[ci];
 		double j = inertia[ci];
 		double r = pos[i].w;
 
-		if(cpplane)
+		if (cpplane)
 			cpplane->cpplCollision(pairs, i, r, m, p, v, o, R, T, F, M, ncobject, xci, cpos);
-		if(cpp)
+		if (cpp)
 			cpp->cppCollision(pairs, i, pos, cpos, vel, ep, ev, mass, R, T, F, M, xci, ncobject);
-		if(cpmeshes)
+		if (cpmeshes)
 			cpmeshes->cppolyCollision(pairs, i, r, m, p, v, o, R, T, F, M, ncobject, xci, cpos);
-		if(cpcylinders)
+		if (cpcylinders)
 			cpcylinders->pcylCollision(pairs, i, r, m, p, v, o, R, T, F, M, ncobject, xci, cpos);
-			
+
 		force[i] += F;
 		moment[i] += M;
 
@@ -515,104 +495,4 @@ void xContactManager::hostCollision(
 			moment[i] += _Tr;
 		}
 	}
-	// 		foreach(xPairData* d, pairs->PlanePair())
-	// 		{
-	// 
-	// 		}
-	// 		
-	// 		foreach(xContact* c, cots)
-	// 		{
-	// // 			if (c->IgnoreTime() && (simulation::ctime > c->IgnoreTime()))
-	// // 				continue;
-	// 			if (c->IsEnabled())
-	// 				c->collision(r, m, p, v, o, F, M);
-	// 		}
-	// 		vector3i gp = xGridCell::getCellNumber(p.x, p.y, p.z);
-	// 		for (int z = -1; z <= 1; z++){
-	// 			for (int y = -1; y <= 1; y++){
-	// 				for (int x = -1; x <= 1; x++){
-	// 					vector3i neigh = new_vector3i(gp.x + x, gp.y + y, gp.z + z);
-	// 					unsigned int hash = xGridCell::getHash(neigh);
-	// 					unsigned int sid = cell_start[hash];
-	// 					if (sid != 0xffffffff){
-	// 						unsigned int eid = cell_end[hash];
-	// 						for (unsigned int j = sid; j < eid; j++){
-	// 							unsigned int k = sorted_id[j];
-	// 							if (i != k && k < np)
-	// 							{
-	// 								vector3d jp = new_vector3d(pos[k].x, pos[k].y, pos[k].z);
-	// 								vector3d jv = vel[k];
-	// 								vector3d jo = omega[k];
-	// 								double jr = pos[k].w;
-	// 								double jm = mass[k];
-	// 								cpp->cppCollision(
-	// 									r, jr,
-	// 									m, jm,
-	// 									p, jp,
-	// 									v, jv,
-	// 									o, jo,
-	// 									F, M);
-	// 							}
-	// 							else if (k >= np)
-	// 							{
-	// // 								if (!cppoly->cppolyCollision(k - np, r, m, p, v, o, F, M))
-	// // 								{
-	// // 
-	// // 								}
-	// 							}
-	// 						}
-	// 					}
-	// 				}
-	// 			}
-	// 		}
-	// 		force[i] += F;
-	// 		moment[i] += M;
-	// 	}
 }
-
-//unsigned int xContactManager::deviceContactCount(
-//	double *pos, double *vel, double *ev,
-//	double *mass, double *force, double *moment,
-//	unsigned int *sorted_id, unsigned int *cell_start,
-//	unsigned int *cell_end, unsigned int np)
-//{
-//	// 	cu_calculate_particle_particle_contact_count(
-//	// 		pos,
-//	// 		d_pppd,
-//	// 		d_old_pair_count,
-//	// 		d_pair_count,
-//	// 		d_pair_start,
-//	// 		sorted_id,
-//	// 		cell_start,
-//	// 		cell_end,
-//	// 		np);
-//	// 	if (cpmeshes && cpmeshes->NumContactObjects())
-//	// 	{
-//	// 		cu_calculate_particle_triangle_contact_count(
-//	// 			cpmeshes->deviceTrianglesInfo(),
-//	// 			pos,
-//	// 			d_pppd,
-//	// 			d_old_pair_count,
-//	// 			d_pair_count,
-//	// 			d_pair_start,
-//	// 			sorted_id,
-//	// 			cell_start,
-//	// 			cell_end,
-//	// 			np);
-//	// 	}
-//	// 	
-//	// 	if (cpplane && cpplane->NumPlanes())
-//	// 	{
-//	// 		cu_calculate_particle_plane_contact_count(
-//	// 			cpplane->devicePlaneInfo(),
-//	// 			d_pppd,
-//	// 			d_old_pair_count,
-//	// 			d_pair_count,
-//	// 			d_pair_start,
-//	// 			pos,
-//	// 			cpplane->NumPlanes(),
-//	// 			np);
-//	// 	}
-//	// 	std::cout << "before cu_sumation_contact_count " << std::endl;
-//	return 0; //cu_sumation_contact_count(d_pair_count, np);
-//}

@@ -36,43 +36,6 @@ void xSimulationThread::setStopCondition()
 	m_mutex.unlock();
 }
 
-// bool xSimulationThread::savePart(double ct, unsigned int pt)
-// {
-// 	if (dem)
-// 	{
-// 		model::rs->insertTimeData(ct);
-// 		double *v_pos = model::rs->getPartPosition(pt);
-// 		//double *v_vel = model::rs->getPartVelocity(pt);
-// 		QString part_name = dem->saveResult(v_pos, NULL, ct, pt);
-// 		model::rs->insertPartName(part_name);
-// 		//model::rs->definePartDatasDEM(false, pt);
-// 	}
-// 	if (mbd)
-// 	{
-// 		mbd->saveResult(ct);
-// 	}
-// 	return true;
-// }
-
-// bool xSimulationThread::saveFinalResult(double ct)
-// {
-// 	QString file = model::path + "/" + model::name + "_final.bfr";
-// 	QFile qf(file);
-// 	qf.open(QIODevice::WriteOnly);
-// 	qf.write((char*)&ct, sizeof(double));
-// 	if (dem)
-// 	{
-// 		dem->saveFinalResult(qf);
-// 	}
-// 	if (mbd)
-// 	{
-// 		mbd->saveFinalResult(qf);
-// 	}
-// 	qf.close();
-// 	//dem->saveFinalResult(file);
-// 	return true;
-// }
-
 void xSimulationThread::run()
 {
 	char buf[255] = { 0, };

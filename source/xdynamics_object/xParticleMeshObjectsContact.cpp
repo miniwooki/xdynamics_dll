@@ -34,13 +34,17 @@ xParticleMeshObjectsContact::~xParticleMeshObjectsContact()
 	if (xmps) delete[] xmps; xmps = NULL;
 	if (hpmi) delete[] hpmi; hpmi = NULL;
 	//qDeleteAll(pair_ip);
-	if (dsphere) checkCudaErrors(cudaFree(dsphere)); dsphere = NULL;
-	if (dlocal) checkCudaErrors(cudaFree(dlocal)); dlocal = NULL;
-	if (dpi) checkCudaErrors(cudaFree(dpi)); dpi = NULL;
-	if (dvList) checkCudaErrors(cudaFree(dvList)); dvList = NULL;
-	if (diList) checkCudaErrors(cudaFree(diList)); diList = NULL;
-	if (dpmi) checkCudaErrors(cudaFree(dpmi)); dpmi = NULL;
-	if (dep) checkCudaErrors(cudaFree(dep)); dep = NULL;
+	if (xSimulation::Gpu())
+	{
+		if (dsphere) checkCudaErrors(cudaFree(dsphere)); dsphere = NULL;
+		if (dlocal) checkCudaErrors(cudaFree(dlocal)); dlocal = NULL;
+		if (dpi) checkCudaErrors(cudaFree(dpi)); dpi = NULL;
+		if (dvList) checkCudaErrors(cudaFree(dvList)); dvList = NULL;
+		if (diList) checkCudaErrors(cudaFree(diList)); diList = NULL;
+		if (dpmi) checkCudaErrors(cudaFree(dpmi)); dpmi = NULL;
+		if (dep) checkCudaErrors(cudaFree(dep)); dep = NULL;
+	}
+	
 }
 
 vector4d * xParticleMeshObjectsContact::GetCurrentSphereData()
@@ -408,7 +412,7 @@ void xParticleMeshObjectsContact::getMeshContactForce()
 		//double f = hpmi[id].force
 		o->setContactForce(hpmi[id].fx, hpmi[id].fy, hpmi[id].fz);
 		//std::cout << hpmi[id].fx << " " << hpmi[id].fy << " " << hpmi[id].fz << std::endl;
-		std::cout << o->Velocity().x << " " << o->Velocity().y << " " << o->Velocity().z << std::endl;
+		//std::cout << o->Velocity().x << " " << o->Velocity().y << " " << o->Velocity().z << std::endl;
 		o->setContactMoment(hpmi[id].mx, hpmi[id].my, hpmi[id].mz);
 	}
 }
@@ -446,14 +450,18 @@ bool xParticleMeshObjectsContact::updateCollisionPair(
 		
 		//cpt = 0.5 * (jpos + pos);
 		//unit = -unit / length(unit);
-		//bool overlab = checkOverlab(ctype, ocpt, cpt, ounit, unit);
-		
-		/*if (overlab)
-			return false;
+		if (t != 0)
+		{
+			bool overlab = checkOverlab(ctype, ocpt, cpt, ounit, unit);
 
-		ocpt = cpt;
-		ounit = unit;
-		*(&(ctype.x) + t) += 1;*/
+			if (overlab)
+				return false;
+
+			ocpt = cpt;
+			ounit = unit;
+		}
+		
+		//*(&(ctype.x) + t) += 1;
 		bool is_new = t == 0 ? xcpl.IsNewTriangleContactPair(id) : (t == 1 ? xcpl.IsNewTriangleLineContactPair(id) : xcpl.IsNewTrianglePointContactPair(id));
 		if (is_new)
 		{
@@ -477,7 +485,10 @@ bool xParticleMeshObjectsContact::updateCollisionPair(
 	}
 	else
 	{
-		t == 0 ? xcpl.deleteTrianglePairData(id) : (t==1 ? xcpl.deleteTriangleLinePairData(id) : xcpl.deleteTrianglePointPairData(id));
+		xcpl.deleteTrianglePairData(id);
+		xcpl.deleteTriangleLinePairData(id);
+		xcpl.deleteTrianglePointPairData(id);
+		//t == 0 ? xcpl.deleteTrianglePairData(id) : (t==1 ? xcpl.deleteTriangleLinePairData(id) : xcpl.deleteTrianglePointPairData(id));
 	}
 	return false;
 }
@@ -652,9 +663,9 @@ vector3d xParticleMeshObjectsContact::particle_polygon_contact_detection(
 	if (va <= 0.0 && (d4 - d3) >= 0.0 && (d5 - d6) >= 0.0) { ct = 1; cpt = b + ((d4 - d3) / ((d4 - d3) + (d5 - d6))) * (c - b); }
 
 
-	if (d1 <= 0.0 && d2 <= 0.0) { ct = 0; cpt = a; }
-	if (d3 >= 0.0 && d4 <= d3) { ct = 0; cpt = b; }
-	if (d6 >= 0.0 && d5 <= d6) { ct = 0; cpt = c; }
+	if (d1 <= 0.0 && d2 <= 0.0) { ct = 2; cpt = a; }
+	if (d3 >= 0.0 && d4 <= d3) { ct = 2; cpt = b; }
+	if (d6 >= 0.0 && d5 <= d6) { ct = 2; cpt = c; }
 
 	if (va >= 0 && vb >= 0 && vc >= 0)
 	{
@@ -662,7 +673,7 @@ vector3d xParticleMeshObjectsContact::particle_polygon_contact_detection(
 		vector3d v = vb * denom * ab;
 		vector3d w = vc * denom * ac;
 		cpt = a + v + w;
-
+		ct = 0;
 		//ct = 2;
 		//if (_dist > 0) return _cpt;
 		//return _cpt; // = u*a + v*b + w*c, u = va * denom = 1.0f - v - w
