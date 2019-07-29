@@ -201,6 +201,7 @@
     <QtMoc Include="..\include\xdynamics_gui\xChartDatabase.h" />
     <ClInclude Include="..\include\xdynamics_gui\xChartSpline.h" />
     <QtMoc Include="..\include\xdynamics_gui\xChartView.h" />
+    <ClInclude Include="..\include\xdynamics_gui\xColorControl.h" />
     <ClInclude Include="..\include\xdynamics_gui\xCommandLine.h" />
     <QtMoc Include="..\include\xdynamics_gui\xLineEditWidget.h" />
     <ClInclude Include="..\include\xdynamics_gui\xChartAxis.h" />

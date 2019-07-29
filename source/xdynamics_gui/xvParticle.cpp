@@ -36,6 +36,10 @@ xvParticle::xvParticle()
 	m_posVBO = 0;
 	m_colorVBO = 0;
 	m_program = 0;
+	max_position[0] = max_position[1] = max_position[2] = -FLT_MAX;
+	min_position[0] = min_position[1] = min_position[2] = FLT_MAX;
+	max_velocity[0] = max_velocity[1] = max_velocity[2] = -FLT_MAX;
+	min_velocity[0] = min_velocity[1] = min_velocity[2] = FLT_MAX;
 }
 
 xvParticle::~xvParticle()
@@ -321,6 +325,8 @@ bool xvParticle::UploadParticleFromFile(unsigned int i, QString path)
 		color_buffers[s + sid + 1] = 0.0f;
 		color_buffers[s + sid + 2] = 1.0f;
 		color_buffers[s + sid + 3] = 1.0f;
+
+
 	}
 	delete[] _pos;
 	delete[] _vel;
@@ -335,23 +341,39 @@ bool xvParticle::UploadParticleFromRelativePosition(unsigned int i, vector3d & p
 	xvAnimationController::addTime(i, 0);
 	for (unsigned int j = 0; j < np; j++)
 	{
-		unsigned int s = j * 4;
-		unsigned int v = j * 3;
+		unsigned int s = j * 4 + sid;
+		unsigned int v = j * 3 + vid;
 		vector3d rp = new_vector3d(r_pos[s + 0], r_pos[s + 1], r_pos[s + 2]);
 		vector3d gp = p + A * rp;
-		buffers[s + sid + 0] = static_cast<float>(gp.x);
-		buffers[s + sid + 1] = static_cast<float>(gp.y);
-		buffers[s + sid + 2] = static_cast<float>(gp.z);
-		buffers[s + sid + 3] = static_cast<float>(r_pos[s + 3]);
+		buffers[s + 0] = static_cast<float>(gp.x);
+		buffers[s + 1] = static_cast<float>(gp.y);
+		buffers[s + 2] = static_cast<float>(gp.z);
+		buffers[s + 3] = static_cast<float>(r_pos[s + 3]);
 
-		vbuffers[v + vid + 0] = 0.0f;// static_cast<float>(_vel[v + 0]);
-		vbuffers[v + vid + 1] = 0.0f;//static_cast<float>(_vel[v + 1]);
-		vbuffers[v + vid + 2] = 0.0f;// static_cast<float>(_vel[v + 2]);
+		vbuffers[v + 0] = 0.0f;// static_cast<float>(_vel[v + 0]);
+		vbuffers[v + 1] = 0.0f;//static_cast<float>(_vel[v + 1]);
+		vbuffers[v + 2] = 0.0f;// static_cast<float>(_vel[v + 2]);
 
-		color_buffers[s + sid + 0] = 0.0f;
-		color_buffers[s + sid + 1] = 0.0f;
-		color_buffers[s + sid + 2] = 1.0f;
-		color_buffers[s + sid + 3] = 1.0f;
+		if (max_position[0] < buffers[s + 0]) max_position[0] = buffers[s + 0];
+		if (max_position[1] < buffers[s + 1]) max_position[1] = buffers[s + 1];
+		if (max_position[2] < buffers[s + 2]) max_position[2] = buffers[s + 2];
+
+		if (min_position[0] > buffers[s + 0]) min_position[0] = buffers[s + 0];
+		if (min_position[1] > buffers[s + 1]) min_position[1] = buffers[s + 1];
+		if (min_position[2] > buffers[s + 2]) min_position[2] = buffers[s + 2];
+
+		if (max_velocity[0] < vbuffers[v + 0]) max_velocity[0] = vbuffers[v + 0];
+		if (max_velocity[1] < vbuffers[v + 1]) max_velocity[1] = vbuffers[v + 1];
+		if (max_velocity[2] < vbuffers[v + 2]) max_velocity[2] = vbuffers[v + 2];
+
+		if (min_velocity[0] > vbuffers[v + 0]) min_velocity[0] = vbuffers[v + 0];
+		if (min_velocity[1] > vbuffers[v + 0]) min_velocity[1] = vbuffers[v + 1];
+		if (min_velocity[2] > vbuffers[v + 0]) min_velocity[2] = vbuffers[v + 2];
+
+		color_buffers[s + 0] = 0.0f;
+		color_buffers[s + 1] = 0.0f;
+		color_buffers[s + 2] = 1.0f;
+		color_buffers[s + 3] = 1.0f;
 	}
 	return false;
 }

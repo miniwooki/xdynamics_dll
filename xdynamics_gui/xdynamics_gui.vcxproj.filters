@@ -263,5 +263,8 @@
     <ClInclude Include="..\include\xdynamics_gui\xChartSpline.h">
       <Filter>Header Files\plot</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\xdynamics_gui\xColorControl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

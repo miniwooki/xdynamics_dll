@@ -75,7 +75,10 @@ private:
 	float *color;
 	double *r_pos;
 	bool isSetColor;
-
+	float max_position[3];
+	float min_position[3];
+	float max_velocity[3];
+	float min_velocity[3];
 	float pscale;
 	QMap<QString, particleGroupData> pgds;
 	shaderProgram program;
