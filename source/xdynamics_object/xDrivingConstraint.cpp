@@ -78,6 +78,28 @@ void xDrivingConstraint::setConstantVelocity(double cv)
 	cons_v = cv;
 }
 
+void xDrivingConstraint::ExportResults(std::fstream & of)
+{
+	std::ofstream ofs;
+	QString _path = xModel::path + xModel::name + "/" + name + ".bkc";
+	//QString _path = QString(xModel::path) + QString(xModel::name) + "/" + QString(name) + ".bkc";
+	ofs.open(_path.toStdString().c_str(), ios::binary | ios::out);
+	char t = 'k';
+	int identifier = RESULT_FILE_IDENTIFIER;
+	ofs.write((char*)&identifier, sizeof(int));
+	ofs.write(&t, sizeof(char));
+	ofs.write((char*)&nr_part, sizeof(unsigned int));
+	ofs.write((char*)kcrs.data(), sizeof(xKinematicConstraint::kinematicConstraint_result) * nr_part);
+	// 	ofs << "time " << "px " << "py " << "pz " << "vx " << "vy " << "vz " << "ax " << "ay " << "az " 
+	// 		<< "avx " << "avy " << "avz "x << "aax " << "aay " << "aaz " 
+	// 		<< "afx " << "afy " << "afz " << "amx " << "amy " << "amz " 
+	// 		<< "afx " << "afy " << "afz " << "amx " << "amy " << "amz "
+	// 		<< "afx " << "afy " << "afz " << "amx " << "amy " << "amz "
+	ofs.close();
+	xLog::log("Exported : " + _path.toStdString());
+	of << _path.toStdString() << endl;
+}
+
 void xDrivingConstraint::ConstraintGamma(xVectorD& rhs, xVectorD& q, xVectorD& qd, unsigned int sr, double ct, double mul)
 {
 	unsigned int i = kconst->IndexBaseBody() * xModel::OneDOF();
@@ -343,7 +365,10 @@ void xDrivingConstraint::SaveStepResult(
 		}
 			//lhs.insert(sr, jc, zv, D2);*/
 	}
-	srow = sr;
+	kcr.time = ct;
+	kcr.location = ri + Ai * kconst->spi;
+	kcrs.push_back(kcr);
+	nr_part++;
 }
 
 void xDrivingConstraint::DerivateEquation(xVectorD& v, xVectorD& q, xVectorD& qd, int sr, double ct, double mul)

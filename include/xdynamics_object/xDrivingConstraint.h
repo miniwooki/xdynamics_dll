@@ -18,6 +18,7 @@ public:
 	QString Name();
 	void setStartTime(double st);
 	void setConstantVelocity(double cv);
+	void ExportResults(std::fstream& of);
 	//unsigned int startRow() { return srow; }
 	//	unsigned int startColumn() { return scol; }
 	//bool use(int i) { return use_p[i]; }
@@ -43,12 +44,14 @@ private:
 	//int maxnnz;
 	double init_v;
 	double cons_v;
+	QVector<xKinematicConstraint::kinematicConstraint_result> kcrs;
 	double theta;
 	//unsigned int srow;
 	//unsigned int scol;
 	//QString name;
 	unsigned int n;
 	unsigned int srow;
+	unsigned int nr_part;
 	xKinematicConstraint* kconst;
 	//Type type;
 };

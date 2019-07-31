@@ -71,6 +71,11 @@ void xMultiBodySimulation::ExportResults(std::fstream& of)
 		xkc->ExportResults(of);
 		sr += xkc->NumConst();
 	}
+	foreach(xDrivingConstraint* xdc, xmbd->Drivings())
+	{
+		xdc->ExportResults(of);
+		sr++;
+	}
 }
 
 int xMultiBodySimulation::Initialize(xMultiBodyModel* _xmbd)
