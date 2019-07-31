@@ -9,6 +9,9 @@ class XDYNAMICS_API xParticleCylindersContact : public xContact
 {
 	struct host_cylinder_info
 	{
+		bool ismoving;
+		unsigned int mid;
+		unsigned int id;
 		vector3d len_rr;
 		vector3d pbase;
 		vector3d ptop;
@@ -25,6 +28,11 @@ public:
 		double &R, vector3d& T, vector3d& F, vector3d& M,
 		unsigned int nco, xClusterInformation* xci, vector4d* cpos);
 	unsigned int NumContact();
+	void updateCylinderObjectData();
+	void getCylinderContactForce();
+	device_cylinder_info* deviceCylinderInfo();
+	device_body_info* deviceCylinderBodyInfo();
+	
 	void updateCollisionPair(xContactPairList& xcpl, double r, vector3d pos);
 	virtual void cudaMemoryAlloc(unsigned int np);
 	virtual void cuda_collision(
@@ -39,10 +47,12 @@ private:
 		host_cylinder_info& cinfo, xCylinderObject* c_ptr, vector3d& pt, vector3d& u, vector3d& cp, double r);
 	QMap<unsigned int, xCylinderObject*> pair_ip;
 	unsigned int ncylinders;
+	unsigned int nmoving;
 	xContactMaterialParameters* hcmp;
 	xMaterialPair* xmps;
 	host_cylinder_info *hci;
 	device_cylinder_info* dci;
+	device_body_info* dbi;
 };
 
 #endif

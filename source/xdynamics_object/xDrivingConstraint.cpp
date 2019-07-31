@@ -289,7 +289,61 @@ void xDrivingConstraint::DerivateJacobian(xMatrixD& lhs, xVectorD& q, xVectorD& 
 void xDrivingConstraint::SaveStepResult(
 	unsigned int part, double ct, xVectorD& q, xVectorD& qd, double* L, unsigned int sr)
 {
-
+	unsigned int i = kconst->IndexBaseBody() * xModel::OneDOF();
+	unsigned int j = kconst->IndexActionBody() * xModel::OneDOF();
+	vector3d ri = kconst->BaseBody()->Position();// q(i + 0), q(i + 1), q(i + 2));
+	vector3d rj = kconst->ActionBody()->Position();//new_vector3d(q(j + 0), q(j + 1), q(j + 2));
+	euler_parameters ei = kconst->BaseBody()->EulerParameters();// new_euler_parameters(q(i + 3), q(i + 4), q(i + 5), q(i + 6));
+	euler_parameters ej = kconst->ActionBody()->EulerParameters();//new_euler_parameters(q(j + 3), q(j + 4), q(j + 5), q(j + 6));
+	matrix33d Ai = kconst->BaseBody()->TransformationMatrix();//GlobalTransformationMatrix(ei);
+	matrix33d Aj = kconst->ActionBody()->TransformationMatrix();//GlobalTransformationMatrix(ej);
+	int ic = (kconst->IndexBaseBody() - 1) * xModel::OneDOF();
+	int jc = (kconst->IndexActionBody() - 1) * xModel::OneDOF();
+	xKinematicConstraint::kinematicConstraint_result kcr = { 0, };
+	double* lm = L + sr;
+	if (type == TRANSLATION_DRIVING)
+	{
+		vector3d dist = (rj + Aj * kconst->spj) - (ri + Ai * kconst->spi);// kconst->CurrentDistance();VEC3D fdij = kconst->CurrentDistance();
+		vector3d hi = Ai * kconst->hi;// im->toGlobal(kconst->h_i());
+		if (i)
+		{
+			vector4d v = dist * BMatrix(ei, kconst->hi) - hi * BMatrix(ei, kconst->spi);
+			kcr.iaforce = lm[0] * -hi;
+			kcr.irforce = 0.5 * LMatrix(ei) * (lm[0] * v);
+			//lhs.insert(sr, ic, -hi, v);
+		}
+		if (j)
+		{
+			vector4d v = hi * BMatrix(ej, kconst->spj);
+			kcr.jaforce = lm[0] * hi;
+			kcr.jrforce = 0.5 * LMatrix(ej) * (lm[0] * v);
+			//lhs.insert(sr, jc, hi, v);
+		}
+	}
+	else if (type == ROTATION_DRIVING)
+	{
+		vector3d fi = Ai * kconst->fi;
+		vector3d fj = Aj * kconst->fj;
+		vector3d gi = Ai * kconst->gi;
+		theta = RelativeAngle(ct, gi, fi, fj);
+		//	std::cout << "driving angle : " << theta << std::endl;
+		vector4d D1 = kconst->relative_rotation_constraintJacobian_e_i(theta, ei, ej, fj);
+		vector4d D2 = kconst->relative_rotation_constraintJacobian_e_j(theta, ei, ej, fi, gi);
+		vector3d zv = new_vector3d(0.0, 0.0, 0.0);
+		if (i)
+		{
+			kcr.iaforce = zv;
+			kcr.irforce = 0.5 * LMatrix(ei) * (lm[0] * D1);
+		}
+			//lhs.insert(sr, ic, zv, D1);
+		if (j)
+		{
+			kcr.jaforce = zv;
+			kcr.jrforce = 0.5 * LMatrix(ej) * (lm[0] * D2);
+		}
+			//lhs.insert(sr, jc, zv, D2);*/
+	}
+	srow = sr;
 }
 
 void xDrivingConstraint::DerivateEquation(xVectorD& v, xVectorD& q, xVectorD& qd, int sr, double ct, double mul)

@@ -53,26 +53,27 @@ void xvPlane::draw(GLenum eMode)
 		glColor3f(clr.redF(), clr.greenF(), clr.blueF());
 		if (eMode == GL_SELECT)
 			glLoadName((GLuint)ID());
-	//	unsigned int idx = vcontroller::getFrame();
-		//QList<geometry_motion_result>* gmr = model::rs->geometryMotionResult(nm);
-// 		if (idx != 0 && gmr)
-// 		{
-// 
-// 			// 			if (gmr->size())
-// 			// 			{
-// 			geometry_motion_result gm = gmr->at(idx);
-// 			animationFrame(gm.p, gm.ep);
-// 			//			}
-// 			/*geometry_motion_result gmr = model::rs->geometryMotionResults()[nm].at(idx);
-// 			animationFrame(gmr.p, gmr.ep);*/
-// 		}
-// 		else
-// 		{
+		unsigned int idx = xvAnimationController::getFrame();
+		bool isplaymode = (xvAnimationController::Play() || xvAnimationController::getFrame()) && xvObject::pmrs;
+		if (isplaymode && xvObject::pmrs)
+		{
+			double t = 180 / M_PI;
+			unsigned int idx = xvAnimationController::getFrame();
+			xPointMass::pointmass_result pmr = xvObject::pmrs->at(idx);
+			glTranslated(pmr.pos.x, pmr.pos.y, pmr.pos.z);
+			vector3d euler = EulerParameterToEulerAngle(pmr.ep);
+			glRotated(t*euler.x, 0, 0, 1);
+			glRotated(t*euler.y, 1, 0, 0);
+			glRotated(t*euler.z, 0, 0, 1);
+			//qDebug() << euler.x << " " << euler.y << " " << euler.z;
+		}
+		else
+		{
 			glTranslated(pos.x, pos.y, pos.z);
 			glRotated(ang.x, 0, 0, 1);
 			glRotated(ang.y, 1, 0, 0);
 			glRotated(ang.z, 0, 0, 1);
-		//}
+		}
 		glCallList(glList);
 		if (isSelected)
 		{

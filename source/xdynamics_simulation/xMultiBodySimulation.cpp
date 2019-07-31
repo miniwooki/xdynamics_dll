@@ -51,6 +51,11 @@ void xMultiBodySimulation::SaveStepResult(unsigned int part, double ct)
 		xkc->SaveStepResult(part, ct, q, qd, lagMul, sr);
 		sr += xkc->NumConst();
 	}
+	foreach(xDrivingConstraint* xdc, xmbd->Drivings())
+	{
+		xdc->SaveStepResult(part, ct, q, qd, lagMul, sr);
+		sr++;
+	}
 }
 
 void xMultiBodySimulation::ExportResults(std::fstream& of)
@@ -115,6 +120,7 @@ int xMultiBodySimulation::Initialize(xMultiBodyModel* _xmbd)
 		xkc->setBaseBodyIndex(base_idx);
 		xkc->setActionBodyIndex(action_idx);
 		xkc->AllocResultMemory(xSimulation::npart);
+		//xkc->set
 	}
 	foreach(xDrivingConstraint* xdc, xmbd->Drivings())
 	{

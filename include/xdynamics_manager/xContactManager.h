@@ -42,6 +42,7 @@ public:
 	xParticleParticleContact* ContactParticles();// { return cpp; }
 	xParticleMeshObjectsContact* ContactParticlesMeshObjects();// { return cpmeshes; }
 	xParticlePlanesContact* ContactParticlesPlanes();
+	xParticleCylindersContact* ContactParticlesCylinders();
 
 	bool runCollision(
 		double *pos, double* cpos, double* ep, double *vel,
@@ -102,13 +103,16 @@ private:
 	unsigned int *d_pair_count_pp;
 	unsigned int *d_pair_count_ppl;
 	unsigned int *d_pair_count_ptri;
+	unsigned int *d_pair_count_pcyl;
 	unsigned int *d_pair_id_pp;
 	unsigned int *d_pair_id_ppl;
 	unsigned int *d_pair_id_ptri;
+	unsigned int *d_pair_id_pcyl;
 
 	double *d_tsd_pp;
 	double *d_tsd_ppl;
 	double *d_tsd_ptri;
+	double *d_tsd_pcyl;
 // 	unsigned int *d_old_pair_start;
 // 	unsigned int *d_pair_start;
 //	pair_data* d_pppd;

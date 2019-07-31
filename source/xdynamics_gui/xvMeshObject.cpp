@@ -208,7 +208,7 @@ void xvMeshObject::draw(GLenum eMode)
 		glPushMatrix();
 		unsigned int idx = xvAnimationController::getFrame();
 		bool isplaymode = (xvAnimationController::Play() || xvAnimationController::getFrame()) && xvObject::pmrs;
-		if (isplaymode)
+		if (isplaymode && xvObject::pmrs)
 		{
 			double t = 180 / M_PI;
 			unsigned int idx = xvAnimationController::getFrame();

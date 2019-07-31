@@ -13,6 +13,8 @@ class XDYNAMICS_API xParticlePlanesContact : public xContact
 	//enum polygonContactType { FACE = 0, VERTEX, EDGE };
 	struct host_plane_info
 	{
+		bool ismoving;
+		unsigned int mid;
 		double l1, l2;
 		vector3d u1;
 		vector3d u2;
@@ -54,6 +56,7 @@ public:
 	//void setZeroCollisionForce();
 	device_plane_info* devicePlaneInfo();
 	unsigned int NumPlanes();
+	void getPlaneContactForce();
 
 private:
 	
@@ -61,6 +64,7 @@ private:
 	double particle_plane_contact_detection(host_plane_info* _pe, vector3d& u, vector3d& xp, vector3d& wp, double r);
 	
 	unsigned int nplanes;
+	unsigned int nmoving;
 // 	unsigned int *d_old_pair_count;
 // 	unsigned int *d_pair_count;
 // 	unsigned int *d_old_pair_start;
@@ -70,6 +74,7 @@ private:
 	xMaterialPair* xmps;
 	host_plane_info* hpi;
 	device_plane_info* dpi;
+	device_body_info* dbi;
 	QMap<unsigned int, xPlaneObject*> pair_ip;
 
 	//device_plane_info *hpmi;

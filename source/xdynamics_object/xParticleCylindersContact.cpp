@@ -1,9 +1,11 @@
 #include "xdynamics_object/xParticleCylindersContact.h"
+#include "xdynamics_simulation/xSimulation.h"
 
 xParticleCylindersContact::xParticleCylindersContact()
 	: xContact()
 	, hci(NULL)
 	, dci(NULL)
+	, dbi(NULL)
 	, xmps(NULL)
 	, hcmp(NULL)
 {
@@ -16,6 +18,7 @@ xParticleCylindersContact::~xParticleCylindersContact()
 	if (xmps) delete[] xmps; xmps = NULL;
 	if (hci) delete[] hci; hci = NULL;
 	if (dci) checkCudaErrors(cudaFree(dci)); dci = NULL;
+	if (dbi) checkCudaErrors(cudaFree(dbi)); dbi = NULL;
 }
 
 void xParticleCylindersContact::define(unsigned int i, xParticleCylinderContact * d)
@@ -23,6 +26,8 @@ void xParticleCylindersContact::define(unsigned int i, xParticleCylinderContact 
 	xCylinderObject* c_ptr = d->CylinderObject();
 	xContactMaterialParameters cp = { 0, };
 	xMaterialPair xmp = { 0, };
+	if (c_ptr->MovingObject())
+		nmoving++;
 	cp.restitution = d->Restitution();
 	cp.stiffness_ratio = d->StiffnessRatio();
 	cp.friction = d->Friction();
@@ -34,6 +39,9 @@ void xParticleCylindersContact::define(unsigned int i, xParticleCylinderContact 
 	xmps[i] = xmp;
 	pair_ip[i] = c_ptr;
 	hci[i] = { 
+		c_ptr->MovingObject(),
+		c_ptr->MovingObject() ? nmoving - 1 : 0,
+		i,
 		c_ptr->cylinder_length(), 
 		c_ptr->cylinder_bottom_radius(), 
 		c_ptr->cylinder_top_radius(), 
@@ -53,6 +61,61 @@ void xParticleCylindersContact::allocHostMemory(unsigned int n)
 unsigned int xParticleCylindersContact::NumContact()
 {
 	return ncylinders;
+}
+
+void xParticleCylindersContact::updateCylinderObjectData()
+{
+	if (xSimulation::Gpu())
+	{
+		device_body_info *bi = new device_body_info[ncylinders];
+		for (unsigned int i = 0; i < ncylinders; i++)
+		{
+			xCylinderObject *c = pair_ip[i];
+			euler_parameters ep = c->EulerParameters(), ed = c->DEulerParameters();
+			bi[i] = {
+				c->Position().x, c->Position().y, c->Position().z,
+				c->Velocity().x, c->Velocity().y, c->Velocity().z,
+				0, 0, 0,
+				0, 0, 0,
+				ep.e0, ep.e1, ep.e2, ep.e3,
+				ed.e0, ed.e1, ed.e2, ed.e3
+			};
+		}
+		checkCudaErrors(cudaMemcpy(dbi, bi, sizeof(device_body_info) * ncylinders, cudaMemcpyHostToDevice));
+	}
+}
+
+void xParticleCylindersContact::getCylinderContactForce()
+{
+	if (nmoving)
+	{
+		device_body_info *hbi = new device_body_info[nmoving];
+		checkCudaErrors(cudaMemcpy(hbi, dbi, sizeof(device_body_info) * nmoving, cudaMemcpyDeviceToHost));
+		QMapIterator<unsigned int, xCylinderObject*> xcy(pair_ip);
+		while (xcy.hasNext())
+		{
+			xcy.next();
+			unsigned int id = xcy.key();
+			xCylinderObject* o = xcy.value();
+			if (o->MovingObject())
+			{
+				o->setContactForce(hbi[id].force.x, hbi[id].force.y, hbi[id].force.z);
+				o->setContactMoment(hbi[id].moment.x, hbi[id].moment.y, hbi[id].moment.z);
+			}
+
+		}
+		delete[] hbi;
+	}	
+}
+
+device_cylinder_info* xParticleCylindersContact::deviceCylinderInfo()
+{
+	return dci;
+}
+
+device_body_info * xParticleCylindersContact::deviceCylinderBodyInfo()
+{
+	return dbi;
 }
 
 double xParticleCylindersContact::particle_cylinder_contact_detection(
@@ -183,7 +246,8 @@ void xParticleCylindersContact::updateCollisionPair(
 	{
 		host_cylinder_info cinfo = hci[cnt++];
 		//xCylinderObject* c_ptr = pcyl->CylinderObject();
-		int id = c_ptr->ObjectID();
+		//int id = c_ptr->ObjectID();
+		unsigned int id = cinfo.id;
 		vector3d cpt = new_vector3d(0, 0, 0);
 		vector3d unit = new_vector3d(0, 0, 0);
 		bool isInnerContact = false;
@@ -195,7 +259,7 @@ void xParticleCylindersContact::updateCollisionPair(
 			if (xcpl.IsNewCylinderContactPair(id))
 			{
 				xPairData *pd = new xPairData;
-				*pd = { CYLINDER_SHAPE, true, 0, static_cast<unsigned int>(id), 0, 0, cpt.x, cpt.y, cpt.z, cdist, unit.x, unit.y, unit.z };
+				*pd = { CYLINDER_SHAPE, true, 0, id, 0, 0, cpt.x, cpt.y, cpt.z, cdist, unit.x, unit.y, unit.z };
 				xcpl.insertCylinderContactPair(pd);
 			}
 			else
@@ -239,7 +303,7 @@ void xParticleCylindersContact::updateCollisionPair(
 				if (xcpl.IsNewCylinderContactPair(id + 1000))
 				{
 					xPairData *pd = new xPairData;
-					*pd = { CYLINDER_SHAPE, true, 0, static_cast<unsigned int>(id + 1000), 0, 0, cpt.x, cpt.y, cpt.z, cdist, unit.x, unit.y, unit.z };
+					*pd = { CYLINDER_SHAPE, true, 0, id + 1000, 0, 0, cpt.x, cpt.y, cpt.z, cdist, unit.x, unit.y, unit.z };
 					xcpl.insertCylinderContactPair(pd);
 				}
 				else
@@ -331,6 +395,7 @@ bool xParticleCylindersContact::pcylCollision(
 	foreach(xPairData* d, pairs->CylinderPair())
 	{
 		unsigned int id = d->id >= 1000 ? d->id - 1000 : d->id;
+		xCylinderObject* cy = pair_ip[id];
 		xMaterialPair mpp = xmps[id];
 		xContactMaterialParameters cpp = hcmp[id];
 		vector3d m_fn = new_vector3d(0.0, 0.0, 0.0);
@@ -340,8 +405,10 @@ bool xParticleCylindersContact::pcylCollision(
 		vector3d u = new_vector3d(d->nx, d->ny, d->nz);
 		vector3d cpt = new_vector3d(d->cpx, d->cpy, d->cpz);
 		vector3d dcpr = cpt - cp;
+		vector3d dcpr_j = cpt - cy->Position();
+		vector3d oj = 2.0 * GMatrix(cy->EulerParameters) * cy->DEulerParameters();
 		//vector3d cp = r * u;
-		vector3d dv = -v - cross(o, dcpr);
+		vector3d dv = cy->Velocity() + cross(oj, dcpr_j) - (v + cross(o, dcpr));
 		//unsigned int jjjj = d->id;
 		//xContactMaterialParameters cmp = hcmp[d->id];
 		xContactParameters c = getContactParameters(
@@ -371,8 +438,12 @@ bool xParticleCylindersContact::pcylCollision(
 		/*if (cmp.cohesion && c.coh_s > d->gab)
 			d->isc = false;*/
 		RollingResistanceForce(c.rfric, r, 0.0, dcpr, m_fn, m_ft, R, T);
-		F += m_fn + m_ft;
-		M += cross(dcpr, m_fn + m_ft);
+		vector3d sum_force = m_fn + m_ft;
+		F += sum_force;
+		M += cross(dcpr, sum_force);
+		cy->addContactForce(-sum_force.x, -sum_force.y, -sum_force.z);
+		vector3d body_moment = -cross(dcpr_j, sum_force);
+		cy->addContactMoment(-body_moment.x, -body_moment.y, -body_moment.z);
 	}
 	return true;
 }

@@ -192,6 +192,10 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 			dp.nplane = xcm->ContactParticlesPlanes()->NumPlanes();
 		else
 			dp.nplane = 0;
+		if (xcm->ContactParticlesCylinders())
+			dp.ncylinder = xcm->ContactParticlesCylinders()->NumContact();
+		else
+			dp.ncylinder = 0;
 		dp.ncell = dtor->nCell();
 		dp.nTsdaConnection = nTsdaConnection;
 		dp.nTsdaConnectionList = nTsdaConnectionList;

@@ -63,7 +63,7 @@ void xvCylinder::draw(GLenum eMode)
 		if (eMode == GL_SELECT)
 			glLoadName((GLuint)ID());
 		bool isplaymode = (xvAnimationController::Play() || xvAnimationController::getFrame()) && xvObject::pmrs;
-		if (isplaymode)
+		if (isplaymode && xvObject::pmrs)
 		{
 			double t = 180 / M_PI;
 			unsigned int idx = xvAnimationController::getFrame();

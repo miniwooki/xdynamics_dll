@@ -16,12 +16,15 @@ xContactManager::xContactManager()
 	, d_pair_count_pp(NULL)
 	, d_pair_count_ppl(NULL)
 	, d_pair_count_ptri(NULL)
+	, d_pair_count_pcyl(NULL)
 	, d_pair_id_pp(NULL)
 	, d_pair_id_ppl(NULL)
 	, d_pair_id_ptri(NULL)
+	, d_pair_id_pcyl(NULL)
 	, d_tsd_pp(NULL)
 	, d_tsd_ppl(NULL)
 	, d_tsd_ptri(NULL)
+	, d_tsd_pcyl(NULL)
 	, d_Tmax(NULL)
 	, d_RRes(NULL)
 	, xcpl(NULL)
@@ -50,12 +53,15 @@ xContactManager::~xContactManager()
 	if (d_pair_count_pp) checkCudaErrors(cudaFree(d_pair_count_pp)); d_pair_count_pp = NULL;
 	if (d_pair_count_ppl) checkCudaErrors(cudaFree(d_pair_count_ppl)); d_pair_count_ppl = NULL;
 	if (d_pair_count_ptri) checkCudaErrors(cudaFree(d_pair_count_ptri)); d_pair_count_ptri = NULL;
+	if (d_pair_count_pcyl) checkCudaErrors(cudaFree(d_pair_count_pcyl)); d_pair_count_pcyl = NULL;
 	if (d_pair_id_pp) checkCudaErrors(cudaFree(d_pair_id_pp)); d_pair_id_pp = NULL;
 	if (d_pair_id_ppl) checkCudaErrors(cudaFree(d_pair_id_ppl)); d_pair_id_ppl = NULL;
 	if (d_pair_id_ptri) checkCudaErrors(cudaFree(d_pair_id_ptri)); d_pair_id_ptri = NULL;
+	if (d_pair_id_pcyl) checkCudaErrors(cudaFree(d_pair_id_pcyl)); d_pair_id_pcyl = NULL;
 	if (d_tsd_pp) checkCudaErrors(cudaFree(d_tsd_pp)); d_tsd_pp = NULL;
 	if (d_tsd_ppl) checkCudaErrors(cudaFree(d_tsd_ppl)); d_tsd_ppl = NULL;
 	if (d_tsd_ptri) checkCudaErrors(cudaFree(d_tsd_ptri)); d_tsd_ptri = NULL;
+	if (d_tsd_pcyl) checkCudaErrors(cudaFree(d_tsd_pcyl)); d_tsd_pcyl = NULL;
 	if (d_Tmax) checkCudaErrors(cudaFree(d_Tmax)); d_Tmax = NULL;
 	if (d_RRes) checkCudaErrors(cudaFree(d_RRes)); d_RRes = NULL;
 }
@@ -200,6 +206,11 @@ xParticlePlanesContact* xContactManager::ContactParticlesPlanes()
 	return cpplane;
 }
 
+xParticleCylindersContact* xContactManager::ContactParticlesCylinders()
+{
+	return cpcylinders;
+}
+
 bool xContactManager::runCollision(
 	double *pos, double* cpos, double* ep, double *vel, double *ev,
 	double *mass, double* inertia, double *force, double *moment,
@@ -247,6 +258,10 @@ void xContactManager::update()
 	{
 		cpplane->updataPlaneObjectData();
 	}
+	if (cpcylinders)
+	{
+		cpcylinders->updateCylinderObjectData();
+	}
 }
 
 void xContactManager::allocPairList(unsigned int np)
@@ -260,34 +275,44 @@ void xContactManager::allocPairList(unsigned int np)
 	}
 	else
 	{
-		checkCudaErrors(cudaMalloc((void**)&d_pair_count_pp, sizeof(unsigned int) * np));
-		checkCudaErrors(cudaMalloc((void**)&d_pair_count_ppl, sizeof(unsigned int) * np));
-		checkCudaErrors(cudaMalloc((void**)&d_pair_count_ptri, sizeof(unsigned int) * np));
-		checkCudaErrors(cudaMalloc((void**)&d_pair_id_pp, sizeof(unsigned int) * np * MAX_P2P_COUNT));
-		checkCudaErrors(cudaMalloc((void**)&d_pair_id_ppl, sizeof(unsigned int) * np * MAX_P2PL_COUNT));
-		checkCudaErrors(cudaMalloc((void**)&d_pair_id_ptri, sizeof(unsigned int) * np * MAX_P2MS_COUNT));
-		checkCudaErrors(cudaMalloc((void**)&d_tsd_pp, sizeof(double2) * np * MAX_P2P_COUNT));
-		checkCudaErrors(cudaMalloc((void**)&d_tsd_ppl, sizeof(double2) * np * MAX_P2PL_COUNT));
-		checkCudaErrors(cudaMalloc((void**)&d_tsd_ptri, sizeof(double2) * np * MAX_P2MS_COUNT));
-		// 		//checkCudaErrors(cudaMalloc((void**)&d_old_pair_count, sizeof(unsigned int) * np));
-		// 		//checkCudaErrors(cudaMalloc((void**)&d_pair_start, sizeof(unsigned int) * np));
-		// 		//checkCudaErrors(cudaMalloc((void**)&d_old_pair_start, sizeof(unsigned int) * np));
-		// 		//checkCudaErrors(cudaMalloc((void**)&d_type_count, sizeof(int) * np * 2));
+		if (cpp)
+		{
+			checkCudaErrors(cudaMalloc((void**)&d_pair_count_pp, sizeof(unsigned int) * np));
+			checkCudaErrors(cudaMalloc((void**)&d_pair_id_pp, sizeof(unsigned int) * np * MAX_P2P_COUNT));
+			checkCudaErrors(cudaMalloc((void**)&d_tsd_pp, sizeof(double2) * np * MAX_P2P_COUNT));
+			checkCudaErrors(cudaMemset(d_pair_count_pp, 0, sizeof(unsigned int) * np));
+			checkCudaErrors(cudaMemset(d_pair_id_pp, 0, sizeof(unsigned int) * np * MAX_P2P_COUNT));
+			checkCudaErrors(cudaMemset(d_tsd_pp, 0, sizeof(double2) * np * MAX_P2P_COUNT));
+		}
+		if (cpplane)
+		{
+			checkCudaErrors(cudaMalloc((void**)&d_pair_count_ppl, sizeof(unsigned int) * np));
+			checkCudaErrors(cudaMalloc((void**)&d_pair_id_ppl, sizeof(unsigned int) * np * MAX_P2PL_COUNT));
+			checkCudaErrors(cudaMalloc((void**)&d_tsd_ppl, sizeof(double2) * np * MAX_P2PL_COUNT));
+			checkCudaErrors(cudaMemset(d_pair_count_ppl, 0, sizeof(unsigned int) * np));
+			checkCudaErrors(cudaMemset(d_pair_id_ppl, 0, sizeof(unsigned int) * np * MAX_P2PL_COUNT));
+			checkCudaErrors(cudaMemset(d_tsd_ppl, 0, sizeof(double2) * np * MAX_P2PL_COUNT));
+		}
+		if (cpcylinders)
+		{
+			checkCudaErrors(cudaMalloc((void**)&d_pair_count_pcyl, sizeof(unsigned int) * np));
+			checkCudaErrors(cudaMalloc((void**)&d_pair_id_pcyl, sizeof(unsigned int) * np * MAX_P2CY_COUNT));
+			checkCudaErrors(cudaMalloc((void**)&d_tsd_pcyl, sizeof(double2) * np * MAX_P2CY_COUNT));
+			checkCudaErrors(cudaMemset(d_pair_count_pcyl, 0, sizeof(unsigned int) * np));
+			checkCudaErrors(cudaMemset(d_pair_id_pcyl, 0, sizeof(unsigned int) * np * MAX_P2CY_COUNT));
+			checkCudaErrors(cudaMemset(d_tsd_pcyl, 0, sizeof(double2) * np * MAX_P2CY_COUNT));
+		}
+		if (cpmeshes)
+		{
+			checkCudaErrors(cudaMalloc((void**)&d_pair_count_ptri, sizeof(unsigned int) * np));
+			checkCudaErrors(cudaMalloc((void**)&d_pair_id_ptri, sizeof(unsigned int) * np * MAX_P2MS_COUNT));
+			checkCudaErrors(cudaMalloc((void**)&d_tsd_ptri, sizeof(double2) * np * MAX_P2MS_COUNT));
+			checkCudaErrors(cudaMemset(d_pair_count_ptri, 0, sizeof(unsigned int) * np));
+			checkCudaErrors(cudaMemset(d_pair_id_ptri, 0, sizeof(unsigned int) * np * MAX_P2MS_COUNT));
+			checkCudaErrors(cudaMemset(d_tsd_ptri, 0, sizeof(double2) * np * MAX_P2MS_COUNT));
+		}
 		checkCudaErrors(cudaMalloc((void**)&d_Tmax, sizeof(double3) * np));
 		checkCudaErrors(cudaMalloc((void**)&d_RRes, sizeof(double) * np));
-		checkCudaErrors(cudaMemset(d_pair_count_pp, 0, sizeof(unsigned int) * np));
-		checkCudaErrors(cudaMemset(d_pair_count_ppl, 0, sizeof(unsigned int) * np));
-		checkCudaErrors(cudaMemset(d_pair_count_ptri, 0, sizeof(unsigned int) * np));
-		checkCudaErrors(cudaMemset(d_pair_id_pp, 0, sizeof(unsigned int) * np * MAX_P2P_COUNT));
-		checkCudaErrors(cudaMemset(d_pair_id_ppl, 0, sizeof(unsigned int) * np * MAX_P2PL_COUNT));
-		checkCudaErrors(cudaMemset(d_pair_id_ptri, 0, sizeof(unsigned int) * np * MAX_P2MS_COUNT));
-		checkCudaErrors(cudaMemset(d_tsd_pp, 0, sizeof(double2) * np * MAX_P2P_COUNT));
-		checkCudaErrors(cudaMemset(d_tsd_ppl, 0, sizeof(double2) * np * MAX_P2PL_COUNT));
-		checkCudaErrors(cudaMemset(d_tsd_ptri, 0, sizeof(double2) * np * MAX_P2MS_COUNT));
-		// 		//checkCudaErrors(cudaMalloc((void**)&d_old_pair_count, sizeof(unsigned int) * np));
-		// 		//checkCudaErrors(cudaMalloc((void**)&d_pair_start, sizeof(unsigned int) * np));
-		// 		//checkCudaErrors(cudaMalloc((void**)&d_old_pair_start, sizeof(unsigned int) * np));
-		// 		//checkCudaErrors(cudaMalloc((void**)&d_type_count, sizeof(int) * np * 2));
 		checkCudaErrors(cudaMemset(d_Tmax, 0, sizeof(double3) * np));
 		checkCudaErrors(cudaMemset(d_RRes, 0, sizeof(double) * np));
 	}
@@ -410,13 +435,25 @@ void xContactManager::deviceCollision(
 					ev, force, moment, mass,
 					d_Tmax, d_RRes, d_pair_count_ppl, d_pair_id_ppl, d_tsd_ppl,
 					np, cpplane->DeviceContactProperty());
+				cpplane->getPlaneContactForce();
 			}
+		}
+		if (cpcylinders)
+		{
+			if (cpcylinders->NumContact())
+			{
+				cu_cylinder_contact_force(1, cpcylinders->deviceCylinderInfo(), 
+					cpcylinders->deviceCylinderBodyInfo(), cpcylinders->DeviceContactProperty(),
+					pos, ep, vel, ev, force, moment, mass,
+					d_Tmax, d_RRes, d_pair_count_pcyl, d_pair_id_pcyl, d_tsd_pcyl, np);
+				cpcylinders->getCylinderContactForce();
+			}			
 		}
 		if (cpmeshes)
 		{
 			if (cpmeshes->NumContactObjects())
 			{
-				cpmeshes->updateMeshMassData();
+				//cpmeshes->updateMeshMassData();
 				cu_particle_polygonObject_collision(1, cpmeshes->deviceTrianglesInfo(), cpmeshes->devicePolygonObjectMassInfo(),
 					pos, ep, vel, ev, force, moment, mass,
 					d_Tmax, d_RRes, d_pair_count_ptri, d_pair_id_ptri, d_tsd_ptri, cpmeshes->SphereData(),

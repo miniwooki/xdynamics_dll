@@ -118,6 +118,10 @@ bool xDynamicsSimulator::xInitialize(
 			if (!checkXerror(xdem->Initialize(xdm->XDEMModel(), xdm->XContact())))
 				xLog::log("The initialization of discrete element method model was succeeded.");
 		}
+		if (xmbd)
+		{
+			xdem->updateObjectFromMBD();
+		}
 		//xdem->EnableSaveResultToMemory(exefromgui);
 	}
 	if (xsph)

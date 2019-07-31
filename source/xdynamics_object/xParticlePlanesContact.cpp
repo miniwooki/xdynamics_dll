@@ -2,6 +2,7 @@
 #include "xdynamics_object/xParticleCubeContact.h"
 #include "xdynamics_object/xPlaneObject.h"
 #include "xdynamics_object/xCubeObject.h"
+#include "xdynamics_simulation/xSimulation.h"
 // #include <thrust/scan.h>
 // #include <thrust/reduce.h>
 // #include <thrust/execution_policy.h>
@@ -14,6 +15,7 @@ xParticlePlanesContact::xParticlePlanesContact()
 	, nplanes(0)
 	, xmps(NULL)
 	, hcmp(NULL)
+	, dbi(NULL)
 // 	, d_pair_count(NULL)
 // 	, d_old_pair_start(NULL)
 // 	, d_pair_start(NULL)
@@ -28,6 +30,7 @@ xParticlePlanesContact::~xParticlePlanesContact()
 	if (xmps) delete[] xmps; xmps = NULL;
 	if (hpi) delete[] hpi; hpi = NULL;
 	if (dpi) checkCudaErrors(cudaFree(dpi)); dpi = NULL;
+	if (dbi) checkCudaErrors(cudaFree(dbi)); dbi = NULL;
 // 	if (d_pair_count) checkCudaErrors(cudaFree(d_pair_count)); d_pair_count = NULL;
 // 	if (d_old_pair_start) checkCudaErrors(cudaFree(d_old_pair_start)); d_old_pair_start = NULL;
 // 	if (d_pair_start) checkCudaErrors(cudaFree(d_pair_start)); d_pair_start = NULL;
@@ -38,6 +41,8 @@ xParticlePlanesContact::~xParticlePlanesContact()
 void xParticlePlanesContact::define(unsigned int id, xParticlePlaneContact* d)
 {
 	xPlaneObject *p = d->PlaneObject();
+	if (p->MovingObject())
+		nmoving++;
 	xContactMaterialParameters cp = { 0, };
 	xMaterialPair xmp = { 0, };
 	cp.restitution = d->Restitution();
@@ -51,6 +56,8 @@ void xParticlePlanesContact::define(unsigned int id, xParticlePlaneContact* d)
 	xmps[id] = xmp;
 	pair_ip[id] = p;
 	hpi[id] = {
+		p->MovingObject(),
+		p->MovingObject() ? nmoving - 1 : 0,
 		p->L1(), p->L2(),
 		p->U1(), p->U2(),
 		p->UW(), p->XW(),
@@ -78,6 +85,8 @@ void xParticlePlanesContact::define(unsigned int id, xParticleCubeContact* d)
 		xmps[id + i] = xmp;
 		pair_ip[id + i] = p;
 		hpi[id + i] = {
+			false,
+			0,
 			p->L1(), p->L2(),
 			p->U1(), p->U2(),
 			p->UW(), p->XW(),
@@ -97,6 +106,10 @@ void xParticlePlanesContact::allocHostMemory(unsigned int n)
 
 void xParticlePlanesContact::updataPlaneObjectData()
 {
+	unsigned int mcnt = 0;
+	device_body_info *bi = NULL;
+	if(nmoving)
+		bi = new device_body_info[nmoving];
 	QMapIterator<unsigned int, xPlaneObject*> it(pair_ip);
 	while (it.hasNext())
 	{
@@ -106,6 +119,8 @@ void xParticlePlanesContact::updataPlaneObjectData()
 		if (p->MovingObject())
 		{
 			host_plane_info new_hpi = { 0, };
+			new_hpi.ismoving = hpi[id].ismoving;
+			new_hpi.mid = hpi[id].mid;
 			new_hpi.xw = p->Position() + p->toGlobal(p->LocalPoint(0));
 			new_hpi.w2 = p->Position() + p->toGlobal(p->LocalPoint(1));
 			new_hpi.w3 = p->Position() + p->toGlobal(p->LocalPoint(2));
@@ -117,9 +132,25 @@ void xParticlePlanesContact::updataPlaneObjectData()
 			new_hpi.u1 = new_hpi.pa / new_hpi.l1;
 			new_hpi.u2 = new_hpi.pb / new_hpi.l2;
 			new_hpi.uw = cross(new_hpi.u1, new_hpi.u2);
-			checkCudaErrors(cudaMemcpy(dpi + id, &new_hpi, sizeof(device_plane_info), cudaMemcpyHostToDevice));
+			hpi[id] = new_hpi;
+			euler_parameters ep = p->EulerParameters(), ed = p->DEulerParameters();
+			bi[mcnt++] = {
+				p->Position().x, p->Position().y, p->Position().z,
+				p->Velocity().x, p->Velocity().y, p->Velocity().z,
+				0, 0, 0,
+				0, 0, 0,
+				ep.e0, ep.e1, ep.e2, ep.e3,
+				ed.e0, ed.e1, ed.e2, ed.e3
+			};
+			if(xSimulation::Gpu())
+				checkCudaErrors(cudaMemcpy(dpi + id, &new_hpi, sizeof(device_plane_info), cudaMemcpyHostToDevice));
 		}
 	}
+	if (xSimulation::Gpu() && nmoving)
+		checkCudaErrors(cudaMemcpy(dbi, bi, sizeof(device_body_info) * nmoving, cudaMemcpyHostToDevice));
+	if (nmoving)
+		delete[] bi; 
+	
 }
 
 device_plane_info* xParticlePlanesContact::devicePlaneInfo()
@@ -130,6 +161,29 @@ device_plane_info* xParticlePlanesContact::devicePlaneInfo()
 unsigned int xParticlePlanesContact::NumPlanes()
 {
 	return nplanes;
+}
+
+void xParticlePlanesContact::getPlaneContactForce()
+{
+	if (nmoving)
+	{
+		device_body_info *hbi = new device_body_info[nmoving];
+		checkCudaErrors(cudaMemcpy(hbi, dbi, sizeof(device_body_info) * nmoving, cudaMemcpyDeviceToHost));
+		QMapIterator<unsigned int, xPlaneObject*> xpl(pair_ip);
+		while (xpl.hasNext())
+		{
+			xpl.next();
+			unsigned int id = xpl.key();
+			xPlaneObject* o = xpl.value();
+			if (o->MovingObject())
+			{
+				o->setContactForce(hbi[id].force.x, hbi[id].force.y, hbi[id].force.z);
+				o->setContactMoment(hbi[id].moment.x, hbi[id].moment.y, hbi[id].moment.z);
+			}
+
+		}
+		delete[] hbi;
+	}
 }
 
 double xParticlePlanesContact::particle_plane_contact_detection(host_plane_info* _pe, vector3d& u, vector3d& xp, vector3d& wp, double r)
@@ -361,12 +415,14 @@ void xParticlePlanesContact::cudaMemoryAlloc(unsigned int np)
 	}
 	checkCudaErrors(cudaMalloc((void**)&dpi, sizeof(device_plane_info) * nplanes));
 	checkCudaErrors(cudaMalloc((void**)&dcp, sizeof(device_contact_property) * nplanes));
+	checkCudaErrors(cudaMalloc((void**)&dbi, sizeof(device_body_info) * nmoving));
 // 	checkCudaErrors(cudaMalloc((void**)&d_pair_count, sizeof(unsigned int) * np));
 // 	checkCudaErrors(cudaMalloc((void**)&d_old_pair_count, sizeof(unsigned int) * np));
 // 	checkCudaErrors(cudaMalloc((void**)&d_pair_start, sizeof(unsigned int) * np));
 // 	checkCudaErrors(cudaMalloc((void**)&d_old_pair_start, sizeof(unsigned int) * np));
 	checkCudaErrors(cudaMemcpy(dpi, hpi, sizeof(device_plane_info) * nplanes, cudaMemcpyHostToDevice));
 	checkCudaErrors(cudaMemcpy(dcp, _hcp, sizeof(device_contact_property) * nplanes, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemset(dbi, 0, sizeof(device_body_info) * nmoving));
 // 	checkCudaErrors(cudaMemset(d_pair_count, 0, sizeof(unsigned int) * np));
 // 	checkCudaErrors(cudaMemset(d_old_pair_count, 0, sizeof(unsigned int) * np));
 // 	checkCudaErrors(cudaMemset(d_pair_start, 0, sizeof(unsigned int) * np));

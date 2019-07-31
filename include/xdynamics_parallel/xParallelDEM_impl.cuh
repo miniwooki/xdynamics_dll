@@ -1288,55 +1288,154 @@ __device__ double3 toGlobal(double3& A_1, double3& A_2, double3& A_3, double3& v
 	return make_double3(dot(A_1, v), dot(A_2, v), dot(A_3, v));
 }
 
+__device__ void particle_cylinder_contact_force(
+	device_cylinder_info& dci,
+	device_contact_property& cp,
+	device_body_info& dpmi,
+	double3& ipos,
+	double3& ivel,
+	double3& iomega,
+	double3& cpt,
+	double3& unit,
+	double cdist,
+	unsigned int pid,
+	unsigned int old_count,
+	unsigned int* p_pair_id,
+	double2* p_tsd,
+	unsigned int* pair_id,
+	double2* tsd,
+	double r,
+	double m,
+	double3& sum_force,
+	double3& sum_moment,
+	double& res,
+	double3& tma,
+	double coh_s,
+	unsigned int& new_count)
+{
+	//device_triangle_info tri = dpi[dtci.id];
+	//double3 qp = tri.Q - tri.P;
+	//double3 rp = tri.R - tri.P;
+	////	double rcon = r - 0.5 * cdist;
+	//double3 unit = -cross(qp, rp);
+	//double3 dcpr = cpt - make_double3(icpos.x, icpos.y, icpos.z);
+	//double3 dcpr_j = cpt - make_double3(jcpos.x, jcpos.y, jcpos.z);
+	//unit = unit / length(unit);
+	double2 sd = make_double2(0.0, 0.0);
+	//unsigned int pidx = dpi[dtci.id].id;
+	//device_contact_property cmp = cp[pidx];
+	//device_mesh_mass_info pmi = dpmi[pidx];
+	//double3 cpt = closestPtPointTriangle(dpi[dtci.id], ipos, r, t);
+	double3 po2cp = cpt - dpmi.pos;
+	//double cdist = r - length(ipos - cpt);
+	/*if (cdist <= 0 && abs(cdist) < abs(coh_s))
+	{
+		double f = JKR_seperation_force(r, 0, cp->coh);
+		double cf = cohesionForce(r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, f);
+		sum_force = sum_force - cf * unit;
+		tsd[new_count] = sd;
+		pair_id[new_count] = dtci.id;
+		new_count++;
+		return;
+	}*/
+
+	double3 Fn = make_double3(0.0, 0.0, 0.0);
+	double3 Ft = make_double3(0, 0, 0);
+	double3 omega = toAngularVelocity(dpmi.ep, dpmi.ed);
+	for (unsigned int i = 0; i < old_count; i++)
+		if (p_pair_id[i] == pid) { sd = p_tsd[i]; break; }
+	double3 rc = r * unit;
+	double3 dv = dpmi.vel + cross(omega, po2cp) - (ivel + cross(iomega, rc));
+	device_force_constant c = getConstant(1, r, 0, m, 0, cp.Ei, cp.Ej, cp.pri, cp.prj, cp.Gi, cp.Gj, cp.rest, cp.fric, cp.rfric, cp.sratio);
+
+	switch (1)
+	{
+	case 1:	DHSModel(c, r, 0, cp.Ei, cp.Ej, cp.pri, cp.prj, cp.coh, cdist, iomega, sd.x, sd.y, dv, unit, Ft, Fn); break;
+	}
+	calculate_previous_rolling_resistance(cp.rfric, r, 0, rc, Fn, Ft, res, tma);
+	sum_force += Fn + Ft;
+	sum_moment += cross(rc, Fn + Ft);
+	dpmi.force += -(Fn + Ft);// +make_double3(1.0, 5.0, 9.0);
+	dpmi.moment += -cross(po2cp, Fn + Ft);
+	tsd[new_count] = sd;
+	pair_id[new_count] = pid;
+	new_count++;
+}
+
 __device__ float particle_cylinder_contact_detection(
-	device_cylinder_info* cy, double4& pt, double3& u, double3& cp, unsigned int id = 0)
+	device_cylinder_info& cy, 
+	device_body_info& bi,
+	double3& p, 
+	double3& u, 
+	double3& cp, 
+	double r,
+	bool isInnerContact)
 {
 	double dist = -1.0;
-	double3 ab = make_double3(cy->ptop.x - cy->pbase.x, cy->ptop.y - cy->pbase.y, cy->ptop.z - cy->pbase.z);
-	double3 p = make_double3(pt.x, pt.y, pt.z);
-	double t = dot(p - cy->pbase, ab) / dot(ab, ab);
+	double3 cyl_pos = bi.pos;// c_ptr->Position();
+	double4 cyl_ep = bi.ep;// c_ptr->EulerParameters();
+	double3 cyl_base = cyl_pos + toGlobal(cy.pbase, cyl_ep);
+	double3 cyl_top = cyl_pos + toGlobal(cy.ptop, cyl_ep);// cinfo.ptop);
+	double3 ab = cyl_top - cyl_base;// make_double3(cy->ptop.x - cy->pbase.x, cy->ptop.y - cy->pbase.y, cy->ptop.z - cy->pbase.z);
+	//double3 p = make_double3(pt.x, pt.y, pt.z);
+	double t = dot(p - cyl_base, ab) / dot(ab, ab);
 	double3 _cp = make_double3(0.0, 0.0, 0.0);
 	if (t >= 0 && t <= 1) {
-		_cp = cy->pbase + t * ab;
+		_cp = cyl_base + t * ab;
 		dist = length(p - _cp);
+		if (dist == 0)
+		{
+			isInnerContact = true;
+			return 0;
+		}
+		double gab = 0;
 		u = (_cp - p) / dist;
-		cp = _cp - cy->len_rr.z * u;
-		return cy->len_rr.y + pt.w - dist;
+		cp = _cp - cy.len_rr.z * u;
+		if (dist < cy.len_rr.z)
+		{
+			isInnerContact = true;
+			u = -u;
+			gab = dist + r - cy.len_rr.y;
+		}
+		else
+			gab = cy.len_rr.y + r - dist;
+		return gab;
 	}
 	else {
-
-		_cp = cy->pbase + t * ab;
+		_cp = cyl_base + t * ab;
 		dist = length(p - _cp);
-		if (dist < cy->len_rr.z) {
-			double3 OtoCp = cy->origin - _cp;
+		double thick = cy.thickness;
+		int one = thick ? 1 : 0;
+		if (dist < cy.len_rr.z + thick && dist > one * cy.len_rr.z) {
+			double3 OtoCp = bi.pos - _cp;
 			double OtoCp_ = length(OtoCp);
 			u = OtoCp / OtoCp_;
-			cp = _cp - cy->len_rr.z * u;
-			return cy->len_rr.x * 0.5 + pt.w - OtoCp_;
+			cp = _cp - cy.len_rr.z * u;
+			return cy.len_rr.x * 0.5 + r - OtoCp_;
 		}
-		double3 A_1 = makeTFM_1(cy->ep);
+	/*	double3 A_1 = makeTFM_1(cy->ep);
 		double3 A_2 = makeTFM_2(cy->ep);
-		double3 A_3 = makeTFM_3(cy->ep);
-		double3 _at = p - cy->ptop;
-		double3 at = toLocal(A_1, A_2, A_3, _at);
+		double3 A_3 = makeTFM_3(cy->ep);*/
+		double3 _at = p - cyl_top;
+		double3 at = toLocal(_at, cyl_ep);
 		//double r = length(at);
-		cp = cy->ptop;
-		if (abs(at.y) > cy->len_rr.x) {
-			_at = p - cy->pbase;
-			at = toLocal(A_1, A_2, A_3, _at);
-			cp = cy->pbase;
+		cp = cyl_top;
+		if (abs(at.y) > cy.len_rr.x) {
+			_at = p - cyl_base;
+			at = toLocal(_at, cyl_ep);
+			cp = cyl_base;
 		}
 		double pi = atan(at.x / at.z);
 		if (pi < 0 && at.z < 0) {
-			_cp.x = cy->len_rr.z * sin(-pi);
+			_cp.x = cy.len_rr.z * sin(-pi);
 		}
 		else if (pi > 0 && at.x < 0 && at.z < 0) {
-			_cp.x = cy->len_rr.z * sin(-pi);
+			_cp.x = cy.len_rr.z * sin(-pi);
 		}
 		else {
-			_cp.x = cy->len_rr.z * sin(pi);
+			_cp.x = cy.len_rr.z * sin(pi);
 		}
-		_cp.z = cy->len_rr.z * cos(pi);
+		_cp.z = cy.len_rr.z * cos(pi);
 		if (at.z < 0 && _cp.z > 0) {
 			_cp.z = -_cp.z;
 		}
@@ -1344,75 +1443,148 @@ __device__ float particle_cylinder_contact_detection(
 			_cp.z = -_cp.z;
 		}
 		_cp.y = 0.;
-		cp = cp + toGlobal(A_1, A_2, A_3, _cp);
+		cp = cp + toGlobal(_cp, cyl_ep);
 
 		double3 disVec = cp - p;
 		dist = length(disVec);
 		u = disVec / dist;
-		if (dist < pt.w) {
-			return pt.w - dist;
+		if (dist < r) {
+			return r - dist;
 		}
 	}
 	return -1.0;
 }
 
+__device__ double particle_cylinder_inner_base_or_top_contact_detection(
+	device_cylinder_info& cy, 
+	device_body_info& bi,
+	double3& p, double3 & u, double3 & cp, unsigned int empty, double r)
+{
+	//isInnerContact = false;
+	double dist = -1.0;
+	double3 cyl_pos = bi.pos;// c_ptr;// ->Position();
+	double4 cyl_ep = bi.ep;// .c_ptr->EulerParameters();
+	double3 cyl_base = cyl_pos + toGlobal(cy.pbase, cyl_ep);
+	double3 cyl_top = cyl_pos + toGlobal(cy.ptop, cyl_ep);
+	double3 ab = cyl_top - cyl_base;
+	//double3 p = new_vector3d(pt.x, pt.y, pt.z);
+	double t = dot(p - cyl_base, ab) / dot(ab, ab);
+	double3 _cp = make_double3(0.0, 0.0, 0.0);
+	double gab = -1.0;
+	_cp = cyl_base + t * ab;
+	dist = length(p - _cp);
+	if (empty == 0 && t > 0.6)
+		return 0.0;	
+	if (empty == 1 && t < 0.4)
+		return 0.0;
+	if (dist < cy.len_rr.z) {
+		double3 OtoCp = cyl_pos - _cp;
+		double OtoCp_ = length(OtoCp);
+		u = -OtoCp / OtoCp_;
+		cp = p + r * u;// _cp - hci.len_rr.z * u;
+		gab = r + OtoCp_ - cy.len_rr.x * 0.5;// +r - OtoCp_;
+	}
+
+	return gab;
+}
+
 template<int TCM>
-__global__ void cylinder_hertzian_contact_force_kernel(
-	device_cylinder_info *cy,
+__global__ void cylinder_contact_force_kernel(
+	device_cylinder_info *cy,device_body_info* bi,
 	double4* pos, double4 *ep, double3* vel, double4* ev,
 	double3* force, double3* moment, device_contact_property *cp,
-	double* mass, double3* mpos, double3* mf, double3* mm, unsigned int np)
+	double* mass, double3* tmax, double* rres,
+	unsigned int* pair_count, unsigned int* pair_id,
+	double2* tsd, unsigned int np)
 {
 	unsigned id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
 
 	if (id >= np)
 		return;
-
-	*mf = make_double3(0.0, 0.0, 0.0);
-	*mm = make_double3(0.0, 0.0, 0.0);
-	double cdist = 0.0;
-	double im = mass[id];
-	double4 ipos = make_double4(pos[id].x, pos[id].y, pos[id].z, pos[id].w);
-	double3 ivel = make_double3(vel[id].x, vel[id].y, vel[id].z);
-	double3 iomega = toAngularVelocity(ep[id], ev[id]);
-	double3 unit = make_double3(0.0, 0.0, 0.0);
-	double3 cpt = make_double3(0.0, 0.0, 0.0);
-	double3 mp = make_double3(mpos->x, mpos->y, mpos->z);
-	cdist = particle_cylinder_contact_detection(cy, ipos, unit, cpt, id);
-	double3 si = cpt - mp;
-	double3 cy2cp = cpt - cy->origin;
-	double3 Ft = make_double3(0.0, 0.0, 0.0);
-	double3 Fn = make_double3(0.0, 0.0, 0.0);
-	double3 M = make_double3(0.0, 0.0, 0.0);
-	double2 ds = make_double2(0.0, 0.0);
-	double3 rc = make_double3(0, 0, 0);
-	if (cdist > 0)
+	unsigned int p_pair_id[MAX_P2CY_COUNT];
+	double2 p_tsd[MAX_P2CY_COUNT];
+	unsigned int sid = id * MAX_P2CY_COUNT;
+	for (unsigned int i = 0; i < MAX_P2CY_COUNT; i++)
 	{
-		double rcon = ipos.w - 0.5 * cdist;
-		rc = ipos.w * unit;
-		double3 dv = cy->vel + cross(cy->omega, cy2cp) - (ivel + cross(iomega, ipos.w * unit));
-		device_force_constant c = getConstant(
-			TCM, ipos.w, 0, im, 0, cp->Ei, cp->Ej,
-			cp->pri, cp->prj, cp->Gi, cp->Gj,
-			cp->rest, cp->fric, cp->rfric, cp->sratio);
-		switch (TCM)
+		p_pair_id[i] = pair_id[sid + i];
+		p_tsd[i] = tsd[sid + i];
+	}
+	unsigned int old_count = pair_count[id];
+	double m = mass[id];
+	double4 ipos = pos[id];
+	double3 ipos3 = make_double3(ipos.x, ipos.y, ipos.z);
+	double r = ipos.w;
+	double3 ivel = vel[id];
+	double3 iomega = toAngularVelocity(ep[id], ev[id]);
+
+	double3 Fn = make_double3(0, 0, 0);
+	double3 Ft = make_double3(0, 0, 0);
+	double3 M = make_double3(0, 0, 0);
+
+	double3 sumF = make_double3(0.0, 0.0, 0.0);
+	double3 sumM = make_double3(0.0, 0.0, 0.0);
+	unsigned int new_count = sid;
+
+	double res = 0.0;
+	double3 tma = make_double3(0.0, 0.0, 0.0);
+	device_body_info dbi = { 0, };
+	double cdist = 0;
+	double3 cpt = make_double3(0.0, 0.0, 0.0);
+	for (unsigned int k = 0; k < cte.ncylinder; k++)
+	{
+		bool isInnerContact = false;
+		double coh_s = 0;
+		device_cylinder_info dci = cy[k];
+		if(dci.ismoving)
+			dbi = bi[dci.mid];
+		device_contact_property dcp = cp[k];
+		double3 unit = make_double3(0, 0, 0);
+		cdist = particle_cylinder_contact_detection(dci, dbi, ipos3, unit, cpt, r, isInnerContact);
+		//double cdist = particle_plane_contact_detection(pl, ipos3, wp, unit, r);
+		if (cp->coh)
+			coh_s = limit_cohesion_depth(r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh);
+		double2 sd = make_double2(0.0, 0.0);
+		if (cdist > 0)
 		{
-		case 0: HMCModel(
-			c, 0, 0, 0, 0, 0, 0, 0, rcon, cdist, iomega,
-			dv, unit, Ft, Fn, M);
-			break;
-		case 1:
-			DHSModel(
-				c, ipos.w, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, cdist, iomega, ds.x, ds.y,
-				dv, unit, Ft, Fn);
-			break;
+			particle_cylinder_contact_force(
+				dci, dcp, dbi, ipos3, ivel, iomega, cpt, unit, cdist, k,
+				old_count, p_pair_id, p_tsd, pair_id, tsd, r, m,
+				sumF, sumM, res, tma, coh_s, new_count);
+		}
+		else if (cdist <= 0 && abs(cdist) < abs(coh_s))
+		{
+			//printf("plane seperation cohesion contact. - %f", cdist);
+			double f = JKR_seperation_force(r, 0, cp->coh);
+			double cf = cohesionForce(r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, f);
+			//printf("f : %f, cf : %f\n", f, cf);
+			sumF = sumF - cf * unit;
+			tsd[new_count] = sd;
+			pair_id[new_count] = k;
+			new_count++;
+		}
+		if (isInnerContact)
+		{
+			cdist = particle_cylinder_inner_base_or_top_contact_detection(dci, dbi, ipos3, unit, cpt, dci.empty_part, r);
+			if (cdist > 0)
+			{
+				particle_cylinder_contact_force(
+					dci, dcp, dbi, ipos3, ivel, iomega, cpt, unit, cdist, k + 1000,
+					old_count, p_pair_id, p_tsd, pair_id, tsd, r, m,
+					sumF, sumM, res, tma, coh_s, new_count);
+			}
+			else if (cdist <= 0 && abs(cdist) < abs(coh_s))
+			{
+				//printf("plane seperation cohesion contact. - %f", cdist);
+				double f = JKR_seperation_force(r, 0, cp->coh);
+				double cf = cohesionForce(r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, f);
+				//printf("f : %f, cf : %f\n", f, cf);
+				sumF = sumF - cf * unit;
+				tsd[new_count] = sd;
+				pair_id[new_count] = k;
+				new_count++;
+			}
 		}
 	}
-	double3 sum_f = Fn + Ft;
-	force[id] += sum_f;
-	moment[id] += cross(rc, sum_f);// crossmake_double3(M.x, M.y, M.z);
-	mf[id] = -(Fn);
-	mm[id] = cross(si, -Fn);
 }
 
 template <typename T, unsigned int blockSize>
