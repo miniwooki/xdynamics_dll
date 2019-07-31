@@ -49,8 +49,8 @@ void xDrivingConstraint::define(xVectorD& q)
 	matrix33d Aj = GlobalTransformationMatrix(ej);
 	if (type == ROTATION_DRIVING)
 	{
-		vector3d fi = Ai * kconst->fi;// im->toGlobal(kconst->f_i());
-		vector3d fj = Aj * kconst->fj;
+		vector3d fi = Ai * kconst->Fi();// im->toGlobal(kconst->f_i());
+		vector3d fj = Aj * kconst->Fj();
 		init_v = acos(dot(fi, fj));
 
 	}
@@ -58,7 +58,7 @@ void xDrivingConstraint::define(xVectorD& q)
 	{
 		vector3d ri = new_vector3d(q(i + 0), q(i + 1), q(i + 2));
 		vector3d rj = new_vector3d(q(j + 0), q(j + 1), q(j + 2));
-		vector3d dij = (rj + Aj * kconst->spj) - (ri + Ai * kconst->spi);
+		vector3d dij = (rj + Aj * kconst->Spj()) - (ri + Ai * kconst->Spi());
 		init_v = length(dij);
 	}
 }
@@ -114,9 +114,9 @@ void xDrivingConstraint::ConstraintGamma(xVectorD& rhs, xVectorD& q, xVectorD& q
 	euler_parameters dej = new_euler_parameters(qd(j + 3), qd(j + 4), qd(j + 5), qd(j + 6));
 	matrix33d Ai = GlobalTransformationMatrix(ei);
 	matrix33d Aj = GlobalTransformationMatrix(ej);
-	vector3d fi = Ai * kconst->fi;
-	vector3d fj = Aj * kconst->fj;
-	vector3d gi = Ai * kconst->gi;
+	vector3d fi = Ai * kconst->Fi();
+	vector3d fj = Aj * kconst->Fj();
+	vector3d gi = Ai * kconst->Gi();
 	if (type == ROTATION_DRIVING)
 	{
 		double v = kconst->relative_rotation_constraintGamma(theta, ei, ej, dei, dej, fi, gi, fj);
@@ -124,9 +124,9 @@ void xDrivingConstraint::ConstraintGamma(xVectorD& rhs, xVectorD& q, xVectorD& q
 	}
 	else if (type == TRANSLATION_DRIVING)
 	{
-		vector3d dist = (rj + Aj * kconst->spj) - (ri + Ai * kconst->spi);// kconst->CurrentDistance();VEC3D fdij = kconst->CurrentDistance();
-		vector3d hi = Ai * kconst->hi;// im->toGlobal(kconst->h_i());
-		double v = kconst->relative_translation_constraintGamma(dist, hi, kconst->hi, vi, vj, ei, ej, dei, dej);
+		vector3d dist = (rj + Aj * kconst->Spj()) - (ri + Ai * kconst->Spi());// kconst->CurrentDistance();VEC3D fdij = kconst->CurrentDistance();
+		vector3d hi = Ai * kconst->Hi();// im->toGlobal(kconst->h_i());
+		double v = kconst->relative_translation_constraintGamma(dist, hi, kconst->Hi(), vi, vj, ei, ej, dei, dej);
 		rhs(sr) = mul * v;
 	}
 }
@@ -144,8 +144,8 @@ void xDrivingConstraint::ConstraintEquation(xVectorD& rhs, xVectorD& q, xVectorD
 	matrix33d Aj = kconst->ActionBody()->TransformationMatrix();//GlobalTransformationMatrix(ej);
 	if (type == TRANSLATION_DRIVING)
 	{
-		vector3d dist = (rj + Aj * kconst->spj) - (ri + Ai * kconst->spi);// kconst->CurrentDistance();
-		vector3d hi = Ai * kconst->hi;// kconst->iMass()->toGlobal(kconst->h_i());
+		vector3d dist = (rj + Aj * kconst->Spj()) - (ri + Ai * kconst->Spi());// kconst->CurrentDistance();
+		vector3d hi = Ai * kconst->Hi();// kconst->iMass()->toGlobal(kconst->h_i());
 		if (start_time > ct + plus_time)
 			v = dot(hi, dist) - (init_v + 0.0 * ct);
 		else
@@ -181,24 +181,24 @@ void xDrivingConstraint::ConstraintJacobian(xSparseD& lhs, xVectorD& q, xVectorD
 	int jc = (kconst->IndexActionBody() - 1) * xModel::OneDOF();
 	if (type == TRANSLATION_DRIVING)
 	{
-		vector3d dist = (rj + Aj * kconst->spj) - (ri + Ai * kconst->spi);// kconst->CurrentDistance();VEC3D fdij = kconst->CurrentDistance();
-		vector3d hi = Ai * kconst->hi;// im->toGlobal(kconst->h_i());
+		vector3d dist = (rj + Aj * kconst->Spj()) - (ri + Ai * kconst->Spi());// kconst->CurrentDistance();VEC3D fdij = kconst->CurrentDistance();
+		vector3d hi = Ai * kconst->Hi();// im->toGlobal(kconst->h_i());
 		if (i)
 		{
-			vector4d v = dist * BMatrix(ei, kconst->hi) - hi * BMatrix(ei, kconst->spi);
+			vector4d v = dist * BMatrix(ei, kconst->Hi()) - hi * BMatrix(ei, kconst->Spi());
 			lhs.insert(sr, ic, -hi, v);
 		}
 		if (j)
 		{
-			vector4d v = hi * BMatrix(ej, kconst->spj);
+			vector4d v = hi * BMatrix(ej, kconst->Spj());
 			lhs.insert(sr, jc, hi, v);
 		}
 	}
 	else if (type == ROTATION_DRIVING)
 	{
- 		vector3d fi = Ai * kconst->fi;
- 		vector3d fj = Aj * kconst->fj;
- 		vector3d gi = Ai * kconst->gi;
+ 		vector3d fi = Ai * kconst->Fi();
+ 		vector3d fj = Aj * kconst->Fj();
+ 		vector3d gi = Ai * kconst->Gi();
 		theta = RelativeAngle(ct, gi, fi, fj);
 	//	std::cout << "driving angle : " << theta << std::endl;
 		vector4d D1 = kconst->relative_rotation_constraintJacobian_e_i(theta, ei, ej, fj);
@@ -231,9 +231,9 @@ void xDrivingConstraint::DerivateJacobian(xMatrixD& lhs, xVectorD& q, xVectorD& 
 		euler_parameters ej = new_euler_parameters(q1[4], q1[5], q1[6], q1[7]);
 		matrix33d Ai = GlobalTransformationMatrix(ei);
 		matrix33d Aj = GlobalTransformationMatrix(ej);
-		vector3d Fi = Ai * kconst->fi;
-		vector3d Fj = Aj * kconst->fj;
-		vector3d Gi = Ai * kconst->gi;
+		vector3d Fi = Ai * kconst->Fi();
+		vector3d Fj = Aj * kconst->Fj();
+		vector3d Gi = Ai * kconst->Gi();
 		vector4d eq_i = kconst->relative_rotation_constraintJacobian_e_i(theta0, ei, ej, Fj);
 		vector4d eq_j = kconst->relative_rotation_constraintJacobian_e_j(theta0, ei, ej, Fi, Gi);
 		for (int i = 0; i < 8; i++)
@@ -244,9 +244,9 @@ void xDrivingConstraint::DerivateJacobian(xMatrixD& lhs, xVectorD& q, xVectorD& 
 			d[i] = 1.0 / (q1[i] - q0[i]);
 			Ai = GlobalTransformationMatrix(e[0]);
 			Aj = GlobalTransformationMatrix(e[1]);
-			Fi = Ai * kconst->fi;
-			Fj = Aj * kconst->fj;
-			Gi = Ai * kconst->gi;
+			Fi = Ai * kconst->Fi();
+			Fj = Aj * kconst->Fj();
+			Gi = Ai * kconst->Gi();
 			double th = RelativeAngle(ct, Gi, Fi, Fj);
 			eqi[i] = kconst->relative_rotation_constraintJacobian_e_i(th, e[0], e[1], Fj);
 			eqj[i] = kconst->relative_rotation_constraintJacobian_e_j(th, e[0], e[1], Fi, Gi);
@@ -303,8 +303,8 @@ void xDrivingConstraint::DerivateJacobian(xMatrixD& lhs, xVectorD& q, xVectorD& 
 		euler_parameters ej = kconst->ActionBody()->EulerParameters();//new_euler_parameters(q(j + 3), q(j + 4), q(j + 5), q(j + 6));
 		matrix33d Ai = kconst->BaseBody()->TransformationMatrix();//GlobalTransformationMatrix(ei);
 		matrix33d Aj = kconst->ActionBody()->TransformationMatrix();//GlobalTrans
-		vector3d dij = (rj + Aj * kconst->spj) - (ri + Ai * kconst->spi);
-		kconst->dot_2_differentialJacobian(lhs, kconst->hi, kconst->spi, kconst->spj, dij, ei, ej, mul * lm[0]);
+		vector3d dij = (rj + Aj * kconst->Spj()) - (ri + Ai * kconst->Spi());
+		kconst->dot_2_differentialJacobian(lhs, kconst->Hi(), kconst->Spi(), kconst->Spj(), dij, ei, ej, mul * lm[0]);
 	}
 }
 
@@ -325,18 +325,18 @@ void xDrivingConstraint::SaveStepResult(
 	double* lm = L + sr;
 	if (type == TRANSLATION_DRIVING)
 	{
-		vector3d dist = (rj + Aj * kconst->spj) - (ri + Ai * kconst->spi);// kconst->CurrentDistance();VEC3D fdij = kconst->CurrentDistance();
-		vector3d hi = Ai * kconst->hi;// im->toGlobal(kconst->h_i());
+		vector3d dist = (rj + Aj * kconst->Spj()) - (ri + Ai * kconst->Spi());// kconst->CurrentDistance();VEC3D fdij = kconst->CurrentDistance();
+		vector3d hi = Ai * kconst->Hi();// im->toGlobal(kconst->h_i());
 		if (i)
 		{
-			vector4d v = dist * BMatrix(ei, kconst->hi) - hi * BMatrix(ei, kconst->spi);
+			vector4d v = dist * BMatrix(ei, kconst->Hi()) - hi * BMatrix(ei, kconst->Spi());
 			kcr.iaforce = lm[0] * -hi;
 			kcr.irforce = 0.5 * LMatrix(ei) * (lm[0] * v);
 			//lhs.insert(sr, ic, -hi, v);
 		}
 		if (j)
 		{
-			vector4d v = hi * BMatrix(ej, kconst->spj);
+			vector4d v = hi * BMatrix(ej, kconst->Spj());
 			kcr.jaforce = lm[0] * hi;
 			kcr.jrforce = 0.5 * LMatrix(ej) * (lm[0] * v);
 			//lhs.insert(sr, jc, hi, v);
@@ -344,9 +344,9 @@ void xDrivingConstraint::SaveStepResult(
 	}
 	else if (type == ROTATION_DRIVING)
 	{
-		vector3d fi = Ai * kconst->fi;
-		vector3d fj = Aj * kconst->fj;
-		vector3d gi = Ai * kconst->gi;
+		vector3d fi = Ai * kconst->Fi();
+		vector3d fj = Aj * kconst->Fj();
+		vector3d gi = Ai * kconst->Gi();
 		theta = RelativeAngle(ct, gi, fi, fj);
 		//	std::cout << "driving angle : " << theta << std::endl;
 		vector4d D1 = kconst->relative_rotation_constraintJacobian_e_i(theta, ei, ej, fj);
@@ -366,7 +366,7 @@ void xDrivingConstraint::SaveStepResult(
 			//lhs.insert(sr, jc, zv, D2);*/
 	}
 	kcr.time = ct;
-	kcr.location = ri + Ai * kconst->spi;
+	kcr.location = ri + Ai * kconst->Spi();
 	kcrs.push_back(kcr);
 	nr_part++;
 }
@@ -377,9 +377,9 @@ void xDrivingConstraint::DerivateEquation(xVectorD& v, xVectorD& q, xVectorD& qd
 		return;
 	matrix33d TAi = Transpose(kconst->BaseBody()->TransformationMatrix());
 	matrix33d Aj = kconst->ActionBody()->TransformationMatrix();
-	vector3d fi = kconst->fi;
-	vector3d fj = kconst->fj;
-	vector3d gi = kconst->gi;
+	vector3d fi = kconst->Fi();
+	vector3d fj = kconst->Fj();
+	vector3d gi = kconst->Gi();
 	if (sr < 0)	sr = srow;
 	if (type == ROTATION_DRIVING)
 	{

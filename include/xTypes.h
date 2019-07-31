@@ -1,6 +1,8 @@
 #ifndef XTYPES_H
 #define XTYPES_H
 
+//#include "xdynamics_algebra/xAlgebraType.h"
+
 #define PATH_BUFFER_SIZE 512
 #define NAME_BUFFER_SIZE 64
 
@@ -273,6 +275,8 @@ typedef struct
 	xCorner c3;
 	bool inner;
 }xOverlapCorner;
+
+
 //
 //typedef struct
 //{

@@ -4,7 +4,7 @@
 #include "xdynamics_decl.h"
 #include "xdynamics_object/xKinematicConstraint.h"
 
-class xKinematicConstraint;
+//class xKinematicConstraint;
 
 class XDYNAMICS_API xDrivingConstraint
 {

@@ -406,7 +406,7 @@ bool xParticleCylindersContact::pcylCollision(
 		vector3d cpt = new_vector3d(d->cpx, d->cpy, d->cpz);
 		vector3d dcpr = cpt - cp;
 		vector3d dcpr_j = cpt - cy->Position();
-		vector3d oj = 2.0 * GMatrix(cy->EulerParameters) * cy->DEulerParameters();
+		vector3d oj = 2.0 * GMatrix(cy->EulerParameters()) * cy->DEulerParameters();
 		//vector3d cp = r * u;
 		vector3d dv = cy->Velocity() + cross(oj, dcpr_j) - (v + cross(o, dcpr));
 		//unsigned int jjjj = d->id;

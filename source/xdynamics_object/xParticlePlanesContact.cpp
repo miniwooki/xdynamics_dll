@@ -294,7 +294,7 @@ bool xParticlePlanesContact::cpplCollision(
 	}
 	foreach(xPairData* d, pairs->PlanePair())
 	{
-		
+		xPlaneObject* pl = pair_ip[d->id];
 		vector3d m_fn = new_vector3d(0.0, 0.0, 0.0);
 		vector3d m_m = new_vector3d(0.0, 0.0, 0.0);
 		vector3d m_ft = new_vector3d(0.0, 0.0, 0.0);
@@ -303,7 +303,9 @@ bool xParticlePlanesContact::cpplCollision(
 		vector3d cpt = new_vector3d(d->cpx, d->cpy, d->cpz);
 		vector3d dcpr = cpt - cp;
 		//vector3d cp = r * u;
-		vector3d dv = -v - cross(o, dcpr);
+		vector3d dcpr_j = cpt - pl->Position();
+		vector3d oj = 2.0 * GMatrix(pl->EulerParameters()) * pl->DEulerParameters();
+		vector3d dv = pl->Velocity() + cross(oj, dcpr_j) - (v + cross(o, dcpr));
 		//unsigned int jjjj = d->id;
 		xContactMaterialParameters cmp = hcmp[d->id];
 		xContactParameters c = getContactParameters(
@@ -333,8 +335,13 @@ bool xParticlePlanesContact::cpplCollision(
 		/*if (cmp.cohesion && c.coh_s > d->gab)
 			d->isc = false;*/
 		RollingResistanceForce(c.rfric, r, 0.0, dcpr, m_fn, m_ft, res, tmax);
-		F += m_fn + m_ft;
-		M += cross(dcpr, m_fn + m_ft);
+		vector3d sum_force = m_fn + m_ft;
+		F += sum_force;
+		M += cross(dcpr, sum_force);
+		pl->addContactForce(-sum_force.x, -sum_force.y, -sum_force.z);
+		vector3d body_moment = -cross(dcpr_j, sum_force);
+		pl->addContactMoment(-body_moment.x, -body_moment.y, -body_moment.z);
+
 	}
 	return true;
 }

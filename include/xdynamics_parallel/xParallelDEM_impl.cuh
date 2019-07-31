@@ -1362,14 +1362,14 @@ __device__ void particle_cylinder_contact_force(
 	new_count++;
 }
 
-__device__ float particle_cylinder_contact_detection(
+__device__ double particle_cylinder_contact_detection(
 	device_cylinder_info& cy, 
 	device_body_info& bi,
 	double3& p, 
 	double3& u, 
 	double3& cp, 
 	double r,
-	bool isInnerContact)
+	bool& isInnerContact)
 {
 	double dist = -1.0;
 	double3 cyl_pos = bi.pos;// c_ptr->Position();

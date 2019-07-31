@@ -4,7 +4,7 @@
 #include "xdynamics_decl.h"
 #include "xdynamics_manager/xModel.h"
 #include "xdynamics_object/xPointMass.h"
-#include "xdynamics_object/xDrivingConstraint.h"
+//#include "xdynamics_object/xDrivingConstraint.h"
 
 //typedef EXPORT_ALGEBRA_API xMatrixD matrixd;
 
@@ -12,7 +12,7 @@ class XDYNAMICS_API xKinematicConstraint
 {
 public:
 	enum cType{ FIXED = 0, SPHERICAL, REVOLUTE, TRANSLATIONAL, UNIVERSAL, CABLE, GEAR, COINCIDE };
-	typedef struct  
+	typedef struct
 	{
 		double time;
 		vector3d location;
@@ -34,6 +34,15 @@ public:
 	std::string ActionBodyName();
 	xPointMass* BaseBody();
 	xPointMass* ActionBody();
+	vector3d Location() { return location; }
+	vector3d Spi() { return spi; }
+	vector3d Spj() { return spj; }
+	vector3d Fi() { return fi; }
+	vector3d Fj() { return fj; }
+	vector3d Gi() { return gi; }
+	vector3d Gj() { return gj; }
+	vector3d Hi() { return hi; }
+	vector3d Hj() { return hj; }
 	void setBaseBodyIndex(int _i);
 	void setActionBodyIndex(int _j);
 	void AllocResultMemory(unsigned int _s);
@@ -50,7 +59,7 @@ public:
 	virtual void SaveStepResult(unsigned int part, double ct, xVectorD& q, xVectorD& qd, double* L, unsigned int sr) = 0;
 	virtual void GammaFunction(xVectorD& rhs, xVectorD& q, xVectorD& qd, unsigned int sr, double mul) = 0;
 
-protected:
+
 	matrix34d spherical_constraintJacobian_e(euler_parameters& e, vector3d& s);
 	void spherical_differentialJacobian(xMatrixD& lhs, vector3d& L);
 	vector3d spherical_constraintEquation(vector3d& ri, vector3d& rj, vector3d& si, vector3d& sj);
@@ -69,6 +78,7 @@ protected:
 	vector4d relative_rotation_constraintJacobian_e_i(double theta, euler_parameters& ei, euler_parameters& ej, vector3d& global_fj);
 	vector4d relative_rotation_constraintJacobian_e_j(double theta, euler_parameters& ei, euler_parameters& ej, vector3d& global_fi, vector3d& global_gi);
 
+protected:
 // 	vector3d relative_distance_constraintJacobian_r_i(euler_parameters& e);
 // 	vector3d relative_distance_constraintJacobian_r_j(euler_parameters& e);
 // 	vector4d relative_distance_constraintJacobian_e_i(vector3d& dist, vector3d& global_hi, euler_parameters& ei);
@@ -79,7 +89,7 @@ protected:
 	QVector<kinematicConstraint_result> kcrs;
 	unsigned int nConst;		// The number of constraint 
 	unsigned int nr_part;	
-	friend class xDrivingConstraint;
+	//friend class xDrivingConstraint;
 	int i, j;
 	xPointMass *i_ptr;
 	xPointMass *j_ptr;
