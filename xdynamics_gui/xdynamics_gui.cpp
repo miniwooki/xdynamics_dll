@@ -16,6 +16,7 @@
 
 xdynamics_gui* xgui;
 wsimulation* wsim;
+wresult* wrst = NULL;
 wpointmass* wpm;
 static xSimulationThread* sThread = NULL;
 
@@ -81,6 +82,7 @@ xdynamics_gui::xdynamics_gui(int _argc, char** _argv, QWidget *parent)
 	setAcceptDrops(true);
 	connect(xnavi, SIGNAL(definedSimulationWidget(wsimulation*)), this, SLOT(xGetSimulationWidget(wsimulation*)));
 	connect(xnavi, SIGNAL(definedPointMassWidget(wpointmass*)), this, SLOT(xGetPointMassWidget(wpointmass*)));
+	connect(xnavi, SIGNAL(definedResultWidget(wresut*)), this, SLOT(xGetResultWidget(wresult*)));
 	connect(xnavi, SIGNAL(InitializeWidgetStatement()), this, SLOT(xInitializeWidgetStatement()));
 	connect(xgl, SIGNAL(signalGeometrySelection(QString)), this, SLOT(xGeometrySelection(QString)));
 	connect(xgl, SIGNAL(releaseOperation()), this, SLOT(xReleaseOperation()));
@@ -112,6 +114,16 @@ void xdynamics_gui::xGetPointMassWidget(wpointmass* w)
 		wpm->UpdateInformation(xpm);
 	}
 	connect(w, SIGNAL(clickEnableConnectGeometry(bool)), this, SLOT(xOnGeometrySelectionOfPointMass()));
+}
+
+void xdynamics_gui::xGetResultWidget(wresult *w)
+{
+	wrst = w;
+	if (xdm->XDEMModel())
+	{
+		connect(w, SIGNAL(clickedApplyButton()), xgl, SLOT(setupParticleBufferColorDistribution(int)));
+	}
+	
 }
 
 xdynamics_gui::~xdynamics_gui()
@@ -604,6 +616,7 @@ void xdynamics_gui::xRecieveProgress(int pt, QString ch)
  			QString fileName;
 			fileName.sprintf("Part%04d", pt);
  			xgl->vParticles()->UploadParticleFromFile(pt, path + xModel::name + "/" + fileName + ".bin");
+			
 			QMapIterator<QString, xvParticle*> xps(xgl->ParticleObjects());
 			while (xps.hasNext())
 			{
@@ -618,6 +631,14 @@ void xdynamics_gui::xRecieveProgress(int pt, QString ch)
 			}
  		}
  		xvAnimationController::setTotalFrame(pt);
+		xgl->setupParticleBufferColorDistribution(pt);
+		if (wrst)
+		{
+			wrst->setMinMaxValue(
+				xgl->GetParticleMinValueFromColorMapType(),
+				xgl->GetParticleMaxValueFromColorMapType()
+			);
+		}
 	}
 	else if (pt == -1 && !ch.isEmpty())
 	{
@@ -795,8 +816,12 @@ void xdynamics_gui::xRunSimulationThread(double dt, unsigned int st, double et)
 	//xcw->write(xCommandWindow::CMD_INFO, QString("%1, %1, %1").arg(dt).arg(st).arg(et));
 	//xcw->write(xCommandWindow::CMD_INFO, "Thread Initialize Done.");
 	xvAnimationController::allocTimeMemory(xSimulation::npart);
-	if(xgl->vParticles())
+	if (xgl->vParticles())
+	{
 		xgl->vParticles()->setBufferMemories(xSimulation::npart);
+		xnavi->addChild(xModelNavigator::RESULT_ROOT, "Particles");
+	}
+		
 	foreach(xvParticle* xp, xgl->ParticleObjects())
 	{
 		if (xp->hasRelativePosition())

@@ -29,6 +29,7 @@
 #define DEG2RAD 0.017453292519943
 
 //GLuint makeCubeObject(int* index, float* vertex);
+class xColorControl;
 
 enum viewObjectType{
 	ALL_DISPLAY,
@@ -109,6 +110,8 @@ public:
 	//	bool changePaletteMode() { sketch.isSketching = sketch.isSketching ? false : true; return sketch.isSketching; }
 	void glObjectClear();
 	void sketchingMode();
+	float GetParticleMinValueFromColorMapType();
+	float GetParticleMaxValueFromColorMapType();
 
 	public slots:
 	void fitView();
@@ -117,6 +120,7 @@ public:
 	void setZRotation(int angle);
 	void ShowContextMenu(const QPoint& pos);
 	void setSketchSpace();
+	void setupParticleBufferColorDistribution(int n = -1);
 
 signals:
 	void xRotationChanged(int angle);
@@ -205,6 +209,7 @@ private:
 	float maxView[3];
 	//float up[3];
 	xvObject* selectedObject;
+	xColorControl* xcc;
 
 signals:
 	void changedAnimationFrame();

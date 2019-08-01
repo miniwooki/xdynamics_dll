@@ -4,12 +4,12 @@
 #include "xvGlew.h"
 #include "xvAnimationController.h"
 #include "xdynamics_algebra/xAlgebraType.h"
+#include "xColorControl.h"
 #include <QMap>
 #include <QFile>
 
-// QT_BEGIN_NAMESPACE
-// class QFile;
-// QT_END_NAMESPACE
+
+
 
 class xvParticle : public xvGlew
 {
@@ -52,6 +52,11 @@ public:
 	QMap<QString, particleGroupData>& ParticleGroupData() { return pgds; }
 
 	bool hasRelativePosition() { return r_pos != NULL; }
+	float* ColorBuffers();
+	float* PositionBuffers();
+	float* VelocityBuffers();
+	float getMinValue(xColorControl::ColorMapType cmt);
+	float getMaxValue(xColorControl::ColorMapType cmt);
 
 private:
 	bool _define();
@@ -79,6 +84,10 @@ private:
 	float min_position[3];
 	float max_velocity[3];
 	float min_velocity[3];
+	float max_position_mag;
+	float min_position_mag;
+	float max_velocity_mag;
+	float min_velocity_mag;
 	float pscale;
 	QMap<QString, particleGroupData> pgds;
 	shaderProgram program;

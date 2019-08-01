@@ -186,6 +186,7 @@ void xModelNavigator::clickAction(QTreeWidgetItem* w, int i)
 		{
 		case SHAPE_ROOT: CallShape(name); break;
 		case MASS_ROOT: CallPointMass(name); break;
+		case RESULT_ROOT: CallResultPart(); break;
 		case PARTICLE_ROOT: CallParticles(name); break;
 		}
 	}
@@ -197,7 +198,7 @@ void xModelNavigator::clickAction(QTreeWidgetItem* w, int i)
 		qDebug() << "Clicked item : " << tr << " - " << name;
 		switch (tr)
 		{
-		case PART_ROOT: break;
+		case PART_ROOT: break;		
 		case SIMULATION_ROOT: CallSimulation(); break;
 		}
 	}
@@ -278,7 +279,20 @@ void xModelNavigator::CallParticles(QString& n)
 
 void xModelNavigator::CallResultPart()
 {
-
+	wresult *xr = new wresult(plate);
+	xr->LE_LimitMin->setText("0.0");
+	xr->LE_LimitMax->setText("0.0");
+	xr->RB_UserInput->setChecked(false);
+	xr->RB_FromResult->setChecked(true);
+	//xws->LEEndTime->setText("0.0");
+	//xws->UpdateInformation();
+	////xws->setParent(plate);
+	plate_layout->addWidget(xr);
+	plate_layout->setAlignment(Qt::AlignTop);
+	plate_frame->setMaximumWidth(270);
+	plate_frame->setLayout(plate_layout);
+	plate->setWidget(plate_frame);
+	cwidget = RESULT_WIDGET;
 }
 
 void xModelNavigator::CallSimulation()

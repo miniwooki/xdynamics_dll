@@ -13,6 +13,7 @@
 #include "xvCylinder.h"
 #include "xvAnimationController.h"
 #include "xModelNavigator.h"
+#include "xColorControl.h"
 #include <QShortcut>
 
 #ifndef M_PI
@@ -25,6 +26,7 @@ xGLWidget* ogl;
 xGLWidget::xGLWidget(int argc, char** argv, QWidget *parent)
 	: QGLWidget(parent)
 	, vp(NULL)
+	, xcc(NULL)
 	, ground_marker(NULL)
 	, selectedObject(NULL)
 	, zRotationFlag(false)
@@ -71,6 +73,7 @@ xGLWidget::xGLWidget(int argc, char** argv, QWidget *parent)
 
 	QShortcut *a = new QShortcut(QKeySequence("Ctrl+F"), this);
 	connect(a, SIGNAL(activated()), this, SLOT(fitView()));
+	xcc = new xColorControl;
 }
 
 xGLWidget::~xGLWidget()
@@ -78,6 +81,7 @@ xGLWidget::~xGLWidget()
 	makeCurrent();
 	glDeleteLists(coordinate, 1);
 	glObjectClear();
+	if (xcc) delete xcc; xcc = NULL;
 }
 
 xGLWidget* xGLWidget::GLObject()
@@ -678,6 +682,32 @@ void xGLWidget::setSketchSpace()
 	//sketch.space = le->text().toDouble();
 }
 
+void xGLWidget::setupParticleBufferColorDistribution(int n)
+{
+	//xColorControl xcc;
+	if (vp)
+	{
+		unsigned int sframe = n < 0 ? 0 : xvAnimationController::getTotalBuffers();
+		unsigned int cframe = xvAnimationController::getTotalBuffers();
+		
+		xColorControl::ColorMapType cmt = xcc->Target();
+		if (!xcc->isUserLimitInput())
+			xcc->setMinMax(vp->getMinValue(cmt), vp->getMaxValue(cmt));
+		unsigned int m_np = vp->NumParticles();
+		for (unsigned int i = sframe; i < cframe - 1; i++)
+		{
+			unsigned int idx = m_np * i;
+			float *pbuf = vp->PositionBuffers() + idx * 4;
+			float *vbuf = vp->VelocityBuffers() + idx * 3;
+			float *cbuf = vp->ColorBuffers() + idx * 3;
+			for (unsigned int j = 0; j < m_np; j++)
+			{
+				xcc->getColorRamp(pbuf + j * 4, vbuf + j * 3, cbuf + j * 3);
+			}
+		}
+	}
+}
+
 void xGLWidget::sketchingMode()
 {
 	// 	glClearColor(0.5f, 0.5f, 0.5f, 0.5f);
@@ -755,6 +785,16 @@ void xGLWidget::sketchingMode()
 	//  	}
 	//  	glEnd();
 
+}
+
+float xGLWidget::GetParticleMinValueFromColorMapType()
+{
+	return vp->getMinValue(xcc->Target());
+}
+
+float xGLWidget::GetParticleMaxValueFromColorMapType()
+{
+	return vp->getMaxValue(xcc->Target());
 }
 
 void xGLWidget::paintGL()

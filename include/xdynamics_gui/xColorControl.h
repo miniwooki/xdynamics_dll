@@ -6,43 +6,52 @@
 
 class xColorControl
 {
-//public:
-//	enum ColorMapType { COLORMAP_PRESSURE = 0, COLORMAP_POSITION_X, COLORMAP_POSITION_Y, COLORMAP_POSITION_Z, COLORMAP_POSITION_MAG, COLORMAP_VELOCITY_X, COLORMAP_VELOCITY_Y, COLORMAP_VELOCITY_Z, COLORMAP_VELOCITY_MAG, COLORMAP_ENUMS/*, COLORMAP_VELOCITY_Y, COLORMAP_VELOCITY_Z*/ };
-//
-//	xColorControl();
-//	xColorControl(size_t _npart);
-//	~xColorControl();
-//
-//	void clearMemory();
-//	void setColormap(QColor *clist, double *lim);
-//	void initColormap(size_t npart);
-//	QColor getColor(int i) { return QColor(c[i][0], c[i][1], c[i][2]); }
-//	double getLimit(int i);// { return limits[i]; }
-//	void setTarget(colorMapTarget _cmt) { cmt = _cmt; }
-//	void setMinMax(size_t cpart, double v1, double v2, double v3, double v4, double v5, double v6, double v7, double v8);
-//	void getColorRamp(size_t c, double v, double *clr);
-//	void setLimitsFromMinMax();
-//	void setNumParts(size_t _npart) { npart = _npart; }
-//	ColorMapType target() { return cmt; }
-//
-//	static double* particleColorBySphType(unsigned int np, unsigned int* tp);
-//
-//private:
-//	static double* tmp_color;
-//	size_t npart;
-//	double *limits;
-//	double c[17][3];
-//	ColorMapType cmt;
-//
-//	double *min_vx;
-//	double *min_vy;
-//	double *min_vz;
-//	double *max_vx;
-//	double *max_vy;
-//	double *max_vz;
-//	double *min_p;
-//	double *max_p;
-//
+public:
+	enum ColorMapType { COLORMAP_NO_TYPE = 0, COLORMAP_POSITION_X, COLORMAP_POSITION_Y, COLORMAP_POSITION_Z, COLORMAP_POSITION_MAG, COLORMAP_VELOCITY_X, COLORMAP_VELOCITY_Y, COLORMAP_VELOCITY_Z, COLORMAP_VELOCITY_MAG, COLORMAP_ENUMS/*, COLORMAP_VELOCITY_Y, COLORMAP_VELOCITY_Z*/ };
+
+	xColorControl();
+	//xColorControl(size_t _npart);
+	~xColorControl();
+
+	//void clearMemory();
+	//void setColormap(QColor *clist, double *lim);
+	//void initColormap(double lmin, double lmax);
+	//QColor getColor(int i) { return QColor(c[i][0], c[i][1], c[i][2]); }
+	//double getLimit(int i);// { return limits[i]; }
+	static void setTarget(ColorMapType _cmt);// { cmt = _cmt; }
+	static ColorMapType Target();
+	static bool isUserLimitInput();
+	static void setMinMax(float lmin, float lmax);
+	void setLimitArray();
+	void getColorRamp(float* p, float* v, float* c);
+	//void setLimitsFromMinMax();
+	//void setNumParts(size_t _npart) { npart = _npart; }
+	//ColorMapType target() { return cmt; }
+
+	//static double* particleColorBySphType(unsigned int np, unsigned int* tp);
+	static void setUserLimitInputType(bool isu);
+
+private:
+	//static double* tmp_color;
+	static bool is_user_limit_input;
+	//size_t npart;
+	float limits[16];
+	float c[17][3];
+	static float min_v;
+	static float max_v;
+	static float range;
+	static float dv;
+	static ColorMapType cmt;
+
+	//double *min_vx;
+	//double *min_vy;
+	//double *min_vz;
+	//double *max_vx;
+	//double *max_vy;
+	//double *max_vz;
+	//double *min_p;
+	//double *max_p;
+
 };
 
 #endif

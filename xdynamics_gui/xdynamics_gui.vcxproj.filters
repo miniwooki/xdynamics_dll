@@ -37,6 +37,9 @@
     <Filter Include="Source Files\chart">
       <UniqueIdentifier>{c43f461a-9455-4775-908b-8db95e6ff0b9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\widget">
+      <UniqueIdentifier>{f94dedf1-79a3-4360-962e-c4a9a26b503b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -84,9 +87,6 @@
     <ClCompile Include="..\source\xdynamics_gui\xSimulationThread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\xdynamics_gui\xSimulationWidget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\source\xdynamics_gui\xvCylinder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -97,9 +97,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\source\xdynamics_gui\xLineEditWidget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\xdynamics_gui\xPointMassWidget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\source\xdynamics_gui\xChartAxis.cpp">
@@ -122,6 +119,18 @@
     </ClCompile>
     <ClCompile Include="..\source\xdynamics_gui\xChartDatabase.cpp">
       <Filter>Source Files\chart</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xColorControl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xPointMassWidget.cpp">
+      <Filter>Source Files\widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xSimulationWidget.cpp">
+      <Filter>Source Files\widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xResultWidget.cpp">
+      <Filter>Source Files\widget</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -167,6 +176,9 @@
     <QtMoc Include="..\include\xdynamics_gui\xChartDatabase.h">
       <Filter>Header Files\plot</Filter>
     </QtMoc>
+    <QtMoc Include="..\include\xdynamics_gui\xResultWidget.h">
+      <Filter>Header Files\widget</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="xdynamics_gui.ui">
@@ -188,6 +200,9 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="wpointmass.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="wresult.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
@@ -265,6 +280,9 @@
     </ClInclude>
     <ClInclude Include="..\include\xdynamics_gui\xColorControl.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_wresult.h">
+      <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

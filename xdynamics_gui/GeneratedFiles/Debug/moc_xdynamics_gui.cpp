@@ -21,8 +21,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_xdynamics_gui_t {
-    QByteArrayData data[25];
-    char stringdata0[359];
+    QByteArrayData data[27];
+    char stringdata0[385];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -43,28 +43,31 @@ QT_MOC_LITERAL(8, 55, 20), // "xGetSimulationWidget"
 QT_MOC_LITERAL(9, 76, 12), // "wsimulation*"
 QT_MOC_LITERAL(10, 89, 19), // "xGetPointMassWidget"
 QT_MOC_LITERAL(11, 109, 11), // "wpointmass*"
-QT_MOC_LITERAL(12, 121, 20), // "xRunSimulationThread"
-QT_MOC_LITERAL(13, 142, 21), // "xExitSimulationThread"
-QT_MOC_LITERAL(14, 164, 16), // "xRecieveProgress"
-QT_MOC_LITERAL(15, 181, 16), // "xEditCommandLine"
-QT_MOC_LITERAL(16, 198, 18), // "xGeometrySelection"
-QT_MOC_LITERAL(17, 217, 17), // "xReleaseOperation"
-QT_MOC_LITERAL(18, 235, 26), // "xInitializeWidgetStatement"
-QT_MOC_LITERAL(19, 262, 31), // "xOnGeometrySelectionOfPointMass"
-QT_MOC_LITERAL(20, 294, 21), // "xStopSimulationThread"
-QT_MOC_LITERAL(21, 316, 19), // "xContextMenuProcess"
-QT_MOC_LITERAL(22, 336, 2), // "nm"
-QT_MOC_LITERAL(23, 339, 15), // "contextMenuType"
-QT_MOC_LITERAL(24, 355, 3) // "vot"
+QT_MOC_LITERAL(12, 121, 16), // "xGetResultWidget"
+QT_MOC_LITERAL(13, 138, 8), // "wresult*"
+QT_MOC_LITERAL(14, 147, 20), // "xRunSimulationThread"
+QT_MOC_LITERAL(15, 168, 21), // "xExitSimulationThread"
+QT_MOC_LITERAL(16, 190, 16), // "xRecieveProgress"
+QT_MOC_LITERAL(17, 207, 16), // "xEditCommandLine"
+QT_MOC_LITERAL(18, 224, 18), // "xGeometrySelection"
+QT_MOC_LITERAL(19, 243, 17), // "xReleaseOperation"
+QT_MOC_LITERAL(20, 261, 26), // "xInitializeWidgetStatement"
+QT_MOC_LITERAL(21, 288, 31), // "xOnGeometrySelectionOfPointMass"
+QT_MOC_LITERAL(22, 320, 21), // "xStopSimulationThread"
+QT_MOC_LITERAL(23, 342, 19), // "xContextMenuProcess"
+QT_MOC_LITERAL(24, 362, 2), // "nm"
+QT_MOC_LITERAL(25, 365, 15), // "contextMenuType"
+QT_MOC_LITERAL(26, 381, 3) // "vot"
 
     },
     "xdynamics_gui\0xNew\0\0xSave\0xOpen\0"
     "xCylinder\0xCube\0xChart\0xGetSimulationWidget\0"
     "wsimulation*\0xGetPointMassWidget\0"
-    "wpointmass*\0xRunSimulationThread\0"
-    "xExitSimulationThread\0xRecieveProgress\0"
-    "xEditCommandLine\0xGeometrySelection\0"
-    "xReleaseOperation\0xInitializeWidgetStatement\0"
+    "wpointmass*\0xGetResultWidget\0wresult*\0"
+    "xRunSimulationThread\0xExitSimulationThread\0"
+    "xRecieveProgress\0xEditCommandLine\0"
+    "xGeometrySelection\0xReleaseOperation\0"
+    "xInitializeWidgetStatement\0"
     "xOnGeometrySelectionOfPointMass\0"
     "xStopSimulationThread\0xContextMenuProcess\0"
     "nm\0contextMenuType\0vot"
@@ -77,7 +80,7 @@ static const uint qt_meta_data_xdynamics_gui[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-      18,   14, // methods
+      19,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -85,24 +88,25 @@ static const uint qt_meta_data_xdynamics_gui[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,  104,    2, 0x08 /* Private */,
-       3,    0,  105,    2, 0x08 /* Private */,
-       4,    0,  106,    2, 0x08 /* Private */,
-       5,    0,  107,    2, 0x08 /* Private */,
-       6,    0,  108,    2, 0x08 /* Private */,
-       7,    0,  109,    2, 0x08 /* Private */,
-       8,    1,  110,    2, 0x08 /* Private */,
-      10,    1,  113,    2, 0x08 /* Private */,
-      12,    3,  116,    2, 0x08 /* Private */,
-      13,    0,  123,    2, 0x08 /* Private */,
-      14,    2,  124,    2, 0x08 /* Private */,
-      15,    0,  129,    2, 0x08 /* Private */,
-      16,    1,  130,    2, 0x08 /* Private */,
-      17,    0,  133,    2, 0x08 /* Private */,
-      18,    0,  134,    2, 0x08 /* Private */,
-      19,    0,  135,    2, 0x08 /* Private */,
-      20,    0,  136,    2, 0x08 /* Private */,
-      21,    2,  137,    2, 0x08 /* Private */,
+       1,    0,  109,    2, 0x08 /* Private */,
+       3,    0,  110,    2, 0x08 /* Private */,
+       4,    0,  111,    2, 0x08 /* Private */,
+       5,    0,  112,    2, 0x08 /* Private */,
+       6,    0,  113,    2, 0x08 /* Private */,
+       7,    0,  114,    2, 0x08 /* Private */,
+       8,    1,  115,    2, 0x08 /* Private */,
+      10,    1,  118,    2, 0x08 /* Private */,
+      12,    1,  121,    2, 0x08 /* Private */,
+      14,    3,  124,    2, 0x08 /* Private */,
+      15,    0,  131,    2, 0x08 /* Private */,
+      16,    2,  132,    2, 0x08 /* Private */,
+      17,    0,  137,    2, 0x08 /* Private */,
+      18,    1,  138,    2, 0x08 /* Private */,
+      19,    0,  141,    2, 0x08 /* Private */,
+      20,    0,  142,    2, 0x08 /* Private */,
+      21,    0,  143,    2, 0x08 /* Private */,
+      22,    0,  144,    2, 0x08 /* Private */,
+      23,    2,  145,    2, 0x08 /* Private */,
 
  // slots: parameters
     QMetaType::Void,
@@ -113,6 +117,7 @@ static const uint qt_meta_data_xdynamics_gui[] = {
     QMetaType::Void,
     QMetaType::Void, 0x80000000 | 9,    2,
     QMetaType::Void, 0x80000000 | 11,    2,
+    QMetaType::Void, 0x80000000 | 13,    2,
     QMetaType::Void, QMetaType::Double, QMetaType::UInt, QMetaType::Double,    2,    2,    2,
     QMetaType::Void,
     QMetaType::Void, QMetaType::Int, QMetaType::QString,    2,    2,
@@ -122,7 +127,7 @@ static const uint qt_meta_data_xdynamics_gui[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::QString, 0x80000000 | 23,   22,   24,
+    QMetaType::Void, QMetaType::QString, 0x80000000 | 25,   24,   26,
 
        0        // eod
 };
@@ -141,16 +146,17 @@ void xdynamics_gui::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _i
         case 5: _t->xChart(); break;
         case 6: _t->xGetSimulationWidget((*reinterpret_cast< wsimulation*(*)>(_a[1]))); break;
         case 7: _t->xGetPointMassWidget((*reinterpret_cast< wpointmass*(*)>(_a[1]))); break;
-        case 8: _t->xRunSimulationThread((*reinterpret_cast< double(*)>(_a[1])),(*reinterpret_cast< uint(*)>(_a[2])),(*reinterpret_cast< double(*)>(_a[3]))); break;
-        case 9: _t->xExitSimulationThread(); break;
-        case 10: _t->xRecieveProgress((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2]))); break;
-        case 11: _t->xEditCommandLine(); break;
-        case 12: _t->xGeometrySelection((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 13: _t->xReleaseOperation(); break;
-        case 14: _t->xInitializeWidgetStatement(); break;
-        case 15: _t->xOnGeometrySelectionOfPointMass(); break;
-        case 16: _t->xStopSimulationThread(); break;
-        case 17: _t->xContextMenuProcess((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< contextMenuType(*)>(_a[2]))); break;
+        case 8: _t->xGetResultWidget((*reinterpret_cast< wresult*(*)>(_a[1]))); break;
+        case 9: _t->xRunSimulationThread((*reinterpret_cast< double(*)>(_a[1])),(*reinterpret_cast< uint(*)>(_a[2])),(*reinterpret_cast< double(*)>(_a[3]))); break;
+        case 10: _t->xExitSimulationThread(); break;
+        case 11: _t->xRecieveProgress((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2]))); break;
+        case 12: _t->xEditCommandLine(); break;
+        case 13: _t->xGeometrySelection((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 14: _t->xReleaseOperation(); break;
+        case 15: _t->xInitializeWidgetStatement(); break;
+        case 16: _t->xOnGeometrySelectionOfPointMass(); break;
+        case 17: _t->xStopSimulationThread(); break;
+        case 18: _t->xContextMenuProcess((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< contextMenuType(*)>(_a[2]))); break;
         default: ;
         }
     }
@@ -185,13 +191,13 @@ int xdynamics_gui::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 18)
+        if (_id < 19)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 18;
+        _id -= 19;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 18)
+        if (_id < 19)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 18;
+        _id -= 19;
     }
     return _id;
 }

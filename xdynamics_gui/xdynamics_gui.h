@@ -18,6 +18,7 @@ class xCommandLine;
 //class xGLWidget;
 class wsimulation;
 class wpointmass;
+class wresult;
 class xChartWindow;
 //class xSimulationThread;
 
@@ -49,6 +50,7 @@ private slots:
 	void xChart();
 	void xGetSimulationWidget(wsimulation*);
 	void xGetPointMassWidget(wpointmass*);
+	void xGetResultWidget(wresult*);
 	void xRunSimulationThread(double, unsigned int, double);
 	void xExitSimulationThread();
 	void xRecieveProgress(int, QString);

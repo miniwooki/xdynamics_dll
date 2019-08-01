@@ -9,6 +9,7 @@
 #include "ui_wparticles.h"
 #include "xSimulationWidget.h"
 #include "xPointMassWidget.h"
+#include "xResultWidget.h"
 //#include "ui_wsimulation.h"
 //#include "xdynamics_gui.h"
 
@@ -77,7 +78,7 @@ class xModelNavigator : public QDockWidget
 
 public:
 	//enum tMotherRoot { OBJECT_ROOT = 0, RESULT_ROOT, SIMULATION_ROOT };
-	enum tWidget{ NO_WIDGET = 0, CUBE_WIDGET, PLANE_WIDGET, SIMULATION_WIDGET, POINTMASS_WIDGET, PARTICLE_WIDGET };
+	enum tWidget{ NO_WIDGET = 0, CUBE_WIDGET, PLANE_WIDGET, SIMULATION_WIDGET, POINTMASS_WIDGET, PARTICLE_WIDGET, RESULT_WIDGET };
 	enum tRoot { OBJECT_ROOT = 0, RESULT_ROOT, SIMULATION_ROOT, SHAPE_ROOT, MASS_ROOT, PARTICLE_ROOT, PART_ROOT };
 
 	xModelNavigator();

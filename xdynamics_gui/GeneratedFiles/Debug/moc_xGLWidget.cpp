@@ -21,8 +21,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_xGLWidget_t {
-    QByteArrayData data[18];
-    char stringdata0[243];
+    QByteArrayData data[20];
+    char stringdata0[282];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -48,7 +48,9 @@ QT_MOC_LITERAL(13, 182, 12), // "setYRotation"
 QT_MOC_LITERAL(14, 195, 12), // "setZRotation"
 QT_MOC_LITERAL(15, 208, 15), // "ShowContextMenu"
 QT_MOC_LITERAL(16, 224, 3), // "pos"
-QT_MOC_LITERAL(17, 228, 14) // "setSketchSpace"
+QT_MOC_LITERAL(17, 228, 14), // "setSketchSpace"
+QT_MOC_LITERAL(18, 243, 36), // "setupParticleBufferColorDistr..."
+QT_MOC_LITERAL(19, 280, 1) // "n"
 
     },
     "xGLWidget\0xRotationChanged\0\0angle\0"
@@ -57,7 +59,9 @@ QT_MOC_LITERAL(17, 228, 14) // "setSketchSpace"
     "releaseOperation\0contextSignal\0"
     "contextMenuType\0fitView\0setXRotation\0"
     "setYRotation\0setZRotation\0ShowContextMenu\0"
-    "pos\0setSketchSpace"
+    "pos\0setSketchSpace\0"
+    "setupParticleBufferColorDistribution\0"
+    "n"
 };
 #undef QT_MOC_LITERAL
 
@@ -67,7 +71,7 @@ static const uint qt_meta_data_xGLWidget[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-      13,   14, // methods
+      15,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -75,21 +79,23 @@ static const uint qt_meta_data_xGLWidget[] = {
        7,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    1,   79,    2, 0x06 /* Public */,
-       4,    1,   82,    2, 0x06 /* Public */,
-       5,    1,   85,    2, 0x06 /* Public */,
-       6,    0,   88,    2, 0x06 /* Public */,
-       7,    1,   89,    2, 0x06 /* Public */,
-       8,    0,   92,    2, 0x06 /* Public */,
-       9,    2,   93,    2, 0x06 /* Public */,
+       1,    1,   89,    2, 0x06 /* Public */,
+       4,    1,   92,    2, 0x06 /* Public */,
+       5,    1,   95,    2, 0x06 /* Public */,
+       6,    0,   98,    2, 0x06 /* Public */,
+       7,    1,   99,    2, 0x06 /* Public */,
+       8,    0,  102,    2, 0x06 /* Public */,
+       9,    2,  103,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-      11,    0,   98,    2, 0x0a /* Public */,
-      12,    1,   99,    2, 0x0a /* Public */,
-      13,    1,  102,    2, 0x0a /* Public */,
-      14,    1,  105,    2, 0x0a /* Public */,
-      15,    1,  108,    2, 0x0a /* Public */,
-      17,    0,  111,    2, 0x0a /* Public */,
+      11,    0,  108,    2, 0x0a /* Public */,
+      12,    1,  109,    2, 0x0a /* Public */,
+      13,    1,  112,    2, 0x0a /* Public */,
+      14,    1,  115,    2, 0x0a /* Public */,
+      15,    1,  118,    2, 0x0a /* Public */,
+      17,    0,  121,    2, 0x0a /* Public */,
+      18,    1,  122,    2, 0x0a /* Public */,
+      18,    0,  125,    2, 0x2a /* Public | MethodCloned */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::Int,    3,
@@ -106,6 +112,8 @@ static const uint qt_meta_data_xGLWidget[] = {
     QMetaType::Void, QMetaType::Int,    3,
     QMetaType::Void, QMetaType::Int,    3,
     QMetaType::Void, QMetaType::QPoint,   16,
+    QMetaType::Void,
+    QMetaType::Void, QMetaType::Int,   19,
     QMetaType::Void,
 
        0        // eod
@@ -130,6 +138,8 @@ void xGLWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, v
         case 10: _t->setZRotation((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 11: _t->ShowContextMenu((*reinterpret_cast< const QPoint(*)>(_a[1]))); break;
         case 12: _t->setSketchSpace(); break;
+        case 13: _t->setupParticleBufferColorDistribution((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 14: _t->setupParticleBufferColorDistribution(); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -215,13 +225,13 @@ int xGLWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 13)
+        if (_id < 15)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 13;
+        _id -= 15;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 13)
+        if (_id < 15)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 13;
+        _id -= 15;
     }
     return _id;
 }
