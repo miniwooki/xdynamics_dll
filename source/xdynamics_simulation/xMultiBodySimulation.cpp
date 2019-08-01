@@ -38,6 +38,14 @@ void xMultiBodySimulation::SetDEMSpringDamper(xSpringDamperForce* dem_t)
 	}
 }
 
+void xMultiBodySimulation::SetZeroBodyForce()
+{
+	foreach(xPointMass* xpm, xmbd->Masses())
+	{
+		xpm->setZeroAllForce();
+	}
+}
+
 void xMultiBodySimulation::SaveStepResult(unsigned int part, double ct)
 {
 	foreach(xPointMass* xpm, xmbd->Masses())

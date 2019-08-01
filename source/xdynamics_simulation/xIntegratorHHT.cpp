@@ -100,6 +100,7 @@ int xIntegratorHHT::OneStepSimulation(double ct, unsigned int cstep)
 
 void xIntegratorHHT::PredictionStep(double ct, unsigned int cstep)
 {
+	SetZeroBodyForce();
 	ConstructForceVector(pre);
 	ConstructContraintJacobian();
 	for (unsigned int i = 0; i < cjaco.NNZ(); i++)
