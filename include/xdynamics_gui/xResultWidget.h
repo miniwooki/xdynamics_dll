@@ -13,11 +13,13 @@ public:
 	void setMinMaxValue(float min, float max);
 
 signals:
-	void clickedApplyButton();
+	void clickedApplyButton(int);
+	void changedTargetCombo(int);
 
 private slots:
 	void ApplyButton();
 	void SelectRadioButton();
+	void ChangeTargetCombo(int);
 
 private:
 	bool is_user_input;// limit_input_type;

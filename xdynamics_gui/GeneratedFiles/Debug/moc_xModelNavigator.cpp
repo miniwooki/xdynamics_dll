@@ -134,8 +134,8 @@ int wview::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     return _id;
 }
 struct qt_meta_stringdata_xModelNavigator_t {
-    QByteArrayData data[9];
-    char stringdata0[144];
+    QByteArrayData data[11];
+    char stringdata0[173];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -150,14 +150,17 @@ QT_MOC_LITERAL(2, 40, 0), // ""
 QT_MOC_LITERAL(3, 41, 12), // "wsimulation*"
 QT_MOC_LITERAL(4, 54, 22), // "definedPointMassWidget"
 QT_MOC_LITERAL(5, 77, 11), // "wpointmass*"
-QT_MOC_LITERAL(6, 89, 25), // "InitializeWidgetStatement"
-QT_MOC_LITERAL(7, 115, 11), // "clickAction"
-QT_MOC_LITERAL(8, 127, 16) // "QTreeWidgetItem*"
+QT_MOC_LITERAL(6, 89, 19), // "definedResultWidget"
+QT_MOC_LITERAL(7, 109, 8), // "wresult*"
+QT_MOC_LITERAL(8, 118, 25), // "InitializeWidgetStatement"
+QT_MOC_LITERAL(9, 144, 11), // "clickAction"
+QT_MOC_LITERAL(10, 156, 16) // "QTreeWidgetItem*"
 
     },
     "xModelNavigator\0definedSimulationWidget\0"
     "\0wsimulation*\0definedPointMassWidget\0"
-    "wpointmass*\0InitializeWidgetStatement\0"
+    "wpointmass*\0definedResultWidget\0"
+    "wresult*\0InitializeWidgetStatement\0"
     "clickAction\0QTreeWidgetItem*"
 };
 #undef QT_MOC_LITERAL
@@ -168,28 +171,30 @@ static const uint qt_meta_data_xModelNavigator[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-       4,   14, // methods
+       5,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       3,       // signalCount
+       4,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    1,   34,    2, 0x06 /* Public */,
-       4,    1,   37,    2, 0x06 /* Public */,
-       6,    0,   40,    2, 0x06 /* Public */,
+       1,    1,   39,    2, 0x06 /* Public */,
+       4,    1,   42,    2, 0x06 /* Public */,
+       6,    1,   45,    2, 0x06 /* Public */,
+       8,    0,   48,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       7,    2,   41,    2, 0x08 /* Private */,
+       9,    2,   49,    2, 0x08 /* Private */,
 
  // signals: parameters
     QMetaType::Void, 0x80000000 | 3,    2,
     QMetaType::Void, 0x80000000 | 5,    2,
+    QMetaType::Void, 0x80000000 | 7,    2,
     QMetaType::Void,
 
  // slots: parameters
-    QMetaType::Void, 0x80000000 | 8, QMetaType::Int,    2,    2,
+    QMetaType::Void, 0x80000000 | 10, QMetaType::Int,    2,    2,
 
        0        // eod
 };
@@ -202,8 +207,9 @@ void xModelNavigator::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int 
         switch (_id) {
         case 0: _t->definedSimulationWidget((*reinterpret_cast< wsimulation*(*)>(_a[1]))); break;
         case 1: _t->definedPointMassWidget((*reinterpret_cast< wpointmass*(*)>(_a[1]))); break;
-        case 2: _t->InitializeWidgetStatement(); break;
-        case 3: _t->clickAction((*reinterpret_cast< QTreeWidgetItem*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 2: _t->definedResultWidget((*reinterpret_cast< wresult*(*)>(_a[1]))); break;
+        case 3: _t->InitializeWidgetStatement(); break;
+        case 4: _t->clickAction((*reinterpret_cast< QTreeWidgetItem*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
         default: ;
         }
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
@@ -221,6 +227,13 @@ void xModelNavigator::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int 
             default: *reinterpret_cast<int*>(_a[0]) = -1; break;
             case 0:
                 *reinterpret_cast<int*>(_a[0]) = qRegisterMetaType< wpointmass* >(); break;
+            }
+            break;
+        case 2:
+            switch (*reinterpret_cast<int*>(_a[1])) {
+            default: *reinterpret_cast<int*>(_a[0]) = -1; break;
+            case 0:
+                *reinterpret_cast<int*>(_a[0]) = qRegisterMetaType< wresult* >(); break;
             }
             break;
         }
@@ -241,9 +254,16 @@ void xModelNavigator::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int 
             }
         }
         {
+            using _t = void (xModelNavigator::*)(wresult * );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&xModelNavigator::definedResultWidget)) {
+                *result = 2;
+                return;
+            }
+        }
+        {
             using _t = void (xModelNavigator::*)();
             if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&xModelNavigator::InitializeWidgetStatement)) {
-                *result = 2;
+                *result = 3;
                 return;
             }
         }
@@ -279,13 +299,13 @@ int xModelNavigator::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 4)
+        if (_id < 5)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 4;
+        _id -= 5;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 4)
+        if (_id < 5)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 4;
+        _id -= 5;
     }
     return _id;
 }
@@ -305,9 +325,16 @@ void xModelNavigator::definedPointMassWidget(wpointmass * _t1)
 }
 
 // SIGNAL 2
+void xModelNavigator::definedResultWidget(wresult * _t1)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    QMetaObject::activate(this, &staticMetaObject, 2, _a);
+}
+
+// SIGNAL 3
 void xModelNavigator::InitializeWidgetStatement()
 {
-    QMetaObject::activate(this, &staticMetaObject, 2, nullptr);
+    QMetaObject::activate(this, &staticMetaObject, 3, nullptr);
 }
 QT_WARNING_POP
 QT_END_MOC_NAMESPACE

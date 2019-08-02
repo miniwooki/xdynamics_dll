@@ -178,7 +178,13 @@ void xModelNavigator::clickAction(QTreeWidgetItem* w, int i)
 	//RemovePlateWidget();
 	if (parent)
 	{
-		tRoot tr = roots.key(parent);
+		tRoot tr;// = roots.key(parent);
+		QList<QTreeWidgetItem*> witem = roots.values();
+		QList<QTreeWidgetItem*>::const_iterator it = qFind(witem, parent);
+		if (it == witem.end())
+			tr = mom_roots.key(parent);
+		else
+			tr = roots.key(parent);
 		QString name = w->text(i);
 		int type = w->data(i, (int)tr).toInt();
 		qDebug() << "Clicked item : " << tr << " - " << name;
@@ -280,10 +286,10 @@ void xModelNavigator::CallParticles(QString& n)
 void xModelNavigator::CallResultPart()
 {
 	wresult *xr = new wresult(plate);
-	xr->LE_LimitMin->setText("0.0");
-	xr->LE_LimitMax->setText("0.0");
-	xr->RB_UserInput->setChecked(false);
-	xr->RB_FromResult->setChecked(true);
+	//xr->LE_LimitMin->setText("0.0");
+	//xr->LE_LimitMax->setText("0.0");
+	//xr->RB_UserInput->setChecked(false);
+	//xr->RB_FromResult->setChecked(true);
 	//xws->LEEndTime->setText("0.0");
 	//xws->UpdateInformation();
 	////xws->setParent(plate);
@@ -293,6 +299,7 @@ void xModelNavigator::CallResultPart()
 	plate_frame->setLayout(plate_layout);
 	plate->setWidget(plate_frame);
 	cwidget = RESULT_WIDGET;
+	emit definedResultWidget(xr);
 }
 
 void xModelNavigator::CallSimulation()

@@ -11,13 +11,24 @@ wresult::wresult(QWidget* parent /* = NULL */)
 	connect(PB_Apply, SIGNAL(clicked()), this, SLOT(ApplyButton()));
 	connect(RB_UserInput, SIGNAL(clicked()), this, SLOT(SelectRadioButton()));
 	connect(RB_FromResult, SIGNAL(clicked()), this, SLOT(SelectRadioButton()));
+	connect(CB_Target, SIGNAL(currentIndexChanged(int)), this, SLOT(ChangeTargetCombo(int)));
 	float lmin = xColorControl::minimumLimit();
 	float lmax = xColorControl::maximumLimit();
 	LE_LimitMin->setText(QString("%1").arg(lmin));
 	LE_LimitMax->setText(QString("%1").arg(lmax));
 	xColorControl::ColorMapType cmt = xColorControl::Target();
 	CB_Target->setCurrentIndex((int)cmt);
-	xColorControl::isUserLimitInput() ? RB_UserInput->setChecked(true) : RB_UserInput->setChecked(false);
+	if (xColorControl::isUserLimitInput())
+	{
+		RB_UserInput->setChecked(true);
+		RB_FromResult->setChecked(false);
+	}
+	else
+	{
+		RB_UserInput->setChecked(false);
+		RB_FromResult->setChecked(true);
+	}
+	SelectRadioButton();
 }
 
 wresult::~wresult()
@@ -36,11 +47,13 @@ void wresult::SelectRadioButton()
 	bool isu = RB_UserInput->isChecked();
 	if (!isu)
 	{
-		PB_Apply->setEnabled(false);
+		LE_LimitMin->setReadOnly(false);
+		LE_LimitMax->setReadOnly(false);
 	}
 	else
 	{
-		PB_Apply->setEnabled(true);
+		LE_LimitMin->setReadOnly(true);
+		LE_LimitMax->setReadOnly(true);
 	}
 	isu ? xColorControl::setUserLimitInputType(true) : xColorControl::setUserLimitInputType(false);
 }
@@ -55,5 +68,11 @@ void wresult::ApplyButton()
 	double et = LEEndTime->text().toDouble();*/
 	bool isu = RB_UserInput->isChecked();
 	xColorControl::setUserLimitInputType(isu);
-	emit clickedApplyButton();
+	emit clickedApplyButton(-1);
+}
+
+void wresult::ChangeTargetCombo(int i)
+{
+	int cmt = CB_Target->currentIndex();
+	emit changedTargetCombo(cmt);
 }

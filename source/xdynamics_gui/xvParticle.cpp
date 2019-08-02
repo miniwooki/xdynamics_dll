@@ -316,41 +316,52 @@ bool xvParticle::UploadParticleFromFile(unsigned int i, QString path)
 	{
 		unsigned int s = j * 4;
 		unsigned int v = j * 3;
-		buffers[s + sid + 0] = static_cast<float>(_pos[s + 0]);
-		buffers[s + sid + 1] = static_cast<float>(_pos[s + 1]);
-		buffers[s + sid + 2] = static_cast<float>(_pos[s + 2]);
-		buffers[s + sid + 3] = static_cast<float>(_pos[s + 3]);
+		vector4f p = new_vector4f(
+			static_cast<float>(_pos[s + 0]),
+			static_cast<float>(_pos[s + 1]),
+			static_cast<float>(_pos[s + 2]),
+			static_cast<float>(_pos[s + 3]));
+		vector3f vv = new_vector3f(
+			static_cast<float>(_vel[v + 0]),
+			static_cast<float>(_vel[v + 1]),
+			static_cast<float>(_vel[v + 2]));
+		s += sid;
+		v += vid;
+		buffers[s + 0] = p.x;// static_cast<float>(_pos[s + 0]);
+		buffers[s + 1] = p.y;// static_cast<float>(_pos[s + 1]);
+		buffers[s + 2] = p.z;// static_cast<float>(_pos[s + 2]);
+		buffers[s + 3] = p.w;// static_cast<float>(_pos[s + 3]);
 
-		vbuffers[v + vid + 0] = static_cast<float>(_vel[v + 0]);
-		vbuffers[v + vid + 1] = static_cast<float>(_vel[v + 1]);
-		vbuffers[v + vid + 2] = static_cast<float>(_vel[v + 2]);
+		vbuffers[v + 0] = vv.x;// static_cast<float>(_vel[v + 0]);
+		vbuffers[v + 1] = vv.y;// static_cast<float>(_vel[v + 1]);
+		vbuffers[v + 2] = vv.z;// static_cast<float>(_vel[v + 2]);
 
-		if (max_position[0] < buffers[s + 0]) max_position[0] = buffers[s + 0];
-		if (max_position[1] < buffers[s + 1]) max_position[1] = buffers[s + 1];
-		if (max_position[2] < buffers[s + 2]) max_position[2] = buffers[s + 2];
+		if (max_position[0] < p.x) max_position[0] = p.x;// buffers[s + 0];
+		if (max_position[1] < p.y) max_position[1] = p.y;// buffers[s + 1];
+		if (max_position[2] < p.z) max_position[2] = p.z;// buffers[s + 2];
 
-		if (min_position[0] > buffers[s + 0]) min_position[0] = buffers[s + 0];
-		if (min_position[1] > buffers[s + 1]) min_position[1] = buffers[s + 1];
-		if (min_position[2] > buffers[s + 2]) min_position[2] = buffers[s + 2];
+		if (min_position[0] > p.x) min_position[0] = p.x;// buffers[s + sid + 0];
+		if (min_position[1] > p.y) min_position[1] = p.y;// buffers[s + sid + 1];
+		if (min_position[2] > p.z) min_position[2] = p.z;// buffers[s + sid + 2];
 
-		if (max_velocity[0] < vbuffers[v + 0]) max_velocity[0] = vbuffers[v + 0];
-		if (max_velocity[1] < vbuffers[v + 1]) max_velocity[1] = vbuffers[v + 1];
-		if (max_velocity[2] < vbuffers[v + 2]) max_velocity[2] = vbuffers[v + 2];
+		if (max_velocity[0] < vv.x) max_velocity[0] = vv.x;// vbuffers[v + vid + 0];
+		if (max_velocity[1] < vv.y) max_velocity[1] = vv.y;// vbuffers[v + vid + 1];
+		if (max_velocity[2] < vv.z) max_velocity[2] = vv.z;// vbuffers[v + vid + 2];
 
-		if (min_velocity[0] > vbuffers[v + 0]) min_velocity[0] = vbuffers[v + 0];
-		if (min_velocity[1] > vbuffers[v + 0]) min_velocity[1] = vbuffers[v + 1];
-		if (min_velocity[2] > vbuffers[v + 0]) min_velocity[2] = vbuffers[v + 2];
+		if (min_velocity[0] > vv.x) min_velocity[0] = vv.x;// vbuffers[v + vid + 0];
+		if (min_velocity[1] > vv.y) min_velocity[1] = vv.y;// vbuffers[v + vid + 1];
+		if (min_velocity[2] > vv.z) min_velocity[2] = vv.z;// vbuffers[v + vid + 2];
 
-		float p_mag = sqrt(buffers[s + 0] * buffers[s + 0] + buffers[s + 1] * buffers[s + 1] + buffers[s + 2] * buffers[s + 2]);
-		float v_mag = sqrt(vbuffers[v + 0] * vbuffers[v + 0] + vbuffers[v + 1] * vbuffers[v + 1] + vbuffers[v + 2] * vbuffers[v + 2]);
+		float p_mag = sqrt(p.x * p.x + p.y * p.y + p.z * p.z);
+		float v_mag = sqrt(vv.x * vv.x + vv.y * vv.y + vv.z * vv.z);// [v + 0] * vbuffers[v + 0] + vbuffers[v + 1] * vbuffers[v + 1] + vbuffers[v + 2] * vbuffers[v + 2]);
 		if (max_position_mag < p_mag) max_position_mag = p_mag;
 		if (min_position_mag > p_mag) min_position_mag = p_mag;
 		if (max_velocity_mag < v_mag) max_velocity_mag = v_mag;
 		if (min_velocity_mag > v_mag) min_velocity_mag = v_mag;
-		color_buffers[s + sid + 0] = 0.0f;
-		color_buffers[s + sid + 1] = 0.0f;
-		color_buffers[s + sid + 2] = 1.0f;
-		color_buffers[s + sid + 3] = 1.0f;
+		color_buffers[s + 0] = 0.0f;
+		color_buffers[s + 1] = 0.0f;
+		color_buffers[s + 2] = 1.0f;
+		color_buffers[s + 3] = 1.0f;
 
 
 	}
@@ -440,14 +451,14 @@ float xvParticle::getMinValue(xColorControl::ColorMapType cmt)
 	float v = 0.0;
 	switch (cmt)
 	{
-	case xColorControl::COLORMAP_POSITION_X: v = min_position[0];
-	case xColorControl::COLORMAP_POSITION_Y: v = min_position[1];
-	case xColorControl::COLORMAP_POSITION_Z: v = min_position[2];
-	case xColorControl::COLORMAP_VELOCITY_X: v = min_velocity[0];
-	case xColorControl::COLORMAP_VELOCITY_Y: v = min_velocity[1];
-	case xColorControl::COLORMAP_VELOCITY_Z: v = min_velocity[2];
-	case xColorControl::COLORMAP_POSITION_MAG: v = min_position_mag;
-	case xColorControl::COLORMAP_VELOCITY_MAG: v = min_velocity_mag;
+	case xColorControl::COLORMAP_POSITION_X: v = min_position[0]; break;
+	case xColorControl::COLORMAP_POSITION_Y: v = min_position[1]; break;
+	case xColorControl::COLORMAP_POSITION_Z: v = min_position[2]; break;
+	case xColorControl::COLORMAP_VELOCITY_X: v = min_velocity[0]; break;
+	case xColorControl::COLORMAP_VELOCITY_Y: v = min_velocity[1]; break;
+	case xColorControl::COLORMAP_VELOCITY_Z: v = min_velocity[2]; break;
+	case xColorControl::COLORMAP_POSITION_MAG: v = min_position_mag; break;
+	case xColorControl::COLORMAP_VELOCITY_MAG: v = min_velocity_mag; break;
 	}
 	return v;
 }
@@ -457,14 +468,14 @@ float xvParticle::getMaxValue(xColorControl::ColorMapType cmt)
 	float v = 0.0;
 	switch (cmt)
 	{
-	case xColorControl::COLORMAP_POSITION_X: v = max_position[0];
-	case xColorControl::COLORMAP_POSITION_Y: v = max_position[1];
-	case xColorControl::COLORMAP_POSITION_Z: v = max_position[2];
-	case xColorControl::COLORMAP_VELOCITY_X: v = max_velocity[0];
-	case xColorControl::COLORMAP_VELOCITY_Y: v = max_velocity[1];
-	case xColorControl::COLORMAP_VELOCITY_Z: v = max_velocity[2];
-	case xColorControl::COLORMAP_POSITION_MAG: v = max_position_mag;
-	case xColorControl::COLORMAP_VELOCITY_MAG: v = max_velocity_mag;
+	case xColorControl::COLORMAP_POSITION_X: v = max_position[0]; break;
+	case xColorControl::COLORMAP_POSITION_Y: v = max_position[1]; break;
+	case xColorControl::COLORMAP_POSITION_Z: v = max_position[2]; break;
+	case xColorControl::COLORMAP_VELOCITY_X: v = max_velocity[0]; break;
+	case xColorControl::COLORMAP_VELOCITY_Y: v = max_velocity[1]; break;
+	case xColorControl::COLORMAP_VELOCITY_Z: v = max_velocity[2]; break;
+	case xColorControl::COLORMAP_POSITION_MAG: v = max_position_mag; break;
+	case xColorControl::COLORMAP_VELOCITY_MAG: v = max_velocity_mag; break;
 	}
 	return v;
 }

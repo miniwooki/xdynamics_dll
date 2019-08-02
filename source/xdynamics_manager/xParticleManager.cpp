@@ -13,6 +13,7 @@ xParticleManager::xParticleManager()
 	, minimum_particle_density(FLT_MAX)
 	, maximum_youngs_modulus(-FLT_MAX)
 	, minimum_poisson_ratio(FLT_MAX)
+	, minimum_radius(FLT_MAX)
 	/*, isCluster(NULL)
 	, cluster_index(NULL)
 	, cluster_count(NULL)
@@ -62,6 +63,11 @@ double xParticleManager::CriticalPoisson()
 double xParticleManager::CriticalYoungs()
 {
 	return maximum_youngs_modulus;
+}
+
+double xParticleManager::CriticalRadius()
+{
+	return minimum_radius;
 }
 
 //unsigned int xParticleManager::NumClusterSet()
@@ -243,6 +249,7 @@ xParticleObject * xParticleManager::CreateLineParticle(std::string n, xMaterialT
 			vector3d p = sp + i * (diameter + space) * dir;
 			pos[i] = new_vector4d(p.x, p.y, p.z, r);
 		}
+		if (minimum_radius > d.minr) minimum_radius = d.minr;
 	}
 	//xpo->set
 	SetMassAndInertia(xpo);
@@ -276,6 +283,7 @@ xParticleObject* xParticleManager::CreateParticleFromList(
 		max_r = max(max_r, d[i].w);
 		ms[i] = m[i];
 	}
+	if (minimum_radius > min_r) minimum_radius = min_r;
 	xpo->setMinRadius(min_r);
 	xpo->setMaxRadius(max_r);
 	SetMassAndInertia(xpo);
@@ -441,6 +449,7 @@ xParticleObject* xParticleManager::CreateCubeParticle(
 				}
 			}
 		}
+		if (minimum_radius > d.minr) minimum_radius = d.minr;
 	}
 	//xpo->set
 	SetMassAndInertia(xpo);
@@ -524,6 +533,7 @@ xParticleObject* xParticleManager::CreateCircleParticle(
 			pos[xpo->StartIndex() + i].w = d.minr + dr * frand();
 		}
 	}
+	if (minimum_radius > d.minr) minimum_radius = d.minr;
 	xpcos[name] = xpo;
 	xObjectManager::XOM()->addObject(xpo);
 	return xpo;
@@ -629,6 +639,7 @@ xParticleObject * xParticleManager::CreateClusterParticle(
 			}
 		}
 	}
+	if (minimum_radius > rad) minimum_radius = rad;
 	xpcos[name] = xpo;
 	xObjectManager::XOM()->addObject(xpo);
 	n_cluster_each += neach;

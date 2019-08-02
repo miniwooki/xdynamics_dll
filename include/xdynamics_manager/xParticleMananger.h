@@ -35,6 +35,7 @@ public:
 	double CriticalDensity();
 	double CriticalPoisson();
 	double CriticalYoungs();
+	double CriticalRadius();
 	//unsigned int nSingleSphere();
 	//unsigned int nClusterSphere();
 	//unsigned int NumParticleWithCluster();
@@ -92,6 +93,7 @@ private:
 	double minimum_particle_density;
 	double maximum_youngs_modulus;
 	double minimum_poisson_ratio;
+	double minimum_radius;
 	//bool *isCluster;
 	//unsigned int *cluster_index;
 	//unsigned int *cluster_count;

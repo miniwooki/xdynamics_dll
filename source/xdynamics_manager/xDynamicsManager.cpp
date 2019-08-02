@@ -320,6 +320,16 @@ xDynamicsManager::solverType xDynamicsManager::OpenModelXLS(const char* n)
 			xve.Write((char*)&vot, sizeof(xViewObjectType));
 			int ns = pv_path.size(); xve.Write((char*)&ns, sizeof(int));
 			xve.Write((char*)pv_path.c_str(), sizeof(char)*pv_path.size());
+			if (xSimulation::dt == 0.0)
+			{
+				xParticleManager *xpm = xdem->XParticleManager();
+				double new_dt = xUtilityFunctions::CriticalTimeStep(
+					xpm->CriticalRadius(),
+					xpm->CriticalDensity(),
+					xpm->CriticalYoungs(),
+					xpm->CriticalPoisson());
+				xSimulation::setTimeStep(new_dt);
+			}
 		}
 // 		foreach(xObject* xo, xom->XObjects())
 // 		{

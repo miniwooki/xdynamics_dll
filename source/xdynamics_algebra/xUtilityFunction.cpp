@@ -497,6 +497,15 @@ double xUtilityFunctions::FitClusterRadius(vector4d * cpos, unsigned int n)
 	return Ra;
 }
 
+double xUtilityFunctions::CriticalTimeStep(double min_rad, double rho, double E, double p)
+{
+	double dt_raleigh = M_PI * min_rad * sqrt(rho * 2.0 * (1 + p) / E) / (0.1631 * (p + 0.8766));
+	double dt_hertz = 2.87 * pow(pow(rho * (4.0 / 3.0) * M_PI * pow(min_rad, 3.0), 2.0) / (min_rad * E * E * 1.0), 0.2);
+	double dt_cundall = 0.2 * M_PI * sqrt(rho * (4.0 / 3.0) * M_PI * min_rad * min_rad * 3.0 * (1.0 + 2.0 * p) / (E * 0.01));
+	double min_dt = dt_raleigh < dt_hertz ? (dt_raleigh < dt_cundall ? dt_raleigh : dt_cundall) : (dt_hertz < dt_cundall ? dt_hertz : dt_cundall);
+	return 0.2 * min_dt;
+}
+
 std::string xUtilityFunctions::xstring(QString v)
 {
 	return v.toStdString();

@@ -95,6 +95,7 @@ public:
 signals:
 	void definedSimulationWidget(wsimulation*);
 	void definedPointMassWidget(wpointmass*);
+	void definedResultWidget(wresult*);
 	void InitializeWidgetStatement();
 
 private slots:

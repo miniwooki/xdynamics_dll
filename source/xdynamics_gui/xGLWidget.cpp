@@ -687,22 +687,24 @@ void xGLWidget::setupParticleBufferColorDistribution(int n)
 	//xColorControl xcc;
 	if (vp)
 	{
-		unsigned int sframe = n < 0 ? 0 : xvAnimationController::getTotalBuffers();
-		unsigned int cframe = xvAnimationController::getTotalBuffers();
+		int sframe = n < 0 ? 0 : xvAnimationController::getTotalBuffers();
+		int cframe = xvAnimationController::getTotalBuffers();
 		
 		xColorControl::ColorMapType cmt = xcc->Target();
 		if (!xcc->isUserLimitInput())
 			xcc->setMinMax(vp->getMinValue(cmt), vp->getMaxValue(cmt));
 		unsigned int m_np = vp->NumParticles();
-		for (unsigned int i = sframe; i < cframe - 1; i++)
+		xcc->setLimitArray();
+		for (int i = sframe; i <= cframe; i++)
 		{
 			unsigned int idx = m_np * i;
 			float *pbuf = vp->PositionBuffers() + idx * 4;
 			float *vbuf = vp->VelocityBuffers() + idx * 3;
-			float *cbuf = vp->ColorBuffers() + idx * 3;
+			float *cbuf = vp->ColorBuffers() + idx * 4;
 			for (unsigned int j = 0; j < m_np; j++)
 			{
-				xcc->getColorRamp(pbuf + j * 4, vbuf + j * 3, cbuf + j * 3);
+				xcc->getColorRamp(pbuf + j * 4, vbuf + j * 3, cbuf + j * 4);
+				cbuf[j * 4 + 3] = 1.0;
 			}
 		}
 	}

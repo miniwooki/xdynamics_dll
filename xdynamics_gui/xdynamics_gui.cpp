@@ -82,7 +82,7 @@ xdynamics_gui::xdynamics_gui(int _argc, char** _argv, QWidget *parent)
 	setAcceptDrops(true);
 	connect(xnavi, SIGNAL(definedSimulationWidget(wsimulation*)), this, SLOT(xGetSimulationWidget(wsimulation*)));
 	connect(xnavi, SIGNAL(definedPointMassWidget(wpointmass*)), this, SLOT(xGetPointMassWidget(wpointmass*)));
-	connect(xnavi, SIGNAL(definedResultWidget(wresut*)), this, SLOT(xGetResultWidget(wresult*)));
+	connect(xnavi, SIGNAL(definedResultWidget(wresult*)), this, SLOT(xGetResultWidget(wresult*)));
 	connect(xnavi, SIGNAL(InitializeWidgetStatement()), this, SLOT(xInitializeWidgetStatement()));
 	connect(xgl, SIGNAL(signalGeometrySelection(QString)), this, SLOT(xGeometrySelection(QString)));
 	connect(xgl, SIGNAL(releaseOperation()), this, SLOT(xReleaseOperation()));
@@ -121,7 +121,8 @@ void xdynamics_gui::xGetResultWidget(wresult *w)
 	wrst = w;
 	if (xdm->XDEMModel())
 	{
-		connect(w, SIGNAL(clickedApplyButton()), xgl, SLOT(setupParticleBufferColorDistribution(int)));
+		connect(w, SIGNAL(clickedApplyButton(int)), xgl, SLOT(setupParticleBufferColorDistribution(int)));
+		connect(w, SIGNAL(changedTargetCombo(int)), this, SLOT(xSetupResultNavigatorByChangeTargetCombo(int)));
 	}
 	
 }
@@ -652,6 +653,21 @@ void xdynamics_gui::xRecieveProgress(int pt, QString ch)
 	else if (pt >= 0 && ch.isEmpty())
 	{
 		pbar->setValue(pt);
+	}
+}
+
+void xdynamics_gui::xSetupResultNavigatorByChangeTargetCombo(int cmt)
+{
+	if (wrst)
+	{
+		xColorControl::setTarget((xColorControl::ColorMapType)cmt);
+		if (!xColorControl::isUserLimitInput())
+		{
+			wrst->setMinMaxValue(
+				xgl->GetParticleMinValueFromColorMapType(),
+				xgl->GetParticleMaxValueFromColorMapType()
+			);
+		}
 	}
 }
 

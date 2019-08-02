@@ -61,6 +61,7 @@ private slots:
 	void xOnGeometrySelectionOfPointMass();
 	void xStopSimulationThread();
 	void xContextMenuProcess(QString nm, contextMenuType vot);
+	void xSetupResultNavigatorByChangeTargetCombo(int);
 	
 private:
 	void setupMeshSphere();
