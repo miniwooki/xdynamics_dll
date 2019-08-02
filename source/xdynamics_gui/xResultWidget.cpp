@@ -11,6 +11,13 @@ wresult::wresult(QWidget* parent /* = NULL */)
 	connect(PB_Apply, SIGNAL(clicked()), this, SLOT(ApplyButton()));
 	connect(RB_UserInput, SIGNAL(clicked()), this, SLOT(SelectRadioButton()));
 	connect(RB_FromResult, SIGNAL(clicked()), this, SLOT(SelectRadioButton()));
+	float lmin = xColorControl::minimumLimit();
+	float lmax = xColorControl::maximumLimit();
+	LE_LimitMin->setText(QString("%1").arg(lmin));
+	LE_LimitMax->setText(QString("%1").arg(lmax));
+	xColorControl::ColorMapType cmt = xColorControl::Target();
+	CB_Target->setCurrentIndex((int)cmt);
+	xColorControl::isUserLimitInput() ? RB_UserInput->setChecked(true) : RB_UserInput->setChecked(false);
 }
 
 wresult::~wresult()

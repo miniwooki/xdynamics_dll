@@ -42,6 +42,16 @@ void xColorControl::setUserLimitInputType(bool isu)
 	is_user_limit_input = isu;
 }
 
+float xColorControl::minimumLimit()
+{
+	return min_v;
+}
+
+float xColorControl::maximumLimit()
+{
+	return max_v;;
+}
+
 void xColorControl::setTarget(ColorMapType _cmt)
 {
 	cmt = _cmt;

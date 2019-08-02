@@ -30,6 +30,8 @@ public:
 
 	//static double* particleColorBySphType(unsigned int np, unsigned int* tp);
 	static void setUserLimitInputType(bool isu);
+	static float minimumLimit();
+	static float maximumLimit();
 
 private:
 	//static double* tmp_color;

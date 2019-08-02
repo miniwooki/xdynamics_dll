@@ -1,13 +1,13 @@
 /********************************************************************************
-** Form generated from reading UI file 'wresultFLFRta.ui'
+** Form generated from reading UI file 'wresultJSMriM.ui'
 **
 ** Created by: Qt User Interface Compiler version 5.12.3
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef WRESULTFLFRTA_H
-#define WRESULTFLFRTA_H
+#ifndef WRESULTJSMRIM_H
+#define WRESULTJSMRIM_H
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
@@ -36,7 +36,7 @@ public:
     QGridLayout *gridLayout_2;
     QHBoxLayout *horizontalLayout_3;
     QLabel *label;
-    QComboBox *comboBox;
+    QComboBox *CB_Target;
     QHBoxLayout *horizontalLayout;
     QRadioButton *RB_UserInput;
     QRadioButton *RB_FromResult;
@@ -92,19 +92,19 @@ public:
 
         horizontalLayout_3->addWidget(label);
 
-        comboBox = new QComboBox(GBColorMap);
-        comboBox->addItem(QString());
-        comboBox->addItem(QString());
-        comboBox->addItem(QString());
-        comboBox->addItem(QString());
-        comboBox->addItem(QString());
-        comboBox->addItem(QString());
-        comboBox->addItem(QString());
-        comboBox->addItem(QString());
-        comboBox->addItem(QString());
-        comboBox->setObjectName(QString::fromUtf8("comboBox"));
+        CB_Target = new QComboBox(GBColorMap);
+        CB_Target->addItem(QString());
+        CB_Target->addItem(QString());
+        CB_Target->addItem(QString());
+        CB_Target->addItem(QString());
+        CB_Target->addItem(QString());
+        CB_Target->addItem(QString());
+        CB_Target->addItem(QString());
+        CB_Target->addItem(QString());
+        CB_Target->addItem(QString());
+        CB_Target->setObjectName(QString::fromUtf8("CB_Target"));
 
-        horizontalLayout_3->addWidget(comboBox);
+        horizontalLayout_3->addWidget(CB_Target);
 
 
         gridLayout_2->addLayout(horizontalLayout_3, 0, 0, 1, 1);
@@ -183,15 +183,15 @@ public:
         wresult->setWindowTitle(QApplication::translate("wresult", "Form", nullptr));
         GBColorMap->setTitle(QApplication::translate("wresult", "ColorMap", nullptr));
         label->setText(QApplication::translate("wresult", "Type", nullptr));
-        comboBox->setItemText(0, QApplication::translate("wresult", "None", nullptr));
-        comboBox->setItemText(1, QApplication::translate("wresult", "Position Magnitude", nullptr));
-        comboBox->setItemText(2, QApplication::translate("wresult", "Position X", nullptr));
-        comboBox->setItemText(3, QApplication::translate("wresult", "Position Y", nullptr));
-        comboBox->setItemText(4, QApplication::translate("wresult", "Position Z", nullptr));
-        comboBox->setItemText(5, QApplication::translate("wresult", "Velocity Magnitude", nullptr));
-        comboBox->setItemText(6, QApplication::translate("wresult", "Velocity X", nullptr));
-        comboBox->setItemText(7, QApplication::translate("wresult", "Velocity Y", nullptr));
-        comboBox->setItemText(8, QApplication::translate("wresult", "Velocity Z", nullptr));
+        CB_Target->setItemText(0, QApplication::translate("wresult", "None", nullptr));
+        CB_Target->setItemText(1, QApplication::translate("wresult", "Position Magnitude", nullptr));
+        CB_Target->setItemText(2, QApplication::translate("wresult", "Position X", nullptr));
+        CB_Target->setItemText(3, QApplication::translate("wresult", "Position Y", nullptr));
+        CB_Target->setItemText(4, QApplication::translate("wresult", "Position Z", nullptr));
+        CB_Target->setItemText(5, QApplication::translate("wresult", "Velocity Magnitude", nullptr));
+        CB_Target->setItemText(6, QApplication::translate("wresult", "Velocity X", nullptr));
+        CB_Target->setItemText(7, QApplication::translate("wresult", "Velocity Y", nullptr));
+        CB_Target->setItemText(8, QApplication::translate("wresult", "Velocity Z", nullptr));
 
         RB_UserInput->setText(QApplication::translate("wresult", "User input", nullptr));
         RB_FromResult->setText(QApplication::translate("wresult", "From result", nullptr));
@@ -209,4 +209,4 @@ namespace Ui {
 
 QT_END_NAMESPACE
 
-#endif // WRESULTFLFRTA_H
+#endif // WRESULTJSMRIM_H
