@@ -618,7 +618,7 @@ void xdynamics_gui::xRecieveProgress(int pt, QString ch)
 			fileName.sprintf("Part%04d", pt);
  			xgl->vParticles()->UploadParticleFromFile(pt, path + xModel::name + "/" + fileName + ".bin");
 			
-			QMapIterator<QString, xvParticle*> xps(xgl->ParticleObjects());
+		/*	QMapIterator<QString, xvParticle*> xps(xgl->ParticleObjects());
 			while (xps.hasNext())
 			{
 				xps.next();
@@ -629,7 +629,7 @@ void xdynamics_gui::xRecieveProgress(int pt, QString ch)
 				{
 					v->UploadParticleFromRelativePosition(pt, xpm->Position(), xpm->EulerParameters());
 				}
-			}
+			}*/
  		}
  		xvAnimationController::setTotalFrame(pt);
 		xgl->setupParticleBufferColorDistribution(pt);
@@ -838,13 +838,13 @@ void xdynamics_gui::xRunSimulationThread(double dt, unsigned int st, double et)
 		xnavi->addChild(xModelNavigator::RESULT_ROOT, "Particles");
 	}
 		
-	foreach(xvParticle* xp, xgl->ParticleObjects())
-	{
-		if (xp->hasRelativePosition())
-		{
-			xp->setBufferMemories(xSimulation::npart);
-		}
-	}
+	//foreach(xvParticle* xp, xgl->ParticleObjects())
+	//{
+	//	if (xp->hasRelativePosition())
+	//	{
+	//		xp->setBufferMemories(xSimulation::npart);
+	//	}
+	//}
 	connect(sThread, SIGNAL(finishedThread()), this, SLOT(xExitSimulationThread()));
 	connect(sThread, SIGNAL(sendProgress(int, QString)), this, SLOT(xRecieveProgress(int, QString)));
 	//xcw->write(xCommandWindow::CMD_INFO, "Thread Initialize Done.");

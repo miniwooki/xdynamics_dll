@@ -108,8 +108,10 @@ void xParticlePlanesContact::updataPlaneObjectData()
 {
 	unsigned int mcnt = 0;
 	device_body_info *bi = NULL;
-	if(nmoving)
+	if (nmoving)
 		bi = new device_body_info[nmoving];
+	else
+		return;
 	QMapIterator<unsigned int, xPlaneObject*> it(pair_ip);
 	while (it.hasNext())
 	{
