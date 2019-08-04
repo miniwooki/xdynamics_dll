@@ -188,6 +188,7 @@ bool xdynamics_gui::ReadViewModel(QString path)
 			qf.read((char*)&d, sizeof(xPointMassData));
 			QString marker_name = name + "_marker";
 			xvMarker* xvm = xgl->makeMarker(marker_name, d);
+			xvm->setMarkerScale(0.1);
 			xvObject* xvo = xgl->Object(name);
 			if (xvo)
 			{
@@ -199,7 +200,7 @@ bool xdynamics_gui::ReadViewModel(QString path)
 						xPointMass* xpm = xdm->XMBDModel()->XMass(name.toStdString());
 						if (xpm)
 						{
-							xpm->setConnectedGeometryName(xvo->Name());
+							xpm->setConnectedGeometryName(xvo->Name());							
 							vector3d p = xpm->Position();
 							xvo->setPosition(static_cast<float>(p.x), static_cast<float>(p.y), static_cast<float>(p.z));								
 						}
@@ -260,25 +261,45 @@ bool xdynamics_gui::ReadModelResults(QString path)
 	qf.open(QIODevice::ReadOnly);
 	QTextStream qts(&qf);
 	QString s;
-	qts >> s;
-	if (s == "MBD")
+	QString dyn_type = "";
+	while (!qts.atEnd())
 	{
-
-	}
-	else if (s == "DEM")
-	{
-		QStringList sl;
-		while (!qts.atEnd())
+		qts >> s;
+		if (s == "MBD" || s == "DEM")
 		{
-			qts >> s;
-			if (!s.isEmpty())
-				sl.push_back(s);
+			dyn_type = s;
+			continue;
 		}
-		if(!xgl->Upload_DEM_Results(sl))
+		if (dyn_type == "MBD")
 		{
-			return false;
+			/*QStringList sl;
+			while (!qts.atEnd())
+			{
+				qts >> s;
+				if (!s.isEmpty())
+					sl.push_back(s);
+			}*/
+			if (!xgl->Upload_PointMass_Results(s));
+			{
+				return false;
+			}
+		}
+		else if (s == "DEM")
+		{
+			QStringList sl;
+			while (!qts.atEnd())
+			{
+				qts >> s;
+				if (!s.isEmpty())
+					sl.push_back(s);
+			}
+			/*if (!xgl->Upload_DEM_Results(sl))
+			{
+				return false;
+			}*/
 		}
 	}
+	
 	qf.close();
 	return true;
 }

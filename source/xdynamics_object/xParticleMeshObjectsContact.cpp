@@ -411,7 +411,7 @@ void xParticleMeshObjectsContact::getMeshContactForce()
 		xMeshObject* o = xmo.value();
 		//double f = hpmi[id].force
 		o->setContactForce(hpmi[id].fx, hpmi[id].fy, hpmi[id].fz);
-		//std::cout << hpmi[id].fx << " " << hpmi[id].fy << " " << hpmi[id].fz << std::endl;
+		std::cout << o->Name().toStdString() << " " << hpmi[id].fx << " " << hpmi[id].fy << " " << hpmi[id].fz << std::endl;
 		//std::cout << o->Velocity().x << " " << o->Velocity().y << " " << o->Velocity().z << std::endl;
 		o->setContactMoment(hpmi[id].mx, hpmi[id].my, hpmi[id].mz);
 	}

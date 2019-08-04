@@ -56,7 +56,7 @@ public:
 
 	static xGLWidget* GLObject();
 	bool Upload_DEM_Results(QStringList& sl);
-
+	bool Upload_PointMass_Results(QString fname);
 	//	void setModeler(modeler* _md) { md = _md; }
 // 	void makeCube(cube* c);
 	void ReadSTLFile(QString& s);

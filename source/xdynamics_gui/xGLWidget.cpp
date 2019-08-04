@@ -89,12 +89,23 @@ xGLWidget* xGLWidget::GLObject()
 	return ogl;
 }
 
+bool xGLWidget::Upload_PointMass_Results(QString fname)
+{
+	int begin = fname.lastIndexOf("/");
+	int end = fname.lastIndexOf(".");
+	QString fn = fname.mid(begin, end - begin);
+	xvObject* vobj = Object(fn);
+	vobj->uploadPointMassResults(fname);
+	return true;
+}
+
 bool xGLWidget::Upload_DEM_Results(QStringList& sl)
 {
 	if (vp)
 	{
 		unsigned int i = 0;
 		vp->setBufferMemories(sl.size());
+		xvAnimationController::allocTimeMemory(sl.size());
 		//xvAnimationController::allocTimeMemory(sl.size());
 		xvAnimationController::setTotalFrame(sl.size()-1);
 		foreach(QString s, sl)
@@ -358,13 +369,13 @@ void xGLWidget::ShowContextMenu(const QPoint& pos)
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LEQUAL);
 		QString txt = selectedItem->text();
-		if (txt == "Wireframe"){
+		if (txt == "Wireframe" && selectedObject){
 			selectedObject->setDrawingMode(GL_LINE);
 		}
-		else if (txt == "Solid"){
+		else if (txt == "Solid" && selectedObject){
 			selectedObject->setDrawingMode(GL_FILL);
 		}
-		else if (txt == "Shade"){
+		else if (txt == "Shade" && selectedObject){
 			glEnable(GL_BLEND);
 			glDisable(GL_DEPTH_TEST);
 			glDepthFunc(GL_LEQUAL);

@@ -43,6 +43,7 @@ public:
 	void setAngle(float x, float y, float z);
 	void setPosition(float x, float y, float z);
 	void setBlendAlpha(float v) { blend_alpha = v; }
+	void uploadPointMassResults(QString fname);
 	void bindPointMassResultsPointer(QVector<xPointMass::pointmass_result>* _pmrs);
  	QColor& Color() { return clr; }
 	void setColor(QColor ct) { clr = ct; }
@@ -59,6 +60,7 @@ protected:
 	int id;
 	Type type;
 	bool isSelected;
+	bool isBindPmrs;
 	xvObject* select_cube;
 	QString name;			// object name
 	QString connected_mass_name;

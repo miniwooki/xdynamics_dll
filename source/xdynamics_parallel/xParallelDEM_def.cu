@@ -34,7 +34,7 @@ void vv_update_position(
 	double *pos, double* ep, double *vel, 
 	double* ev, double *acc, double* ea, unsigned int np)
 {
-	computeGridSize(np, 256, numBlocks, numThreads);
+	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
 	vv_update_position_kernel << < numBlocks, numThreads >> > (
 		(double4 *)pos,
 		(double4 *)ep,
@@ -51,7 +51,7 @@ void vv_update_velocity(
 	double *force, double *moment, double* mass, 
 	double* iner, unsigned int np)
 {
-	computeGridSize(np, 256, numBlocks, numThreads);
+	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
 	vv_update_velocity_kernel << < numBlocks, numThreads >> > (
 		(double3 *)vel,
 		(double3 *)acc,
@@ -71,7 +71,7 @@ void cu_calculateHashAndIndex(
 	double *pos,
 	unsigned int np)
 {
-	computeGridSize(np, 256, numBlocks, numThreads);
+	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
 	calculateHashAndIndex_kernel << < numBlocks, numThreads >> > (hash, index, (double4 *)pos, np);
 }
 
@@ -82,7 +82,7 @@ void cu_calculateHashAndIndexForPolygonSphere(
 	unsigned int nsphere,
 	double *sphere)
 {
-	computeGridSize(nsphere, 256, numBlocks, numThreads);
+	computeGridSize(nsphere, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
 	calculateHashAndIndexForPolygonSphere_kernel << <numBlocks, numThreads >> > (hash, index, sid, nsphere, (double4 *)sphere);
 }
 
@@ -105,7 +105,7 @@ void cu_reorderDataAndFindCellStart(
 		thrust::device_ptr<unsigned>(index));
 	//std::cout << "end sortbykey" << std::endl;
 	//std::cout << "step 2" << std::endl;
-	computeGridSize(np, 256, numBlocks, numThreads);
+	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
 	checkCudaErrors(cudaMemset(cstart, 0xffffffff, ncell * sizeof(unsigned int)));
 	checkCudaErrors(cudaMemset(cend, 0, ncell * sizeof(unsigned int)));
 	unsigned smemSize = sizeof(unsigned int)*(numThreads + 1);
@@ -127,7 +127,7 @@ void cu_calculate_p2p(
 	unsigned int* sorted_index, unsigned int* cstart,
 	unsigned int* cend, device_contact_property* cp, unsigned int np)
 {
-	computeGridSize(np, 256, numBlocks, numThreads);
+	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
 	switch (tcm)
 	{
 	case 0:
@@ -159,7 +159,7 @@ void cu_plane_contact_force(
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd,
 	unsigned int np, device_contact_property *cp)
 {
-	computeGridSize(np, 256, numBlocks, numThreads);
+	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
 	switch (tcm)
 	{
 	case 0: plane_contact_force_kernel<0> << < numBlocks, numThreads >> > (
@@ -183,7 +183,7 @@ void cu_cube_contact_force(
 	double* force, double* moment, double* mass,
 	unsigned int np, device_contact_property *cp)
 {
-	/*computeGridSize(np, 256, numBlocks, numThreads);
+	/*computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
 	for (unsigned int i = 0; i < 6; i++)
 	{
 	switch (tcm)
@@ -208,7 +208,7 @@ void cu_cylinder_contact_force(
 	double* mass, double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd, unsigned int np)
 {
-	computeGridSize(np, 256, numBlocks, numThreads);
+	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
 	switch (tcm)
 	{
 	//case 0: cylinder_hertzian_contact_force_kernel<0> << < numBlocks, numThreads >> > (
@@ -233,7 +233,7 @@ void cu_particle_polygonObject_collision(
 	unsigned int* sorted_index, unsigned int* cstart, unsigned int* cend, device_contact_property *cp,
 	unsigned int np)
 {
-	computeGridSize(np, 256, numBlocks, numThreads);
+	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
 	switch (tcm)
 	{
 	case 1:
@@ -257,7 +257,7 @@ void cu_decide_rolling_friction_moment(
 	double* moment,
 	unsigned int np)
 {
-	computeGridSize(np, 256, numBlocks, numThreads);
+	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
 	decide_rolling_friction_moment_kernel << <numBlocks, numThreads >> > (
 		(double3 *)tmax,
 		rres,
@@ -271,13 +271,13 @@ void cu_decide_rolling_friction_moment(
 double3 reductionD3(double3* in, unsigned int np)
 {
 	double3 rt = make_double3(0.0, 0.0, 0.0);
-	computeGridSize(np, 256, numBlocks, numThreads);
+	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
 	double3* d_out;
 	double3* h_out = new double3[numBlocks];
 	checkCudaErrors(cudaMalloc((void**)&d_out, sizeof(double3) * numBlocks));
 	checkCudaErrors(cudaMemset(d_out, 0, sizeof(double3) * numBlocks));
 	//unsigned smemSize = sizeof(double3)*(512);
-	reduce6<double3, 256> << < numBlocks, numThreads/*, smemSize*/ >> > (in, d_out, np);
+	reduce6<double3, CUDA_THREADS_PER_BLOCK> << < numBlocks, numThreads/*, smemSize*/ >> > (in, d_out, np);
 	checkCudaErrors(cudaMemcpy(h_out, d_out, sizeof(double3) * numBlocks, cudaMemcpyDeviceToHost));
 	for (unsigned int i = 0; i < numBlocks; i++) {
 		rt.x += h_out[i].x;
@@ -293,7 +293,7 @@ void cu_update_meshObjectData(
 	double *vList, double* sph, double* dlocal, device_triangle_info* poly,
 	device_mesh_mass_info* dpmi, double* ep, unsigned int ntriangle)
 {
-	computeGridSize(ntriangle, 256, numBlocks, numThreads);
+	computeGridSize(ntriangle, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
 	updateMeshObjectData_kernel << <numBlocks, numThreads >> > (
 		dpmi,
 		(double4 *)ep,
@@ -312,7 +312,7 @@ void cu_clusters_contact(
 	unsigned int* sorted_index, unsigned int* cstart,
 	unsigned int* cend, device_contact_property* cp, xClusterInformation* xci, unsigned int np)
 {
-	computeGridSize(np, 256, numBlocks, numThreads);
+	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
 	calcluate_clusters_contact_kernel << < numBlocks, numThreads >> > (
 			(double4 *)pos, (double4* )cpos, (double4 *)ep, (double3 *)vel,
 			(double4 *)ev, (double3 *)force,
@@ -330,7 +330,7 @@ void cu_cluster_plane_contact(
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd, 
 	xClusterInformation* xci, unsigned int np, device_contact_property *cp)
 {
-	computeGridSize(np, 256, numBlocks, numThreads);
+	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
 	cluster_plane_contact_kernel << < numBlocks, numThreads >> > (
 		plan, (double4 *)pos, (double4*)cpos, (double4 *)ep, (double3 *)vel, (double4 *)ev,
 		(double3 *)force, (double3 *)moment, cp, mass,
@@ -361,7 +361,7 @@ void cu_cluster_meshes_contact(
 	xClusterInformation * xci, 
 	unsigned int np)
 {
-	computeGridSize(np, 256, numBlocks, numThreads);
+	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
 	cluster_meshes_contact_kernel << <numBlocks, numThreads >> > (
 		dpi, dpmi,
 		(double4*)pos,
@@ -386,7 +386,7 @@ void vv_update_cluster_position(
 	double* ev, double* ea,
 	xClusterInformation *xci, unsigned int np)
 {
-	computeGridSize(np, 256, numBlocks, numThreads);
+	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
 
 	vv_update_position_cluster_kernel << < numBlocks, numThreads >> > (
 		(double4*)pos, 
@@ -406,7 +406,7 @@ void vv_update_cluster_velocity(
 	double *ea, double *force, double *moment, double* rloc,
 	double* mass, double* iner, xClusterInformation* xci, unsigned int np)
 {
-	computeGridSize(np, 256, numBlocks, numThreads);
+	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
 	vv_update_cluster_velocity_kernel << <numBlocks, numThreads >> > (
 		(double4*)cpos,
 		(double4*)ep,
@@ -433,7 +433,7 @@ void cu_calculate_spring_damper_force(
 	xSpringDamperCoefficient* xsdkc,
 	unsigned int nc)
 {
-	computeGridSize(nc, 256, numBlocks, numThreads);
+	computeGridSize(nc, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
 	calculate_spring_damper_force_kernel << <numBlocks, numThreads >> > (
 		(double4*)pos,
 		(double3*)vel,
@@ -455,7 +455,7 @@ void cu_calculate_spring_damper_connecting_body_force(
 	xSpringDamperCoefficient* xsdkc,
 	unsigned int nc)
 {
-	computeGridSize(nc, 256, numBlocks, numThreads);
+	computeGridSize(nc, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
 	calculate_spring_damper_connecting_body_force_kernel << <numBlocks, numThreads >> > (
 		(double4*)pos,
 		(double3*)vel,

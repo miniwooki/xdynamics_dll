@@ -14,6 +14,7 @@ typedef unsigned int uint;
 #define MAX_P2PL_COUNT 3
 #define MAX_P2MS_COUNT 5
 #define MAX_P2CY_COUNT 3
+#define CUDA_THREADS_PER_BLOCK 128
 //__constant__ device_parameters cte;
 //double3 toDouble3(VEC3D& v3) { return double3(v3.x, v3.y, v3.z); }
 //inline double3 change_cuda_double3(VEC3D& v3) { return make_double3(v3.x, v3.y, v3.z); }

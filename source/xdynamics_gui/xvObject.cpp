@@ -12,6 +12,7 @@ xvObject::xvObject()
 	, blend_alpha(0.5f)
 	, display(false)
 	, isSelected(false)
+	, isBindPmrs(false)
 {
 	count++;
 	id = count;
@@ -28,6 +29,7 @@ xvObject::xvObject(Type tp, QString _name)
 	, blend_alpha(1.0f)
 	, display(false)
 	, isSelected(false)
+	, isBindPmrs(false)
 {
 	count++;
 	id = count;
@@ -83,9 +85,40 @@ void xvObject::setPosition(float x, float y, float z)
 	pos.x = x; pos.y = y; pos.z = z;
 }
 
+void xvObject::uploadPointMassResults(QString fname)
+{
+	if (pmrs && isBindPmrs == true)
+	{
+		pmrs->clear();
+	}
+	pmrs = new QVector<xPointMass::pointmass_result>;
+	char t;
+	int identifier = 0;
+	unsigned int nr_part = 0;
+	QFile qf(fname);
+	qf.open(QIODevice::ReadOnly);
+	qf.read((char*)&identifier, sizeof(int));
+	qf.read(&t, sizeof(char));
+	qf.read((char*)&nr_part, sizeof(unsigned int));
+	xPointMass::pointmass_result *pmr = new xPointMass::pointmass_result[nr_part];
+	qf.read((char*)pmr, sizeof(xPointMass::pointmass_result) * nr_part);
+	for (unsigned int i = 0; i < nr_part; i++)
+	{
+		pmrs->push_back(pmr[i]);
+	}
+	isBindPmrs = false;
+}
+
 void xvObject::bindPointMassResultsPointer(QVector<xPointMass::pointmass_result>* _pmrs)
 {
+	if (pmrs && isBindPmrs == false)
+	{
+		//qDeleteAll(pmrs);
+		pmrs->clear();
+		pmrs = NULL;
+	}
 	pmrs = _pmrs;
+	isBindPmrs = true;
 }
 
 void xvObject::setSelected(bool b)
