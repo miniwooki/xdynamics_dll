@@ -40,8 +40,10 @@ void xParticleCylindersContact::define(unsigned int i, xParticleCylinderContact 
 	pair_ip[i] = c_ptr;
 	hci[i] = { 
 		c_ptr->MovingObject(),
-		c_ptr->MovingObject() ? nmoving - 1 : 0,
 		i,
+		c_ptr->MovingObject() ? nmoving - 1 : 0,
+		(unsigned int)c_ptr->empty_part_type(),
+		c_ptr->cylinder_thickness(),
 		c_ptr->cylinder_length(), 
 		c_ptr->cylinder_bottom_radius(), 
 		c_ptr->cylinder_top_radius(), 
@@ -349,25 +351,26 @@ void xParticleCylindersContact::updateCollisionPair(
 
 void xParticleCylindersContact::cudaMemoryAlloc(unsigned int np)
 {
-	/*device_contact_property *_hcp = new device_contact_property[nplanes];
-	for (unsigned int i = 0; i < nplanes; i++)
+	device_contact_property *_hcp = new device_contact_property[ncylinders];
+	for (unsigned int i = 0; i < ncylinders; i++)
 	{
 		_hcp[i] = { xmps[i].Ei, xmps[i].Ej, xmps[i].Pri, xmps[i].Prj, xmps[i].Gi, xmps[i].Gj,
 			hcmp[i].restitution, hcmp[i].friction, hcmp[i].rolling_friction, hcmp[i].cohesion, hcmp[i].stiffness_ratio, hcmp[i].stiffness_multiplyer };
-	}*/
-	//checkCudaErrors(cudaMalloc((void**)&dpi, sizeof(device_plane_info) * nplanes));
-	//checkCudaErrors(cudaMalloc((void**)&dcp, sizeof(device_contact_property) * nplanes));
-	// 	checkCudaErrors(cudaMalloc((void**)&d_pair_count, sizeof(unsigned int) * np));
-	// 	checkCudaErrors(cudaMalloc((void**)&d_old_pair_count, sizeof(unsigned int) * np));
-	// 	checkCudaErrors(cudaMalloc((void**)&d_pair_start, sizeof(unsigned int) * np));
-	// 	checkCudaErrors(cudaMalloc((void**)&d_old_pair_start, sizeof(unsigned int) * np));
-	//checkCudaErrors(cudaMemcpy(dpi, hpi, sizeof(device_plane_info) * nplanes, cudaMemcpyHostToDevice));
-	//checkCudaErrors(cudaMemcpy(dcp, _hcp, sizeof(device_contact_property) * nplanes, cudaMemcpyHostToDevice));
-	// 	checkCudaErrors(cudaMemset(d_pair_count, 0, sizeof(unsigned int) * np));
-	// 	checkCudaErrors(cudaMemset(d_old_pair_count, 0, sizeof(unsigned int) * np));
-	// 	checkCudaErrors(cudaMemset(d_pair_start, 0, sizeof(unsigned int) * np));
-	// 	checkCudaErrors(cudaMemset(d_old_pair_start, 0, sizeof(unsigned int) * np));
-	//delete[] _hcp;
+	}
+	checkCudaErrors(cudaMalloc((void**)&dci, sizeof(device_cylinder_info) * ncylinders));
+	checkCudaErrors(cudaMalloc((void**)&dcp, sizeof(device_contact_property) * ncylinders));
+	checkCudaErrors(cudaMalloc((void**)&dbi, sizeof(device_body_info) * ncylinders));
+	 	/*checkCudaErrors(cudaMalloc((void**)&d_pair_count, sizeof(unsigned int) * np));
+	 	checkCudaErrors(cudaMalloc((void**)&d_old_pair_count, sizeof(unsigned int) * np));
+	 	checkCudaErrors(cudaMalloc((void**)&d_pair_start, sizeof(unsigned int) * np));
+	 	checkCudaErrors(cudaMalloc((void**)&d_old_pair_start, sizeof(unsigned int) * np));*/
+	checkCudaErrors(cudaMemcpy(dci, hci, sizeof(device_cylinder_info) * ncylinders, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemcpy(dcp, _hcp, sizeof(device_contact_property) * ncylinders, cudaMemcpyHostToDevice));
+	 	/*checkCudaErrors(cudaMemset(d_pair_count, 0, sizeof(unsigned int) * np));
+	 	checkCudaErrors(cudaMemset(d_old_pair_count, 0, sizeof(unsigned int) * np));
+	 	checkCudaErrors(cudaMemset(d_pair_start, 0, sizeof(unsigned int) * np));
+	 	checkCudaErrors(cudaMemset(d_old_pair_start, 0, sizeof(unsigned int) * np));*/
+	delete[] _hcp;
 }
 
 void xParticleCylindersContact::cuda_collision(double * pos, double * vel, double * omega, double * mass, double * force, double * moment, unsigned int * sorted_id, unsigned int * cell_start, unsigned int * cell_end, unsigned int np)

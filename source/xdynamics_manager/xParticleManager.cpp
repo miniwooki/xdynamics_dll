@@ -503,7 +503,7 @@ xParticleObject* xParticleManager::CreateCircleParticle(
 			dth = ((2.0 * M_PI) / npr);
 			for (unsigned int j = 0; j < npr; j++)
 			{
-				vector3d pp = new_vector3d(_r * cos(dth * j), 0, _r * sin(dth * j));
+				vector3d pp = new_vector3d(0, _r * sin(dth * j), _r * cos(dth * j));
 				vector4d new_pp = new_vector4d(pp.x, pp.y, pp.z, r);				
 				new_pp.x = pp.x * cos(th) + pp.z * sin(th);
 				new_pp.z = -pp.x * sin(th) + pp.z * cos(th);
@@ -534,6 +534,7 @@ xParticleObject* xParticleManager::CreateCircleParticle(
 		}
 	}
 	if (minimum_radius > d.minr) minimum_radius = d.minr;
+	SetMassAndInertia(xpo);
 	xpcos[name] = xpo;
 	xObjectManager::XOM()->addObject(xpo);
 	return xpo;

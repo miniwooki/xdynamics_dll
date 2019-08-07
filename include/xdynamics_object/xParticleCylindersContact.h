@@ -10,8 +10,10 @@ class XDYNAMICS_API xParticleCylindersContact : public xContact
 	struct host_cylinder_info
 	{
 		bool ismoving;
-		unsigned int mid;
 		unsigned int id;
+		unsigned int mid;
+		unsigned int empty_part;
+		double thickness;
 		vector3d len_rr;
 		vector3d pbase;
 		vector3d ptop;

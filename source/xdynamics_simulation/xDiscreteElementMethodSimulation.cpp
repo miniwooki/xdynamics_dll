@@ -180,6 +180,8 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 				xcm->ContactParticlesMeshObjects()->cudaMemoryAlloc(np);
 			if (xcm->ContactParticlesPlanes())
 				xcm->ContactParticlesPlanes()->cudaMemoryAlloc(np);
+			if (xcm->ContactParticlesCylinders())
+				xcm->ContactParticlesCylinders()->cudaMemoryAlloc(np);
 		}
 		device_dem_parameters dp;
 		dp.np = np;

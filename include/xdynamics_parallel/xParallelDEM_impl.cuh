@@ -1542,7 +1542,7 @@ __global__ void cylinder_contact_force_kernel(
 		cdist = particle_cylinder_contact_detection(dci, dbi, ipos3, unit, cpt, r, isInnerContact);
 		//double cdist = particle_plane_contact_detection(pl, ipos3, wp, unit, r);
 		if (cp->coh)
-			coh_s = limit_cohesion_depth(r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh);
+			coh_s = limit_cohesion_depth(r, 0, dcp.Ei, dcp.Ej, dcp.pri, dcp.prj, dcp.coh);
 		double2 sd = make_double2(0.0, 0.0);
 		if (cdist > 0)
 		{
@@ -1554,8 +1554,8 @@ __global__ void cylinder_contact_force_kernel(
 		else if (cdist <= 0 && abs(cdist) < abs(coh_s))
 		{
 			//printf("plane seperation cohesion contact. - %f", cdist);
-			double f = JKR_seperation_force(r, 0, cp->coh);
-			double cf = cohesionForce(r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, f);
+			double f = JKR_seperation_force(r, 0, dcp.coh);
+			double cf = cohesionForce(r, 0, dcp.Ei, dcp.Ej, dcp.pri, dcp.prj, dcp.coh, f);
 			//printf("f : %f, cf : %f\n", f, cf);
 			sumF = sumF - cf * unit;
 			tsd[new_count] = sd;
@@ -1575,8 +1575,8 @@ __global__ void cylinder_contact_force_kernel(
 			else if (cdist <= 0 && abs(cdist) < abs(coh_s))
 			{
 				//printf("plane seperation cohesion contact. - %f", cdist);
-				double f = JKR_seperation_force(r, 0, cp->coh);
-				double cf = cohesionForce(r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, f);
+				double f = JKR_seperation_force(r, 0, dcp.coh);
+				double cf = cohesionForce(r, 0, dcp.Ei, dcp.Ej, dcp.pri, dcp.prj, dcp.coh, f);
 				//printf("f : %f, cf : %f\n", f, cf);
 				sumF = sumF - cf * unit;
 				tsd[new_count] = sd;
