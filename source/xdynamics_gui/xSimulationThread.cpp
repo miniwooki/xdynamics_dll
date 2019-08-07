@@ -70,7 +70,7 @@ void xSimulationThread::run()
 		if (isStop)
 			break;
 		cstep++;
-		cout << cstep << endl;
+		//cout << cstep << endl;
 		eachStep++;
 		ct += xSimulation::dt;
 		xSimulation::setCurrentTime(ct);

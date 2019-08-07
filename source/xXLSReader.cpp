@@ -436,6 +436,7 @@ void xXLSReader::ReadDEMParticle(xDiscreteElementMethodModel* xdem, xObjectManag
 	if (xdem->XParticleManager())
 	{
 		int init_col = rc.y;
+		xParticleObject* xpo = NULL;
 		while (1)
 		{
 			if (IsEmptyCell(rc.x, rc.y))
@@ -465,11 +466,9 @@ void xXLSReader::ReadDEMParticle(xDiscreteElementMethodModel* xdem, xObjectManag
 			{
 				xCircleParticleData d = ReadCircleParticleData(name, rc.x, rc.y);
 				unsigned int p_np = xdem->XParticleManager()->NumParticle();
-				unsigned int np = 0;
-				unsigned int neach = 0;
-				unsigned int nstep = 0;
+			
 				unsigned int npcircle = xdem->XParticleManager()->GetNumCircleParticles(d.diameter, d.minr, d.maxr);
-				if (!IsEmptyCell(rc.x, rc.y))
+				/*if (!IsEmptyCell(rc.x, rc.y))
 				{
 					vector2i _rc = new_vector2i(0, 0);
 					xUtilityFunctions::xsplit(sheet->readStr(rc.x, rc.y++), ",", 2, &_rc.x);
@@ -485,14 +484,9 @@ void xXLSReader::ReadDEMParticle(xDiscreteElementMethodModel* xdem, xObjectManag
 						neach = npcircle;
 				}
 				else
-					np = xdem->XParticleManager()->GetNumCircleParticles(d.diameter, d.minr, d.maxr);
-				xParticleObject* xpo = xdem->XParticleManager()->CreateCircleParticle(name.c_str(), (xMaterialType)material, np, d);
-				if (neach && nstep)
-				{
-					xpo->setEachCount(npcircle);
-					xParticleCreateCondition xpcc = { p_np, np, neach, nstep };
-					xdem->XParticleManager()->AddParticleCreatingCondition(xpo, xpcc);
-				}
+					np = xdem->XParticleManager()->GetNumCircleParticles(d.diameter, d.minr, d.maxr);*/
+				xpo = xdem->XParticleManager()->CreateCircleParticle(name.c_str(), (xMaterialType)material, npcircle, d);
+				
 			}
 			else if (form == CLUSTER_SHAPE)
 			{
@@ -537,6 +531,31 @@ void xXLSReader::ReadDEMParticle(xDiscreteElementMethodModel* xdem, xObjectManag
 				xdem->XParticleManager()->CreateParticleFromList(name.c_str(), (xMaterialType)material, number, d, m);
 				delete[] d;
 				delete[] m;
+			}
+			
+			if (!IsEmptyCell(rc.x, rc.y))
+			{
+				unsigned int np = 0;
+				unsigned int neach = 0;
+				unsigned int nstep = 0;
+				vector2i _rc = new_vector2i(0, 0);
+				xUtilityFunctions::xsplit(sheet->readStr(rc.x, rc.y++), ",", 2, &_rc.x);
+				unsigned int _neach = 0;
+				_rc.x -= 1; _rc.y -= 1;
+				if (!IsEmptyCell(_rc.x, _rc.y))
+				{
+					np = sheet->readNum(_rc.x, _rc.y++);
+					neach = sheet->readNum(_rc.x, _rc.y++);
+					nstep = sheet->readNum(_rc.x, _rc.y);
+				}
+		/*		if (!neach)
+					neach = npcircle;*/
+				if (neach && nstep)
+				{
+					xpo->setEachCount(xpo->NumParticle());
+					xParticleCreateCondition xpcc = { xpo->StartIndex(), np, neach, nstep };
+					xdem->XParticleManager()->AddParticleCreatingCondition(xpo, xpcc);
+				}
 			}
 			if (!IsEmptyCell(rc.x, rc.y))
 			{

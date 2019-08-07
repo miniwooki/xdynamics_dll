@@ -491,9 +491,8 @@ xParticleObject* xParticleManager::CreateCircleParticle(
 	vector3d qu = cross(u, pu);
 	vector3d sp = new_vector3d(d.sx, d.sy, d.sz);
 	matrix33d A = { u.x, pu.x, qu.x, u.y, pu.y, qu.y, u.z, pu.z, qu.z };
-	while (1)
-	{
-		
+	/*while (1)
+	{*/
 		for (unsigned int i = 1; i <= nr; i++)
 		{
 			double _r = i * (2.0 * r + space);
@@ -501,6 +500,7 @@ xParticleObject* xParticleManager::CreateCircleParticle(
 			double th = 0.5 * k * r / _r;
 			unsigned int npr = static_cast<unsigned int>((2.0 * M_PI) / dth);
 			dth = ((2.0 * M_PI) / npr);
+			//double rval = r * space * frand();
 			for (unsigned int j = 0; j < npr; j++)
 			{
 				vector3d pp = new_vector3d(0, _r * sin(dth * j), _r * cos(dth * j));
@@ -511,17 +511,17 @@ xParticleObject* xParticleManager::CreateCircleParticle(
 				pos[cnt] = new_vector4d(gpp.x, gpp.y, gpp.z, r);
 			//	mass[cnt] = 0.0;
 				cnt++;
-				if (cnt == _np)
+				/*if (cnt == _np)
 				{
 					isStopCreating = true;
 					break;
-				}
+				}*/
 			}
-			if (isStopCreating) break;
+			//if (isStopCreating) break;
 		}
-		if (isStopCreating) break;
-		k++;
-	}
+	//	if (isStopCreating) break;
+	//	k++;
+	//}
 	
 	
 	if (d.minr != d.maxr)
@@ -871,31 +871,50 @@ void xParticleManager::AddParticleCreatingCondition(xParticleObject* xpo, xParti
 	unsigned int it = 0;
 	unsigned int k = 0;
 	QVector<unsigned int>::iterator iter = iList.begin();
-	QList<vector4d> pList;
-	
+	QVector<vector4d> pList;
+	QVector<double> mList;
+	QVector<vector3d> jList;
+	vector4d* mpos = xpo->Position();
+	double* mmass = xpo->Mass();
+	vector3d* miner = xpo->Inertia();
+	for (unsigned int i = 0; i < xpo->NumParticle(); i++)
+	{
+		pList.push_back(mpos[i]);
+		mList.push_back(mmass[i]);
+		jList.push_back(miner[i]);
+	}
+		
+	np = np - xpo->NumParticle();
+	xpo->resizeParticles(xpcc.count);
+	np = np + xpo->NumParticle();
 	while (1)
 	{
+		int sign = k % 2 ? 1 : -1;
 		if ((k + 1) * xpo->EachCount() > xpo->NumParticle())
 			it = xpo->NumParticle() - k * xpo->EachCount();
 		else
 			it = xpo->EachCount();
-		vector4d* pos = pos = xpo->Position() + k * xpo->EachCount();
-					
-		for (unsigned int i = 0; i < it; i++)
+		vector4d* pos = xpo->Position() + k * xpo->EachCount();
+		double* mass = xpo->Mass() + k * xpo->EachCount();
+		vector3d* inertia = xpo->Inertia() + k * xpo->EachCount();
+		/*for (unsigned int i = 0; i < it; i++)
 		{
 			pList.push_back(pos[i]);
-		}
+		}*/
 		unsigned int over = 0;
-		foreach(vector4d v, pList)
+		for(unsigned int i = 0; i < iList.size(); i++)
+		//foreach(vector4d v, pList)
 		{
 			if (over > it) break;
 			while (*iter >= it) { iter++; }
-			pos[*iter] = v;
+			pos[*iter] = pList.at(i) + sign * xpo->MaxRadius() * frand() * new_vector4d(0.1, 0.1, 0.1, 0.0);
+			mass[*iter] = mList.at(i);
+			inertia[*iter] = jList.at(i);
 			iter++;
 			over++;
 		}
 		iter = iList.begin();
-		pList.clear();
+		//pList.clear();
 		k++;
 		if (k * xpo->EachCount() > xpo->NumParticle())
 			break;

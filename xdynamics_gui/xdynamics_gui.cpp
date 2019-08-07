@@ -188,7 +188,7 @@ bool xdynamics_gui::ReadViewModel(QString path)
 			qf.read((char*)&d, sizeof(xPointMassData));
 			QString marker_name = name + "_marker";
 			xvMarker* xvm = xgl->makeMarker(marker_name, d);
-			xvm->setMarkerScale(0.1);
+			//xvm->setMarkerScale(0.1);
 			xvObject* xvo = xgl->Object(name);
 			if (xvo)
 			{

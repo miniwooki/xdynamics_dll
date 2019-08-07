@@ -102,6 +102,47 @@ void xParticleObject::CopyPosition(double* _pos)
 	memcpy(_pos + sid * 4, pos, sizeof(vector4d) * np);
 }
 
+void xParticleObject::resizeParticles(unsigned int new_np)
+{
+	if (pos)
+	{
+		vector4d* tmp = new vector4d[np];
+		memcpy(tmp, pos, sizeof(vector4d) * np);
+		delete[] pos;
+		pos = new vector4d[new_np];
+		memcpy(pos, tmp, sizeof(vector4d) * np);
+		delete[] tmp;
+	}
+	if (ep)
+	{
+		vector4d* tmp = new vector4d[np];
+		memcpy(tmp, ep, sizeof(vector4d) * np);
+		delete[] ep;
+		ep = new vector4d[new_np];
+		memcpy(ep, tmp, sizeof(vector4d) * np);
+		delete[] tmp;
+	}
+	if (mass)
+	{
+		double* tmp = new double[np];
+		memcpy(tmp, mass, sizeof(double) * np);
+		delete[] mass;
+		mass = new double[new_np];
+		memcpy(mass, tmp, sizeof(double) * np);
+		delete[] tmp;
+	}
+	if (inertia)
+	{
+		vector3d* tmp = new vector3d[np];
+		memcpy(tmp, inertia, sizeof(vector3d) * np);
+		delete[] inertia;
+		inertia = new vector3d[new_np];
+		memcpy(inertia, tmp, sizeof(vector3d) * np);
+		delete[] tmp;
+	}
+	np = new_np;
+}
+
 void xParticleObject::CopyMassAndInertia(double * _mass, vector3d* _inertia)
 {
 	unsigned int _np = shape == CLUSTER_SHAPE ? cnp : np;
@@ -243,3 +284,5 @@ void xParticleObject::setMassIndex(unsigned _mid)
 {
 	mid = _mid;
 }
+
+

@@ -366,7 +366,8 @@ void xParticleCylindersContact::cudaMemoryAlloc(unsigned int np)
 	 	checkCudaErrors(cudaMalloc((void**)&d_old_pair_start, sizeof(unsigned int) * np));*/
 	checkCudaErrors(cudaMemcpy(dci, hci, sizeof(device_cylinder_info) * ncylinders, cudaMemcpyHostToDevice));
 	checkCudaErrors(cudaMemcpy(dcp, _hcp, sizeof(device_contact_property) * ncylinders, cudaMemcpyHostToDevice));
-	 	/*checkCudaErrors(cudaMemset(d_pair_count, 0, sizeof(unsigned int) * np));
+	updateCylinderObjectData();
+	/*checkCudaErrors(cudaMemset(d_pair_count, 0, sizeof(unsigned int) * np));
 	 	checkCudaErrors(cudaMemset(d_old_pair_count, 0, sizeof(unsigned int) * np));
 	 	checkCudaErrors(cudaMemset(d_pair_start, 0, sizeof(unsigned int) * np));
 	 	checkCudaErrors(cudaMemset(d_old_pair_start, 0, sizeof(unsigned int) * np));*/

@@ -18,7 +18,7 @@ public:
 	void setShapeForm(xShapeType xst);
 	void setRelativeLocation(vector3d* rl);
 	void setMassIndex(unsigned _mid);
-
+	void resizeParticles(unsigned int new_np);
 	vector4d* AllocMemory(unsigned int _np);
 	//vector3d* AllocInertiaMemory(unsigned int _np);
 	vector4d* AllocClusterMemory(unsigned int _np);
