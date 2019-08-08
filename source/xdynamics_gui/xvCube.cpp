@@ -87,17 +87,20 @@ void xvCube::draw(GLenum eMode)
 			glRotated(ang.z, 0, 0, 1);
 		}
 		
-		glCallList(glList);
+		//glCallList(glList);
 		if (isSelected)
 		{
 			glLineWidth(2.0);
-			glLineStipple(5, 0x5555);
-			glEnable(GL_LINE_STIPPLE);
-			glColor3f(1.0f, 0.0f, 0.0f);
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			glCallList(glHiList);
-			glDisable(GL_LINE_STIPPLE);
+			//glLineStipple(5, 0x5555);
+			//glEnable(GL_LINE_STIPPLE);
+			//glColor3f(1.0f, 0.0f, 0.0f);
+			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			//glCallList(glHiList);
+			//glDisable(GL_LINE_STIPPLE);
 		}
+		else
+			glLineWidth(1.0);
+		glCallList(glList);
 		glPopMatrix();
 		//glEnable(GL_LIGHTING);
 		//glDisable(GL_BLEND);
@@ -123,37 +126,37 @@ bool xvCube::define()
 	glEndList();
 
 
-	glHiList = glGenLists(1);
-	glNewList(glHiList, GL_COMPILE);
-	//	glColor3f(1.0, 0.0, 0.0);
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	glBegin(GL_LINE_LOOP);
-	int *id = &indice[0];
-	glVertex3f(vertice[id[3] * 3 + 0], vertice[id[3] * 3 + 1], vertice[id[3] * 3 + 2]);
-	glVertex3f(vertice[id[2] * 3 + 0], vertice[id[2] * 3 + 1], vertice[id[2] * 3 + 2]);
-	glVertex3f(vertice[id[1] * 3 + 0], vertice[id[1] * 3 + 1], vertice[id[1] * 3 + 2]);
-	glVertex3f(vertice[id[0] * 3 + 0], vertice[id[0] * 3 + 1], vertice[id[0] * 3 + 2]);
-	glEnd();
-	glBegin(GL_LINE_LOOP);
-	id = &indice[5 * 4];
-	glVertex3f(vertice[id[3] * 3 + 0], vertice[id[3] * 3 + 1], vertice[id[3] * 3 + 2]);
-	glVertex3f(vertice[id[2] * 3 + 0], vertice[id[2] * 3 + 1], vertice[id[2] * 3 + 2]);
-	glVertex3f(vertice[id[1] * 3 + 0], vertice[id[1] * 3 + 1], vertice[id[1] * 3 + 2]);
-	glVertex3f(vertice[id[0] * 3 + 0], vertice[id[0] * 3 + 1], vertice[id[0] * 3 + 2]);
-	glEnd();
-	glBegin(GL_LINES);
-	glVertex3f(vertice[0], vertice[1], vertice[2]);
-	glVertex3f(vertice[3], vertice[4], vertice[5]);
+	//glHiList = glGenLists(1);
+	//glNewList(glHiList, GL_COMPILE);
+	////	glColor3f(1.0, 0.0, 0.0);
+	////glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//glBegin(GL_LINE_LOOP);
+	//int *id = &indice[0];
+	//glVertex3f(vertice[id[3] * 3 + 0], vertice[id[3] * 3 + 1], vertice[id[3] * 3 + 2]);
+	//glVertex3f(vertice[id[2] * 3 + 0], vertice[id[2] * 3 + 1], vertice[id[2] * 3 + 2]);
+	//glVertex3f(vertice[id[1] * 3 + 0], vertice[id[1] * 3 + 1], vertice[id[1] * 3 + 2]);
+	//glVertex3f(vertice[id[0] * 3 + 0], vertice[id[0] * 3 + 1], vertice[id[0] * 3 + 2]);
+	//glEnd();
+	//glBegin(GL_LINE_LOOP);
+	//id = &indice[5 * 4];
+	//glVertex3f(vertice[id[3] * 3 + 0], vertice[id[3] * 3 + 1], vertice[id[3] * 3 + 2]);
+	//glVertex3f(vertice[id[2] * 3 + 0], vertice[id[2] * 3 + 1], vertice[id[2] * 3 + 2]);
+	//glVertex3f(vertice[id[1] * 3 + 0], vertice[id[1] * 3 + 1], vertice[id[1] * 3 + 2]);
+	//glVertex3f(vertice[id[0] * 3 + 0], vertice[id[0] * 3 + 1], vertice[id[0] * 3 + 2]);
+	//glEnd();
+	//glBegin(GL_LINES);
+	//glVertex3f(vertice[0], vertice[1], vertice[2]);
+	//glVertex3f(vertice[3], vertice[4], vertice[5]);
 
-	glVertex3f(vertice[6], vertice[7], vertice[8]);
-	glVertex3f(vertice[9], vertice[10], vertice[11]);
+	//glVertex3f(vertice[6], vertice[7], vertice[8]);
+	//glVertex3f(vertice[9], vertice[10], vertice[11]);
 
-	glVertex3f(vertice[12], vertice[13], vertice[14]);
-	glVertex3f(vertice[15], vertice[16], vertice[17]);
+	//glVertex3f(vertice[12], vertice[13], vertice[14]);
+	//glVertex3f(vertice[15], vertice[16], vertice[17]);
 
-	glVertex3f(vertice[18], vertice[19], vertice[20]);
-	glVertex3f(vertice[21], vertice[22], vertice[23]);
-	glEnd();
-	glEndList();
+	//glVertex3f(vertice[18], vertice[19], vertice[20]);
+	//glVertex3f(vertice[21], vertice[22], vertice[23]);
+	//glEnd();
+	//glEndList();
 	return true;
 }

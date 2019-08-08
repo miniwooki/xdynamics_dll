@@ -18,8 +18,8 @@ public:
 private:
 	bool define();
 
-	unsigned int glHiList;
-	unsigned int glList;
+	//unsigned int glHiList;
+	//unsigned int glList;
 	float width;
 	float height;
 	vector3f p0;

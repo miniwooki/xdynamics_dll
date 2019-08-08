@@ -21,8 +21,8 @@ private:
 	bool define();
 	void setIndexList();
 	void setNormalList();
-	unsigned int glList;
-	unsigned int glHiList;
+//	unsigned int glList;
+	//unsigned int glHiList;
 // 	float len;
 // 	float r_top, r_bottom;
 // 	float p0[3];

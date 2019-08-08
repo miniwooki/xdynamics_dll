@@ -794,6 +794,7 @@ void xdynamics_gui::xReleaseOperation()
 {
 	if (wpm)
 		wpm->IsOnConnectGeomegry() = false;
+	xgl->releaseSelectedObjects();
 	ui.statusBar->setStatusTip(QString(""));
 }
 

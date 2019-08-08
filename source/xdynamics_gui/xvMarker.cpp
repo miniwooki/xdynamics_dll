@@ -60,6 +60,10 @@ void xvMarker::draw(GLenum eMode)
 			glRotated(ang.y, 1, 0, 0);
 			glRotated(ang.z, 0, 0, 1);
 		}
+		if (isSelected)
+			glLineWidth(2.0);
+		else
+			glLineWidth(1.0);
 		glCallList(glList);
 		glEnable(GL_LIGHTING);
 		glPopMatrix();

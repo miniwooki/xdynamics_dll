@@ -41,7 +41,7 @@ void xParticleCylindersContact::define(unsigned int i, xParticleCylinderContact 
 	hci[i] = { 
 		c_ptr->MovingObject(),
 		i,
-		c_ptr->MovingObject() ? nmoving - 1 : 0,
+		c_ptr->MovingObject() ? nmoving - 1 : i,
 		(unsigned int)c_ptr->empty_part_type(),
 		c_ptr->cylinder_thickness(),
 		c_ptr->cylinder_length(), 

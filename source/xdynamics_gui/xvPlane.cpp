@@ -74,17 +74,12 @@ void xvPlane::draw(GLenum eMode)
 			glRotated(ang.y, 1, 0, 0);
 			glRotated(ang.z, 0, 0, 1);
 		}
-		glCallList(glList);
+		
 		if (isSelected)
-		{
 			glLineWidth(2.0);
-			glLineStipple(5, 0x5555);
-			glEnable(GL_LINE_STIPPLE);
-			glColor3f(1.0f, 0.0f, 0.0f);
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			glCallList(glHiList);
-			glDisable(GL_LINE_STIPPLE);
-		}
+		else
+			glLineWidth(1.0);
+		glCallList(glList);
 		glPopMatrix();
 		glEnable(GL_LIGHTING);
 		//	qDebug() << nm << " is displayed - " << glList;
@@ -109,17 +104,17 @@ bool xvPlane::define()
 	glEnd();
 	glEndList();
 	//qDebug() << "glList - " << glList;
-	glHiList = glGenLists(1);
-	glNewList(glHiList, GL_COMPILE);
-	glBegin(GL_QUADS);
-	{
-		glVertex3f(p0.x, p0.y, p0.z);
-		glVertex3f(p1.x, p1.y, p1.z);
-		glVertex3f(p2.x, p2.y, p2.z);
-		glVertex3f(p3.x, p3.y, p3.z);
-		//glVertex3f(p0.x, p0.y, p0.z);
-	}
-	glEnd();
-	glEndList();
+	//glHiList = glGenLists(1);
+	//glNewList(glHiList, GL_COMPILE);
+	//glBegin(GL_QUADS);
+	//{
+	//	glVertex3f(p0.x, p0.y, p0.z);
+	//	glVertex3f(p1.x, p1.y, p1.z);
+	//	glVertex3f(p2.x, p2.y, p2.z);
+	//	glVertex3f(p3.x, p3.y, p3.z);
+	//	//glVertex3f(p0.x, p0.y, p0.z);
+	//}
+	//glEnd();
+	//glEndList();
 	return true;
 }

@@ -96,6 +96,7 @@ public:
 	bool is_set_particle() { return isSetParticle; }
 	void openResults(QStringList& fl);
 	void ChangeDisplayOption(int oid);
+	void releaseSelectedObjects();
 	xvObject* Object(QString n);
 	xvObject* Object(int id);
 	QMap<QString, xvObject*>& Objects() { return v_objs; }

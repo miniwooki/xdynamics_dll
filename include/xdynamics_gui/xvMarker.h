@@ -30,7 +30,7 @@ private:
 	QString attachObject;
 	bool markerScaleFlag;
 	float scale;
-	unsigned int glList;
+	//unsigned int glList;
 	//static float icon_scale;
 	//unsigned int glHiList;
 	//	float loc[3];

@@ -58,6 +58,7 @@ public:
 
 protected:
 	int id;
+	unsigned int glList;
 	Type type;
 	bool isSelected;
 	bool isBindPmrs;

@@ -1067,6 +1067,14 @@ void xGLWidget::ChangeDisplayOption(int oid)
 	viewOption = oid;
 }
 
+void xGLWidget::releaseSelectedObjects()
+{
+	foreach(xvObject* xo, selectedObjects)
+	{
+		xo->setSelected(false);
+	}
+}
+
 xvObject* xGLWidget::Object(QString nm)
 {
 	QStringList l = v_objs.keys();
@@ -1101,7 +1109,7 @@ xvMarker* xGLWidget::makeMarker(QString n, double x, double y, double z, bool mc
 
 xvMarker* xGLWidget::makeMarker(QString& _name, xPointMassData& d)
 {
-	xvMarker* vm = new xvMarker(_name, false);
+	xvMarker* vm = new xvMarker(_name, true);
 	//vm->setAttachObject(n);
 	vm->define(d);
 	v_objs[_name] = vm;

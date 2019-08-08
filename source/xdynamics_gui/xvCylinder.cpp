@@ -81,17 +81,12 @@ void xvCylinder::draw(GLenum eMode)
 			glRotatef(ang.y, 1, 0, 0);
 			glRotatef(ang.z, 0, 0, 1);
 		}		
-		glCallList(glList);
+		
 		if (isSelected)
-		{
 			glLineWidth(2.0);
-			glLineStipple(5, 0x5555);
-			glEnable(GL_LINE_STIPPLE);
-			glColor3f(1.0f, 0.0f, 0.0f);
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			glCallList(glHiList);
-			glDisable(GL_LINE_STIPPLE);
-		}
+		else
+			glLineWidth(1.0);
+		glCallList(glList);
 		glPopMatrix();
 		glEnable(GL_LIGHTING);
 	}
