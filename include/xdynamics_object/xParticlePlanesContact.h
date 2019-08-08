@@ -55,6 +55,7 @@ public:
 		unsigned int *sorted_id, unsigned int *cell_start, unsigned int *cell_end, unsigned int np);
 	//void setZeroCollisionForce();
 	device_plane_info* devicePlaneInfo();
+	device_body_info* devicePlaneBodyInfo();
 	unsigned int NumPlanes();
 	void getPlaneContactForce();
 

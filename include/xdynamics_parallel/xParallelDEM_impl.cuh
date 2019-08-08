@@ -1160,10 +1160,9 @@ __global__ void cluster_plane_contact_kernel(
 
 template <int TCM>
 __global__ void plane_contact_force_kernel(
-	device_plane_info *plane,
+	device_plane_info *plane, device_body_info* dbi, device_contact_property *cp,
 	double4* pos, double4 *ep, double3* vel, double4* ev,
-	double3* force, double3* moment,
-	device_contact_property *cp, double* mass,
+	double3* force, double3* moment, double* mass,
 	double3* tmax, double* rres,
 	unsigned int* pair_count, unsigned int* pair_id, double2* tsd, unsigned int np)
 {
@@ -1201,6 +1200,7 @@ __global__ void plane_contact_force_kernel(
 	{
 		double coh_s = 0;
 		device_plane_info pl = plane[k];
+		device_body_info bi = dbi[pl.mid];
 		double3 dp = make_double3(ipos.x, ipos.y, ipos.z) - pl.xw;
 		double3 unit = make_double3(0, 0, 0);
 		double3 wp = make_double3(dot(dp, pl.u1), dot(dp, pl.u2), dot(dp, pl.uw));
@@ -1211,25 +1211,36 @@ __global__ void plane_contact_force_kernel(
 		//printf("coh : %f, coh_s : %f\n", cp->coh, coh_s);
 		//printf("Ei*/ : %f, Ej : %f, pri : %f, pri : %f", c.kn, c.vn, c.ks, c.vs);
 		double2 sd = make_double2(0.0, 0.0);
+		double3 m_force = make_double3(0, 0, 0);
+		double3 cpt = ipos3 + r * unit;
+		double3 dcpr_j = cpt - bi.pos;
+		//double3 m_moment = make_double3(0, 0, 0);
 		if (cdist > 0) {
 			
 			//printf("plane contact. - %f", cdist);
 			for (unsigned int i = 0; i < old_count; i++)
 				if (p_pair_id[i] == k){ sd = p_tsd[i]; break; }
 			
-			double rcon = r - 0.5 * cdist;
-			double3 rc = r * unit;
-			double3 dv = -(ivel + cross(iomega, rc));
+			//double rcon = r - 0.5 * cdist;
+			//double3 rc = r * unit;
+			
+			double3 dcpr = cpt - ipos3;			
+			double3 oj = toAngularVelocity(bi.ep, bi.ed);
+			double3 dv = bi.vel + cross(oj, dcpr_j) - (ivel + cross(iomega, dcpr));
 			device_force_constant c = getConstant(TCM, r, 0.0, m, 0.0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->Gi, cp->Gj, cp->rest, cp->fric, cp->rfric, cp->sratio);
 			switch (TCM)
 			{
-			case 0: HMCModel(c, 0, 0, 0, 0, 0, 0, cp->coh, rcon, cdist, iomega, dv, unit, Ft, Fn, M); break;
+//			case 0: HMCModel(c, 0, 0, 0, 0, 0, 0, cp->coh, rcon, cdist, iomega, dv, unit, Ft, Fn, M); break;
 			case 1: DHSModel(c, r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, cdist, iomega, sd.x, sd.y, dv, unit, Ft, Fn); break;
 			}
-			calculate_previous_rolling_resistance(cp->rfric, r, 0, rc, Fn, Ft, res, tma);
+			calculate_previous_rolling_resistance(cp->rfric, r, 0, dcpr, Fn, Ft, res, tma);
 			//printf("kn : %f, cn : %f, ks : %f, cs : %f", c.kn, c.vn, c.ks, c.vs);
-			sumF += Fn + Ft;
-			sumM += cross(rc, Fn + Ft);
+			m_force = Fn + Ft;
+			//m_moment = cross(dcpr, m_force);
+			sumF += m_force;
+			sumM += cross(dcpr, m_force);
+			dbi[pl.mid].force += -m_force;
+			dbi[pl.mid].moment += -cross(dcpr_j, m_force);
 			tsd[new_count] = sd;
 			pair_id[new_count] = k;
 			new_count++;
@@ -1240,16 +1251,21 @@ __global__ void plane_contact_force_kernel(
 			double f = JKR_seperation_force(r, 0, cp->coh);
 			double cf = cohesionForce(r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, f);
 			//printf("f : %f, cf : %f\n", f, cf);
-			sumF = sumF - cf * unit;
+			m_force = - cf * unit;
+			sumF += m_force;
+			dbi[pl.mid].force += -m_force;
+			dbi[pl.mid].moment += -cross(dcpr_j, m_force);
 			tsd[new_count] = sd;
 			pair_id[new_count] = k;
 			new_count++;
 		}
+		
 	}
 	//printf("sumF = [%f, %f, %f]\n", sumF.x, sumF.y, sumF.z);
 	//printf("sumM = [%f, %f, %f]\n", sumM.x, sumM.y, sumM.z);
 	force[id] += sumF;
 	moment[id] += sumM;
+
 	if (new_count - sid > 3)
 		printf("The total of contact with plane is over(%d)\n.", new_count - sid);
 	pair_count[id] = new_count - sid;

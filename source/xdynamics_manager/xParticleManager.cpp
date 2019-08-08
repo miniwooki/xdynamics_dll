@@ -386,11 +386,12 @@ void xParticleManager::SetCurrentParticlesFromPartResult(std::string path)
 			vector4d* xpo_pos = xpo->Position();
 			memcpy(xpo_pos, m_pos + sid, sizeof(vector4d) * xnp);
 		//	qf.read((char*)m_pos, sizeof()
+			xpccs.erase(xpccs.find(xpo->Name()));
 		}
 		delete[] m_pos;
+		
 	}
 	qf.close();
-
 }
 
 xParticleObject* xParticleManager::CreateCubeParticle(
@@ -857,7 +858,7 @@ void xParticleManager::AllocParticleResultMemory(unsigned int npart, unsigned in
 
 void xParticleManager::AddParticleCreatingCondition(xParticleObject* xpo, xParticleCreateCondition& xpcc)
 {
-	xpccs.push_back(xpcc);
+	xpccs[xpo->Name()] = xpcc;
 	QRandomGenerator qran;
 	QVector<unsigned int> iList;
 	while (iList.size() != xpo->EachCount())

@@ -183,12 +183,12 @@ void XDYNAMICS_API cu_calculate_p2p(
 
 // Function for contact between particle and plane
 void XDYNAMICS_API cu_plane_contact_force(
-	const int tcm, device_plane_info* plan,
+	const int tcm, device_plane_info* plan, device_body_info* dbi, device_contact_property *cp,
 	double* pos, double* ep, double* vel, double* omega,
 	double* force, double* moment, double* mass,
 	double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd,
-	unsigned int np, device_contact_property *cp);
+	unsigned int np);
 
 void XDYNAMICS_API cu_cube_contact_force(
 	const int tcm, device_plane_info* plan,

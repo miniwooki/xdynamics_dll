@@ -26,7 +26,7 @@ int xIntegratorVV::Initialize(xDiscreteElementMethodModel* _xdem, xContactManage
 int xIntegratorVV::OneStepSimulation(double ct, unsigned int cstep)
 {
 	m_np = xdem->XParticleManager()->ExcuteCreatingCondition(ct, cstep, m_np);
-	std::cout << m_np << std::endl;
+	//std::cout << m_np << std::endl;
 	this->updatePosition(dpos, dcpos, dvel, dacc, dep, davel, daacc, m_np);
 	dtor->detection(dpos, (nPolySphere ? xcm->ContactParticlesMeshObjects()->SphereData() : NULL), nco ? np : m_np, nPolySphere);
 //	std::cout << "after detection " << std::endl;

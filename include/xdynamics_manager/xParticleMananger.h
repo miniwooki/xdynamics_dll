@@ -86,7 +86,7 @@ private:
 	//unsigned int per_np;
 	//double per_time;
 	QMap<QString, xParticleObject*> xpcos;
-	QList<xParticleCreateCondition> xpccs;
+	QMap<QString, xParticleCreateCondition> xpccs;
 
 	double *r_pos;
 	double *r_vel;

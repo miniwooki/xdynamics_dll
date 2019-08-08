@@ -431,10 +431,12 @@ void xContactManager::deviceCollision(
 		{
 			if (cpplane->NumContact())
 			{
-				cu_plane_contact_force(1, cpplane->devicePlaneInfo(), pos, ep, vel,
+				cu_plane_contact_force(1, cpplane->devicePlaneInfo(),
+					cpplane->devicePlaneBodyInfo(), cpplane->DeviceContactProperty(),
+					pos, ep, vel,
 					ev, force, moment, mass,
 					d_Tmax, d_RRes, d_pair_count_ppl, d_pair_id_ppl, d_tsd_ppl,
-					np, cpplane->DeviceContactProperty());
+					np);
 				cpplane->getPlaneContactForce();
 			}
 		}

@@ -198,6 +198,7 @@ bool xDynamicsSimulator::xRunSimulationThread(double ct, unsigned int cstep)
 			return false;
 		if (xdem)
 			xdem->updateObjectFromMBD();
+		xmbd->SetZeroBodyForce();
 	}
 		
 //	return xDynamicsError::xdynamicsErrorDiscreteElementMethodModelInitialization;

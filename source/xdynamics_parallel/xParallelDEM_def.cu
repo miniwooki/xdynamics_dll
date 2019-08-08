@@ -152,25 +152,25 @@ void cu_calculate_p2p(
 }
 
 void cu_plane_contact_force(
-	const int tcm, device_plane_info* plan,
+	const int tcm, device_plane_info* plan, device_body_info* dbi, device_contact_property *cp,
 	double* pos, double* ep, double* vel, double* ev,
 	double* force, double* moment, double* mass,
 	double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd,
-	unsigned int np, device_contact_property *cp)
+	unsigned int np)
 {
 	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
 	switch (tcm)
 	{
-	case 0: plane_contact_force_kernel<0> << < numBlocks, numThreads >> > (
-		plan, (double4 *)pos, (double4 *)ep, (double3 *)vel, (double4 *)ev,
-		(double3 *)force, (double3 *)moment, cp, mass,
-		(double3 *)tmax, rres,
-		pair_count, pair_id, (double2 *)tsd, np);
-		break;
+	//case 0: plane_contact_force_kernel<0> << < numBlocks, numThreads >> > (
+	//	plan, (double4 *)pos, (double4 *)ep, (double3 *)vel, (double4 *)ev,
+	//	(double3 *)force, (double3 *)moment, cp, mass,
+	//	(double3 *)tmax, rres,
+	//	pair_count, pair_id, (double2 *)tsd, np);
+	//	break;
 	case 1: plane_contact_force_kernel<1> << < numBlocks, numThreads >> > (
-		plan, (double4 *)pos, (double4 *)ep, (double3 *)vel, (double4 *)ev,
-		(double3 *)force, (double3 *)moment, cp, mass,
+		plan, dbi, cp, (double4 *)pos, (double4 *)ep, (double3 *)vel, (double4 *)ev,
+		(double3 *)force, (double3 *)moment, mass,
 		(double3 *)tmax, rres,
 		pair_count, pair_id, (double2 *)tsd, np);
 		break;
