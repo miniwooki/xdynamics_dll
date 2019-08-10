@@ -101,8 +101,8 @@ void xParticleCylindersContact::getCylinderContactForce()
 			xCylinderObject* o = xcy.value();
 			if (o->MovingObject())
 			{
-				o->setContactForce(hbi[id].force.x, hbi[id].force.y, hbi[id].force.z);
-				o->setContactMoment(hbi[id].moment.x, hbi[id].moment.y, hbi[id].moment.z);
+				o->addContactForce(hbi[id].force.x, hbi[id].force.y, hbi[id].force.z);
+				o->addContactMoment(hbi[id].moment.x, hbi[id].moment.y, hbi[id].moment.z);
 			}
 
 		}

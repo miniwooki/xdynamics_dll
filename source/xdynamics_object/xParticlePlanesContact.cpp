@@ -108,8 +108,8 @@ void xParticlePlanesContact::updataPlaneObjectData()
 {
 	unsigned int mcnt = 0;
 	device_body_info *bi = NULL;
-	//if (nmoving)
-	bi = new device_body_info[nmoving];
+	if (nmoving)
+		bi = new device_body_info[nmoving];
 	//else
 	//	return;
 	QMapIterator<unsigned int, xPlaneObject*> it(pair_ip);
@@ -139,7 +139,7 @@ void xParticlePlanesContact::updataPlaneObjectData()
 			if (xSimulation::Gpu())
 				checkCudaErrors(cudaMemcpy(dpi + id, &new_hpi, sizeof(device_plane_info), cudaMemcpyHostToDevice));
 		}
-		if (xSimulation::Gpu())
+		if (xSimulation::Gpu() && nmoving)
 		{
 			euler_parameters ep = p->EulerParameters(), ed = p->DEulerParameters();
 			bi[mcnt++] = {
@@ -154,7 +154,8 @@ void xParticlePlanesContact::updataPlaneObjectData()
 		}
 	}
 	//if (nmoving)
-	delete[] bi; 
+	if(bi)
+		delete[] bi; 
 	
 }
 
@@ -187,8 +188,11 @@ void xParticlePlanesContact::getPlaneContactForce()
 			xPlaneObject* o = xpl.value();
 			if (o->MovingObject())
 			{
-				o->setContactForce(hbi[id].force.x, hbi[id].force.y, hbi[id].force.z);
-				o->setContactMoment(hbi[id].moment.x, hbi[id].moment.y, hbi[id].moment.z);
+			//	std::cout << hbi[id].force.x << " " << hbi[id].force.y << " " << hbi[id].force.z << std::endl;
+				/*if (hbi[id].force.y != 0.0)
+					bool ddd = true;*/
+				o->addContactForce(hbi[id].force.x, hbi[id].force.y, hbi[id].force.z);
+				o->addContactMoment(hbi[id].moment.x, hbi[id].moment.y, hbi[id].moment.z);
 			}
 
 		}
