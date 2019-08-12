@@ -5,6 +5,8 @@ xContact::xContact()
 	: dcp(NULL)
 	, iobj(NULL)
 	, jobj(NULL)
+	, db_force(NULL)
+	, db_moment(NULL)
 	, cohesion(0)
 	, restitution(0)
 	, stiffnessRatio(0)
@@ -22,6 +24,8 @@ xContact::xContact(std::string _name, xContactPairType xcpt)
 	, dcp(NULL)
 	, iobj(NULL)
 	, jobj(NULL)
+	, db_force(NULL)
+	, db_moment(NULL)
 	, cohesion(0)
 	, restitution(0)
 	, stiffnessRatio(0)
@@ -37,6 +41,8 @@ xContact::xContact(const xContact& xc)
 	, type(xc.PairType())
 	, force_model(xc.ContactForceModel())
 	, dcp(NULL)
+	, db_force(NULL)
+	, db_moment(NULL)
 	, iobj(xc.FirstObject())
 	, jobj(xc.SecondObject())
 	, cohesion(xc.Cohesion())
@@ -364,4 +370,14 @@ double xContact::StiffMultiplyer() const
 void xContact::setStiffMultiplyer(double d)
 {
 	stiff_multiplyer = d;
+}
+
+double3 * xContact::deviceBodyForce()
+{
+	return db_force;
+}
+
+double3 * xContact::deviceBodyMoment()
+{
+	return db_moment;
 }

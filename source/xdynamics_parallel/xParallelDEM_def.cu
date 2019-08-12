@@ -153,6 +153,7 @@ void cu_calculate_p2p(
 
 void cu_plane_contact_force(
 	const int tcm, device_plane_info* plan, device_body_info* dbi, device_contact_property *cp,
+	double3* dbf, double3* dbm,
 	double* pos, double* ep, double* vel, double* ev,
 	double* force, double* moment, double* mass,
 	double* tmax, double* rres,
@@ -169,7 +170,8 @@ void cu_plane_contact_force(
 	//	pair_count, pair_id, (double2 *)tsd, np);
 	//	break;
 	case 1: plane_contact_force_kernel<1> << < numBlocks, numThreads >> > (
-		plan, dbi, cp, (double4 *)pos, (double4 *)ep, (double3 *)vel, (double4 *)ev,
+		plan, dbi, cp, dbf, dbm,
+		(double4 *)pos, (double4 *)ep, (double3 *)vel, (double4 *)ev,
 		(double3 *)force, (double3 *)moment, mass,
 		(double3 *)tmax, rres,
 		pair_count, pair_id, (double2 *)tsd, np);
@@ -203,6 +205,7 @@ void cu_cube_contact_force(
 void cu_cylinder_contact_force(
 	const int tcm, device_cylinder_info* cyl, 
 	device_body_info* bi, device_contact_property *cp,
+	double3* dbf, double3* dbm,
 	double* pos, double* ep, double* vel, double* ev,
 	double* force, double* moment,
 	double* mass, double* tmax, double* rres,
@@ -216,7 +219,7 @@ void cu_cylinder_contact_force(
 	//	(double3 *)force, (double3 *)moment, cp, mass, mpos, mf, mm, np);
 	//	break;
 	case 1: cylinder_contact_force_kernel<1> << < numBlocks, numThreads >> > (
-		cyl, bi, (double4 *)pos, (double4 *)ep, (double3 *)vel, (double4 *)ev,
+		cyl, bi, dbf, dbm, (double4 *)pos, (double4 *)ep, (double3 *)vel, (double4 *)ev,
 		(double3 *)force, (double3 *)moment, cp, mass, 
 		(double3* )tmax, rres, pair_count, pair_id, (double2 *)tsd, np);
 		break;

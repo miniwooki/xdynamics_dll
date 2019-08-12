@@ -40,6 +40,8 @@ public:
 	void setStiffnessRatio(double d);
 	void setRollingFactor(double d);
 	void setStiffMultiplyer(double d);
+	double3* deviceBodyForce();
+	double3* deviceBodyMoment();
 	//contactForce_type ForceMethod() const { return f_type; }
 	xMaterialPair MaterialPropertyPair() const;
 	xContactForceModelType ContactForceModel() const;
@@ -106,6 +108,8 @@ protected:
 // 	device_contact_property_f* dcp_f;
 	xObject* iobj;
 	xObject* jobj;
+	double3* db_force;
+	double3* db_moment;
 
 	double cohesion;
 	double restitution;

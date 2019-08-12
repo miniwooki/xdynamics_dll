@@ -77,12 +77,12 @@ void xParticleCylindersContact::updateCylinderObjectData()
 			bi[i] = {
 				c->Position().x, c->Position().y, c->Position().z,
 				c->Velocity().x, c->Velocity().y, c->Velocity().z,
-				0, 0, 0,
-				0, 0, 0,
 				ep.e0, ep.e1, ep.e2, ep.e3,
 				ed.e0, ed.e1, ed.e2, ed.e3
 			};
 		}
+		checkCudaErrors(cudaMemset(db_force, 0, sizeof(double3) * ncylinders));
+		checkCudaErrors(cudaMemset(db_moment, 0, sizeof(double3) * ncylinders));
 		checkCudaErrors(cudaMemcpy(dbi, bi, sizeof(device_body_info) * ncylinders, cudaMemcpyHostToDevice));
 	}
 }
@@ -91,8 +91,11 @@ void xParticleCylindersContact::getCylinderContactForce()
 {
 	if (nmoving)
 	{
-		device_body_info *hbi = new device_body_info[nmoving];
-		checkCudaErrors(cudaMemcpy(hbi, dbi, sizeof(device_body_info) * nmoving, cudaMemcpyDeviceToHost));
+		double3 *hbf = new double3[ncylinders];// device_body_force *hbf = new device_body_force[nmoving];
+		double3 *hbm = new double3[ncylinders];
+		//device_body_info *hbi = new device_body_info[nmoving];
+		checkCudaErrors(cudaMemcpy(hbf, db_force, sizeof(device_body_info) * ncylinders, cudaMemcpyDeviceToHost));
+		checkCudaErrors(cudaMemcpy(hbm, db_moment, sizeof(device_body_info) * ncylinders, cudaMemcpyDeviceToHost));
 		QMapIterator<unsigned int, xCylinderObject*> xcy(pair_ip);
 		while (xcy.hasNext())
 		{
@@ -101,12 +104,13 @@ void xParticleCylindersContact::getCylinderContactForce()
 			xCylinderObject* o = xcy.value();
 			if (o->MovingObject())
 			{
-				o->addContactForce(hbi[id].force.x, hbi[id].force.y, hbi[id].force.z);
-				o->addContactMoment(hbi[id].moment.x, hbi[id].moment.y, hbi[id].moment.z);
+				o->addContactForce(hbf[id].x, hbf[id].y, hbf[id].z);
+				o->addContactMoment(hbm[id].x, hbm[id].y, hbm[id].z);
 			}
 
 		}
-		delete[] hbi;
+		delete[] hbf;
+		delete[] hbm;
 	}	
 }
 
@@ -360,12 +364,16 @@ void xParticleCylindersContact::cudaMemoryAlloc(unsigned int np)
 	checkCudaErrors(cudaMalloc((void**)&dci, sizeof(device_cylinder_info) * ncylinders));
 	checkCudaErrors(cudaMalloc((void**)&dcp, sizeof(device_contact_property) * ncylinders));
 	checkCudaErrors(cudaMalloc((void**)&dbi, sizeof(device_body_info) * ncylinders));
+	checkCudaErrors(cudaMalloc((void**)&db_force, sizeof(double3) * ncylinders));
+	checkCudaErrors(cudaMalloc((void**)&db_moment, sizeof(double3) * ncylinders));
 	 	/*checkCudaErrors(cudaMalloc((void**)&d_pair_count, sizeof(unsigned int) * np));
 	 	checkCudaErrors(cudaMalloc((void**)&d_old_pair_count, sizeof(unsigned int) * np));
 	 	checkCudaErrors(cudaMalloc((void**)&d_pair_start, sizeof(unsigned int) * np));
 	 	checkCudaErrors(cudaMalloc((void**)&d_old_pair_start, sizeof(unsigned int) * np));*/
 	checkCudaErrors(cudaMemcpy(dci, hci, sizeof(device_cylinder_info) * ncylinders, cudaMemcpyHostToDevice));
 	checkCudaErrors(cudaMemcpy(dcp, _hcp, sizeof(device_contact_property) * ncylinders, cudaMemcpyHostToDevice));
+	checkCudaErrors(cudaMemset(db_force, 0, sizeof(double3) * ncylinders));
+	checkCudaErrors(cudaMemset(db_moment, 0, sizeof(double3) * ncylinders));
 	updateCylinderObjectData();
 	/*checkCudaErrors(cudaMemset(d_pair_count, 0, sizeof(unsigned int) * np));
 	 	checkCudaErrors(cudaMemset(d_old_pair_count, 0, sizeof(unsigned int) * np));
@@ -445,6 +453,8 @@ bool xParticleCylindersContact::pcylCollision(
 		vector3d sum_force = m_fn + m_ft;
 		F += sum_force;
 		M += cross(dcpr, sum_force);
+	/*	if(i==0)
+			printf("cyl force : [%e, %e, %e]\n", sum_force.x, sum_force.y, sum_force.z);*/
 		cy->addContactForce(-sum_force.x, -sum_force.y, -sum_force.z);
 		vector3d body_moment = -cross(dcpr_j, sum_force);
 		cy->addContactMoment(-body_moment.x, -body_moment.y, -body_moment.z);

@@ -16,6 +16,7 @@ xParticlePlanesContact::xParticlePlanesContact()
 	, xmps(NULL)
 	, hcmp(NULL)
 	, dbi(NULL)
+
 // 	, d_pair_count(NULL)
 // 	, d_old_pair_start(NULL)
 // 	, d_pair_start(NULL)
@@ -31,6 +32,8 @@ xParticlePlanesContact::~xParticlePlanesContact()
 	if (hpi) delete[] hpi; hpi = NULL;
 	if (dpi) checkCudaErrors(cudaFree(dpi)); dpi = NULL;
 	if (dbi) checkCudaErrors(cudaFree(dbi)); dbi = NULL;
+	if (db_force) checkCudaErrors(cudaFree(db_force)); db_force = NULL;
+	if (db_moment) checkCudaErrors(cudaFree(db_moment)); db_moment = NULL;
 // 	if (d_pair_count) checkCudaErrors(cudaFree(d_pair_count)); d_pair_count = NULL;
 // 	if (d_old_pair_start) checkCudaErrors(cudaFree(d_old_pair_start)); d_old_pair_start = NULL;
 // 	if (d_pair_start) checkCudaErrors(cudaFree(d_pair_start)); d_pair_start = NULL;
@@ -145,11 +148,13 @@ void xParticlePlanesContact::updataPlaneObjectData()
 			bi[mcnt++] = {
 				p->Position().x, p->Position().y, p->Position().z,
 				p->Velocity().x, p->Velocity().y, p->Velocity().z,
-				0, 0, 0,
-				0, 0, 0,
 				ep.e0, ep.e1, ep.e2, ep.e3,
 				ed.e0, ed.e1, ed.e2, ed.e3
 			};
+			checkCudaErrors(cudaMemset(db_force, 0, sizeof(double3) * nplanes));
+			checkCudaErrors(cudaMemset(db_moment, 0, sizeof(double3) * nplanes));
+			//std::cout << "plane_velocity : [" << p->Velocity().x << ", " << p->Velocity().y << ", " << p->Velocity().z << std::endl;
+			//std::cout << "plane_velocity : [" << p->Velocity().x << ", " << p->Velocity().y << ", " << p->Velocity().z << std::endl;
 			checkCudaErrors(cudaMemcpy(dbi, bi, sizeof(device_body_info) * nplanes, cudaMemcpyHostToDevice));
 		}
 	}
@@ -178,8 +183,11 @@ void xParticlePlanesContact::getPlaneContactForce()
 {
 	if (nmoving)
 	{
-		device_body_info *hbi = new device_body_info[nmoving];
-		checkCudaErrors(cudaMemcpy(hbi, dbi, sizeof(device_body_info) * nmoving, cudaMemcpyDeviceToHost));
+		double3 *hbf = new double3[nplanes];// device_body_force *hbf = new device_body_force[nmoving];
+		double3 *hbm = new double3[nplanes];
+		//device_body_info *hbi = new device_body_info[nmoving];
+		checkCudaErrors(cudaMemcpy(hbf, db_force, sizeof(double3) * nplanes, cudaMemcpyDeviceToHost));
+		checkCudaErrors(cudaMemcpy(hbm, db_moment, sizeof(double3) * nplanes, cudaMemcpyDeviceToHost));
 		QMapIterator<unsigned int, xPlaneObject*> xpl(pair_ip);
 		while (xpl.hasNext())
 		{
@@ -188,15 +196,16 @@ void xParticlePlanesContact::getPlaneContactForce()
 			xPlaneObject* o = xpl.value();
 			if (o->MovingObject())
 			{
-			//	std::cout << hbi[id].force.x << " " << hbi[id].force.y << " " << hbi[id].force.z << std::endl;
+				std::cout << "plane force : [" << hbf[id].x << ", " << hbf[id].y << ", " << hbf[id].z << "]" << std::endl;
 				/*if (hbi[id].force.y != 0.0)
 					bool ddd = true;*/
-				o->addContactForce(hbi[id].force.x, hbi[id].force.y, hbi[id].force.z);
-				o->addContactMoment(hbi[id].moment.x, hbi[id].moment.y, hbi[id].moment.z);
+				o->addContactForce(hbf[id].x, hbf[id].y, hbf[id].z);
+				o->addContactMoment(hbm[id].x, hbm[id].y, hbm[id].z);
 			}
 
 		}
-		delete[] hbi;
+		delete[] hbf;
+		delete[] hbm;
 	}
 }
 
@@ -437,13 +446,17 @@ void xParticlePlanesContact::cudaMemoryAlloc(unsigned int np)
 	checkCudaErrors(cudaMalloc((void**)&dpi, sizeof(device_plane_info) * nplanes));
 	checkCudaErrors(cudaMalloc((void**)&dcp, sizeof(device_contact_property) * nplanes));
 	checkCudaErrors(cudaMalloc((void**)&dbi, sizeof(device_body_info) * nplanes));
+	checkCudaErrors(cudaMalloc((void**)&db_force, sizeof(double3) * nplanes));
+	checkCudaErrors(cudaMalloc((void**)&db_moment, sizeof(double3) * nplanes));
 // 	checkCudaErrors(cudaMalloc((void**)&d_pair_count, sizeof(unsigned int) * np));
 // 	checkCudaErrors(cudaMalloc((void**)&d_old_pair_count, sizeof(unsigned int) * np));
 // 	checkCudaErrors(cudaMalloc((void**)&d_pair_start, sizeof(unsigned int) * np));
 // 	checkCudaErrors(cudaMalloc((void**)&d_old_pair_start, sizeof(unsigned int) * np));
 	checkCudaErrors(cudaMemcpy(dpi, hpi, sizeof(device_plane_info) * nplanes, cudaMemcpyHostToDevice));
 	checkCudaErrors(cudaMemcpy(dcp, _hcp, sizeof(device_contact_property) * nplanes, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMemset(dbi, 0, sizeof(device_body_info) * nplanes));
+	checkCudaErrors(cudaMemset(dbi, 0, sizeof(device_body_info) * nplanes));	
+	checkCudaErrors(cudaMemset(db_force, 0, sizeof(double3) * nplanes));
+	checkCudaErrors(cudaMemset(db_moment, 0, sizeof(double3) * nplanes));
 // 	checkCudaErrors(cudaMemset(d_pair_count, 0, sizeof(unsigned int) * np));
 // 	checkCudaErrors(cudaMemset(d_old_pair_count, 0, sizeof(unsigned int) * np));
 // 	checkCudaErrors(cudaMemset(d_pair_start, 0, sizeof(unsigned int) * np));

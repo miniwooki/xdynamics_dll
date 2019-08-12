@@ -433,10 +433,10 @@ void xContactManager::deviceCollision(
 			{
 				cu_plane_contact_force(1, cpplane->devicePlaneInfo(),
 					cpplane->devicePlaneBodyInfo(), cpplane->DeviceContactProperty(),
+					cpplane->deviceBodyForce(), cpplane->deviceBodyMoment(),
 					pos, ep, vel,
 					ev, force, moment, mass,
-					d_Tmax, d_RRes, d_pair_count_ppl, d_pair_id_ppl, d_tsd_ppl,
-					np);
+					d_Tmax, d_RRes, d_pair_count_ppl, d_pair_id_ppl, d_tsd_ppl, np);
 				cpplane->getPlaneContactForce();
 			}
 		}
@@ -446,6 +446,7 @@ void xContactManager::deviceCollision(
 			{
 				cu_cylinder_contact_force(1, cpcylinders->deviceCylinderInfo(), 
 					cpcylinders->deviceCylinderBodyInfo(), cpcylinders->DeviceContactProperty(),
+					cpplane->deviceBodyForce(), cpplane->deviceBodyMoment(),
 					pos, ep, vel, ev, force, moment, mass,
 					d_Tmax, d_RRes, d_pair_count_pcyl, d_pair_id_pcyl, d_tsd_pcyl, np);
 				cpcylinders->getCylinderContactForce();

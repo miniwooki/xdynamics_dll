@@ -87,10 +87,14 @@ struct device_body_info
 {
 	double3 pos;
 	double3 vel;
-	double3 force;
-	double3 moment;
 	double4 ep;
 	double4 ed;
+};
+
+struct device_body_force
+{
+	double3 force;
+	double3 moment;
 };
 
 struct device_tsda_connection_body_data
@@ -184,6 +188,7 @@ void XDYNAMICS_API cu_calculate_p2p(
 // Function for contact between particle and plane
 void XDYNAMICS_API cu_plane_contact_force(
 	const int tcm, device_plane_info* plan, device_body_info* dbi, device_contact_property *cp,
+	double3* dbf, double3* dbm,
 	double* pos, double* ep, double* vel, double* omega,
 	double* force, double* moment, double* mass,
 	double* tmax, double* rres,
@@ -209,6 +214,7 @@ void XDYNAMICS_API cu_particle_polygonObject_collision(
 // Function for contact between particle and cylinder
 void XDYNAMICS_API cu_cylinder_contact_force(
 	const int tcm, device_cylinder_info* cyl, device_body_info* bi, device_contact_property *cp,
+	double3* dbf, double3* dbm,
 	double* pos, double* ep, double* vel, double* omega,
 	double* force, double* moment, double* mass,
 	double* tmax, double* rres,
