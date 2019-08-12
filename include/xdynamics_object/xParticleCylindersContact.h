@@ -34,7 +34,7 @@ public:
 	void getCylinderContactForce();
 	device_cylinder_info* deviceCylinderInfo();
 	device_body_info* deviceCylinderBodyInfo();
-	
+	device_body_force* deviceCylinderBodyForceAndMoment();
 	void updateCollisionPair(xContactPairList& xcpl, double r, vector3d pos);
 	virtual void cudaMemoryAlloc(unsigned int np);
 	virtual void cuda_collision(
@@ -55,6 +55,7 @@ private:
 	host_cylinder_info *hci;
 	device_cylinder_info* dci;
 	device_body_info* dbi;
+	device_body_force* dbf;
 };
 
 #endif

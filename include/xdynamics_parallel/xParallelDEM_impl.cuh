@@ -1176,9 +1176,8 @@ __global__ void cluster_plane_contact_kernel(
 	rres[id] += res;
 }
 
-template <int TCM>
 __global__ void plane_contact_force_kernel(
-	device_plane_info *plane, device_body_info* dbi, device_contact_property *cp,
+	device_plane_info *plane, unsigned int k, device_body_info* dbi, device_contact_property *cp,
 	double3* dbf, double3* dbm,
 	double4* pos, double4 *ep, double3* vel, double4* ev,
 	double3* force, double3* moment, double* mass,
@@ -1198,6 +1197,8 @@ __global__ void plane_contact_force_kernel(
 		p_pair_id[i] = pair_id[sid + i];
 		p_tsd[i] = tsd[sid + i];
 	}
+	dbf[id] = make_double3(0, 0, 0);
+	dbm[id] = make_double3(0, 0, 0);
 	//for(unsigned int i = 0; i < cte.nplane)
 	unsigned int old_count = pair_count[id];
 	double m = mass[id];
@@ -1213,12 +1214,12 @@ __global__ void plane_contact_force_kernel(
 
 	double3 sumF = make_double3(0.0, 0.0, 0.0);
 	double3 sumM = make_double3(0.0, 0.0, 0.0);
-	unsigned int new_count = sid;
+	unsigned int new_count = sid + (k ? old_count : 0);
 	
 	double res = 0.0;
 	double3 tma = make_double3(0.0, 0.0, 0.0);
-	for (unsigned int k = 0; k < cte.nplane; k++)
-	{
+	//for (unsigned int k = 0; k < cte.nplane; k++)
+	//{
 		double coh_s = 0;
 		device_plane_info pl = plane[k];
 		device_body_info bi = dbi[pl.mid];
@@ -1241,7 +1242,7 @@ __global__ void plane_contact_force_kernel(
 		if (cdist > 0) {
 			
 			
-			for (unsigned int i = 0; i < old_count; i++)
+			for (unsigned int i = 0; i < 3; i++)
 				if (p_pair_id[i] == k){ sd = p_tsd[i]; break; }
 			
 			//double rcon = r - 0.5 * cdist;
@@ -1251,7 +1252,7 @@ __global__ void plane_contact_force_kernel(
 			double3 oj = toAngularVelocity(bi.ep, bi.ed);
 			double3 dv = bi.vel + cross(oj, dcpr_j) - (ivel + cross(iomega, dcpr));
 			//printf("body_vel : [%f, %f, %f]\n", bi.vel.x, bi.vel.y, bi.vel.z);
-			device_force_constant c = getConstant(TCM, r, 0.0, m, 0.0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->Gi, cp->Gj, cp->rest, cp->fric, cp->rfric, cp->sratio);
+			device_force_constant c = getConstant(1, r, 0.0, m, 0.0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->Gi, cp->Gj, cp->rest, cp->fric, cp->rfric, cp->sratio);
 			/*printf("cdist : %e\n", cdist);
 			printf("ipos : [%e, %e, %e]\n", ipos3.x, ipos3.y, ipos3.z);
 			printf("jpos : [%e, %e, %e]\n", bi.pos.x, bi.pos.y, bi.pos.z);
@@ -1274,10 +1275,10 @@ __global__ void plane_contact_force_kernel(
 			//m_moment = cross(dcpr, m_force);
 			sumF += m_force;
 			sumM += cross(dcpr, m_force);
-			dbf[pl.mid] += -m_force;
-			printf("[%d][%d] plane force : [%e, %e, %e]\n", id, m_force.x, m_force.y, m_force.z);
-			printf("[%d][%d] summa force : [%e, %e, %e]\n", id, dbf[pl.mid].x, dbf[pl.mid].y, dbf[pl.mid].z);
-			dbm[pl.mid] += -cross(dcpr_j, m_force);
+			dbf[id] += -m_force;
+			printf("[%d] plane force : [%e, %e, %e]\n", id, m_force.x, m_force.y, m_force.z);
+			//printf("[%d][%d] summa force : [%e, %e, %e]\n", id, dbf[id].x, dbf[id].y, dbf[id].z);
+			dbm[id] += -cross(dcpr_j, m_force);
 			tsd[new_count] = sd;
 			pair_id[new_count] = k;
 			new_count++;
@@ -1290,22 +1291,22 @@ __global__ void plane_contact_force_kernel(
 			//printf("f : %f, cf : %f\n", f, cf);
 			m_force = -cf * unit;
 			sumF += m_force;
-			dbf[pl.mid] += -m_force;
-			dbm[pl.mid] += -cross(dcpr_j, m_force);
+			dbf[id] += -m_force;
+			dbm[id] += -cross(dcpr_j, m_force);
 			tsd[new_count] = sd;
 			pair_id[new_count] = k;
 			new_count++;
 		}
 		
-	}
+	//}
 	//printf("sumF = [%f, %f, %f]\n", sumF.x, sumF.y, sumF.z);
 	//printf("sumM = [%f, %f, %f]\n", sumM.x, sumM.y, sumM.z);
 	force[id] += sumF;
 	moment[id] += sumM;
 
-	if (new_count - sid > 3)
+	if (new_count - id * 3 > 3)
 		printf("The total of contact with plane is over(%d)\n.", new_count - sid);
-	pair_count[id] = new_count - sid;
+	pair_count[id] = new_count - id * 3;
 	//f("idx %d : %d\n", id, new_count - sid);
 	tmax[id] += tma;
 	rres[id] += res;
@@ -1399,7 +1400,7 @@ __device__ void particle_cylinder_contact_force(
 	double3 Fn = make_double3(0.0, 0.0, 0.0);
 	double3 Ft = make_double3(0, 0, 0);
 	double3 omega = toAngularVelocity(dbi.ep, dbi.ed);
-	for (unsigned int i = 0; i < old_count; i++)
+	for (unsigned int i = 0; i < MAX_P2CY_COUNT; i++)
 		if (p_pair_id[i] == pid) { sd = p_tsd[i]; break; }
 	double3 rc = cpt - ipos;// r * unit;
 	double3 dv = dbi.vel + cross(omega, po2cp) - (ivel + cross(iomega, rc));
@@ -1422,8 +1423,8 @@ __device__ void particle_cylinder_contact_force(
 	printf("res : %e, tma : [%e, %e, %e]\n", res, tma.x, tma.y, tma.z);*/
 	sum_force += Fn + Ft;
 	sum_moment += cross(rc, Fn + Ft);
-	dbf[dci.mid] += -(Fn + Ft);// +make_double3(1.0, 5.0, 9.0);
-	dbm[dci.mid] += -cross(po2cp, Fn + Ft);
+	dbf[id] += -(Fn + Ft);// +make_double3(1.0, 5.0, 9.0);
+	dbm[id] += -cross(po2cp, Fn + Ft);
 	tsd[new_count] = sd;
 	pair_id[new_count] = pid;
 	new_count++;
@@ -1559,9 +1560,8 @@ __device__ double particle_cylinder_inner_base_or_top_contact_detection(
 	return gab;
 }
 
-template<int TCM>
 __global__ void cylinder_contact_force_kernel(
-	device_cylinder_info *cy, device_body_info* bi,
+	device_cylinder_info *cy, unsigned int k, device_body_info* bi,
 	double3* dbf, double3* dbm,
 	double4* pos, double4 *ep, double3* vel, double4* ev,
 	double3* force, double3* moment, device_contact_property *cp,
@@ -1581,6 +1581,8 @@ __global__ void cylinder_contact_force_kernel(
 		p_pair_id[i] = pair_id[sid + i];
 		p_tsd[i] = tsd[sid + i];
 	}
+	dbf[id] = make_double3(0, 0, 0);
+	dbm[id] = make_double3(0, 0, 0);
 	unsigned int old_count = pair_count[id];
 	double m = mass[id];
 	double4 ipos = pos[id];
@@ -1595,15 +1597,15 @@ __global__ void cylinder_contact_force_kernel(
 
 	double3 sumF = make_double3(0.0, 0.0, 0.0);
 	double3 sumM = make_double3(0.0, 0.0, 0.0);
-	unsigned int new_count = sid;
+	unsigned int new_count = sid + (k ? old_count : 0);
 
 	double res = 0.0;
 	double3 tma = make_double3(0.0, 0.0, 0.0);
 	device_body_info dbi = { 0, };
 	double cdist = 0;
 	double3 cpt = make_double3(0.0, 0.0, 0.0);
-	for (unsigned int k = 0; k < cte.ncylinder; k++)
-	{
+	//for (unsigned int k = 0; k < cte.ncylinder; k++)
+	//{
 		bool isInnerContact = false;
 		double coh_s = 0;
 		device_cylinder_info dci = cy[k];
@@ -1638,8 +1640,8 @@ __global__ void cylinder_contact_force_kernel(
 			//printf("f : %f, cf : %f\n", f, cf);
 			double3 m_force = -cf * unit;
 			sumF = sumF + m_force;
-			dbf[dci.mid] += -m_force;
-			dbm[dci.mid] += -cross(cpt - dbi.pos, m_force);
+			dbf[id] += -m_force;
+			dbm[id] += -cross(cpt - dbi.pos, m_force);
 			tsd[new_count] = sd;
 			pair_id[new_count] = k;
 			new_count++;
@@ -1665,8 +1667,8 @@ __global__ void cylinder_contact_force_kernel(
 				//printf("f : %f, cf : %f\n", f, cf);
 				double3 m_force = -cf * unit;
 				sumF = sumF + m_force;
-				dbf[dci.mid] += -m_force;
-				dbm[dci.mid] += -cross(cpt - dbi.pos, m_force);
+				dbf[id] += -m_force;
+				dbm[id] += -cross(cpt - dbi.pos, m_force);
 				tsd[new_count] = sd;
 				pair_id[new_count] = k + 1000;
 				new_count++;
@@ -1683,7 +1685,7 @@ __global__ void cylinder_contact_force_kernel(
 		//bi[dci.mid].force += dbi.force;
 		//bi[dci.mid].moment += dbi.moment;
 		//}		
-	}
+	//}
 	//if (id == 0)
 	//{
 	////	printf("[%d] particle posit : [%e, %e, %e], particle veloci : [%e, %e, %e]\n", id, ipos3.x, ipos3.y, ipos3.z, ivel.x, ivel.y, ivel.z);
@@ -1700,7 +1702,7 @@ __global__ void cylinder_contact_force_kernel(
 template <typename T, unsigned int blockSize>
 __global__ void reduce6(T *g_idata, T *g_odata, unsigned int n)
 {
-	/*extern*/ __shared__ T sdata[512];
+	extern __shared__ T sdata[];
 	unsigned int tid = threadIdx.x;
 	unsigned int i = blockIdx.x*(blockSize * 2) + tid;
 	unsigned int gridSize = blockSize * 2 * gridDim.x;

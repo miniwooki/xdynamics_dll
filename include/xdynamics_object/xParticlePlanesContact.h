@@ -56,7 +56,7 @@ public:
 	//void setZeroCollisionForce();
 	device_plane_info* devicePlaneInfo();
 	device_body_info* devicePlaneBodyInfo();
-	
+	device_body_force* deviceBodyForceAndMoment();
 	unsigned int NumPlanes();
 	void getPlaneContactForce();
 
@@ -77,7 +77,7 @@ private:
 	host_plane_info* hpi;
 	device_plane_info* dpi;
 	device_body_info* dbi;
-	
+	device_body_force* dbf;
 	QMap<unsigned int, xPlaneObject*> pair_ip;
 
 	//device_plane_info *hpmi;

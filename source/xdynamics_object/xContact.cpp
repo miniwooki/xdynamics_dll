@@ -1,12 +1,13 @@
 #include "xdynamics_object/xConatct.h"
 #include "xdynamics_simulation//xSimulation.h"
 
+double3* xContact::db_force = NULL;
+double3* xContact::db_moment = NULL;
+
 xContact::xContact()
 	: dcp(NULL)
 	, iobj(NULL)
 	, jobj(NULL)
-	, db_force(NULL)
-	, db_moment(NULL)
 	, cohesion(0)
 	, restitution(0)
 	, stiffnessRatio(0)
@@ -24,8 +25,6 @@ xContact::xContact(std::string _name, xContactPairType xcpt)
 	, dcp(NULL)
 	, iobj(NULL)
 	, jobj(NULL)
-	, db_force(NULL)
-	, db_moment(NULL)
 	, cohesion(0)
 	, restitution(0)
 	, stiffnessRatio(0)
@@ -41,8 +40,6 @@ xContact::xContact(const xContact& xc)
 	, type(xc.PairType())
 	, force_model(xc.ContactForceModel())
 	, dcp(NULL)
-	, db_force(NULL)
-	, db_moment(NULL)
 	, iobj(xc.FirstObject())
 	, jobj(xc.SecondObject())
 	, cohesion(xc.Cohesion())
@@ -57,12 +54,12 @@ xContact::xContact(const xContact& xc)
 		checkCudaErrors(cudaMalloc((void**)&dcp, sizeof(device_contact_property)));
 		checkCudaErrors(cudaMemcpy(dcp, xc.DeviceContactProperty(), sizeof(device_contact_property), cudaMemcpyDeviceToDevice));
 	}
-
 }
 
 xContact::~xContact()
 {
-
+	if (db_force) checkCudaErrors(cudaFree(db_force)); db_force = NULL;
+	if (db_moment) checkCudaErrors(cudaFree(db_moment)); db_moment = NULL;
 }
 
 xContactForceModelType xContact::ContactForceModel() const
@@ -335,6 +332,10 @@ void xContact::cudaMemoryAlloc(unsigned int np)
 	}*/
 	checkCudaErrors(cudaMalloc((void**)&dcp, sizeof(device_contact_property)));
 	checkCudaErrors(cudaMemcpy(dcp, &hcp, sizeof(device_contact_property), cudaMemcpyHostToDevice));
+	if (!db_force)
+		checkCudaErrors(cudaMalloc((void**)&db_force, sizeof(double3) * np));
+	if (!db_moment)
+		checkCudaErrors(cudaMalloc((void**)&db_moment, sizeof(double3) * np));
 }
 
 //void xContact::collision(
