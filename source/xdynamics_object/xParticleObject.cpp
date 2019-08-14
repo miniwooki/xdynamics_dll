@@ -145,8 +145,8 @@ void xParticleObject::resizeParticles(unsigned int new_np)
 
 void xParticleObject::CopyMassAndInertia(double * _mass, vector3d* _inertia)
 {
-	unsigned int _np = shape == CLUSTER_SHAPE ? cnp : np;
-	unsigned int _sid = shape == CLUSTER_SHAPE ? csid : sid;
+	unsigned int _np = form == CLUSTER_SHAPE ? cnp : np;
+	unsigned int _sid = form == CLUSTER_SHAPE ? csid : sid;
 	memcpy(_mass + _sid, mass, sizeof(double) * _np);
 	memcpy(_inertia + _sid, inertia, sizeof(vector3d) * _np);
 	/*if (shape != NO_SHAPE_AND_MASS)

@@ -347,6 +347,7 @@ void cu_cluster_plane_contact(
 	memset(dbfm, 0, sizeof(device_body_force) * nplanes);
 	double3* dbf = xContact::deviceBodyForce();
 	double3* dbm = xContact::deviceBodyMoment();
+	//double3* h_dbf = new double3[np];
 	for (unsigned int i = 0; i < nplanes; i++)
 	{
 		cluster_plane_contact_kernel << < numBlocks, numThreads >> > (
@@ -362,6 +363,7 @@ void cu_cluster_plane_contact(
 			(double3 *)tmax, rres,
 			pair_count, pair_id, 
 			(double2 *)tsd, xci, np);
+		//cudaMemcpy(h_dbf, dbf, sizeof(double3) * np, cudaMemcpyDeviceToHost);
 		dbfm[i].force += reductionD3(dbf, np);
 		dbfm[i].moment += reductionD3(dbm, np);
 	}

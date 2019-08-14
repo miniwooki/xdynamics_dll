@@ -291,6 +291,7 @@ QString xDiscreteElementMethodSimulation::SaveStepResult(unsigned int pt, double
 	{
 		qf.write((char*)&ct, sizeof(double));
 		qf.write((char*)&np, sizeof(unsigned int));
+		qf.write((char*)&ns, sizeof(unsigned int));
 		qf.write((char*)pos, sizeof(double) * np * 4);
 		qf.write((char*)vel, sizeof(double) * ns * 3);
 		//qf.write((char*)ep, sizeof(double) * np * 4);

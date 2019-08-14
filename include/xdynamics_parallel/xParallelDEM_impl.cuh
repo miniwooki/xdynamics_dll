@@ -1179,7 +1179,7 @@ __global__ void cluster_plane_contact_kernel(
 		}
 //	}
 
-	printf("dbf[%d] : [%e, %e, %e]\n", id, dbf[id].x, dbf[id].y, dbf[id].z);
+	//printf("dbf[%d] : [%e, %e, %e]\n", id, dbf[id].x, dbf[id].y, dbf[id].z);
 	force[id] += sumF;
 	moment[id] += sumM;
 	pair_count[id] = new_count - id * 3;

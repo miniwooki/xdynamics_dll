@@ -293,49 +293,45 @@ bool xvParticle::UploadParticleFromFile(unsigned int i, QString path)
 {
 	//qDebug() << i;
 	double ct = 0.0;
+	unsigned int neach = 1;
 	unsigned int inp = 0;
+	unsigned int ins = 0;
 	unsigned int sid = 0;
 	unsigned int vid = 0;
 	QFile qf(path);
 	qf.open(QIODevice::ReadOnly);
 	qf.read((char*)&ct, sizeof(double));
 	qf.read((char*)&inp, sizeof(unsigned int));
+	qf.read((char*)&ins, sizeof(unsigned int));
 	if (np != inp)
 	{
 		return false;
 	}
+	if (inp != ins)
+		neach = inp / ins;
 	sid = inp * i * 4;
 	vid = inp * i * 3;
 	double *_pos = new double[inp * 4];
-	double *_vel = new double[inp * 3];
+	double *_vel = new double[ins * 3];
 	qf.read((char*)_pos, sizeof(double) * inp * 4);
-	qf.read((char*)_vel, sizeof(double) * inp * 3);
+	qf.read((char*)_vel, sizeof(double) * ins * 3);
 	qf.close();
 	xvAnimationController::addTime(i, ct);
 	for (unsigned int j = 0; j < inp; j++)
 	{
 		unsigned int s = j * 4;
-		unsigned int v = j * 3;
+		
 		vector4f p = new_vector4f(
 			static_cast<float>(_pos[s + 0]),
 			static_cast<float>(_pos[s + 1]),
 			static_cast<float>(_pos[s + 2]),
 			static_cast<float>(_pos[s + 3]));
-		vector3f vv = new_vector3f(
-			static_cast<float>(_vel[v + 0]),
-			static_cast<float>(_vel[v + 1]),
-			static_cast<float>(_vel[v + 2]));
+
 		s += sid;
-		v += vid;
 		buffers[s + 0] = p.x;// static_cast<float>(_pos[s + 0]);
 		buffers[s + 1] = p.y;// static_cast<float>(_pos[s + 1]);
 		buffers[s + 2] = p.z;// static_cast<float>(_pos[s + 2]);
 		buffers[s + 3] = p.w;// static_cast<float>(_pos[s + 3]);
-
-		vbuffers[v + 0] = vv.x;// static_cast<float>(_vel[v + 0]);
-		vbuffers[v + 1] = vv.y;// static_cast<float>(_vel[v + 1]);
-		vbuffers[v + 2] = vv.z;// static_cast<float>(_vel[v + 2]);
-
 		if (max_position[0] < p.x) max_position[0] = p.x;// buffers[s + 0];
 		if (max_position[1] < p.y) max_position[1] = p.y;// buffers[s + 1];
 		if (max_position[2] < p.z) max_position[2] = p.z;// buffers[s + 2];
@@ -343,6 +339,23 @@ bool xvParticle::UploadParticleFromFile(unsigned int i, QString path)
 		if (min_position[0] > p.x) min_position[0] = p.x;// buffers[s + sid + 0];
 		if (min_position[1] > p.y) min_position[1] = p.y;// buffers[s + sid + 1];
 		if (min_position[2] > p.z) min_position[2] = p.z;// buffers[s + sid + 2];
+		float p_mag = sqrt(p.x * p.x + p.y * p.y + p.z * p.z);
+		if (max_position_mag < p_mag) max_position_mag = p_mag;
+		if (min_position_mag > p_mag) min_position_mag = p_mag;
+		vector3f vv = new_vector3f(0, 0, 0);
+		unsigned int v = j * 3;
+		if (inp != ins)
+			v = (j / neach) * 3;
+		vv = new_vector3f(
+			static_cast<float>(_vel[v + 0]),
+			static_cast<float>(_vel[v + 1]),
+			static_cast<float>(_vel[v + 2]));
+
+		v = j * 3 + vid;
+		
+		vbuffers[v + 0] = vv.x;// static_cast<float>(_vel[v + 0]);
+		vbuffers[v + 1] = vv.y;// static_cast<float>(_vel[v + 1]);
+		vbuffers[v + 2] = vv.z;// static_cast<float>(_vel[v + 2]);
 
 		if (max_velocity[0] < vv.x) max_velocity[0] = vv.x;// vbuffers[v + vid + 0];
 		if (max_velocity[1] < vv.y) max_velocity[1] = vv.y;// vbuffers[v + vid + 1];
@@ -352,10 +365,8 @@ bool xvParticle::UploadParticleFromFile(unsigned int i, QString path)
 		if (min_velocity[1] > vv.y) min_velocity[1] = vv.y;// vbuffers[v + vid + 1];
 		if (min_velocity[2] > vv.z) min_velocity[2] = vv.z;// vbuffers[v + vid + 2];
 
-		float p_mag = sqrt(p.x * p.x + p.y * p.y + p.z * p.z);
 		float v_mag = sqrt(vv.x * vv.x + vv.y * vv.y + vv.z * vv.z);// [v + 0] * vbuffers[v + 0] + vbuffers[v + 1] * vbuffers[v + 1] + vbuffers[v + 2] * vbuffers[v + 2]);
-		if (max_position_mag < p_mag) max_position_mag = p_mag;
-		if (min_position_mag > p_mag) min_position_mag = p_mag;
+		
 		if (max_velocity_mag < v_mag) max_velocity_mag = v_mag;
 		if (min_velocity_mag > v_mag) min_velocity_mag = v_mag;
 		color_buffers[s + 0] = 0.0f;
