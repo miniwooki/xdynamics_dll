@@ -49,6 +49,7 @@ struct device_dem_parameters
 struct device_triangle_info
 {
 	int id;
+	unsigned int sid;
 	double3 P;
 	double3 Q;
 	double3 R;
@@ -203,14 +204,13 @@ void XDYNAMICS_API cu_cube_contact_force(
 
 // Function for contact between particle and polygonObject
 void XDYNAMICS_API cu_particle_polygonObject_collision(
-	const int tcm, device_triangle_info* dpi, device_mesh_mass_info* dpmi,
-	
+	device_triangle_info* dpi, device_body_info* dbi, device_body_force* dbf,
 	double* pos, double* ep, double* vel, double* omega,
 	double* force, double* moment, double* mass,
 	double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd, double* dsph,
 	unsigned int* sidx, unsigned int* cstart, unsigned int* cend, device_contact_property *cp,
-	unsigned int np/*, double3* mpos, double3* mf, double3* mm, double3& _mf, double3& _mm*/);
+	unsigned int np, unsigned int bindex, unsigned int eindex, unsigned int nmesh/*, double3* mpos, double3* mf, double3* mm, double3& _mf, double3& _mm*/);
 
 // Function for contact between particle and cylinder
 void XDYNAMICS_API cu_cylinder_contact_force(
@@ -234,7 +234,7 @@ void XDYNAMICS_API cu_decide_rolling_friction_moment(
 double3 XDYNAMICS_API reductionD3(double3* in, unsigned int np);
 void XDYNAMICS_API cu_update_meshObjectData(
 	double *vList, double* sph, double* dlocal, device_triangle_info* poly,
-	device_mesh_mass_info* dpmi, double* ep, unsigned int np);
+	device_body_info* dbi, unsigned int np);
 
 void XDYNAMICS_API cu_clusters_contact(
 	double* pos, double* cpos, double* ep, double* vel,
@@ -245,22 +245,22 @@ void XDYNAMICS_API cu_clusters_contact(
 	unsigned int* cend, device_contact_property* cp, xClusterInformation* xci, unsigned int np);
 
 void XDYNAMICS_API cu_cluster_plane_contact(
-	device_plane_info* plan,
+	device_plane_info* plan, device_body_info* dbi, device_body_force* dbfm, device_contact_property *cp,
 	double* pos, double* cpos, double* ep, double* vel, double* omega,
 	double* force, double* moment, double* mass,
 	double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd, xClusterInformation* xci,
-	unsigned int np, device_contact_property *cp);
+	unsigned int np, unsigned int nplanes);
 
 void XDYNAMICS_API cu_cluster_meshes_contact(
-	device_triangle_info *dpi, device_mesh_mass_info* dpmi,
+	device_triangle_info *dpi, device_body_info* dbi,
 	double* pos, double* cpos, double *ep, double* vel, double* ev,
 	double* force, double* moment,
 	device_contact_property *cp, double* mass,
 	double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int* pair_id,
 	double* tsd, unsigned int* sorted_index, unsigned int* cstart, unsigned int* cend,
-	xClusterInformation* xci, unsigned int np);
+	xClusterInformation* xci, unsigned int bindex, unsigned int eindex, unsigned int np);
 
 void XDYNAMICS_API vv_update_cluster_position(
 	double *pos, double *cpos, double* ep, 

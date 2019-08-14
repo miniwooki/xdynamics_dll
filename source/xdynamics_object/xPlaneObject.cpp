@@ -27,18 +27,10 @@ bool xPlaneObject::define(vector3d& p0, vector3d& p1, vector3d& p2, vector3d& p3
 	w4 = p3;
 	minp.x = xw.x < minp.x ? xw.x : minp.x; minp.y = xw.y < minp.y ? xw.y : minp.y; minp.z = xw.z < minp.z ? xw.z : minp.z;
 	maxp.x = xw.x > maxp.x ? xw.x : maxp.x; maxp.y = xw.y > maxp.y ? xw.y : maxp.y; maxp.z = xw.z > maxp.z ? xw.z : maxp.z;
-	//w3 = p2;
 	minp.x = w3.x < minp.x ? w3.x : minp.x; minp.y = w3.y < minp.y ? w3.y : minp.y; minp.z = w3.z < minp.z ? w3.z : minp.z;
 	maxp.x = w3.x > maxp.x ? w3.x : maxp.x; maxp.y = w3.y > maxp.y ? w3.y : maxp.y; maxp.z = w3.z > maxp.z ? w3.z : maxp.z;
-	//w2 = cross(d, _xw);
-	//w2 = w2 /length(w2);
-	//double hl = sqrt(0.25 * dx * dx + 0.25 * dy * dy);
-	//w2 = hl * w2;
 	minp.x = w2.x < minp.x ? w2.x : minp.x; minp.y = w2.y < minp.y ? w2.y : minp.y; minp.z = w2.z < minp.z ? w2.z : minp.z;
 	maxp.x = w2.x > maxp.x ? w2.x : maxp.x; maxp.y = w2.y > maxp.y ? w2.y : maxp.y; maxp.z = w2.z > maxp.z ? w2.z : maxp.z;
-	//w4 = cross(d, _pc);
-	//w4 = w4 / length(w4);
-	//w4 = hl * w4;
 	minp.x = w4.x < minp.x ? w4.x : minp.x; minp.y = w4.y < minp.y ? w4.y : minp.y; minp.z = w4.z < minp.z ? w4.z : minp.z;
 	maxp.x = w4.x > maxp.x ? w4.x : maxp.x; maxp.y = w4.y > maxp.y ? w4.y : maxp.y; maxp.z = w4.z > maxp.z ? w4.z : maxp.z;
 	xPointMass::pos = 0.5 * (xw + w3);
@@ -73,8 +65,12 @@ bool xPlaneObject::define(vector3d& _xw, vector3d& _pa, vector3d& _pb)
 	u1 = pa / l1;
 	u2 = pb / l2;
 	uw = cross(u1, u2);
-	xPointMass::pos = 0.5 * (_pa + _pb);
 	w3 = xw + w2 + l2 * u2;
+	xPointMass::pos = 0.5 * (xw + w3);
+	local_point[0] = toLocal(xw - xPointMass::pos);
+	local_point[1] = toLocal(w2 - xPointMass::pos);
+	local_point[2] = toLocal(w3 - xPointMass::pos);
+	local_point[3] = toLocal(w4 - xPointMass::pos);
 	return true;
 }
 

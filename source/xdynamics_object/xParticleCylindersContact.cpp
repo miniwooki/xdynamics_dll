@@ -67,9 +67,9 @@ unsigned int xParticleCylindersContact::NumContact()
 	return ncylinders;
 }
 
-void xParticleCylindersContact::updateCylinderObjectData()
+void xParticleCylindersContact::updateCylinderObjectData(bool is_first_set_up)
 {
-	if (xSimulation::Gpu())
+	if ((xSimulation::Gpu() && nmoving) || is_first_set_up)
 	{
 		device_body_info *bi = new device_body_info[ncylinders];
 		for (unsigned int i = 0; i < ncylinders; i++)

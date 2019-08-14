@@ -24,7 +24,7 @@ public:
 	static void xsplit(const std::string& s, const char* c, int n, int* data);
 	static void xsplit(const std::string& s, const char* c, vector2i& data);
 	static void xsplit(const std::string& s, const char* c, int n, double* data);
-	static void xsplit(const char* s, const char* c, int n, int* data);
+	static bool xsplit(const char* s, const char* c, int n, int* data);
 	static void xsplit(const char* s, const char* c, int n, double* data);
 	static void xsplit(const char* s, const char* c, int n, std::string* data);
 	static unsigned int xsplitn(const char* s, const char* c);

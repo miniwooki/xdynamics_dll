@@ -608,7 +608,7 @@ xParticleObject * xParticleManager::CreateClusterParticle(
 	xpo->setRelativeLocation(xo->RelativeLocation());
 	double c_rad = 0.0;
 	unsigned int cnt = 0;
-	SetClusterMassAndInertia(xpo);
+	
 	for (int x = 0; x < grid.x; x++)
 	{
 		for (int y = 0; y < grid.y; y++)
@@ -641,7 +641,8 @@ xParticleObject * xParticleManager::CreateClusterParticle(
 			}
 		}
 	}
-	if (minimum_radius > rad) minimum_radius = rad;
+	SetClusterMassAndInertia(xpo);
+	//if (minimum_radius > rad) minimum_radius = rad;
 	xpcos[name] = xpo;
 	xObjectManager::XOM()->addObject(xpo);
 	n_cluster_each += neach;

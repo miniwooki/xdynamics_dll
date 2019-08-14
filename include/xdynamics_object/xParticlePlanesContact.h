@@ -37,7 +37,7 @@ public:
 	void define(unsigned int i, xParticlePlaneContact* d);
 	void define(unsigned int i, xParticleCubeContact* d);
 	void allocHostMemory(unsigned int n);
-	void updataPlaneObjectData();
+	void updataPlaneObjectData(bool is_first_set_up = false);
 	bool cpplCollision(
 		xContactPairList* pairs, unsigned int i, double r, double m,
 		vector3d& p, vector3d& v, vector3d& o, 
@@ -66,6 +66,7 @@ private:
 	double particle_plane_contact_detection(host_plane_info* _pe, vector3d& u, vector3d& xp, vector3d& wp, double r);
 	
 	unsigned int nplanes;
+	unsigned int nContactObject;
 	unsigned int nmoving;
 // 	unsigned int *d_old_pair_count;
 // 	unsigned int *d_pair_count;
@@ -79,6 +80,7 @@ private:
 	device_body_info* dbi;
 	device_body_force* dbf;
 	QMap<unsigned int, xPlaneObject*> pair_ip;
+	QMap<unsigned int, xContact*> pair_contact;
 
 	//device_plane_info *hpmi;
 	//device_mesh_mass_info *dpmi;

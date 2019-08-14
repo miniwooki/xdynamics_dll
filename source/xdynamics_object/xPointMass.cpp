@@ -13,6 +13,7 @@ xPointMass::xPointMass(xShapeType _s)
 	, initial_data(NULL)
 {
 	//memset(&id, 0, sizeof(*this));
+	memset(&nr_part, 0, 564);
 	ep.e0 = 1.0;
 	setupTransformationMatrix();
 }

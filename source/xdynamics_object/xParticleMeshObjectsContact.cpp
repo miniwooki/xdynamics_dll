@@ -12,15 +12,16 @@ xParticleMeshObjectsContact::xParticleMeshObjectsContact()
 	, hpi(NULL)
 	, dpi(NULL)
 	, hcp(NULL)
-	, dep(NULL)
 	, nPobjs(NULL)
 	, dvList(NULL)
 	, diList(NULL)
-	, hpmi(NULL)
-	, dpmi(NULL)
+	//, hpmi(NULL)
+	, dbi(NULL)
+	, dbf(NULL)
 	, maxRadius(0)
 	, npolySphere(0)
 	, ncontact(0)
+	, nmoving(0)
 {
 
 }
@@ -32,7 +33,7 @@ xParticleMeshObjectsContact::~xParticleMeshObjectsContact()
 	if (hpi) delete[] hpi; hpi = NULL;
 	if (hcp) delete[] hcp; hcp = NULL;
 	if (xmps) delete[] xmps; xmps = NULL;
-	if (hpmi) delete[] hpmi; hpmi = NULL;
+	//if (hpmi) delete[] hpmi; hpmi = NULL;
 	//qDeleteAll(pair_ip);
 	if (xSimulation::Gpu())
 	{
@@ -41,8 +42,8 @@ xParticleMeshObjectsContact::~xParticleMeshObjectsContact()
 		if (dpi) checkCudaErrors(cudaFree(dpi)); dpi = NULL;
 		if (dvList) checkCudaErrors(cudaFree(dvList)); dvList = NULL;
 		if (diList) checkCudaErrors(cudaFree(diList)); diList = NULL;
-		if (dpmi) checkCudaErrors(cudaFree(dpmi)); dpmi = NULL;
-		if (dep) checkCudaErrors(cudaFree(dep)); dep = NULL;
+		if (dbi) checkCudaErrors(cudaFree(dbi)); dbi = NULL;
+		if (dbf) checkCudaErrors(cudaFree(dbf)); dbf = NULL;
 	}
 	
 }
@@ -64,6 +65,8 @@ unsigned int xParticleMeshObjectsContact::define(QMap<QString, xParticleMeshObje
 	foreach(xParticleMeshObjectContact* cpm, cpmesh)
 	{
 		xMeshObject* pobj = cpm->MeshObject();
+		if (pobj->MovingObject())
+			nmoving++;
 		npolySphere += pobj->NumTriangle();
 	}
 	nPobjs = cpmesh.size();
@@ -72,8 +75,8 @@ unsigned int xParticleMeshObjectsContact::define(QMap<QString, xParticleMeshObje
 	hpi = new host_mesh_info[npolySphere];
 	hcp = new xContactMaterialParameters[nPobjs];
 	xmps = new xMaterialPair[nPobjs];
-	hpmi = new host_mesh_mass_info[nPobjs];
-	memset(hpmi, 0, sizeof(host_mesh_mass_info) * nPobjs);
+	//hpmi = new host_mesh_mass_info[nPobjs];
+	//memset(hpmi, 0, sizeof(host_mesh_mass_info) * nPobjs);
 	// 	if (simulation::isCpu())
 	// 		dsphere = (double*)hsphere;
 // 	if (!pct)
@@ -109,6 +112,7 @@ unsigned int xParticleMeshObjectsContact::define(QMap<QString, xParticleMeshObje
 		{
 			//			host_mesh_info po;
 			hpi[i].id = idx;
+			hpi[i].sid = bPolySphere;
 			vector3d pos = pobj->Position();
 			euler_parameters ep = pobj->EulerParameters();
 			//unsigned int s = vi * 9;
@@ -158,15 +162,19 @@ void xParticleMeshObjectsContact::particle_triangle_contact_force(
 	vector3d m_m = new_vector3d(0, 0, 0);
 	vector3d m_ft = new_vector3d(0, 0, 0);
 	unsigned int j = hpi[d->id].id;
-	host_mesh_mass_info hmmi = hpmi[j];
+	xPointMass* hmmi = pair_ip[j];
+	vector3d mp = hmmi->Position();
+	vector3d mo = 2.0 * GMatrix(hmmi->EulerParameters()) * hmmi->DEulerParameters();
+	vector3d mv = hmmi->Velocity();
+	//host_mesh_mass_info hmmi = hpmi[j];
 	double rcon = r - 0.5 * d->gab;
 	vector3d u = new_vector3d(d->nx, d->ny, d->nz);
 	//vector3d rc = r * u;
 	vector3d dcpr = new_vector3d(d->cpx, d->cpy, d->cpz) - p;
-	vector3d po2cp = new_vector3d(d->cpx - hmmi.px, d->cpy - hmmi.py, d->cpz - hmmi.pz);
-	vector3d mvel = new_vector3d(hmmi.vx, hmmi.vy, hmmi.vz);
-	vector3d momega = new_vector3d(hmmi.ox, hmmi.oy, hmmi.oz);
-	vector3d rv = mvel + cross(momega, po2cp) - (v + cross(o, dcpr));
+	vector3d po2cp = new_vector3d(d->cpx - mp.x, d->cpy - mp.y, d->cpz - mp.z);
+///vector3d mvel = new_vector3d(mp.x, mp.y, mp.z);
+	//vector3d momega = new_vector3d(hmmi.ox, hmmi.oy, hmmi.oz);
+	vector3d rv = mv + cross(mo, po2cp) - (v + cross(o, dcpr));
 	xContactMaterialParameters cmp = hcp[j];
 	xContactParameters c = getContactParameters(
 		r, 0.0,
@@ -184,13 +192,15 @@ void xParticleMeshObjectsContact::particle_triangle_contact_force(
 	vector3d nforce = m_fn + m_ft;
 	F += nforce;
 	M += cross(dcpr, nforce);
-	hpmi[j].fx += -nforce.x;
+	hmmi->addContactForce(-nforce.x, -nforce.y, -nforce.z);
+	/*hpmi[j].fx += -nforce.x;
 	hpmi[j].fy += -nforce.y;
-	hpmi[j].fz += -nforce.z;
+	hpmi[j].fz += -nforce.z;*/
 	vector3d tmoment = -cross(po2cp, nforce);
-	hpmi[j].mx = tmoment.x;
+	hmmi->addContactMoment(tmoment.x, tmoment.y, tmoment.z);
+	/*hpmi[j].mx = tmoment.x;
 	hpmi[j].my = tmoment.y;
-	hpmi[j].mz = tmoment.z;
+	hpmi[j].mz = tmoment.z;*/
 }
 
 bool xParticleMeshObjectsContact::cppolyCollision(
@@ -292,46 +302,63 @@ bool xParticleMeshObjectsContact::cppolyCollision(
 	return false;
 }
 
-void xParticleMeshObjectsContact::updateMeshObjectData()
+void xParticleMeshObjectsContact::updateMeshObjectData(bool is_first_set_up)
 {
 	unsigned int bPolySphere = 0;
 	unsigned int ePolySphere = 0;
-	QMapIterator<unsigned int, xMeshObject*> po(pair_ip);
-	double *hep = new double[nPobjs * 4];
-	while (po.hasNext())
+	//QMapIterator<unsigned int, xMeshObject*> po(pair_ip);
+	//double *hep = new double[nPobjs * 4];
+	//while (po.hasNext())
+	//{
+	//	po.next();
+	//	unsigned int id = po.key();
+	//	xMeshObject* mesh = po.value();
+	//	unsigned int xid = mesh->xpmIndex() * xModel::OneDOF();
+	//	//xMeshObject* p = po.value();
+	//	vector3d pos = mesh->Position();//new_vector3d(q(xid + 0), q(xid + 1), q(xid + 2));
+	//	euler_parameters ep = mesh->EulerParameters();//new_euler_parameters(q(xid + 3), q(xid + 4), q(xid + 5), q(xid + 6));
+	//	vector3d vel = mesh->Velocity();//new_vector3d(qd(xid + 0), qd(xid + 1), qd(xid + 2));// p->Velocity();
+	//	euler_parameters ev = mesh->DEulerParameters();//new_euler_parameters(qd(xid + 3), qd(xid + 4), qd(xid + 5), qd(xid + 6));
+	//	vector3d omega = 2.0 * GMatrix(ep) * ev;
+	//	hpmi[id] =
+	//	{
+	//		mesh->Mass(),
+	//		pos.x, pos.y, pos.z,
+	//		vel.x, vel.y, vel.z,
+	//		omega.x, omega.y, omega.z,
+	//		0.0, 0.0, 0.0,
+	//		0.0, 0.0, 0.0
+	//	};
+	//	hep[id * 4 + 0] = ep.e0;
+	//	hep[id * 4 + 1] = ep.e1;
+	//	hep[id * 4 + 2] = ep.e2;
+	//	hep[id * 4 + 3] = ep.e3;
+	//}
+
+	if ((xSimulation::Gpu() && nmoving) || is_first_set_up)
 	{
-		po.next();
-		unsigned int id = po.key();
-		xMeshObject* mesh = po.value();
-		unsigned int xid = mesh->xpmIndex() * xModel::OneDOF();
-		//xMeshObject* p = po.value();
-		vector3d pos = mesh->Position();//new_vector3d(q(xid + 0), q(xid + 1), q(xid + 2));
-		euler_parameters ep = mesh->EulerParameters();//new_euler_parameters(q(xid + 3), q(xid + 4), q(xid + 5), q(xid + 6));
-		vector3d vel = mesh->Velocity();//new_vector3d(qd(xid + 0), qd(xid + 1), qd(xid + 2));// p->Velocity();
-		euler_parameters ev = mesh->DEulerParameters();//new_euler_parameters(qd(xid + 3), qd(xid + 4), qd(xid + 5), qd(xid + 6));
-		vector3d omega = 2.0 * GMatrix(ep) * ev;
-		hpmi[id] =
+		unsigned int mcnt = 0;
+		device_body_info *bi = NULL;
+		if (nPobjs)
+			bi = new device_body_info[nPobjs];
+		//checkCudaErrors(cudaMemcpy(dpmi, hpmi, sizeof(device_mesh_mass_info) * nPobjs, cudaMemcpyHostToDevice));
+		//checkCudaErrors(cudaMemcpy(dep, hep, sizeof(double4) * nPobjs, cudaMemcpyHostToDevice));
+		foreach(xMeshObject* pobj, pair_ip)
 		{
-			mesh->Mass(),
-			pos.x, pos.y, pos.z,
-			vel.x, vel.y, vel.z,
-			omega.x, omega.y, omega.z,
-			0.0, 0.0, 0.0,
-			0.0, 0.0, 0.0
-		};
-		hep[id * 4 + 0] = ep.e0;
-		hep[id * 4 + 1] = ep.e1;
-		hep[id * 4 + 2] = ep.e2;
-		hep[id * 4 + 3] = ep.e3;
-	}
-	if (xSimulation::Gpu())
-	{
-		checkCudaErrors(cudaMemcpy(dpmi, hpmi, sizeof(device_mesh_mass_info) * nPobjs, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(dep, hep, sizeof(double4) * nPobjs, cudaMemcpyHostToDevice));
+			euler_parameters ep = pobj->EulerParameters(), ed = pobj->DEulerParameters();
+			bi[mcnt] = {
+				pobj->Position().x, pobj->Position().y, pobj->Position().z,
+				pobj->Velocity().x, pobj->Velocity().y, pobj->Velocity().z,
+				ep.e0, ep.e1, ep.e2, ep.e3,
+				ed.e0, ed.e1, ed.e2, ed.e3
+			};
+			checkCudaErrors(cudaMemcpy(dbi, bi, sizeof(device_body_info) * nPobjs, cudaMemcpyHostToDevice));
+			mcnt++;
+		}
 		foreach(xMeshObject* pobj, pair_ip)
 		{
 			ePolySphere += pobj->NumTriangle();
-			cu_update_meshObjectData(dvList, dsphere, dlocal, dpi, dpmi, dep, ePolySphere - bPolySphere);
+			cu_update_meshObjectData(dvList, dsphere, dlocal, dpi, dbi, ePolySphere - bPolySphere);
 			bPolySphere += pobj->NumTriangle();// ePolySphere;
 		}
 	}
@@ -349,13 +376,15 @@ void xParticleMeshObjectsContact::updateMeshObjectData()
 				//hpi[i].id = idx;
 				//unsigned int s = vi * 9;
 				unsigned int id = hpi[i].id;
-				host_mesh_mass_info m = hpmi[id];
-				vector3d pos = new_vector3d(m.px, m.py, m.pz);// [hpi[i].id].pos;
-				euler_parameters ep = new_euler_parameters(
-					hep[id * 4 + 0],
-					hep[id * 4 + 1],
-					hep[id * 4 + 2],
-					hep[id * 4 + 3]);
+				vector3d pos = mesh->Position();
+				euler_parameters ep = mesh->EulerParameters();
+				//host_mesh_mass_info m = hpmi[id];
+				//vector3d pos = new_vector3d(m.px, m.py, m.pz);// [hpi[i].id].pos;
+				//euler_parameters ep = new_euler_parameters(
+				//	hep[id * 4 + 0],
+				//	hep[id * 4 + 1],
+				//	hep[id * 4 + 2],
+				//	hep[id * 4 + 3]);
 				/*hpi[i].P = pos + ToGlobal(ep, vList[vi++]);
 				hpi[i].Q = pos + ToGlobal(ep, vList[vi++]);
 				hpi[i].R = pos + ToGlobal(ep, vList[vi++]);
@@ -368,53 +397,58 @@ void xParticleMeshObjectsContact::updateMeshObjectData()
 			bPolySphere += mesh->NumTriangle();
 		}
 	}
-	delete[] hep;
+	//delete[] hep;
 }
 
 void xParticleMeshObjectsContact::updateMeshMassData()
 {
-	QMapIterator<unsigned int, xMeshObject*> xmo(pair_ip);
-	while (xmo.hasNext())
-	{
-		xmo.next();
-		unsigned int id = xmo.key();
-		xMeshObject* o = xmo.value();
-		vector3d pos = o->Position();
-		vector3d vel = o->Velocity();
-		euler_parameters ep = o->EulerParameters();
-		euler_parameters ev = o->DEulerParameters();
-		vector3d omega = 2.0 * GMatrix(ep) * ev;		
-		hpmi[id] =
-		{
-			o->Mass(),
-			pos.x, pos.y, pos.z,
-			vel.x, vel.y, vel.z,
-			omega.x, omega.y, omega.z,
-			0.0, 0.0, 0.0,
-			0.0, 0.0, 0.0
-		};
-	}
-	if (dpmi)
-	{
-		checkCudaErrors(cudaMemcpy(dpmi, hpmi, sizeof(device_mesh_mass_info) * nPobjs, cudaMemcpyHostToDevice));
-	}
+	//QMapIterator<unsigned int, xMeshObject*> xmo(pair_ip);
+	//while (xmo.hasNext())
+	//{
+	//	xmo.next();
+	//	unsigned int id = xmo.key();
+	//	xMeshObject* o = xmo.value();
+	//	vector3d pos = o->Position();
+	//	vector3d vel = o->Velocity();
+	//	euler_parameters ep = o->EulerParameters();
+	//	euler_parameters ev = o->DEulerParameters();
+	//	vector3d omega = 2.0 * GMatrix(ep) * ev;		
+	//	hpmi[id] =
+	//	{
+	//		o->Mass(),
+	//		pos.x, pos.y, pos.z,
+	//		vel.x, vel.y, vel.z,
+	//		omega.x, omega.y, omega.z,
+	//		0.0, 0.0, 0.0,
+	//		0.0, 0.0, 0.0
+	//	};
+	//}
+	//if (dpmi)
+	//{
+	//	checkCudaErrors(cudaMemcpy(dpmi, hpmi, sizeof(device_mesh_mass_info) * nPobjs, cudaMemcpyHostToDevice));
+	//}
 }
 
 void xParticleMeshObjectsContact::getMeshContactForce()
 {
-	checkCudaErrors(cudaMemcpy(hpmi, dpmi, sizeof(device_mesh_mass_info) * nPobjs, cudaMemcpyDeviceToHost));
-	QMapIterator<unsigned int, xMeshObject*> xmo(pair_ip);
-	while (xmo.hasNext())
+	if (nmoving)
 	{
-		xmo.next();
-		unsigned int id = xmo.key();
-		xMeshObject* o = xmo.value();
-		//double f = hpmi[id].force
-		o->setContactForce(hpmi[id].fx, hpmi[id].fy, hpmi[id].fz);
-		std::cout << o->Name().toStdString() << " " << hpmi[id].fx << " " << hpmi[id].fy << " " << hpmi[id].fz << std::endl;
-		//std::cout << o->Velocity().x << " " << o->Velocity().y << " " << o->Velocity().z << std::endl;
-		o->setContactMoment(hpmi[id].mx, hpmi[id].my, hpmi[id].mz);
+		QMapIterator<unsigned int, xMeshObject*> xmo(pair_ip);
+		while (xmo.hasNext())
+		{
+			xmo.next();
+			unsigned int id = xmo.key();
+			xMeshObject* o = xmo.value();
+			if (o->MovingObject())
+			{
+				std::cout << "mesh contact force : [" << dbf[id].force.x << ", " << dbf[id].force.y << ", " << dbf[id].force.z << "]" << std::endl;
+				o->addContactForce(dbf[id].force.x, dbf[id].force.y, dbf[id].force.z);
+				o->addContactMoment(dbf[id].moment.x, dbf[id].moment.y, dbf[id].moment.z);
+			}
+		}
 	}
+//	checkCudaErrors(cudaMemcpy(hpmi, dpmi, sizeof(device_mesh_mass_info) * nPobjs, cudaMemcpyDeviceToHost));
+	
 }
 
 bool xParticleMeshObjectsContact::updateCollisionPair(
@@ -424,7 +458,7 @@ bool xParticleMeshObjectsContact::updateCollisionPair(
 	int t = -1;
 	unsigned int k = 0;
 	host_mesh_info hmi = hpi[id];
-	host_mesh_mass_info hmmi = hpmi[hmi.id];
+//	host_mesh_mass_info hmmi = hpmi[hmi.id];
 	vector3d jpos = new_vector3d(hsphere[id].x, hsphere[id].y, hsphere[id].z);
 	double jr = hsphere[id].w;
 	vector3d cpt = particle_polygon_contact_detection(hmi, pos, r, t);
@@ -500,8 +534,9 @@ void xParticleMeshObjectsContact::updateCollisionPairLineOrVertex(
 	double dist = length(rp);
 	vector3d unit = rp / dist;
 	host_mesh_info hmi = hpi[oid];
-	host_mesh_mass_info hmmi = hpmi[hmi.id];
-	vector3d po2cp = ocpt - new_vector3d(hmmi.px, hmmi.py, hmmi.pz);
+	//host_mesh_mass_info hmmi = hpmi[hmi.id];
+	xMeshObject* mesh = pair_ip[hmi.id];
+	vector3d po2cp = ocpt - mesh->Position();// new_vector3d(hmmi.px, hmmi.py, hmmi.pz);
 	//double cdist = r - length(pos - cpt);
 	double cdist = r - dist;
 	if (cdist > 0)
@@ -557,8 +592,8 @@ void xParticleMeshObjectsContact::cudaMemoryAlloc(unsigned int np)
 	checkCudaErrors(cudaMalloc((void**)&dpi, sizeof(device_triangle_info) * npolySphere));
 	checkCudaErrors(cudaMalloc((void**)&dcp, sizeof(device_contact_property) * nPobjs));
 	checkCudaErrors(cudaMalloc((void**)&dvList, sizeof(double) * npolySphere * 9));
-	checkCudaErrors(cudaMalloc((void**)&dpmi, sizeof(device_mesh_mass_info) * nPobjs));
-	checkCudaErrors(cudaMalloc((void**)&dep, sizeof(double4) * nPobjs));
+	checkCudaErrors(cudaMalloc((void**)&dbi, sizeof(device_body_info) * nPobjs));
+	
 	//checkCudaErrors(cduaMalloc((void**)&diList, sizeof(unsigned int) * ))
 	checkCudaErrors(cudaMemcpy(dsphere, hsphere, sizeof(double) * npolySphere * 4, cudaMemcpyHostToDevice));
 	checkCudaErrors(cudaMemcpy(dpi, hpi, sizeof(device_triangle_info) * npolySphere, cudaMemcpyHostToDevice));
@@ -575,6 +610,8 @@ void xParticleMeshObjectsContact::cudaMemoryAlloc(unsigned int np)
 		checkCudaErrors(cudaMemcpy(dvList + bPolySphere * 9, vList, sizeof(double) * pobj->NumTriangle() * 9, cudaMemcpyHostToDevice));
 		bPolySphere += pobj->NumTriangle();// ePolySphere;
 	}
+	dbf = new device_body_force[nPobjs];
+	updateMeshObjectData(true);
 	delete[] _hcp;
 }
 
@@ -609,14 +646,19 @@ void xParticleMeshObjectsContact::setZeroCollisionForce()
 	}
 }
 
+device_body_force * xParticleMeshObjectsContact::deviceBodyForceAndMoment()
+{
+	return dbf;
+}
+
 device_triangle_info* xParticleMeshObjectsContact::deviceTrianglesInfo()
 {
 	return dpi;
 }
 
-device_mesh_mass_info* xParticleMeshObjectsContact::devicePolygonObjectMassInfo()
+device_body_info* xParticleMeshObjectsContact::devicePolygonObjectMassInfo()
 {
-	return dpmi;
+	return dbi;
 }
 
 void xParticleMeshObjectsContact::ExportTriangleSphereLocalPosition(std::string & name, unsigned int b, unsigned int e, vector3d* hlocal, double *rad)

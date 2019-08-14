@@ -341,7 +341,7 @@ double xDiscreteElementMethodSimulation::CriticalTimeStep(double min_rad)
 	double dt_hertz = 2.87 * pow(pow(rho * (4.0 / 3.0) * M_PI * pow(min_rad, 3.0), 2.0) / (min_rad * E * E * 1.0), 0.2);
 	double dt_cundall = 0.2 * M_PI * sqrt(rho * (4.0 / 3.0) * M_PI * min_rad * min_rad * 3.0 * (1.0 + 2.0 * p) / (E * 0.01));
 	double min_dt = dt_raleigh < dt_hertz ? (dt_raleigh < dt_cundall ? dt_raleigh : dt_cundall) : (dt_hertz < dt_cundall ? dt_hertz : dt_cundall);
-	return 0.2 * min_dt;
+	return 0.1 * min_dt;
 }
 
 void xDiscreteElementMethodSimulation::updateObjectFromMBD()

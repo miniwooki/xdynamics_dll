@@ -14,6 +14,7 @@ class XDYNAMICS_API xParticleMeshObjectsContact : public xContact
 	struct host_mesh_info
 	{
 		int id;
+		unsigned int sid;
 		//vector3ui indice;
 		vector3d P;
 		vector3d Q;
@@ -55,7 +56,7 @@ public:
 	unsigned int NumContact() { return ncontact; }
 	unsigned int NumContactObjects() { return nPobjs; }
 	void setNumContact(unsigned int c) { ncontact = c; }
-	void updateMeshObjectData();
+	void updateMeshObjectData(bool is_first_set_up = false);
 	void updateMeshMassData();
 	void getMeshContactForce();
 	bool updateCollisionPair(
@@ -68,8 +69,9 @@ public:
 		double *mass, double *force, double *moment,
 		unsigned int *sorted_id, unsigned int *cell_start, unsigned int *cell_end, unsigned int np);
 	void setZeroCollisionForce();
+	device_body_force* deviceBodyForceAndMoment();
 	device_triangle_info* deviceTrianglesInfo();
-	device_mesh_mass_info* devicePolygonObjectMassInfo();
+	device_body_info* devicePolygonObjectMassInfo();
 	void ExportTriangleSphereLocalPosition(std::string& name, unsigned int b, unsigned int e, vector3d* hlocal, double *rad);
 
 private:
@@ -77,6 +79,7 @@ private:
 		host_mesh_info& dpi, vector3d& p, double r, int& t);
 	bool checkOverlab(vector3i ctype, vector3d p, vector3d c, vector3d u0, vector3d u1);
 	unsigned int ncontact;
+	unsigned int nmoving;
 	//polygonContactType *pct;
 	double maxRadius;
 	unsigned int nPobjs;
@@ -94,9 +97,10 @@ private:
 	host_mesh_info* hpi;
 	device_triangle_info* dpi;
 	QMap<unsigned int, xMeshObject*> pair_ip;
-	host_mesh_mass_info *hpmi;
-	double* dep;
-	device_mesh_mass_info *dpmi;
+	//host_mesh_mass_info *hpmi;
+//	double* dep;
+	device_body_info *dbi;
+	device_body_force *dbf;
 };
 
 #endif

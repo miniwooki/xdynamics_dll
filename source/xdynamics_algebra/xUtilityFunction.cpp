@@ -237,12 +237,15 @@ void xUtilityFunctions::xsplit(const std::string& s, const char* c, int n, doubl
 // 	}
 }
 
-void xUtilityFunctions::xsplit(const char* wc, const char* c, int n, int* data)
+bool xUtilityFunctions::xsplit(const char* wc, const char* c, int n, int* data)
 {
 	QString d = toWideCharToQString(wc);
 	QStringList ds = d.split(c);
+	if (ds.size() != n)
+		return false;
 	for (int i = 0; i < n; i++)
 		data[i] = ds.at(i).toInt();
+	return true;
 // 	string s = WideChar2String(wc);
 // 	basic_string<char>::size_type start = 0, end;
 // 	static const basic_string<char>::size_type npos = -1;
@@ -480,17 +483,18 @@ double xUtilityFunctions::FitClusterRadius(vector4d * cpos, unsigned int n)
 	vector3d Pj = cj + cpj.w * ((cj - ci) / length(cj - ci));
 	vector3d Ca = 0.5 * (Pi + Pj);
 	double Ra = 0.5 * length(Pi - Pj);
+	vector3d Cb = new_vector3d(0, 0, 0);
 	for (int i = 0; i < n; i++)
 	{
 		if (i == m_i || i == m_j)
 			continue;
 		vector4d CPo = cpos[i];
 		vector3d Co = new_vector3d(CPo.x, CPo.y, CPo.z);
-		vector3d Pa = (Co - Ca) + CPo.w * ((Co - Ca) / length(Co - Ca)); 
-		double len_a = length(Pa);
+		vector3d Pa = Ca + (Co - Ca) + CPo.w * ((Co - Ca) / length(Co - Ca)); 
+		double len_a = length(Pa - Ca);
 		if (len_a > Ra)
 		{
-			Ca = Pa - Ra * ((Ca - Pa) / length(Ca - Pa));
+			Cb = Pa - Ra * ((Ca - Pa) / length(Ca - Pa));
 			Ra = len_a;
 		}
 	}

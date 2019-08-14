@@ -30,7 +30,7 @@ public:
 		double &R, vector3d& T, vector3d& F, vector3d& M,
 		unsigned int nco, xClusterInformation* xci, vector4d* cpos);
 	unsigned int NumContact();
-	void updateCylinderObjectData();
+	void updateCylinderObjectData(bool is_first_set_up = false);
 	void getCylinderContactForce();
 	device_cylinder_info* deviceCylinderInfo();
 	device_body_info* deviceCylinderBodyInfo();

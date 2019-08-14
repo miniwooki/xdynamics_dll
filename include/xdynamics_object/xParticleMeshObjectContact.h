@@ -16,7 +16,7 @@ public:
 
 	virtual void cudaMemoryAlloc(unsigned int np);
 	//void insertContactParameters(unsigned int id, double r, double rt, double fr);
-	xMeshObject* MeshObject() { return dynamic_cast<xMeshObject*>(po); }
+	xMeshObject* MeshObject() { return po; }
 	//virtual void updateCollisionPair(unsigned int id, xContactPairList& xcpl, double r, vector3d pos, double rj = 0, vector3d posj = new_vector3d(0.0, 0.0, 0.0));
 	virtual void cuda_collision(
 		double *pos, double *vel,

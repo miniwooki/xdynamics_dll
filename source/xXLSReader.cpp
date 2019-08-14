@@ -539,23 +539,26 @@ void xXLSReader::ReadDEMParticle(xDiscreteElementMethodModel* xdem, xObjectManag
 				unsigned int neach = 0;
 				unsigned int nstep = 0;
 				vector2i _rc = new_vector2i(0, 0);
-				xUtilityFunctions::xsplit(sheet->readStr(rc.x, rc.y++), ",", 2, &_rc.x);
-				unsigned int _neach = 0;
-				_rc.x -= 1; _rc.y -= 1;
-				if (!IsEmptyCell(_rc.x, _rc.y))
+				if (xUtilityFunctions::xsplit(sheet->readStr(rc.x, rc.y), ",", 2, &_rc.x))
 				{
-					np = sheet->readNum(_rc.x, _rc.y++);
-					neach = sheet->readNum(_rc.x, _rc.y++);
-					nstep = sheet->readNum(_rc.x, _rc.y);
-				}
-		/*		if (!neach)
-					neach = npcircle;*/
-				if (neach && nstep)
-				{
-					xpo->setEachCount(xpo->NumParticle());
-					xParticleCreateCondition xpcc = { xpo->StartIndex(), np, neach, nstep };
-					xdem->XParticleManager()->AddParticleCreatingCondition(xpo, xpcc);
-				}
+					unsigned int _neach = 0;
+					_rc.x -= 1; _rc.y -= 1;
+					if (!IsEmptyCell(_rc.x, _rc.y))
+					{
+						np = sheet->readNum(_rc.x, _rc.y++);
+						neach = sheet->readNum(_rc.x, _rc.y++);
+						nstep = sheet->readNum(_rc.x, _rc.y);
+					}
+					/*		if (!neach)
+								neach = npcircle;*/
+					if (neach && nstep)
+					{
+						xpo->setEachCount(xpo->NumParticle());
+						xParticleCreateCondition xpcc = { xpo->StartIndex(), np, neach, nstep };
+						xdem->XParticleManager()->AddParticleCreatingCondition(xpo, xpcc);
+					}
+					rc.y++;
+				}				
 			}
 			if (!IsEmptyCell(rc.x, rc.y))
 			{

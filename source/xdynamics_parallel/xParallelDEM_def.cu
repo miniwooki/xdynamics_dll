@@ -239,27 +239,26 @@ void cu_cylinder_contact_force(
 }
 
 void cu_particle_polygonObject_collision(
-	const int tcm, device_triangle_info* dpi, device_mesh_mass_info* dpmi,
+	device_triangle_info* dpi, device_body_info* dbi,
+	device_body_force* dbfm,
 	double* pos, double* ep, double* vel, double* ev,
 	double* force, double* moment, double* mass,
 	double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd, double* dsph,
 	unsigned int* sorted_index, unsigned int* cstart, unsigned int* cend, device_contact_property *cp,
-	unsigned int np)
+	unsigned int np, unsigned int bindex, unsigned int eindex, unsigned int nmesh)
 {
 	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
-	switch (tcm)
-	{
-	case 1:
-		particle_polygonObject_collision_kernel<1> << < numBlocks, numThreads >> > (
-			dpi, dpmi,
-			(double4 *)pos, (double4 *)ep, (double3 *)vel, (double4 *)ev,
-			(double3 *)force, (double3 *)moment, mass,
-			(double3 *)tmax, rres,
-			pair_count, pair_id, (double2 *)tsd, (double4 *)dsph,
-			sorted_index, cstart, cend, cp, np);
-		break;
-	}
+	
+	double3* dbf = xContact::deviceBodyForce();
+	double3* dbm = xContact::deviceBodyMoment();
+	particle_polygonObject_collision_kernel<< < numBlocks, numThreads >> > (
+		dpi, dbi, dbf, dbm,
+		(double4 *)pos, (double4 *)ep, (double3 *)vel, (double4 *)ev,
+		(double3 *)force, (double3 *)moment, mass,
+		(double3 *)tmax, rres,
+		pair_count, pair_id, (double2 *)tsd, (double4 *)dsph,
+		sorted_index, cstart, cend, cp, bindex, eindex, np);
 }
 
 void cu_decide_rolling_friction_moment(
@@ -305,12 +304,11 @@ double3 reductionD3(double3* in, unsigned int np)
 
 void cu_update_meshObjectData(
 	double *vList, double* sph, double* dlocal, device_triangle_info* poly,
-	device_mesh_mass_info* dpmi, double* ep, unsigned int ntriangle)
+	device_body_info* dbi, unsigned int ntriangle)
 {
 	computeGridSize(ntriangle, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
 	updateMeshObjectData_kernel << <numBlocks, numThreads >> > (
-		dpmi,
-		(double4 *)ep,
+		dbi,
 		vList,
 		(double4 *)sph,
 		(double3 *)dlocal,
@@ -337,24 +335,41 @@ void cu_clusters_contact(
 }
 
 void cu_cluster_plane_contact(
-	device_plane_info* plan,
+	device_plane_info* plan, device_body_info* dbi, device_body_force* dbfm,
+	device_contact_property *cp,
 	double* pos, double* cpos, double* ep, double* vel, double* ev,
 	double* force, double* moment, double* mass,
 	double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd, 
-	xClusterInformation* xci, unsigned int np, device_contact_property *cp)
+	xClusterInformation* xci, unsigned int np, unsigned int nplanes)
 {
 	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
-	cluster_plane_contact_kernel << < numBlocks, numThreads >> > (
-		plan, (double4 *)pos, (double4*)cpos, (double4 *)ep, (double3 *)vel, (double4 *)ev,
-		(double3 *)force, (double3 *)moment, cp, mass,
-		(double3 *)tmax, rres,
-		pair_count, pair_id, (double2 *)tsd, xci, np);
+	memset(dbfm, 0, sizeof(device_body_force) * nplanes);
+	double3* dbf = xContact::deviceBodyForce();
+	double3* dbm = xContact::deviceBodyMoment();
+	for (unsigned int i = 0; i < nplanes; i++)
+	{
+		cluster_plane_contact_kernel << < numBlocks, numThreads >> > (
+			plan, i, dbi, dbf, dbm,
+			(double4 *)pos, 
+			(double4*)cpos, 
+			(double4 *)ep, 
+			(double3 *)vel, 
+			(double4 *)ev,
+			(double3 *)force, 
+			(double3 *)moment,
+			cp, mass,
+			(double3 *)tmax, rres,
+			pair_count, pair_id, 
+			(double2 *)tsd, xci, np);
+		dbfm[i].force += reductionD3(dbf, np);
+		dbfm[i].moment += reductionD3(dbm, np);
+	}
 }
 
 void cu_cluster_meshes_contact(
 	device_triangle_info * dpi, 
-	device_mesh_mass_info * dpmi,
+	device_body_info * dbi,
 	double * pos,
 	double * cpos,
 	double * ep,
@@ -372,12 +387,16 @@ void cu_cluster_meshes_contact(
 	unsigned int * sorted_index,
 	unsigned int * cstart, 
 	unsigned int * cend, 
-	xClusterInformation * xci, 
+	xClusterInformation * xci,
+	unsigned int bindex,
+	unsigned int eindex,
 	unsigned int np)
 {
 	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
+	double3* dbf = xContact::deviceBodyForce();
+	double3* dbm = xContact::deviceBodyMoment();
 	cluster_meshes_contact_kernel << <numBlocks, numThreads >> > (
-		dpi, dpmi,
+		dpi, dbi, dbf, dbm,
 		(double4*)pos,
 		(double4*)cpos,
 		(double4*)ep,
@@ -391,7 +410,7 @@ void cu_cluster_meshes_contact(
 		pair_count, pair_id,
 		(double2*)tsd, sorted_index,
 		cstart, cend,
-		xci, np);
+		xci, bindex, eindex, np);
 }
 
 void vv_update_cluster_position(
