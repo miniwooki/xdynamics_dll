@@ -86,6 +86,7 @@ struct device_mesh_mass_info
 
 struct device_body_info
 {
+	double mass;
 	double3 pos;
 	double3 vel;
 	double4 ep;

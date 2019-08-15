@@ -166,6 +166,7 @@ void xParticlePlanesContact::updataPlaneObjectData(bool is_first_set_up)
 			}
 			euler_parameters ep = pm->EulerParameters(), ed = pm->DEulerParameters();
 			bi[hpi[id].mid] = {
+				pm->Mass(),
 				pm->Position().x, pm->Position().y, pm->Position().z,
 				pm->Velocity().x, pm->Velocity().y, pm->Velocity().z,
 				ep.e0, ep.e1, ep.e2, ep.e3,

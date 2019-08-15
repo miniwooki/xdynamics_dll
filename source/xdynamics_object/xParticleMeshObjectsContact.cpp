@@ -347,6 +347,7 @@ void xParticleMeshObjectsContact::updateMeshObjectData(bool is_first_set_up)
 		{
 			euler_parameters ep = pobj->EulerParameters(), ed = pobj->DEulerParameters();
 			bi[mcnt] = {
+				pobj->Mass(),
 				pobj->Position().x, pobj->Position().y, pobj->Position().z,
 				pobj->Velocity().x, pobj->Velocity().y, pobj->Velocity().z,
 				ep.e0, ep.e1, ep.e2, ep.e3,

@@ -77,6 +77,7 @@ void xParticleCylindersContact::updateCylinderObjectData(bool is_first_set_up)
 			xCylinderObject *c = pair_ip[i];
 			euler_parameters ep = c->EulerParameters(), ed = c->DEulerParameters();
 			bi[i] = {
+				c->Mass(),
 				c->Position().x, c->Position().y, c->Position().z,
 				c->Velocity().x, c->Velocity().y, c->Velocity().z,
 				ep.e0, ep.e1, ep.e2, ep.e3,

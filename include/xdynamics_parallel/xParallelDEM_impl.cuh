@@ -1909,8 +1909,8 @@ __device__ void particle_triangle_contact_force(
 	double cdist = r - length(ipos - dtci.cpt);
 	if (cdist <= 0 && abs(cdist) < abs(coh_s))
 	{
-		double f = JKR_seperation_force(r, 0, cp->coh);
-		double cf = cohesionForce(r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, f);
+		double f = JKR_seperation_force(r, 0, cmp.coh);
+		double cf = cohesionForce(r, 0, cmp.Ei, cmp.Ej, cmp.pri, cmp.prj, cmp.coh, f);
 		sum_force = sum_force - cf * unit;
 		tsd[new_count] = sd;
 		pair_id[new_count] = dtci.id;
@@ -1925,11 +1925,11 @@ __device__ void particle_triangle_contact_force(
 		if (p_pair_id[i] == dtci.id){ sd = p_tsd[i]; break; }
 	double3 rc = dtci.cpt - ipos;
 	double3 dv = db.vel + cross(jomega, po2cp) - (ivel + cross(iomega, rc));
-	device_force_constant c = getConstant(1, r, 0, m, 0, cmp.Ei, cmp.Ej, cmp.pri, cmp.prj, cmp.Gi, cmp.Gj, cmp.rest, cmp.fric, cmp.rfric, cmp.sratio);
+	device_force_constant c = getConstant(1, r, 0, m, db.mass, cmp.Ei, cmp.Ej, cmp.pri, cmp.prj, cmp.Gi, cmp.Gj, cmp.rest, cmp.fric, cmp.rfric, cmp.sratio);
 	
 	switch (1)
 	{
-	case 1:	DHSModel( c, r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, cdist, iomega, sd.x, sd.y, dv, unit, Ft, Fn); break;
+	case 1:	DHSModel( c, r, 0, cmp.Ei, cmp.Ej, cmp.pri, cmp.prj, cmp.coh, cdist, iomega, sd.x, sd.y, dv, unit, Ft, Fn); break;
 	}
 	calculate_previous_rolling_resistance(cmp.rfric, r, 0, rc, Fn, Ft, res, tma);
 	double3 m_force = Fn + Ft;
@@ -1945,7 +1945,7 @@ __device__ void particle_triangle_contact_force(
 }
 
 __device__ void cluster_triangle_contact_force(
-	unsigned int k,
+	device_triangle_contact_info dtci,
 	int t,
 	unsigned int id,
 	device_triangle_info* dpi,
@@ -1968,42 +1968,53 @@ __device__ void cluster_triangle_contact_force(
 	double3& sum_moment,
 	double& res,
 	double3& tma,
+	double coh_s,
 	unsigned int& new_count)
 {
-	unsigned int pidx = dpi[k].id;
-	device_contact_property cmp = cp[pidx];
-	device_body_info db = dbi[pidx];// device_mesh_mass_info pmi = dpmi[pidx];
-	double3 cpt = closestPtPointTriangle(dpi[k], ipos, r, t);
-	double3 po2cp = cpt - db.pos;// pmi.origin;
-	double cdist = r - length(ipos - cpt);
-	double3 Fn = make_double3(0.0, 0.0, 0.0);
-	double3 Ft = make_double3(0, 0, 0);
-	device_triangle_info tri = dpi[k];
+	device_triangle_info tri = dpi[dtci.id];// unsigned int pidx = dpi[k].id;
 	double3 qp = tri.Q - tri.P;
 	double3 rp = tri.R - tri.P;
-//	double rcon = r - 0.5 * cdist;
+	//	double rcon = r - 0.5 * cdist;
 	double3 unit = -cross(qp, rp);
-	double3 dcpr = cpt - make_double3(icpos.x, icpos.y, icpos.z);
+	unsigned int pidx = dpi[dtci.id].id;
+	device_contact_property cmp = cp[pidx];
+	device_body_info db = dbi[pidx];// device_mesh_mass_info pmi = dpmi[pidx];
+	//double3 cpt = closestPtPointTriangle(dpi[k], ipos, r, t);
+	double3 po2cp = dtci.cpt - db.pos;// pmi.origin;
+	double cdist = r - length(ipos - dtci.cpt);
+	double2 sd = make_double2(0.0, 0.0);
+	if (cdist <= 0 && abs(cdist) < abs(coh_s))
+	{
+		double f = JKR_seperation_force(r, 0, cmp.coh);
+		double cf = cohesionForce(r, 0, cmp.Ei, cmp.Ej, cmp.pri, cmp.prj, cmp.coh, f);
+		sum_force = sum_force - cf * unit;
+		tsd[new_count] = sd;
+		pair_id[new_count] = dtci.id;
+		new_count++;
+		return;
+	}
+	double3 Fn = make_double3(0.0, 0.0, 0.0);
+	double3 Ft = make_double3(0, 0, 0);
+	//device_triangle_info tri = dpi[k];
+	
+	double3 dcpr = dtci.cpt - make_double3(icpos.x, icpos.y, icpos.z);
 	//double3 dcpr_j = cpt - make_double3(jcpos.x, jcpos.y, jcpos.z);
 	unit = unit / length(unit);
 	double2 sd = make_double2(0.0, 0.0);
 	for (unsigned int i = 0; i < MAX_P2MS_COUNT; i++)
-		if (p_pair_id[i] == k) { sd = p_tsd[i]; break; }
+		if (p_pair_id[i] == dtci.id) { sd = p_tsd[i]; break; }
 	//double3 rc = r * unit;
 	double3 jomega = toAngularVelocity(db.ep, db.ed);
 	double3 dv = db.vel + cross(jomega, po2cp) - (ivel + cross(iomega, dcpr));
-	device_force_constant c = getConstant(1, r, 0, m, 0, cmp.Ei, cmp.Ej, cmp.pri, cmp.prj, cmp.Gi, cmp.Gj, cmp.rest, cmp.fric, cmp.rfric, cmp.sratio);
-	switch (1)
-	{
-	case 1:	DHSModel(c, r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, cdist, iomega, sd.x, sd.y, dv, unit, Ft, Fn); break;
-	}
+	device_force_constant c = getConstant(1, r, 0, m, db.mass, cmp.Ei, cmp.Ej, cmp.pri, cmp.prj, cmp.Gi, cmp.Gj, cmp.rest, cmp.fric, cmp.rfric, cmp.sratio);
+	DHSModel(c, r, 0, cmp.Ei, cmp.Ej, cmp.pri, cmp.prj, cmp.coh, cdist, iomega, sd.x, sd.y, dv, unit, Ft, Fn);
 	calculate_previous_rolling_resistance(cmp.rfric, r, 0, dcpr, Fn, Ft, res, tma);
 	sum_force += Fn + Ft;
 	sum_moment += cross(dcpr, Fn + Ft);
 	dbf[id] += -(Fn + Ft);// +make_double3(1.0, 5.0, 9.0);
 	dbm[id] += -cross(po2cp, Fn + Ft);
 	tsd[new_count] = sd;
-	pair_id[new_count] = k;
+	pair_id[new_count] = dtci.id;
 	new_count++;
 }
 
@@ -2212,17 +2223,18 @@ __global__ void cluster_meshes_contact_kernel(
 	double3 sum_moment = make_double3(0, 0, 0);
 	unsigned int new_count = sid + (bindex ? old_count : 0);
 
-	double3 previous_cpt = make_double3(0.0, 0.0, 0.0);
-	double3 previous_unit = make_double3(0.0, 0.0, 0.0);
+	double3 previous_line_cpt = make_double3(0.0, 0.0, 0.0);
+	double3 previous_point_cpt = make_double3(0.0, 0.0, 0.0);
 	unsigned int start_index = 0;
 	unsigned int end_index = 0;
 	int3 ctype = make_int3(0, 0, 0);
-	unsigned int ctriangle[5] = { 0, };
-	unsigned int cline[5] = { 0, };
-	unsigned int cpoint[5] = { 0, };
+	device_triangle_contact_info ctriangle[20] = { 0, };
+	device_triangle_contact_info cline[20] = { 0, };
+	device_triangle_contact_info cpoint[20] = { 0, };
 	unsigned int nct = 0;
 	unsigned int ncl = 0;
 	unsigned int ncp = 0;
+	double coh_s = 0;
 	for (int z = -1; z <= 1; z++) {
 		for (int y = -1; y <= 1; y++) {
 			for (int x = -1; x <= 1; x++) {
@@ -2241,13 +2253,36 @@ __global__ void cluster_meshes_contact_kernel(
 							int t = -1;
 							double3 cpt = closestPtPointTriangle(dpi[k], ipos, ir, t);
 							double cdist = ir - length(ipos - cpt);
+							if (cp->coh)
+								coh_s = limit_cohesion_depth(ir, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh);
 							if (cdist > 0)
+							{
+								if (t == 1)
+								{
+									if (checkOverlab(previous_line_cpt, cpt))
+										continue;
+									previous_line_cpt = cpt;
+								}
+								else if (t == 0)
+								{
+									if (checkOverlab(previous_point_cpt, cpt))
+										continue;
+									previous_point_cpt = cpt;
+								}
+								switch (t)
+								{
+								case 2: ctriangle[nct++] = { k, cpt }; break;
+								case 1: cline[ncl++] = { k, cpt }; break;
+								case 0: cpoint[ncp++] = { k, cpt }; break;
+								}
+							}
+							else if (cdist <= 0 && abs(cdist) < abs(coh_s))
 							{
 								switch (t)
 								{
-								case 2: ctriangle[nct++] = k; break;
-								case 1: cline[ncl++] = k; break;
-								case 0: cpoint[ncp++] = k; break;
+								case 2: ctriangle[nct++] = { k, cpt }; break;
+								case 1: cline[ncl++] = { k, cpt }; break;
+								case 0: cpoint[ncp++] = { k, cpt }; break;
 								}
 							}
 						}
