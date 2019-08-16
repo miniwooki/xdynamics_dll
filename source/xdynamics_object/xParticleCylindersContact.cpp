@@ -376,7 +376,7 @@ void xParticleCylindersContact::cudaMemoryAlloc(unsigned int np)
 	checkCudaErrors(cudaMemcpy(dcp, _hcp, sizeof(device_contact_property) * ncylinders, cudaMemcpyHostToDevice));
 	/*checkCudaErrors(cudaMemset(db_force, 0, sizeof(double3) * ncylinders));
 	checkCudaErrors(cudaMemset(db_moment, 0, sizeof(double3) * ncylinders));*/
-	updateCylinderObjectData();
+	updateCylinderObjectData(true);
 	dbf = new device_body_force[ncylinders];
 	/*checkCudaErrors(cudaMemset(d_pair_count, 0, sizeof(unsigned int) * np));
 	 	checkCudaErrors(cudaMemset(d_old_pair_count, 0, sizeof(unsigned int) * np));

@@ -63,7 +63,7 @@ void xParticlePlanesContact::define(unsigned int id, xParticlePlaneContact* d)
 	pair_ip[id] = p;
 	hpi[id] = {
 		p->MovingObject(),
-		p->MovingObject() ? nmoving - 1 : 0,
+		nContactObject,// p->MovingObject() ? nmoving - 1 : 0,
 		p->L1(), p->L2(),
 		p->U1(), p->U2(),
 		p->UW(), p->XW(),
@@ -71,6 +71,7 @@ void xParticlePlanesContact::define(unsigned int id, xParticlePlaneContact* d)
 		p->W2(), p->W3(), p->W4()
 	};
 	nContactObject++;
+	pair_contact[id] = d;
 }
 
 void xParticlePlanesContact::define(unsigned int id, xParticleCubeContact* d)
@@ -95,7 +96,7 @@ void xParticlePlanesContact::define(unsigned int id, xParticleCubeContact* d)
 		pair_ip[id + i] = p;
 		hpi[id + i] = {
 			d->CubeObject()->MovingObject(),
-			id,// d->CubeObject()->MovingObject() ? nmoving - 1 : 0,
+			nContactObject,// d->CubeObject()->MovingObject() ? nmoving - 1 : 0,
 			p->L1(), p->L2(),
 			p->U1(), p->U2(),
 			p->UW(), p->XW(),
@@ -117,7 +118,6 @@ void xParticlePlanesContact::allocHostMemory(unsigned int n)
 
 void xParticlePlanesContact::updataPlaneObjectData(bool is_first_set_up)
 {
-	unsigned int mcnt = 0;
 	device_body_info *bi = NULL;
 	if (nmoving || is_first_set_up)
 		bi = new device_body_info[nContactObject];
@@ -150,22 +150,48 @@ void xParticlePlanesContact::updataPlaneObjectData(bool is_first_set_up)
 			if (xSimulation::Gpu())
 				checkCudaErrors(cudaMemcpy(dpi + id, &new_hpi, sizeof(device_plane_info), cudaMemcpyHostToDevice));
 		}
-		if ((xSimulation::Gpu() && nmoving) || is_first_set_up)
+		//if ((xSimulation::Gpu() && p->MovingObject()) || (is_first_set_up && p->MovingObject()))
+		//{
+		//	if (mcnt >= nContactObject)
+		//		continue;
+		//	xContact* xc = pair_contact[hpi[id].mid];
+		//	xPointMass* pm = NULL;
+		//	if (xc->PairType() == PARTICLE_CUBE)
+		//	{
+		//		pm = dynamic_cast<xParticleCubeContact*>(xc)->CubeObject();
+		//	}
+		//	else
+		//	{
+		//		pm = p;
+		//	}
+		//	euler_parameters ep = pm->EulerParameters(), ed = pm->DEulerParameters();
+		//	bi[hpi[id].mid] = {
+		//		pm->Mass(),
+		//		pm->Position().x, pm->Position().y, pm->Position().z,
+		//		pm->Velocity().x, pm->Velocity().y, pm->Velocity().z,
+		//		ep.e0, ep.e1, ep.e2, ep.e3,
+		//		ed.e0, ed.e1, ed.e2, ed.e3
+		//	};
+		//	//checkCudaErrors(cudaMemset(db_force, 0, sizeof(double3) * nplanes));
+		//	//checkCudaErrors(cudaMemset(db_moment, 0, sizeof(double3) * nplanes));
+		//	//std::cout << "plane_velocity : [" << p->Velocity().x << ", " << p->Velocity().y << ", " << p->Velocity().z << std::endl;
+		//	//std::cout << "plane_velocity : [" << p->Velocity().x << ", " << p->Velocity().y << ", " << p->Velocity().z << std::endl;
+		//	checkCudaErrors(cudaMemcpy(dbi, bi, sizeof(device_body_info) * nContactObject, cudaMemcpyHostToDevice));
+		//	mcnt++;
+		//}
+	}
+	if (xSimulation::Gpu())
+	{
+		unsigned int mcnt = 0;
+		foreach(xContact* xc, pair_contact)
 		{
-			if (mcnt >= nContactObject)
-				continue;
-			xContact* xc = pair_contact[hpi[id].mid];
 			xPointMass* pm = NULL;
 			if (xc->PairType() == PARTICLE_CUBE)
-			{
 				pm = dynamic_cast<xParticleCubeContact*>(xc)->CubeObject();
-			}
-			else
-			{
-				pm = p;
-			}
+			else if (xc->PairType() == PARTICLE_PANE)
+				pm = dynamic_cast<xParticlePlaneContact*>(xc)->PlaneObject();
 			euler_parameters ep = pm->EulerParameters(), ed = pm->DEulerParameters();
-			bi[hpi[id].mid] = {
+			bi[mcnt++] = {
 				pm->Mass(),
 				pm->Position().x, pm->Position().y, pm->Position().z,
 				pm->Velocity().x, pm->Velocity().y, pm->Velocity().z,
@@ -175,11 +201,11 @@ void xParticlePlanesContact::updataPlaneObjectData(bool is_first_set_up)
 			//checkCudaErrors(cudaMemset(db_force, 0, sizeof(double3) * nplanes));
 			//checkCudaErrors(cudaMemset(db_moment, 0, sizeof(double3) * nplanes));
 			//std::cout << "plane_velocity : [" << p->Velocity().x << ", " << p->Velocity().y << ", " << p->Velocity().z << std::endl;
-			//std::cout << "plane_velocity : [" << p->Velocity().x << ", " << p->Velocity().y << ", " << p->Velocity().z << std::endl;
-			checkCudaErrors(cudaMemcpy(dbi, bi, sizeof(device_body_info) * nContactObject, cudaMemcpyHostToDevice));
-			mcnt++;
+			//std::cout << "plane_velocity : [" << p->Velocity().x << ", " << p->Velocity().y << ", " << p->Velocity().z << std::endl;			
 		}
+		checkCudaErrors(cudaMemcpy(dbi, bi, sizeof(device_body_info) * nContactObject, cudaMemcpyHostToDevice));
 	}
+	
 	//if (nmoving)
 	if(bi)
 		delete[] bi; 

@@ -11,7 +11,7 @@ public:
 	xPlaneObject(std::string _name);
 	virtual ~xPlaneObject();
 
-	bool define(vector3d& _xw, vector3d& _pa, vector3d& _pb);
+	bool define(bool isMovingObject, vector3d& _xw, vector3d& _pa, vector3d& _pb);
 	bool define(vector3d& p0, vector3d& p1, vector3d& p2, vector3d& p3);
 	double L1() const;// { return l1; }
 	double L2() const;// { return l2; }

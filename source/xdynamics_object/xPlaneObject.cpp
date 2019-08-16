@@ -48,8 +48,9 @@ bool xPlaneObject::define(vector3d& p0, vector3d& p1, vector3d& p2, vector3d& p3
 	return true;
 }
 
-bool xPlaneObject::define(vector3d& _xw, vector3d& _pa, vector3d& _pb)
+bool xPlaneObject::define(bool isMovingObject, vector3d& _xw, vector3d& _pa, vector3d& _pb)
 {
+	xObject::is_moving_object = isMovingObject;
 	w2 = _pa;
 	//w3 = _pc;
 	w4 = _pb;
