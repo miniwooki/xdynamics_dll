@@ -499,7 +499,7 @@ void xXLSReader::ReadDEMParticle(xDiscreteElementMethodModel* xdem, xObjectManag
 				vector3i grid = new_vector3i(0, 0, 0);
 				xUtilityFunctions::xsplit(sheet->readStr(rc.x, rc.y++), ",", 3, &loc.x);
 				xUtilityFunctions::xsplit(sheet->readStr(rc.x, rc.y++), ",", 3, &grid.x);
-				xdem->XParticleManager()->CreateClusterParticle(name.c_str(), xo->Material(), loc, grid, dynamic_cast<xClusterObject*>(xo)); break;
+				xdem->XParticleManager()->CreateClusterParticle(name.c_str(), xo->Material(), loc, grid, dynamic_cast<xClusterObject*>(xo));
 			}
 			else if (form == NO_SHAPE_AND_MASS)
 			{

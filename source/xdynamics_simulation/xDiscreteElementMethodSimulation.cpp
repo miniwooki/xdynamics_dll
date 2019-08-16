@@ -279,6 +279,8 @@ QString xDiscreteElementMethodSimulation::SaveStepResult(unsigned int pt, double
 		checkCudaErrors(cudaMemcpy(vel, dvel, sizeof(double) * ns * 3, cudaMemcpyDeviceToHost));
 		//checkCudaErrors(cudaMemcpy(ep, dep, sizeof(double) * np * 4, cudaMemcpyDeviceToHost));
 		checkCudaErrors(cudaMemcpy(avel, davel, sizeof(double) * ns * 4, cudaMemcpyDeviceToHost));
+		if (np != ns)
+			checkCudaErrors(cudaMemcpy(cpos, dcpos, sizeof(double) * ns * 4, cudaMemcpyDeviceToHost));
 	}
 	//char pname[256] = { 0, };
  	QString fname = xModel::path + xModel::name;
@@ -296,6 +298,8 @@ QString xDiscreteElementMethodSimulation::SaveStepResult(unsigned int pt, double
 		qf.write((char*)vel, sizeof(double) * ns * 3);
 		//qf.write((char*)ep, sizeof(double) * np * 4);
 		qf.write((char*)avel, sizeof(double) * ns * 4);
+		if((np != ns) && cpos) 
+			qf.write((char*)cpos, sizeof(double) * ns * 4);
 	}
 	qf.close();
 //	double total_energy = 0.0;
