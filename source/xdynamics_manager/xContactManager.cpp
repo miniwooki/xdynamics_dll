@@ -477,6 +477,8 @@ void xContactManager::deviceCollision(
 		}
 		if (cpmeshes)
 		{
+
+
 			if (cpmeshes->NumContactObjects())
 			{
 				//cpmeshes->updateMeshMassData();

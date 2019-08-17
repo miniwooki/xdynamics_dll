@@ -172,7 +172,7 @@ void cu_plane_contact_force(
 	for (unsigned int i = 0; i < nplane; i++)
 	{
 		plane_contact_force_kernel << < numBlocks, numThreads >> > (
-			plan, i, dbi, cp, dbf, dbm,
+			plan, i, dbi, cp+i, dbf, dbm,
 			(double4 *)pos, (double4 *)ep, (double3 *)vel, (double4 *)ev,
 			(double3 *)force, (double3 *)moment, mass,
 			(double3 *)tmax, rres,

@@ -237,22 +237,7 @@ double xContact::cohesionForce(double coh, double cdist, double coh_r, double co
 		if (eq <= 0)
 			Fn = -0.5 * c0;
 		double a3 = (3.0 * coh_r) * (Fn + c0 + sqrt(2.0 * c0 * Fn + c0 * c0)) / (4.0 * coh_e);
-		//double a3 = (3.0 * coh_r) * c0 / (4.0 * coh_e);
-		/*double c1 = (M_PI * M_PI * coh * coh * coh_r) / (coh_e * coh_e);
-		double gs = -(3.0 / 4.0) * pow(c1, 1.0 / 3.0);*/
-	/*	if (coh_s < cdist)
-		{
-			cf = -(3.0 / 2.0) * M_PI * coh * coh_r;
-		}
-		else
-		{*/
-			cf = /*(4.0 * coh_e * a3) / (3.0 * coh_r)*/ - sqrt(8.0 * M_PI * coh * coh_e * a3);
-		//}
-			
-		/*double rcp = (3.0 * coh_r * (-Fn)) / (4.0 * (1.0 / coh_e));
-		double rc = pow(rcp, 1.0 / 3.0);
-		double Ac = M_PI * rc * rc;
-		cf = coh * Ac;*/
+		cf = - sqrt(8.0 * M_PI * coh * coh_e * a3);
 	}
 	return cf;
 }

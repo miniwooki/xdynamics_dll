@@ -190,6 +190,7 @@ void xParticlePlanesContact::updataPlaneObjectData(bool is_first_set_up)
 				pm = dynamic_cast<xParticleCubeContact*>(xc)->CubeObject();
 			else if (xc->PairType() == PARTICLE_PANE)
 				pm = dynamic_cast<xParticlePlaneContact*>(xc)->PlaneObject();
+			if (pm->MovingObject() == false && !is_first_set_up) continue;
 			euler_parameters ep = pm->EulerParameters(), ed = pm->DEulerParameters();
 			bi[mcnt++] = {
 				pm->Mass(),
@@ -203,7 +204,8 @@ void xParticlePlanesContact::updataPlaneObjectData(bool is_first_set_up)
 			//std::cout << "plane_velocity : [" << p->Velocity().x << ", " << p->Velocity().y << ", " << p->Velocity().z << std::endl;
 			//std::cout << "plane_velocity : [" << p->Velocity().x << ", " << p->Velocity().y << ", " << p->Velocity().z << std::endl;			
 		}
-		checkCudaErrors(cudaMemcpy(dbi, bi, sizeof(device_body_info) * nContactObject, cudaMemcpyHostToDevice));
+		if(bi)
+			checkCudaErrors(cudaMemcpy(dbi, bi, sizeof(device_body_info) * nContactObject, cudaMemcpyHostToDevice));
 	}
 	
 	//if (nmoving)

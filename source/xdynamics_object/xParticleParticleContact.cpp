@@ -136,7 +136,7 @@ void xParticleParticleContact::cppCollision(
 			double f = JKRSeperationForce(c, cohesion);
 			double cf = cohesionForce(cohesion, d->gab, c.coh_r, c.coh_e, c.coh_s, f);
 			F -= cf * u;
-			continue;
+			continue; 
 		}
 		//else if (d->isc && d->gab < 0 && abs(d->gab) > abs(c.coh_s))
 		//{

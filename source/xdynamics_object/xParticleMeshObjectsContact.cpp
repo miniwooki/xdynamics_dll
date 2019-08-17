@@ -442,7 +442,7 @@ void xParticleMeshObjectsContact::getMeshContactForce()
 			xMeshObject* o = xmo.value();
 			if (o->MovingObject())
 			{
-				std::cout << "mesh contact force : [" << dbf[id].force.x << ", " << dbf[id].force.y << ", " << dbf[id].force.z << "]" << std::endl;
+				//std::cout << "mesh contact force : [" << dbf[id].force.x << ", " << dbf[id].force.y << ", " << dbf[id].force.z << "]" << std::endl;
 				o->addContactForce(dbf[id].force.x, dbf[id].force.y, dbf[id].force.z);
 				o->addContactMoment(dbf[id].moment.x, dbf[id].moment.y, dbf[id].moment.z);
 			}

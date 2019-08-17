@@ -109,8 +109,8 @@ void xIntegratorVV::updateVelocity(
 		vector3d* iner = (vector3d*)dinertia;
 		for (unsigned int i = 0; i < np; i++){
 			matrix33d J = { iner[i].x, 0, 0, 0, iner[i].y, 0, 0, 0, iner[i].z };
-			if (i == 0)
-				printf("p0 force : [%e, %e, %e], p0 moment : [%e, %e, %e]\n", f[i].x, f[i].y, f[i].z, m[i].x, m[i].y, m[i].z);
+			/*if (i == 0)
+				printf("p0 force : [%e, %e, %e], p0 moment : [%e, %e, %e]\n", f[i].x, f[i].y, f[i].z, m[i].x, m[i].y, m[i].z);*/
 			//std::cout << "force : [" << f[i].x << " " << f[i].y << " " << f[i].z << "]" << std::endl;
 		//	std::cout << "moment : [" << m[i].x << " " << m[i].y << " " << m[i].z << "]" << std::endl;
 			vector3d n_prime = ToLocal(ep[i], m[i]);

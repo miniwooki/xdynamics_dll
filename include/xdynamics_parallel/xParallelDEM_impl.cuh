@@ -537,20 +537,13 @@ __device__ double cohesionForce(
 		double Eeq = 1.0 / (((1.0 - pri * pri) / Ei) + ((1.0 - prj * prj) / Ej));// (Ei * Ej) / (Ei*(1.0 - prj * prj) + Ej * (1.0 - pri * pri));
 		double c0 = 3.0 * coh * M_PI * Req;
 		double eq = 2.0 * c0 * Fn + c0 * c0;
-		//printf("\nPrevious_Fn : %f, Previous_eq : %.16f", Fn, eq);
 		if (eq <= 0)
 		{
 			Fn = -0.5 * c0;
-		//	eq = 2.0 * c0 * Fn + c0 * c0;
 		}			
 		
 		double a3 = (3.0 * Req) * (Fn + c0 + sqrt(abs(2.0 * c0 * Fn + c0 * c0))) / (4.0 * Eeq);
-		//printf("\nFn : %f, c0 : %f, Req : %f, Eeq : %f, eq : %f, a3 : %f\n", Fn, c0, Req, Eeq, eq, 2.0 * c0 * Fn + c0 * c0);
-		/*double rcp = (3.0 * req * (-Fn)) / (4.0 * (1.0 / Eeq));
-		double rc = pow(rcp, 1.0 / 3.0);
-		double Ac = M_PI * rc * rc;
-		cf = coh * Ac;*/
-		cf = /*(4.0 * coh_e * a3) / (3.0 * coh_r)*/ -sqrt(8.0 * M_PI * coh * Eeq * a3);
+		cf = -sqrt(8.0 * M_PI * coh * Eeq * a3);
 	}
 	return cf;
 }

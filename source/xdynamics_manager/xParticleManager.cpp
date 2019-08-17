@@ -372,7 +372,7 @@ void xParticleManager::SetCurrentParticlesFromPartResult(std::string path)
 	{
 		qf.read((char*)&m_ct, sizeof(double));
 		qf.read((char*)&m_np, sizeof(unsigned int));
-		qf.read((char*)&m_ns, sizeof(unsigned int));
+	//	qf.read((char*)&m_ns, sizeof(unsigned int));
 		if (np != m_np)
 		{
 			std::cout << "Failed setCurrentParticlesFromPartResult" << std::endl;
@@ -380,35 +380,35 @@ void xParticleManager::SetCurrentParticlesFromPartResult(std::string path)
 			return;
 		}
 		vector4d* m_pos = new vector4d[m_np];
-		vector3d* m_vel = new vector3d[m_ns];
-		vector4d* m_avel = new vector4d[m_ns];
-		vector4d* m_cpos = NULL;
+		//vector3d* m_vel = new vector3d[m_ns];
+		//vector4d* m_avel = new vector4d[m_ns];
+		/*vector4d* m_cpos = NULL;
 		if (m_np != m_ns)
-			m_cpos = new vector4d[m_ns];
+			m_cpos = new vector4d[m_ns];*/
 		qf.read((char*)m_pos, sizeof(vector4d) * m_np);
-		qf.read((char*)m_vel, sizeof(vector3d) * m_ns);
-		qf.read((char*)m_avel, sizeof(vector4d) * m_ns);
-		if(m_cpos)
-			qf.read((char*)m_cpos, sizeof(vector4d) * m_ns);
+		//qf.read((char*)m_vel, sizeof(vector3d) * m_ns);
+		//qf.read((char*)m_avel, sizeof(vector4d) * m_ns);
+		//if(m_cpos)
+		//	qf.read((char*)m_cpos, sizeof(vector4d) * m_ns);
 		foreach(xParticleObject* xpo, xpcos)
 		{
 			unsigned int sid = xpo->StartIndex();
 			unsigned int xnp = xpo->NumParticle();
 			vector4d* xpo_pos = xpo->Position();
 			memcpy(xpo_pos, m_pos + sid, sizeof(vector4d) * xnp);
-			if (m_cpos)
-			{
+			//if (m_cpos)
+			/*{
 				vector4d* xpo_cpos = xpo->ClusterPosition();
 				unsigned int xns = xpo->NumCluster();
 				memcpy(xpo_cpos, m_cpos, sizeof(vector4d) * xns);
-			}
+			}*/
 		//	qf.read((char*)m_pos, sizeof()
 			xpccs.erase(xpccs.find(xpo->Name()));
 		}
-		delete[] m_pos;
+	/*	delete[] m_pos;
 		delete[] m_vel;
 		delete[] m_avel;
-		if (m_cpos) delete[] m_cpos;
+		if (m_cpos) delete[] m_cpos;*/
 		
 	}
 	qf.close();
