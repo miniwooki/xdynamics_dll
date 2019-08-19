@@ -694,9 +694,11 @@ void xXLSReader::ReadShapeObject(xObjectManager* xom, vector2i rc)
 			}
 			if (!IsEmptyCell(rc.x, rc.y))
 			{
-				double v = 0.0;
-				v = sheet->readNum(rc.x, rc.y++);
+				double v[3] = { 0.0, };
+				std::string ch_vel = sheet->readStr(rc.x, rc.y++);
+				xUtilityFunctions::xsplit(ch_vel.c_str(), ",", 3, v);
 				xPointMass* xpm = xom->setMovingConstantMovingVelocity(name, v);
+				xpm->setCompulsionMovingObject(true);
 				if (!IsEmptyCell(rc.x, rc.y))
 				{
 					std::string ch;

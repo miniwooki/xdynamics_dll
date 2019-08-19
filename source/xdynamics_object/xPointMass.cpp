@@ -356,6 +356,22 @@ void xPointMass::SaveStepResult(unsigned int part, double time, xVectorD& q, xVe
 	nr_part++;
 }
 
+void xPointMass::SaveStepResult(double time)
+{
+	vector3d aa = 2.0 * GMatrix(ep) * ea;// m->getEP().G() * m->getEA();
+	vector3d av = 2.0 * GMatrix(ep) * ev;// m->getEP().G() * m->getEV();
+	pointmass_result pmr =
+	{
+		time,
+		pos,
+		vel,
+		acc,
+		av, aa, af, am, cf, cm, hf, hm, ep, ev, ea
+	};
+	pmrs.push_back(pmr);
+	nr_part++;
+}
+
 void xPointMass::ExportResults(std::fstream& of)
 {
 	std::ofstream ofs;
@@ -444,6 +460,14 @@ bool xPointMass::checkStopCondition()
 		}
 	}
 	return is_stop;
+}
+
+void xPointMass::UpdateByCompulsion(double dt)
+{
+	if (is_compulsion_moving_object)
+	{
+		pos += dt * const_vel;
+	}
 }
 
 //bool xPointMass::checkForceStopCondition(xSimulationStopCondition xComparisonType ct, double v)

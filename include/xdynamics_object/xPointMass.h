@@ -88,6 +88,7 @@ public:
 	void AllocResultMomory(unsigned int _s);
 	void setZeroAllForce();
 	void SaveStepResult(unsigned int part, double time, xVectorD& q, xVectorD& qd, xVectorD& qdd);
+	void SaveStepResult(double time);
 	void ExportResults(std::fstream& of);
 	void SetDataFromStructure(int id, xPointMassData& d);
 	void ImportInitialData();
@@ -96,6 +97,7 @@ public:
 	void setNewPositionData(xVectorD& q);
 	void setNewVelocityData(xVectorD& qd);
 	bool checkStopCondition();
+	void UpdateByCompulsion(double ct);
 	//virtual void translation(vector3d new_pos);
 //	static void ExportResult2ASCII(std::ifstream& ifs);
 

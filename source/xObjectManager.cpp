@@ -41,14 +41,31 @@ QMap<QString, xObject*>& xObjectManager::XObjects()
 	return objects;
 }
 
-xPointMass * xObjectManager::setMovingConstantMovingVelocity(std::string _name, double v)
+xPointMass * xObjectManager::setMovingConstantMovingVelocity(std::string _name, double* v)
 {
 	xPointMass* xpm = dynamic_cast<xPointMass*>(XObject(_name));
 	if (xpm)
-	{
-		xpm->setMovingConstantMovingVelocity(v);
-	}
+		xpm->setMovingConstantMovingVelocity(new_vector3d(v[0], v[1], v[2]));
+	compulsion_moving_objects[QString::fromStdString(_name)] = xpm;
 	return xpm;
+}
+
+void xObjectManager::UpdateMovingObjects(double ct)
+{
+	foreach(xObject* xo, compulsion_moving_objects)
+	{
+		xPointMass* xpm = dynamic_cast<xPointMass*>(xo);
+		xpm->UpdateByCompulsion(ct);
+	}
+}
+
+void xObjectManager::SaveResultCompulsionMovingObjects(double ct)
+{
+	foreach(xObject* xo, compulsion_moving_objects)
+	{
+		xPointMass* xpm = dynamic_cast<xPointMass*>(xo);
+		xpm->SaveStepResult(ct);
+	}
 }
 
 xLineObject* xObjectManager::CreateLineShapeObject(std::string _name, int _xmt)
@@ -137,4 +154,9 @@ void xObjectManager::CreateSPHBoundaryParticles(xParticleManager* xpm)
 // 			xpm->CreateLineParticle
 // 		}
 // 	}
+}
+
+QMap<QString, xObject*>& xObjectManager::CompulsionMovingObjects()
+{
+	return compulsion_moving_objects;
 }

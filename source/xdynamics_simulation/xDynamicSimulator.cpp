@@ -158,7 +158,13 @@ bool xDynamicsSimulator::savePartData(double ct, unsigned int pt)
 	if (xmbd)
 		xmbd->SaveStepResult(pt, ct);
 	if (xdem)
+	{
 		xdem->SaveStepResult(pt, ct);
+		if (!xmbd)
+		{
+			xdm->XObject()->SaveResultCompulsionMovingObjects(ct);
+		}
+	}		
 	if (xsph)
 		xsph->SaveStepResult(pt, ct);
 	return true;
@@ -203,12 +209,21 @@ bool xDynamicsSimulator::checkStopCondition()
 
 bool xDynamicsSimulator::xRunSimulationThread(double ct, unsigned int cstep)
 {
+	
 	if (xsph)
 		if (checkXerror(xsph->OneStepSimulation(ct, cstep)))
 			return false;
 	if (xdem)
+	{
+		if (!xmbd)
+		{
+			xdm->XObject()->UpdateMovingObjects(xSimulation::dt);
+			xdem->updateObjectFromMBD();
+		}
+			
 		if (checkXerror(xdem->OneStepSimulation(ct, cstep)))
 			return false;
+	}
 	if (xmbd)
 	{
 		if (checkXerror(xmbd->OneStepSimulation(ct, cstep)))

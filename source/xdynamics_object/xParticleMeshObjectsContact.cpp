@@ -65,7 +65,7 @@ unsigned int xParticleMeshObjectsContact::define(QMap<QString, xParticleMeshObje
 	foreach(xParticleMeshObjectContact* cpm, cpmesh)
 	{
 		xMeshObject* pobj = cpm->MeshObject();
-		if (pobj->MovingObject())
+		if (pobj->MovingObject() || pobj->CompulsionMovingObject())
 			nmoving++;
 		npolySphere += pobj->NumTriangle();
 	}

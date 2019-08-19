@@ -571,7 +571,20 @@ void xdynamics_gui::setupBindingPointer()
 					if (obj)
 						obj->bindPointMassResultsPointer(pm->XPointMassResultPointer());
 				}
-			}			
+			}	
+			else
+			{
+				foreach(xObject* xo, xdm->XObject()->CompulsionMovingObjects())
+				{
+					xPointMass* pm = dynamic_cast<xPointMass*>(xo);
+					xvObject* obj = xgl->Object(xo->Name());
+					if (obj)
+						obj->bindPointMassResultsPointer(pm->XPointMassResultPointer());
+					obj = xgl->Object(xo->Name() + "_marker");
+					if (obj)
+						obj->bindPointMassResultsPointer(pm->XPointMassResultPointer());
+				}
+			}
 		}
 	}
 }

@@ -26,7 +26,8 @@ public:
 	void setShapeType(xShapeType xst);
 	void setMaterialType(xMaterialType xmt);
 	void setConnectedGeometryName(QString n);
-	void setMovingConstantMovingVelocity(double v);
+	void setCompulsionMovingObject(bool b);
+	void setMovingConstantMovingVelocity(vector3d v);
 
 	double Density() const;// { return d; }
 	double Youngs() const;// { return y; }
@@ -34,6 +35,7 @@ public:
 	double Shear() const;
 	double Volume() const;
 	bool MovingObject() const;
+	bool CompulsionMovingObject() const;
 	xShapeType Shape() const;
 	xMaterialType Material() const;
 
@@ -47,14 +49,15 @@ protected:
 	QString connected_geometry_name;
 	xShapeType shape;
 	xMaterialType material;
-	bool is_moving_object;
+	bool is_compulsion_moving_object;
+	bool is_mass_moving_object;
 	int id;
 // 	static unsigned int count;
 // 	dimension_type dim;
 // 	unsigned int id;
 // 	// pointMass of object
 // 	VEC3D dia_iner0;			// Ixx, Iyy, Izz
-	double const_vel;
+	vector3d const_vel;
 // 	VEC3D sym_iner0;		// Ixy, Ixz, Iyz
  	double vol;				// volume
 // 	QString name;

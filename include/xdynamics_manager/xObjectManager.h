@@ -24,8 +24,9 @@ public:
 	xObject* XObject(std::string& ws);
 	QMap<QString, xObject*>& XObjects();
 	
-	xPointMass* setMovingConstantMovingVelocity(std::string _name, double v);
-
+	xPointMass* setMovingConstantMovingVelocity(std::string _name, double* v);
+	void UpdateMovingObjects(double ct);
+	void SaveResultCompulsionMovingObjects(double ct);
 	xLineObject* CreateLineShapeObject(std::string _name, int _xmt);
 	xPlaneObject* CreatePlaneShapeObject(std::string _name, int _xmt);
 	xCubeObject* CreateCubeShapeObject(std::string _name, int _xmt);
@@ -34,10 +35,11 @@ public:
 	xCylinderObject* CreateCylinderShapeObject(std::string _name, int _xmt);
 
 	void CreateSPHBoundaryParticles(xParticleManager* xpm);
+	QMap<QString, xObject*>& CompulsionMovingObjects();
 
 private:
 	QMap<QString, xObject*> objects;
-	QMap<QString, xObject*> moving_objects;
+	QMap<QString, xObject*> compulsion_moving_objects;
 };
 
 #endif

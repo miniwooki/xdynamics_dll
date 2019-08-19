@@ -10,6 +10,8 @@ xObject::xObject(xShapeType _s)
 	, p(0)
 	, sm(0)
 	, shape(_s)
+	, is_mass_moving_object(false)
+	, is_compulsion_moving_object(false)
 {
 	id = count++;
 }
@@ -23,6 +25,8 @@ xObject::xObject(std::string _name, xShapeType _s)
 	, p(0)
 	, sm(0)
 	, shape(_s)
+	, is_mass_moving_object(false)
+	, is_compulsion_moving_object(false)
 {
 	id = count++;
 }
@@ -35,6 +39,8 @@ xObject::xObject(const xObject& o)
 	, p(o.Poisson())
 	, sm(o.Shear())
 	, vol(o.Volume())
+	, is_mass_moving_object(o.MovingObject())
+	, is_compulsion_moving_object(o.CompulsionMovingObject())
 {
 
 }
@@ -105,7 +111,12 @@ double xObject::Volume() const
 
 bool xObject::MovingObject() const
 {
-	return is_moving_object;
+	return is_mass_moving_object;
+}
+
+bool xObject::CompulsionMovingObject() const
+{
+	return is_compulsion_moving_object;
 }
 
 void xObject::setDensity(double _d)
@@ -125,7 +136,7 @@ void xObject::setPoisson(double _p)
 
 void xObject::setMovingObject(bool ismo)
 {
-	is_moving_object = ismo;
+	is_mass_moving_object = ismo;
 }
 
 xShapeType xObject::Shape() const
@@ -148,7 +159,12 @@ void xObject::setConnectedGeometryName(QString n)
 	connected_geometry_name = n;
 }
 
-void xObject::setMovingConstantMovingVelocity(double v)
+void xObject::setCompulsionMovingObject(bool b)
+{
+	is_compulsion_moving_object = b;
+}
+
+void xObject::setMovingConstantMovingVelocity(vector3d v)
 {
 	const_vel = v;
 }
