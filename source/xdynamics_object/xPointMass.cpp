@@ -459,6 +459,9 @@ bool xPointMass::checkStopCondition()
 		case GRATER_THAN: is_stop = v > stop_condition.value; break;
 		}
 	}
+	/*af = new_vector3d(0, 0, 0);
+	cf = new_vector3d(0, 0, 0);
+	hf = new_vector3d(0, 0, 0);*/
 	return is_stop;
 }
 

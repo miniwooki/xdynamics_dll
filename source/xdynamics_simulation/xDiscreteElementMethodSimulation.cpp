@@ -277,7 +277,7 @@ QString xDiscreteElementMethodSimulation::SaveStepResult(unsigned int pt, double
 	{
 		checkCudaErrors(cudaMemcpy(pos, dpos, sizeof(double) * np * 4, cudaMemcpyDeviceToHost));
 		checkCudaErrors(cudaMemcpy(vel, dvel, sizeof(double) * ns * 3, cudaMemcpyDeviceToHost));
-		//checkCudaErrors(cudaMemcpy(ep, dep, sizeof(double) * np * 4, cudaMemcpyDeviceToHost));
+		checkCudaErrors(cudaMemcpy(ep, dep, sizeof(double) * ns * 4, cudaMemcpyDeviceToHost));
 		checkCudaErrors(cudaMemcpy(avel, davel, sizeof(double) * ns * 4, cudaMemcpyDeviceToHost));
 		if (np != ns)
 			checkCudaErrors(cudaMemcpy(cpos, dcpos, sizeof(double) * ns * 4, cudaMemcpyDeviceToHost));
@@ -296,7 +296,7 @@ QString xDiscreteElementMethodSimulation::SaveStepResult(unsigned int pt, double
 		qf.write((char*)&ns, sizeof(unsigned int));
 		qf.write((char*)pos, sizeof(double) * np * 4);
 		qf.write((char*)vel, sizeof(double) * ns * 3);
-		//qf.write((char*)ep, sizeof(double) * np * 4);
+		qf.write((char*)ep, sizeof(double) * np * 4);
 		qf.write((char*)avel, sizeof(double) * ns * 4);
 		if((np != ns) && cpos) 
 			qf.write((char*)cpos, sizeof(double) * ns * 4);

@@ -56,6 +56,7 @@ void xObjectManager::UpdateMovingObjects(double ct)
 	{
 		xPointMass* xpm = dynamic_cast<xPointMass*>(xo);
 		xpm->UpdateByCompulsion(ct);
+		xpm->setZeroAllForce();
 	}
 }
 

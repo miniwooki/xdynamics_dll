@@ -220,7 +220,10 @@ bool xDynamicsSimulator::xRunSimulationThread(double ct, unsigned int cstep)
 			xdm->XObject()->UpdateMovingObjects(xSimulation::dt);
 			xdem->updateObjectFromMBD();
 		}
-			
+		else
+		{
+			xmbd->SetZeroBodyForce();
+		}
 		if (checkXerror(xdem->OneStepSimulation(ct, cstep)))
 			return false;
 	}
@@ -230,7 +233,7 @@ bool xDynamicsSimulator::xRunSimulationThread(double ct, unsigned int cstep)
 			return false;
 		if (xdem)
 			xdem->updateObjectFromMBD();
-		xmbd->SetZeroBodyForce();
+		//xmbd->SetZeroBodyForce();
 	}
 	if (checkStopCondition())
 		xSimulation::triggerStopSimulation();
