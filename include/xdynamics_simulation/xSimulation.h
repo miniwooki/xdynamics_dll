@@ -19,6 +19,8 @@ public:
 	static void initialize();
 	static bool Cpu();
 	static bool Gpu();
+	static bool ConfirmStopSimulation();
+	static void triggerStopSimulation();
 	static void setCPUDevice();
 	static void setGPUDevice();
 	static void setTimeStep(double _dt);
@@ -31,6 +33,7 @@ public:
 	static void setSPHSolverType(SPHSolverType sst);
 	void setDEMPositionVelocity(double* p, double *v);
 
+	static bool triggered_stop_simulation;
 	static double start_time;
 	static double et;
 	static double init_dt;

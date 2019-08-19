@@ -26,6 +26,7 @@ public:
 	void setShapeType(xShapeType xst);
 	void setMaterialType(xMaterialType xmt);
 	void setConnectedGeometryName(QString n);
+	void setMovingConstantMovingVelocity(double v);
 
 	double Density() const;// { return d; }
 	double Youngs() const;// { return y; }
@@ -53,6 +54,7 @@ protected:
 // 	unsigned int id;
 // 	// pointMass of object
 // 	VEC3D dia_iner0;			// Ixx, Iyy, Izz
+	double const_vel;
 // 	VEC3D sym_iner0;		// Ixy, Ixz, Iyz
  	double vol;				// volume
 // 	QString name;
@@ -63,7 +65,7 @@ protected:
  	double y;		// young's modulus
  	double p;		// poisson ratio
  	double sm;		// shear modulus
-// 
+ 
 // 	vobject* vobj;
 // 	vobject* marker;
 };

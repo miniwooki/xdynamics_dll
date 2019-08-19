@@ -21,17 +21,14 @@ public:
 	bool xRunSimulationThread(double ct, unsigned int pt);
 	bool savePartData(double ct, unsigned int pt);
 	void exportPartData();
+	bool checkStopCondition();
 
 private:
-
+	//xSimulationStopCondition *stop_condition;
 	xDynamicsManager* xdm;
 	xMultiBodySimulation* xmbd;
 	xDiscreteElementMethodSimulation* xdem;
 	xSmoothedParticleHydrodynamicsSimulation* xsph;
 };
-
-
-
-
 
 #endif

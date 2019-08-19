@@ -186,6 +186,8 @@ enum xBoundaryTreatmentType
 
 enum xUnitType{ MKS = 0, MMKS };
 enum xGravityDirection{ PLUS_X = 0, PLUS_Y, PLUS_Z, MINUS_X, MINUS_Y, MINUS_Z };
+enum xSimulationStopType{ FORCE_MAGNITUDE = 0 };
+enum xComparisonType{ GRATER_THAN = 0 };
 /*enum xInputDataFormType { FORM_OBJECT_PLANE = 2, FORM_OBJECT_CUBE = 3, FORM_OBJECT_SHAPE = 4 };*/
 
 typedef struct{	double density, youngs, poisson, shear; }xMaterial;
@@ -276,6 +278,13 @@ typedef struct
 	bool inner;
 }xOverlapCorner;
 
+typedef struct
+{
+	bool enable;
+	xSimulationStopType type;
+	xComparisonType comparison;
+	double value;
+}xSimulationStopCondition;
 
 //
 //typedef struct

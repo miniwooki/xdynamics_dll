@@ -659,7 +659,7 @@ void xXLSReader::ReadShapeObject(xObjectManager* xom, vector2i rc)
 				double rad = sheet->readNum(rc.x, rc.y++);
 				std::string sdata;
 				int loc[2] = { 0, };
-				sdata = sheet->readStr(rc.x, rc.y); uf::xsplit(sdata, ",", 2, loc);
+				sdata = sheet->readStr(rc.x, rc.y++); uf::xsplit(sdata, ",", 2, loc);
 				vector3d *d = new vector3d[num];
 				loc[0] -= 1; loc[1] -= 1;
 				for (unsigned int i = 0; i < num; i++)
@@ -691,6 +691,25 @@ void xXLSReader::ReadShapeObject(xObjectManager* xom, vector2i rc)
 				xve->Write((char*)file.c_str(), sizeof(char)*ns);
 				xmo->exportMeshData(file);
 				//xmo->splitTriangles(fsz);
+			}
+			if (!IsEmptyCell(rc.x, rc.y))
+			{
+				double v = 0.0;
+				v = sheet->readNum(rc.x, rc.y++);
+				xPointMass* xpm = xom->setMovingConstantMovingVelocity(name, v);
+				if (!IsEmptyCell(rc.x, rc.y))
+				{
+					std::string ch;
+					std::string och[3];
+					ch = sheet->readStr(rc.x, rc.y++);
+					xUtilityFunctions::xsplit(ch.c_str(), " ", 3, och);
+					double stop_value = atof(och[2].c_str());
+					xSimulationStopType xssc;
+					xComparisonType xct;
+					if (och[0] == "FM")	{ xssc = FORCE_MAGNITUDE; }
+					if (och[1] == ">") { xct = GRATER_THAN; }
+					xpm->setStopCondition(xssc, xct, stop_value);
+				}
 			}
 			rc.x++;
 			rc.y = init_col;

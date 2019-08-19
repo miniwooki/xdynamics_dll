@@ -43,6 +43,7 @@ public:
 	void setHydroForce(double x, double y, double z);
 	void setHydroMoment(double x, double y, double z);
 	void setEulerParameterMoment(double m0, double m1, double m2, double m3);
+	void setStopCondition(xSimulationStopType sst, xComparisonType ct, double value);
 
 	void addContactForce(double x, double y, double z);
 	void addContactMoment(double x, double y, double z);
@@ -94,6 +95,7 @@ public:
 	void setNewData(xVectorD& q, xVectorD& qd);
 	void setNewPositionData(xVectorD& q);
 	void setNewVelocityData(xVectorD& qd);
+	bool checkStopCondition();
 	//virtual void translation(vector3d new_pos);
 //	static void ExportResult2ASCII(std::ifstream& ifs);
 
@@ -129,8 +131,11 @@ protected:
 
 	QVector<pointmass_result> pmrs;
 
+	xSimulationStopCondition stop_condition;
+
 private:
 	double* initial_data;
+	//bool checkForceStopCondition(xComparisonType ct, double v);
 };
 
 #endif

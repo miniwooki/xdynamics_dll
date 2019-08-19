@@ -16,6 +16,7 @@ xPointMass::xPointMass(xShapeType _s)
 	memset(&nr_part, 0, 564);
 	ep.e0 = 1.0;
 	setupTransformationMatrix();
+	stop_condition = { 0, };
 }
 
 xPointMass::xPointMass(std::string _name, xShapeType _s)
@@ -32,6 +33,7 @@ xPointMass::xPointMass(std::string _name, xShapeType _s)
 	//wsprintfW(name, TEXT("%s"), _name);
 	ep.e0 = 1.0;
 	setupTransformationMatrix();
+	stop_condition = { 0, };
 }
 
 xPointMass::xPointMass(const xPointMass& xpm)
@@ -145,6 +147,11 @@ void xPointMass::setHydroMoment(double x, double y, double z)
 void xPointMass::setEulerParameterMoment(double m0, double m1, double m2, double m3)
 {
 	em = new_vector4d(m0, m1, m2, m3);
+}
+
+void xPointMass::setStopCondition(xSimulationStopType sst, xComparisonType ct, double value)
+{
+	stop_condition = { true, sst, ct, value };
 }
 
 void xPointMass::addContactForce(double x, double y, double z)
@@ -400,7 +407,6 @@ void xPointMass::setNewData(xVectorD& q, xVectorD& qd)
 	ep.e0 = q(idx + 3); ep.e1 = q(idx + 4); ep.e2 = q(idx + 5); ep.e3 = q(idx + 6);
 	vel.x = qd(idx + 0); vel.y = qd(idx + 1); vel.z = qd(idx + 2);
 	ev.e0 = qd(idx + 3); ev.e1 = qd(idx + 4); ev.e2 = qd(idx + 5); ev.e3 = qd(idx + 6);
-	//setZeroAllForce();
 	af = new_vector3d(0.0, 0.0, 0.0);
 	am = new_vector3d(0.0, 0.0, 0.0);
 	setupTransformationMatrix();
@@ -421,6 +427,30 @@ void xPointMass::setNewVelocityData(xVectorD& qd)
 	vel.x = qd(idx + 0); vel.y = qd(idx + 1); vel.z = qd(idx + 2);
 	ev.e0 = qd(idx + 3); ev.e1 = qd(idx + 4); ev.e2 = qd(idx + 5); ev.e3 = qd(idx + 6);
 }
+
+bool xPointMass::checkStopCondition()
+{
+	double v = 0.0;
+	bool is_stop = false;
+	if (stop_condition.enable)
+	{
+		switch (stop_condition.type)
+		{
+		case FORCE_MAGNITUDE: v = length(af + cf + hf); break;
+		}
+		switch (stop_condition.comparison)
+		{
+		case GRATER_THAN: is_stop = v > stop_condition.value; break;
+		}
+	}
+	return is_stop;
+}
+
+//bool xPointMass::checkForceStopCondition(xSimulationStopCondition xComparisonType ct, double v)
+//{
+//
+//	return false;
+//}
 
 // void xPointMass::translation(vector3d new_pos)
 // {

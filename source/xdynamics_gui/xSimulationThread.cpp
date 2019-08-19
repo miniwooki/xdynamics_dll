@@ -67,7 +67,7 @@ void xSimulationThread::run()
 	while (cstep < xSimulation::nstep)
 	{
 		QMutexLocker locker(&m_mutex);
-		if (isStop)
+		if (isStop || xSimulation::ConfirmStopSimulation())
 			break;
 		cstep++;
 		cout << cstep << endl;
@@ -100,6 +100,7 @@ void xSimulationThread::run()
 		sendProgress(cstep, "");
 
 	}
+	xds->savePartData(ct, 9999);
 	elapsed_time = tme.elapsed() * 0.001;
 	total_time += elapsed_time;
 	sendProgress(-1, QString("=========  =======    ==========    ======   ========   =============  ====================\n"));

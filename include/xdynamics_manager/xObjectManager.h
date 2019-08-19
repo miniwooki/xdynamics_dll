@@ -23,6 +23,8 @@ public:
 	static xObjectManager* XOM();
 	xObject* XObject(std::string& ws);
 	QMap<QString, xObject*>& XObjects();
+	
+	xPointMass* setMovingConstantMovingVelocity(std::string _name, double v);
 
 	xLineObject* CreateLineShapeObject(std::string _name, int _xmt);
 	xPlaneObject* CreatePlaneShapeObject(std::string _name, int _xmt);
@@ -35,6 +37,7 @@ public:
 
 private:
 	QMap<QString, xObject*> objects;
+	QMap<QString, xObject*> moving_objects;
 };
 
 #endif

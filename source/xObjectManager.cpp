@@ -41,6 +41,16 @@ QMap<QString, xObject*>& xObjectManager::XObjects()
 	return objects;
 }
 
+xPointMass * xObjectManager::setMovingConstantMovingVelocity(std::string _name, double v)
+{
+	xPointMass* xpm = dynamic_cast<xPointMass*>(XObject(_name));
+	if (xpm)
+	{
+		xpm->setMovingConstantMovingVelocity(v);
+	}
+	return xpm;
+}
+
 xLineObject* xObjectManager::CreateLineShapeObject(std::string _name, int _xmt)
 {
 	QString name = QString::fromStdString(_name);

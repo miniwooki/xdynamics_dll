@@ -16,6 +16,7 @@ xDynamicsSimulator::xDynamicsSimulator()
 	, xmbd(NULL)
 	, xdem(NULL)
 	, xsph(NULL)
+	//, stop_condition(NULL)
 {
 
 }
@@ -26,6 +27,7 @@ xDynamicsSimulator::xDynamicsSimulator(xDynamicsManager* _xdm)
 	, xmbd(NULL)
 	, xdem(NULL)
 	, xsph(NULL)
+	//, stop_condition(NULL)
 {
 // 	if (xdm->XMBDModel())
 // 	{
@@ -40,6 +42,7 @@ xDynamicsSimulator::~xDynamicsSimulator()
 {
 	if (xmbd) delete xmbd; xmbd = NULL;
 	if (xdem) delete xdem; xdem = NULL;
+	//if (stop_condition) delete stop_condition; stop_condition = NULL;
 }
 
 xMultiBodySimulation* xDynamicsSimulator::setupMBDSimulation(xSimulation::MBDSolverType mst)
@@ -184,6 +187,20 @@ void xDynamicsSimulator::exportPartData()
 	of.close();
 }
 
+bool xDynamicsSimulator::checkStopCondition()
+{
+	foreach(xObject* xo, xdm->XObject()->XObjects())
+	{
+		xPointMass* xpm = dynamic_cast<xPointMass*>(xo);
+		if (xpm)
+		{
+			if (xpm->checkStopCondition())
+				return true;
+		}		
+	}
+	return false;
+}
+
 bool xDynamicsSimulator::xRunSimulationThread(double ct, unsigned int cstep)
 {
 	if (xsph)
@@ -200,7 +217,8 @@ bool xDynamicsSimulator::xRunSimulationThread(double ct, unsigned int cstep)
 			xdem->updateObjectFromMBD();
 		xmbd->SetZeroBodyForce();
 	}
-		
+	if (checkStopCondition())
+		xSimulation::triggerStopSimulation();
 //	return xDynamicsError::xdynamicsErrorDiscreteElementMethodModelInitialization;
 	return true;
 }

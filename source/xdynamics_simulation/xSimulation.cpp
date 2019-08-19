@@ -7,6 +7,7 @@ xSimulation::MBDSolverType xSimulation::mbd_solver_type = xSimulation::MBD_SOLVE
 xSimulation::DEMSolverType xSimulation::dem_solver_type = xSimulation::DEM_SOLVER;
 xSimulation::SPHSolverType xSimulation::sph_solver_type = xSimulation::SPH_SOLVER;
 
+bool xSimulation::triggered_stop_simulation = false;
 double xSimulation::ctime = 0.0;
 double xSimulation::et = 1.0;
 double xSimulation::start_time = 0.0;
@@ -50,6 +51,16 @@ bool xSimulation::Cpu()
 bool xSimulation::Gpu()
 {
 	return dev == GPU;
+}
+
+bool xSimulation::ConfirmStopSimulation()
+{
+	return triggered_stop_simulation;
+}
+
+void xSimulation::triggerStopSimulation()
+{
+	triggered_stop_simulation = true;
 }
 
 void xSimulation::setCPUDevice()

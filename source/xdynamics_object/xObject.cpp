@@ -148,6 +148,11 @@ void xObject::setConnectedGeometryName(QString n)
 	connected_geometry_name = n;
 }
 
+void xObject::setMovingConstantMovingVelocity(double v)
+{
+	const_vel = v;
+}
+
 xMaterialType xObject::Material() const
 {
 	return material;
