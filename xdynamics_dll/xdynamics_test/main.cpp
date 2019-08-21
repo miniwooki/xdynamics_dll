@@ -1,6 +1,7 @@
 //#include "xdynamics.h"
 #include "xdynamics.h"
 //#include "boost/algorithm.hpp"
+//#include <QtCore/QString>
 #include <crtdbg.h>
 
 //static xMultiBodySimulation* xmbs = NULL;
@@ -50,22 +51,22 @@ int main(int argc, char* argv[])
 		}
 		else
 		{
-			//std::wstring check_command = argv[1];
-			//if (check_command == L"-result")
-			//{
-			//	xResultManager *xrm = new xResultManager;
-			//	if (argc > 2)
-			//	{
-			//		std::wstring check_model = argv[2];
-			//		xrm->xRun(xModel::path.toStdWString(), check_model);
-			//	}
-			//	else
-			//	{
-			//		xrm->xRun(xModel::path.toStdWString(), xModel::name.toStdWString());
-			//	}
-			//	//xdm.xRunResultWorld(argv[2]);
-			//}
-			//return 0;
+			std::string check_command = argv[1];
+			if (check_command == "-result")
+			{
+				xResultManager *xrm = new xResultManager;
+				if (argc > 2)
+				{
+					std::string check_model = argv[2];
+					xrm->xRun("C:/Users/xdynamics/Documents/xdynamics/", check_model);
+				}
+			/*	else
+				{
+					xrm->xRun("C:/Users/xdynamics/Documents/xdynamics", xUtilityFunctions::xstring(xModel::name));
+				}*/
+				//xdm.xRunResultWorld(argv[2]);
+			}
+			return 0;
 		}
 // 		delete xds;
 // 		return 0;

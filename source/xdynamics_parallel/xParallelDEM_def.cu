@@ -415,6 +415,28 @@ void cu_cluster_meshes_contact(
 		xci, bindex, eindex, np);
 }
 
+void cu_decide_cluster_rolling_friction_moment(
+	double* tmax,
+	double* rres,
+	double* inertia,
+	double* ep,
+	double* ev,
+	double* moment,
+	xClusterInformation* xci,
+	unsigned int np)
+{
+	computeGridSize(np, 256, numBlocks, numThreads);
+	decide_cluster_rolling_friction_moment_kernel << <numBlocks, numThreads >> > (
+		(double3 *)tmax,
+		rres,
+		(double3*)inertia,
+		(double4*)ep,
+		(double4*)ev,
+		(double3*)moment,
+		xci,
+		np);
+}
+
 void vv_update_cluster_position(
 	double *pos, double *cpos, double* ep,
 	double *rloc, double *vel, double *acc,

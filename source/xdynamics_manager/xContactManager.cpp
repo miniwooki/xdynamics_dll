@@ -440,6 +440,7 @@ void xContactManager::deviceCollision(
 				cpmeshes->getMeshContactForce();
 			}
 		}
+		cu_decide_cluster_rolling_friction_moment(d_Tmax, d_RRes, inertia, ep, ev, moment, xci, np);
 	}
 	else
 	{
@@ -510,9 +511,8 @@ void xContactManager::deviceCollision(
 				cpmeshes->getMeshContactForce();
 			}
 		}
+		cu_decide_rolling_friction_moment(d_Tmax, d_RRes, inertia, ep, ev, moment, np);
 	}
-	
-	cu_decide_rolling_friction_moment(d_Tmax, d_RRes, inertia, ep, ev, moment, np);
 }
 
 void xContactManager::hostCollision(

@@ -263,6 +263,16 @@ void XDYNAMICS_API cu_cluster_meshes_contact(
 	double* tsd, unsigned int* sorted_index, unsigned int* cstart, unsigned int* cend,
 	xClusterInformation* xci, unsigned int bindex, unsigned int eindex, unsigned int np);
 
+void XDYNAMICS_API cu_decide_cluster_rolling_friction_moment(
+	double* tmax,
+	double* rres,
+	double* inertia,
+	double* ep,
+	double* ev,
+	double* moment,
+	xClusterInformation* xci,
+	unsigned int np);
+
 void XDYNAMICS_API vv_update_cluster_position(
 	double *pos, double *cpos, double* ep, 
 	double *rloc, double *vel, double *acc, 

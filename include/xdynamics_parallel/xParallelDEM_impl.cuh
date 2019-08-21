@@ -61,6 +61,13 @@ inline __host__ __device__ void operator+=(double3& a, double3 b)
 	a.z += b.z;
 }
 
+inline __host__ __device__ void operator-=(double3& a, double3 b)
+{
+	a.x -= b.x;
+	a.y -= b.y;
+	a.z -= b.z;
+}
+
 inline __device__ double3 operator/(double3& v1, double v2)
 {
 	return make_double3(v1.x / v2, v1.y / v2, v1.z / v2);
@@ -2491,6 +2498,52 @@ __global__ void decide_rolling_friction_moment_kernel(
 	tmax[id] = make_double3(0, 0, 0);
 	rres[id] = 0.0;
 	//rfm[id] = make_double4(0.0, 0.0, 0.0, 0.0);
+}
+
+__global__ void decide_cluster_rolling_friction_moment_kernel(
+	double3* tmax,
+	double* rres,
+	double3* inertia,
+	double4* ep,
+	double4* ev,
+	double3* moment,
+	xClusterInformation* xci,
+	unsigned int np)
+{
+	unsigned int id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
+	if (id >= np)
+		return;
+	double Tr = rres[id];
+	if (!Tr)
+		return;
+	unsigned int neach = 0;
+	unsigned int seach = 0;
+	//unsigned int sbegin = 0;
+	for (unsigned int i = 0; i < cte.nClusterObject; i++)
+	{
+		xClusterInformation xc = xci[i];
+		if (id >= xc.sid && id < xc.sid + xc.count * xc.neach)
+		{
+			neach = xc.neach;
+			break;
+		}
+		seach += xc.neach;
+	}
+	double3 Tmax = tmax[id];// make_double3(rfm[id].x, rfm[id].y, rfm[id].z);
+	unsigned int cid = id / neach;
+	double3 J = inertia[cid];
+	double3 iomega = toAngularVelocity(ep[cid], ev[cid]);
+	double3 J_iomega = make_double3(J.x * iomega.x, J.y * iomega.y, J.z * iomega.z);
+	double3 _Tmax = cte.dt * J_iomega - Tmax;
+	if (length(_Tmax) && Tr)
+	{
+		double3 _Tr = Tr * (_Tmax / length(_Tmax));
+		if (length(_Tr) >= length(_Tmax))
+			_Tr = _Tmax;
+		moment[id] -= _Tr;
+	}
+	tmax[id] = make_double3(0, 0, 0);
+	rres[id] = 0.0;
 }
 
 //__device__ double3 toGlobal(double4& ep, double3& s)

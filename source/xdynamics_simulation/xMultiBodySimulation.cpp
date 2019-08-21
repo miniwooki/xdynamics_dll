@@ -261,6 +261,12 @@ void xMultiBodySimulation::ConstructForceVector(xVectorD& v)
 	}
 	foreach(xPointMass* xpm, xmbd->Masses())
 	{
+	/*	if (xpm->Name() == "wheel")
+		{
+			xpm->setAxialForce(0, 0, 5.0);
+			xpm->setAxialMoment(0.001, 0.001, 0.001);
+		}*/
+			
 	//	i = xpm->xpmIndex() * 7;
 		e = xpm->EulerParameters();// new_euler_parameters(q(i + 3), q(i + 4), q(i + 5), q(i + 6));
 		ev = xpm->DEulerParameters();// new_euler_parameters(qd(i + 3), qd(i + 4), qd(i + 5), qd(i + 6));
