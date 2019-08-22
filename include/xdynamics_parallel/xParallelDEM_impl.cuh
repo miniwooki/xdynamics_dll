@@ -1982,8 +1982,8 @@ __device__ void cluster_triangle_contact_force(
 	double3 po2cp = dtci.cpt - db.pos;// pmi.origin;
 	double cdist = r - length(ipos - dtci.cpt);
 	double coh_s = 0.0;
-	if (cp->coh)
-		coh_s = limit_cohesion_depth(r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh);
+	if (cmp.coh)
+		coh_s = limit_cohesion_depth(r, 0, cmp.Ei, cmp.Ej, cmp.pri, cmp.prj, cmp.coh);
 	double2 sd = make_double2(0.0, 0.0);
 	if (cdist <= 0 && abs(cdist) < abs(coh_s))
 	{
@@ -2087,9 +2087,10 @@ __global__ void particle_polygonObject_collision_kernel(
 								continue;
 							int t = -1;
 							double3 cpt = closestPtPointTriangle(dpi[k], ipos, ir, t);
+							device_contact_property cmp = cp[dpi[k].id];
 							double cdist = ir - length(ipos - cpt);
-							if (cp->coh)
-								coh_s = limit_cohesion_depth(ir, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh);
+							if (cmp.coh)
+								coh_s = limit_cohesion_depth(ir, 0, cmp.Ei, cmp.Ej, cmp.pri, cmp.prj, cmp.coh);
 							if (cdist > 0)
 							{
 								//printf("cidst : %f, contact_type : %d\n", cdist, t);
@@ -2254,9 +2255,10 @@ __global__ void cluster_meshes_contact_kernel(
 								continue;
 							int t = -1;
 							double3 cpt = closestPtPointTriangle(dpi[k], ipos, ir, t);
+							device_contact_property cmp = cp[dpi[k].id];
 							double cdist = ir - length(ipos - cpt);
-							if (cp->coh)
-								coh_s = limit_cohesion_depth(ir, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh);
+							if (cmp.coh)
+								coh_s = limit_cohesion_depth(ir, 0, cmp.Ei, cmp.Ej, cmp.pri, cmp.prj, cmp.coh);
 							if (cdist > 0)
 							{
 								if (t == 1)
