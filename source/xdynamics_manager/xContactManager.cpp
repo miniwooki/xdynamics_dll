@@ -440,6 +440,18 @@ void xContactManager::deviceCollision(
 				cpmeshes->getMeshContactForce();
 			}
 		}
+		if (cpcylinders)
+		{
+			cu_cluster_cylinder_contact(
+				cpcylinders->deviceCylinderInfo(),
+				cpcylinders->deviceCylinderBodyInfo(),
+				cpcylinders->deviceCylinderBodyForceAndMoment(), xci,
+				cpcylinders->DeviceContactProperty(),
+				pos, cpos, ep, vel, ev, force, moment, mass,
+				d_Tmax, d_RRes, d_pair_count_pcyl, d_pair_id_pcyl, d_tsd_pcyl,
+				np, cpcylinders->NumContact());
+			cpcylinders->getCylinderContactForce();
+		}
 		cu_decide_cluster_rolling_friction_moment(d_Tmax, d_RRes, inertia, ep, ev, moment, xci, np);
 	}
 	else

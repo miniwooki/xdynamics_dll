@@ -1382,32 +1382,9 @@ __device__ void particle_cylinder_contact_force(
 	double coh_s,
 	unsigned int& new_count)
 {
-	//device_triangle_info tri = dpi[dtci.id];
-	//double3 qp = tri.Q - tri.P;
-	//double3 rp = tri.R - tri.P;
-	////	double rcon = r - 0.5 * cdist;
-	//double3 unit = -cross(qp, rp);
-	//double3 dcpr = cpt - make_double3(icpos.x, icpos.y, icpos.z);
-	//double3 dcpr_j = cpt - make_double3(jcpos.x, jcpos.y, jcpos.z);
-	//unit = unit / length(unit);
 	double2 sd = make_double2(0.0, 0.0);
 	device_body_info dbi = dpmi[dci.mid];
-	//unsigned int pidx = dpi[dtci.id].id;
-	//device_contact_property cmp = cp[pidx];
-	//device_mesh_mass_info pmi = dpmi[pidx];
-	//double3 cpt = closestPtPointTriangle(dpi[dtci.id], ipos, r, t);
 	double3 po2cp = cpt - dbi.pos;
-	//double cdist = r - length(ipos - cpt);
-	/*if (cdist <= 0 && abs(cdist) < abs(coh_s))
-	{
-		double f = JKR_seperation_force(r, 0, cp->coh);
-		double cf = cohesionForce(r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, f);
-		sum_force = sum_force - cf * unit;
-		tsd[new_count] = sd;
-		pair_id[new_count] = dtci.id;
-		new_count++;
-		return;
-	}*/
 
 	double3 Fn = make_double3(0.0, 0.0, 0.0);
 	double3 Ft = make_double3(0, 0, 0);
@@ -1416,23 +1393,13 @@ __device__ void particle_cylinder_contact_force(
 		if (p_pair_id[i] == pid) { sd = p_tsd[i]; break; }
 	double3 rc = cpt - ipos;// r * unit;
 	double3 dv = dbi.vel + cross(omega, po2cp) - (ivel + cross(iomega, rc));
-	/*if (id == 0)
-	{
-		printf("[%d] relV : [%e, %e, %e]\n", id, dv.x, dv.y, dv.z);
-		printf("[%d] prds : [%e, %e]\n", id, sd.x, sd.y);
-	}*/
+
 	device_force_constant c = getConstant(1, r, 0, m, 0, cp.Ei, cp.Ej, cp.pri, cp.prj, cp.Gi, cp.Gj, cp.rest, cp.fric, cp.rfric, cp.sratio);
 	//printf("%f, %f, %f, %f\n", c.kn, c.ks, c.vn, c.vs);
 	DHSModel(c, r, 0, cp.Ei, cp.Ej, cp.pri, cp.prj, cp.coh, cdist, iomega, sd.x, sd.y, dv, unit, Ft, Fn);
-	/*if (id == 0)
-	{
-		printf("[%d] afds : [%e, %e]\n", id, sd.x, sd.y);
-	}*/
+
 	calculate_previous_rolling_resistance(cp.rfric, r, 0, rc, Fn, Ft, res, tma);
-	/*printf("Fn : [%e, %e, %e]\n", Fn.x, Fn.y, Fn.z);
-	printf("Ft : [%e, %e, %e]\n", Ft.x, Ft.y, Ft.z);
-	printf("rc : [%e, %e, %e]\n", rc.x, rc.y, rc.z);
-	printf("res : %e, tma : [%e, %e, %e]\n", res, tma.x, tma.y, tma.z);*/
+
 	sum_force += Fn + Ft;
 	sum_moment += cross(rc, Fn + Ft);
 	dbf[id] += -(Fn + Ft);// +make_double3(1.0, 5.0, 9.0);
@@ -1447,12 +1414,12 @@ __device__ double particle_cylinder_contact_detection(
 	device_cylinder_info& cy, 
 	device_body_info& bi,
 	double3& p, 
-	double3& u, 
-	double3& cp, 
+	double3& u,  
 	double r,
 	bool& isInnerContact)
 {
 	double dist = -1.0;
+	double3 cp = make_double3(0.0, 0.0, 0.0);
 	double3 cyl_pos = bi.pos;// c_ptr->Position();
 	//printf("cylinder_position : [%f, %f, %f]\n", cyl_pos.x, cyl_pos.y, cyl_pos.z);
 	double4 cyl_ep = bi.ep;// c_ptr->EulerParameters();
@@ -1473,7 +1440,7 @@ __device__ double particle_cylinder_contact_detection(
 		}
 		double gab = 0;
 		u = (_cp - p) / dist;
-		cp = _cp - cy.len_rr.z * u;
+		//cp = _cp - cy.len_rr.z * u;
 		if (dist < cy.len_rr.z)
 		{
 			isInnerContact = true;
@@ -1493,7 +1460,7 @@ __device__ double particle_cylinder_contact_detection(
 			double3 OtoCp = bi.pos - _cp;
 			double OtoCp_ = length(OtoCp);
 			u = OtoCp / OtoCp_;
-			cp = _cp - cy.len_rr.z * u;
+			//cp = _cp - cy.len_rr.z * u;
 			return cy.len_rr.x * 0.5 + r - OtoCp_;
 		}
 	/*	double3 A_1 = makeTFM_1(cy->ep);
@@ -1572,6 +1539,137 @@ __device__ double particle_cylinder_inner_base_or_top_contact_detection(
 	return gab;
 }
 
+__global__ void cluster_cylinder_contact_force_kernel(
+	device_cylinder_info *cy, unsigned int k, device_body_info* bi,
+	double3* dbf, double3* dbm,
+	double4* pos, double4* cpos, double4 *ep, double3* vel, double4* ev,
+	double3* force, double3* moment, xClusterInformation* xci, 
+	device_contact_property *cp,
+	double* mass, double3* tmax, double* rres,
+	unsigned int* pair_count, unsigned int* pair_id,
+	double2* tsd, unsigned int np)
+{
+	unsigned id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
+
+	if (id >= np)
+		return;
+	unsigned int p_pair_id[MAX_P2CY_COUNT];
+	double2 p_tsd[MAX_P2CY_COUNT];
+	unsigned int sid = id * MAX_P2CY_COUNT;
+	for (unsigned int i = 0; i < MAX_P2CY_COUNT; i++)
+	{
+		p_pair_id[i] = pair_id[sid + i];
+		p_tsd[i] = tsd[sid + i];
+	}
+	unsigned int neach = 0;
+	unsigned int seach = 0;
+	unsigned int sbegin = 0;
+	for (unsigned int i = 0; i < cte.nClusterObject; i++)
+	{
+		xClusterInformation xc = xci[i];
+		if (id >= xc.sid && id < xc.sid + xc.count * xc.neach)
+		{
+			neach = xc.neach;
+			break;
+		}
+		seach += xc.neach;
+		sbegin += xc.count * xc.neach;
+	}
+	unsigned int cid = id / neach;
+	unsigned int old_count = pair_count[id];
+	dbf[id] = make_double3(0, 0, 0);
+	dbm[id] = make_double3(0, 0, 0);
+	//unsigned int old_count = pair_count[id];
+	double m = mass[cid];
+	double4 ipos = pos[id];
+	double3 ipos3 = make_double3(ipos.x, ipos.y, ipos.z);
+	double4 icpos = cpos[cid];
+	double r = ipos.w;
+	double3 ivel = vel[cid];
+	double3 iomega = toAngularVelocity(ep[cid], ev[cid]);
+
+	double3 Fn = make_double3(0, 0, 0);
+	double3 Ft = make_double3(0, 0, 0);
+	double3 M = make_double3(0, 0, 0);
+
+	double3 sumF = make_double3(0.0, 0.0, 0.0);
+	double3 sumM = make_double3(0.0, 0.0, 0.0);
+	unsigned int new_count = sid + (k ? old_count : 0);
+
+	double res = 0.0;
+	double3 tma = make_double3(0.0, 0.0, 0.0);
+	device_body_info dbi = { 0, };
+	double cdist = 0;
+	double3 cpt = make_double3(0.0, 0.0, 0.0);
+
+	bool isInnerContact = false;
+	double coh_s = 0;
+	device_cylinder_info dci = cy[k];
+	//if (dci.ismoving)
+	dbi = bi[dci.mid];
+	device_contact_property dcp = cp[k];
+	double3 unit = make_double3(0, 0, 0);
+	cdist = particle_cylinder_contact_detection(dci, dbi, ipos3, unit, r, isInnerContact);
+	//double cdist = particle_plane_contact_detection(pl, ipos3, wp, unit, r);
+	if (dcp.coh)
+		coh_s = limit_cohesion_depth(r, 0, dcp.Ei, dcp.Ej, dcp.pri, dcp.prj, dcp.coh);
+	double2 sd = make_double2(0.0, 0.0);
+	cpt = ipos3 + r * unit;
+	double3 icpos3 = make_double3(icpos.x, icpos.y, icpos.z);
+	if (cdist > 0)
+	{
+		particle_cylinder_contact_force(
+			dci, dcp, bi, dbf, dbm, icpos3, ivel, iomega, cpt, unit, cdist, id, k,
+			old_count, p_pair_id, p_tsd, pair_id, tsd, r, m,
+			sumF, sumM, res, tma, coh_s, new_count);
+	}
+	else if (cdist <= 0 && abs(cdist) < abs(coh_s))
+	{
+		//printf("plane seperation cohesion contact. - %f", cdist);
+		double f = JKR_seperation_force(r, 0, dcp.coh);
+		double cf = cohesionForce(r, 0, dcp.Ei, dcp.Ej, dcp.pri, dcp.prj, dcp.coh, f);
+		//printf("f : %f, cf : %f\n", f, cf);
+		double3 m_force = -cf * unit;
+		sumF = sumF + m_force;
+		dbf[id] += -m_force;
+		dbm[id] += -cross(cpt - dbi.pos, m_force);
+		tsd[new_count] = sd;
+		pair_id[new_count] = k;
+		new_count++;
+	}
+	if (isInnerContact)
+	{
+		cdist = particle_cylinder_inner_base_or_top_contact_detection(dci, dbi, ipos3, unit, cpt, dci.empty_part, r);
+		if (cdist > 0)
+		{
+
+			particle_cylinder_contact_force(
+				dci, dcp, bi, dbf, dbm, icpos3, ivel, iomega, cpt, unit, cdist, id, k + 1000,
+				old_count, p_pair_id, p_tsd, pair_id, tsd, r, m,
+				sumF, sumM, res, tma, coh_s, new_count);
+
+		}
+		else if (cdist <= 0 && abs(cdist) < abs(coh_s))
+		{
+			double f = JKR_seperation_force(r, 0, dcp.coh);
+			double cf = cohesionForce(r, 0, dcp.Ei, dcp.Ej, dcp.pri, dcp.prj, dcp.coh, f);
+			double3 m_force = -cf * unit;
+			sumF = sumF + m_force;
+			dbf[id] += -m_force;
+			dbm[id] += -cross(cpt - dbi.pos, m_force);
+			tsd[new_count] = sd;
+			pair_id[new_count] = k + 1000;
+			new_count++;
+		}
+	}
+
+	force[id] += sumF;
+	moment[id] += sumM;
+	pair_count[id] = new_count - sid;
+	tmax[id] += tma;
+	rres[id] += res;
+}
+
 __global__ void cylinder_contact_force_kernel(
 	device_cylinder_info *cy, unsigned int k, device_body_info* bi,
 	double3* dbf, double3* dbm,
@@ -1616,93 +1714,67 @@ __global__ void cylinder_contact_force_kernel(
 	device_body_info dbi = { 0, };
 	double cdist = 0;
 	double3 cpt = make_double3(0.0, 0.0, 0.0);
-	//for (unsigned int k = 0; k < cte.ncylinder; k++)
-	//{
-		bool isInnerContact = false;
-		double coh_s = 0;
-		device_cylinder_info dci = cy[k];
-		//if (dci.ismoving)
-		dbi = bi[dci.mid];
-		/*if (id == 0)
-		{
-			printf("cyl pos : [%e, %e, %e], cyl vel : [%e, %e, %e]\n", dbi.pos.x, dbi.pos.y, dbi.pos.z, dbi.vel.x, dbi.vel.y, dbi.vel.z);
-			printf("cyl epa : [%e, %e, %e, %e]\n", dbi.ep.x, dbi.ep.y, dbi.ep.z, dbi.ep.w);
-		}*/
-		device_contact_property dcp = cp[k];
-		double3 unit = make_double3(0, 0, 0);
-		cdist = particle_cylinder_contact_detection(dci, dbi, ipos3, unit, cpt, r, isInnerContact);
-		//double cdist = particle_plane_contact_detection(pl, ipos3, wp, unit, r);
-		if (dcp.coh)
-			coh_s = limit_cohesion_depth(r, 0, dcp.Ei, dcp.Ej, dcp.pri, dcp.prj, dcp.coh);
-		double2 sd = make_double2(0.0, 0.0);
-		//
+
+	bool isInnerContact = false;
+	double coh_s = 0;
+	device_cylinder_info dci = cy[k];
+	//if (dci.ismoving)
+	dbi = bi[dci.mid];
+	device_contact_property dcp = cp[k];
+	double3 unit = make_double3(0, 0, 0);
+	cdist = particle_cylinder_contact_detection(dci, dbi, ipos3, unit, r, isInnerContact);
+	//double cdist = particle_plane_contact_detection(pl, ipos3, wp, unit, r);
+	if (dcp.coh)
+		coh_s = limit_cohesion_depth(r, 0, dcp.Ei, dcp.Ej, dcp.pri, dcp.prj, dcp.coh);
+	double2 sd = make_double2(0.0, 0.0);
+	cpt = ipos3 + r * unit;
+	if (cdist > 0)
+	{
+		//printf("cylinder contact distance : %f\n", cdist);
+		particle_cylinder_contact_force(
+			dci, dcp, bi, dbf, dbm, ipos3, ivel, iomega, cpt, unit, cdist, id, k,
+			old_count, p_pair_id, p_tsd, pair_id, tsd, r, m,
+			sumF, sumM, res, tma, coh_s, new_count);
+	}
+	else if (cdist <= 0 && abs(cdist) < abs(coh_s))
+	{
+		//printf("plane seperation cohesion contact. - %f", cdist);
+		double f = JKR_seperation_force(r, 0, dcp.coh);
+		double cf = cohesionForce(r, 0, dcp.Ei, dcp.Ej, dcp.pri, dcp.prj, dcp.coh, f);
+		//printf("f : %f, cf : %f\n", f, cf);
+		double3 m_force = -cf * unit;
+		sumF = sumF + m_force;
+		dbf[id] += -m_force;
+		dbm[id] += -cross(cpt - dbi.pos, m_force);
+		tsd[new_count] = sd;
+		pair_id[new_count] = k;
+		new_count++;
+	}
+	if (isInnerContact)
+	{
+		cdist = particle_cylinder_inner_base_or_top_contact_detection(dci, dbi, ipos3, unit, cpt, dci.empty_part, r);
 		if (cdist > 0)
 		{
-			//printf("cylinder contact distance : %f\n", cdist);
+
 			particle_cylinder_contact_force(
-				dci, dcp, bi, dbf, dbm, ipos3, ivel, iomega, cpt, unit, cdist, id, k,
+				dci, dcp, bi, dbf, dbm, ipos3, ivel, iomega, cpt, unit, cdist, id, k + 1000,
 				old_count, p_pair_id, p_tsd, pair_id, tsd, r, m,
 				sumF, sumM, res, tma, coh_s, new_count);
+
 		}
 		else if (cdist <= 0 && abs(cdist) < abs(coh_s))
 		{
-			//printf("plane seperation cohesion contact. - %f", cdist);
 			double f = JKR_seperation_force(r, 0, dcp.coh);
 			double cf = cohesionForce(r, 0, dcp.Ei, dcp.Ej, dcp.pri, dcp.prj, dcp.coh, f);
-			//printf("f : %f, cf : %f\n", f, cf);
 			double3 m_force = -cf * unit;
 			sumF = sumF + m_force;
 			dbf[id] += -m_force;
 			dbm[id] += -cross(cpt - dbi.pos, m_force);
 			tsd[new_count] = sd;
-			pair_id[new_count] = k;
+			pair_id[new_count] = k + 1000;
 			new_count++;
 		}
-		if (isInnerContact)
-		{
-			cdist = particle_cylinder_inner_base_or_top_contact_detection(dci, dbi, ipos3, unit, cpt, dci.empty_part, r);
-			//printf("inner(%d) cylinder contact distance : %f\n", isInnerContact, cdist);
-			if (cdist > 0)
-			{
-				
-				particle_cylinder_contact_force(
-					dci, dcp, bi, dbf, dbm, ipos3, ivel, iomega, cpt, unit, cdist, id, k + 1000,
-					old_count, p_pair_id, p_tsd, pair_id, tsd, r, m,
-					sumF, sumM, res, tma, coh_s, new_count);
-				
-			}
-			else if (cdist <= 0 && abs(cdist) < abs(coh_s))
-			{
-				//printf("plane seperation cohesion contact. - %f", cdist);
-				double f = JKR_seperation_force(r, 0, dcp.coh);
-				double cf = cohesionForce(r, 0, dcp.Ei, dcp.Ej, dcp.pri, dcp.prj, dcp.coh, f);
-				//printf("f : %f, cf : %f\n", f, cf);
-				double3 m_force = -cf * unit;
-				sumF = sumF + m_force;
-				dbf[id] += -m_force;
-				dbm[id] += -cross(cpt - dbi.pos, m_force);
-				tsd[new_count] = sd;
-				pair_id[new_count] = k + 1000;
-				new_count++;
-			}
-		}
-		//if (id == 0)
-		//{
-		//	printf("[%d][%d] sumF : [%e, %e, %e]\n", id, dci.mid, sumF.x, sumF.y, sumF.z);
-		//	printf("[%d][%d] relV : [%e, %e, %e]\n", id, dci.mid, cpt.x, cpt.y, cpt.z);
-		//}
-			
-	/*	if (dci.ismoving)
-		{*/
-		//bi[dci.mid].force += dbi.force;
-		//bi[dci.mid].moment += dbi.moment;
-		//}		
-	//}
-	//if (id == 0)
-	//{
-	////	printf("[%d] particle posit : [%e, %e, %e], particle veloci : [%e, %e, %e]\n", id, ipos3.x, ipos3.y, ipos3.z, ivel.x, ivel.y, ivel.z);
-	//	printf("[%d] cylinder force : [%e, %e, %e], cylinder moment : [%e, %e, %e]\n", id, sumF.x, sumF.y, sumF.z, sumM.x, sumM.y, sumM.z);
-	//}
+	}
 		
 	force[id] += sumF;
 	moment[id] += sumM;

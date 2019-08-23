@@ -253,6 +253,16 @@ void XDYNAMICS_API cu_cluster_plane_contact(
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd, xClusterInformation* xci,
 	unsigned int np, unsigned int nplanes);
 
+void XDYNAMICS_API cu_cluster_cylinder_contact(
+	device_cylinder_info* cyl, device_body_info* bi,
+	device_body_force* dbfm, xClusterInformation* xci, 
+	device_contact_property *cp,
+	double* pos, double* cpos, double* ep, double* vel, double* omega,
+	double* force, double* moment, double* mass,
+	double* tmax, double* rres,
+	unsigned int* pair_count, unsigned int *pair_id, double* tsd,
+	unsigned int np, unsigned int ncylinder);
+
 void XDYNAMICS_API cu_cluster_meshes_contact(
 	device_triangle_info *dpi, device_body_info* dbi,
 	double* pos, double* cpos, double *ep, double* vel, double* ev,

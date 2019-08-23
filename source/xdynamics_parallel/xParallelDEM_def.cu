@@ -369,6 +369,32 @@ void cu_cluster_plane_contact(
 	}
 }
 
+void cu_cluster_cylinder_contact(
+	device_cylinder_info* cyl, device_body_info* bi,
+	device_body_force* dbfm, xClusterInformation* xci,
+	device_contact_property *cp,
+	double* pos, double* cpos, double* ep, double* vel, double* ev,
+	double* force, double* moment, double* mass,
+	double* tmax, double* rres,
+	unsigned int* pair_count, unsigned int *pair_id, double* tsd,
+	unsigned int np, unsigned int ncylinder)
+{
+	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
+	memset(dbfm, 0, sizeof(device_body_force) * ncylinder);
+	double3* dbf = xContact::deviceBodyForce();
+	double3* dbm = xContact::deviceBodyMoment();
+	for (unsigned int i = 0; i < ncylinder; i++)
+	{
+		cluster_cylinder_contact_force_kernel << < numBlocks, numThreads >> > (
+			cyl, i, bi, dbf, dbm, (double4 *)pos, (double4 *)cpos,
+			(double4 *)ep, (double3 *)vel, (double4 *)ev,
+			(double3 *)force, (double3 *)moment, xci, cp, mass,
+			(double3*)tmax, rres, pair_count, pair_id, (double2 *)tsd, np);
+		dbfm[i].force += reductionD3(dbf, np);
+		dbfm[i].moment += reductionD3(dbm, np);
+	}
+}
+
 void cu_cluster_meshes_contact(
 	device_triangle_info * dpi, 
 	device_body_info * dbi,
