@@ -252,7 +252,7 @@ void xParticlePlanesContact::getPlaneContactForce()
 			xPlaneObject* o = xpl.value();
 			if (o->MovingObject())
 			{
-				std::cout << "plane force : [" << dbf[id].force.x << ", " << dbf[id].force.y << ", " << dbf[id].force.z << "]" << std::endl;
+				//std::cout << "plane force : [" << dbf[id].force.x << ", " << dbf[id].force.y << ", " << dbf[id].force.z << "]" << std::endl;
 				/*if (hbi[id].force.y != 0.0)
 					bool ddd = true;*/
 				o->addContactForce(dbf[id].force.x, dbf[id].force.y, dbf[id].force.z);
