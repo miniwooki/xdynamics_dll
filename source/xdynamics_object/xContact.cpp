@@ -126,17 +126,23 @@ xContactParameters xContact::getContactParameters(
 	double Meq = jm ? (im * jm) / (im + jm) : im;
 	double Req = jr ? (ir * jr) / (ir + jr) : ir;
 	double Eeq = (iE * jE) / (iE*(1 - jp*jp) + jE*(1 - ip * ip));
+	double Seq = (2.0 * (2.0 - ip) * (1.0 + ip) / iE) + (2.0 * (2.0 - jp) * (1.0 + jp) / jE);
+	Seq = 1.0 / Seq;
 	cp.coh_e = 1.0 / (((1.0 - ip * ip) / iE) + ((1.0 - jp * jp) / jE));
 	double lne = log(rest);
 	double beta = 0.0;
 // 	switch (f_type)
 // 	{
 // 	case DHS:
-	beta = (M_PI / log(rest));
+	beta = -lne / sqrt(lne*lne + M_PI * M_PI);// (M_PI / log(rest));
+	cp.eq_e = Eeq;
+	cp.eq_m = Meq;
+	cp.eq_r = Req;
+	cp.eq_s = Seq;
 	cp.kn = (4.0 / 3.0) * Eeq * sqrt(Req);
-	cp.vn = sqrt((4.0 * Meq * cp.kn) / (1.0 + beta * beta));
-	cp.ks = cp.kn * ratio;
-	cp.vs = cp.vn * ratio;
+	cp.vn = -2.0 * sqrt(5.0 / 6.0) * beta; //(//sqrt((4.0 * Meq * cp.kn) / (1.0 + beta * beta));
+	cp.ks = 8.0 * Seq;// cp.kn * ratio;
+	cp.vs = -2.0 * sqrt(5.0 / 6.0) * beta;//c//p.vn * ratio;
 	cp.fric = fric;
 	cp.rfric = rfric;
 	cp.coh_r = Req;
@@ -267,6 +273,39 @@ void xContact::DHSModel(
 		dots = s_dot;
 		//double ds = mag_e * xSimulation::dt;
 		double ft1 = c.ks * ds + c.vs * dot(dv, s_hat);
+		double ft2 = c.fric * length(Fn);
+		Ft = min(ft1, ft2) * s_hat;
+		//M = cross(cp, Ft);
+	}
+	//F = Fn + Ft;
+}
+
+void xContact::Hertz_Mindlin(
+	xContactParameters& c, double cdist, double& ds, double& dots, double coh,
+	vector3d& dv, vector3d& unit, vector3d& Fn, vector3d& Ft/*, vector3d& M*/)
+{
+	//vector3d Fn, Ft;
+	double fsn = (-c.kn * pow(cdist, 1.5));
+	double fsd = c.vn * (2.0 * c.eq_e * sqrt(c.eq_r * cdist)) * dot(dv, unit);
+	double fco = -cohesionForce(coh, cdist, c.coh_r, c.coh_e, c.coh_s, fsn + fsd);
+	//double sum_f = fsn + fsd;
+	////double fsd = 0.0;
+	//if (coh)
+	//{
+	//	sum_f = cohesionForce(coh, cdist, c.coh_r, c.coh_e, c.coh_s, sum_f);
+	//}
+
+	Fn = (fsn + fsd + fco) * unit;
+	vector3d e = dv - dot(dv, unit) * unit;
+	double mag_e = length(e);
+	if (mag_e) {
+		vector3d s_hat = e / mag_e;
+		double s_dot = dot(dv, s_hat);
+		ds = ds + xSimulation::dt * (s_dot + dots);
+		dots = s_dot;
+		//double ds = mag_e * xSimulation::dt;
+		double S_t = c.ks * sqrt(c.eq_r * cdist);
+		double ft1 = S_t * ds + c.vs * sqrt(S_t * c.eq_m) * dot(dv, s_hat);
 		double ft2 = c.fric * length(Fn);
 		Ft = min(ft1, ft2) * s_hat;
 		//M = cross(cp, Ft);

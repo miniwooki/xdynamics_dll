@@ -32,6 +32,7 @@ public:
 	static void setGravity(double g, int d);
 	static void setGravity(double x, double y, double z);
 	static void launchLogSystem(std::string lpath);
+	static std::string getModelName();
 	static std::string makeFilePath(std::string file_name);
 	//static void 
 

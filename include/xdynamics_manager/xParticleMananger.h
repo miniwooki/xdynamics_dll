@@ -65,6 +65,7 @@ public:
 	xParticleObject* CreateCircleParticle(std::string n, xMaterialType mt, unsigned int _np, xCircleParticleData& d);
 	xParticleObject* CreateClusterParticle(std::string n, xMaterialType mt, vector3d& loc, vector3i& grid, xClusterObject* xo);
 	xParticleObject* CreateMassParticle(std::string n, xMaterialType mt, double rad, xPointMassData& d);
+	xParticleObject* CreatePlaneParticle(std::string n, xMaterialType mt, xPlaneParticleData& d);
 //	xParticleObject* CreateSPHParticles(xObject* xobj, double ps, unsigned int nlayer);
 //	xParticleObject* CreateBoundaryParticles(xObject* xobj, double lx, double ly, double lz, double ps);
 	//xParticleObject* CreateSPHLineParticle(std::string n, xMa)

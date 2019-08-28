@@ -49,6 +49,7 @@ private:
 	xPlaneObjectData ReadPlaneObjectData(std::string& _name, int mat, int r, int& c);
 	xCubeObjectData ReadCubeObjectData(std::string& _name, int mat, int r, int& c);
 	xCubeParticleData ReadCubeParticleData(std::string& _name, int r, int& c);
+	xPlaneParticleData ReadPlaneParticleData(std::string& _name, int r, int& c);
 	xLineParticleData ReadLineParticleData(std::string& _name, int r, int& c);
 	xListParticleData ReadListParticleData(std::string& _name, int r, int& c);
 	xCircleParticleData ReadCircleParticleData(std::string& _name, int r, int& c);

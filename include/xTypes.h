@@ -9,7 +9,7 @@
 #define STEEL_YOUNGS_MODULUS 2e+011
 #define STEEL_DENSITY 7850
 #define STEEL_POISSON_RATIO 0.3
-#define STEEL_SHEAR_MODULUS 0.0
+#define STEEL_SHEAR_MODULUS 79.3e+009
 
 #define MEDIUM_CLAY_YOUNGS_MODULUS 35E+06
 #define MEDIUM_CLAY_DENSITY 1900
@@ -115,7 +115,7 @@ enum xShapeType
 	OBJECT = 100 
 };
 enum xContactForceModelType
-{ DHS = 0 };
+{ DHS = 0, HERTZ_MINDLIN_NO_SLIP };
 
 enum xXlsInputDataType 
 { 
@@ -195,13 +195,14 @@ typedef struct{ double p0x, p0y, p0z, p1x, p1y, p1z, p2x, p2y, p2z, p3x, p3y, p3
 //typedef struct{ double dx, dy, lx, ly, lz; }xSPHPlaneObjectData;
 typedef struct{ double p0x, p0y, p0z, p1x, p1y, p1z; }xCubeObjectData;
 typedef struct{ double dx, dy, dz, lx, ly, lz, minr, maxr; }xCubeParticleData;
+typedef struct { double dx, dy, dz, drx, dry, drz, lx, ly, lz, minr, maxr; }xPlaneParticleData;
 typedef struct { double sx, sy, sz, ex, ey, ez, minr, maxr; }xLineParticleData;
 typedef struct{ unsigned int number; }xListParticleData;
 typedef struct{ double rest, rto, mu, coh, rf; }xContactParameterData;
 typedef struct{ double mass, ixx, iyy, izz, ixy, ixz, iyz, px, py, pz, e0, e1, e2, e3, vx, vy, vz; }xPointMassData;
 typedef struct{ double lx, ly, lz, fix, fiy, fiz, gix, giy, giz, fjx, fjy, fjz, gjx, gjy, gjz; }xJointData;
 typedef struct{ double Ei, Ej, Pri, Prj, Gi, Gj; }xMaterialPair;
-typedef struct{ double coh_r, coh_e, coh_s, kn, vn, ks, vs, fric, rfric, amp; }xContactParameters;
+typedef struct{ double eq_e, eq_r, eq_m, eq_s, coh_r, coh_e, coh_s, kn, vn, ks, vs, fric, rfric, amp; }xContactParameters;
 typedef struct{ double restitution, friction, rolling_friction, cohesion, stiffness_ratio, stiffness_multiplyer; }xContactMaterialParameters;
 typedef struct{ double spix, spiy, spiz, spjx, spjy, spjz, k, c, init_l; }xTSDAData;
 typedef struct{ int correction, dim, type; double factor; }xKernelFunctionData;

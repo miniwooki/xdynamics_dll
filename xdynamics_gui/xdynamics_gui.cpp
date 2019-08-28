@@ -417,6 +417,16 @@ void xdynamics_gui::OpenFile(QString s)
 	{
 		xgl->ReadSTLFile(s);
 	}
+	else if (ext == "lmr")
+	{
+		if (xdm->XMBDModel())
+			mbd_last_result = s;// xdm->XMBDModel()->SetByLastResultFile(s.toStdString());
+	}
+	else if (ext == "ldr")
+	{
+		if (xdm->XDEMModel())
+			dem_last_result = s;
+	}
 	else
 		xcw->write(xCommandWindow::CMD_ERROR, kor("지원하지 않는 파일 형식입니다."));
 }
@@ -858,35 +868,27 @@ void xdynamics_gui::deleteFileByEXT(QString ext)
 
 void xdynamics_gui::xRunSimulationThread(double dt, unsigned int st, double et)
 {
-	deleteFileByEXT("txt");
-	deleteFileByEXT("bin");
+	if (mbd_last_result.isEmpty() && dem_last_result.isEmpty())
+	{
+		deleteFileByEXT("txt");
+		deleteFileByEXT("bin");
+	}	
 	setupAnimationTool();
 	sThread = new xSimulationThread;
 	sThread->xInitialize(xdm, dt, st, et);
-	//setupMeshSphere();
-	//xcw->write(xCommandWindow::CMD_INFO, QString("%1, %1, %1").arg(dt).arg(st).arg(et));
-	//xcw->write(xCommandWindow::CMD_INFO, "Thread Initialize Done.");
 	xvAnimationController::allocTimeMemory(xSimulation::npart);
 	if (xgl->vParticles())
 	{
 		xgl->vParticles()->setBufferMemories(xSimulation::npart);
 		xnavi->addChild(xModelNavigator::RESULT_ROOT, "Particles");
 	}
-		
-	//foreach(xvParticle* xp, xgl->ParticleObjects())
-	//{
-	//	if (xp->hasRelativePosition())
-	//	{
-	//		xp->setBufferMemories(xSimulation::npart);
-	//	}
-	//}
+
 	connect(sThread, SIGNAL(finishedThread()), this, SLOT(xExitSimulationThread()));
 	connect(sThread, SIGNAL(sendProgress(int, QString)), this, SLOT(xRecieveProgress(int, QString)));
-	//xcw->write(xCommandWindow::CMD_INFO, "Thread Initialize Done.");
 	if (!pbar) pbar = new QProgressBar;
-	//xcw->write(xCommandWindow::CMD_INFO, "Thread Initialize Done.");
-	//unsigned int nstep = xSimulation::nstep;
 	pbar->setMaximum(xSimulation::nstep);
+
+	sThread->setupByLastSimulationFile(mbd_last_result, dem_last_result);
 
 	ui.statusBar->addWidget(pbar, 1);
 	setupBindingPointer();

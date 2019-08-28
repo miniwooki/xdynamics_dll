@@ -19,6 +19,7 @@ public:
 	~xSimulationThread();
 
 	bool xInitialize(xDynamicsManager* _xdm, double dt, unsigned int st, double et);
+	void setupByLastSimulationFile(QString lmr, QString ldr);
 	//bool xInitialize(QString xmlFile);
 
 // 	unsigned int totalStep() { return nstep; }
@@ -36,6 +37,7 @@ private:
 	bool isStop;
 	QMutex m_mutex;
 	xDynamicsSimulator* xds;
+	unsigned int last_pt;
 // 	modelManager* mg;
 // 	dem_simulation *dem;
 // 	multibodyDynamics *mbd;
@@ -43,6 +45,7 @@ private:
 signals:
 	void finishedThread();
 	void sendProgress(int, QString);
+	
 //	void excuteMessageBox();
 };
 

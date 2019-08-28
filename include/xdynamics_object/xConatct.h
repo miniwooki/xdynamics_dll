@@ -93,6 +93,8 @@ protected:
 	double JKRSeperationForce(xContactParameters& c, double coh);
 	void DHSModel(xContactParameters& c, double cdist, double& ds, 
 		double& dots, double coh, vector3d& dv, vector3d& unit, vector3d& Fn, vector3d& Ft);
+	void Hertz_Mindlin(xContactParameters& c, double cdist, double& ds,
+		double& dots, double coh, vector3d& dv, vector3d& unit, vector3d& Fn, vector3d& Ft);
 	void RollingResistanceForce(
 		double rf, double ir, double jr, vector3d rc,
 		vector3d Fn, vector3d Ft, double& Mr, vector3d& Tmax);

@@ -6,6 +6,7 @@
 
 xSimulationThread::xSimulationThread()
 	: isStop(false)
+	, last_pt(0)
 	, xds(NULL)
 {
 
@@ -29,6 +30,15 @@ bool xSimulationThread::xInitialize(xDynamicsManager* dm, double dt, unsigned in
 	return true;
 }
 
+void xSimulationThread::setupByLastSimulationFile(QString lmr, QString ldr)
+{
+	//unsigned int pt = 0;
+	if(!lmr.isEmpty() || !ldr.isEmpty())
+		last_pt = xds->setupByLastSimulationFile(lmr.toStdString(), ldr.toStdString());
+	for (unsigned int i = 0; i <= last_pt; i++)
+		sendProgress(i, QString("Upload DEM result for view - ") + QString("%1").arg(i));
+}
+
 void xSimulationThread::setStopCondition()
 {
 	m_mutex.lock();
@@ -39,8 +49,8 @@ void xSimulationThread::setStopCondition()
 void xSimulationThread::run()
 {
 	char buf[255] = { 0, };
-	unsigned int part = 0;
-	unsigned int cstep = 0;
+	unsigned int part = last_pt;
+	unsigned int cstep = last_pt * xSimulation::st;
 	unsigned int eachStep = 0;
 	unsigned int numPart = 0;
 	double dt = xSimulation::dt;
@@ -60,7 +70,8 @@ void xSimulationThread::run()
 	QTime startTime = tme.currentTime();
 	QDate startDate = QDate::currentDate();
 	tme.start();
-	sendProgress(0, ch);
+	if(last_pt == 0) 
+		sendProgress(0, ch);
 	ch.clear();
 	//sendProgress(-1, QString("%1").arg(nstep));
 	//qDebug() << nstep;
@@ -70,7 +81,7 @@ void xSimulationThread::run()
 		if (isStop || xSimulation::ConfirmStopSimulation())
 			break;
 		cstep++;
-		cout << cstep << endl;
+		//cout << cstep << endl;
 		eachStep++;
 		ct += xSimulation::dt;
 		xSimulation::setCurrentTime(ct);

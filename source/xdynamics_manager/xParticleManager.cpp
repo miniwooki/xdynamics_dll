@@ -484,6 +484,81 @@ xParticleObject* xParticleManager::CreateCubeParticle(
 	return xpo;
 }
 
+xParticleObject* xParticleManager::CreatePlaneParticle(
+	std::string n, xMaterialType mt, xPlaneParticleData& d)
+{
+	QString name = QString::fromStdString(n);
+	xParticleObject* xpo = new xParticleObject(n);
+//	vector4d* pos = xpo->AllocMemory(_np);
+
+	xpo->setStartIndex(np);
+	xpo->setMaterialType(mt);
+	//np += _np;
+	xMaterial xm = GetMaterialConstant(mt);
+	xpo->setDensity(xm.density);
+	xpo->setYoungs(xm.youngs);
+	xpo->setPoisson(xm.poisson);
+	xpo->setMinRadius(d.minr);
+	xpo->setMaxRadius(d.maxr);
+	setCriticalMaterial(xm.density, xm.youngs, xm.poisson);
+	
+	//double r = d.maxr;
+	//unsigned int nr = static_cast<unsigned int>(cr / (2.0 * r)) - 1;
+//	double rr = 2.0 * r * nr + r;
+	//double space = (cr - rr) / (nr + 1);
+//	unsigned int cnt = 0;
+//	unsigned int k = 0;
+	bool isStopCreating = false;
+	vector3d u = new_vector3d(d.drx, d.dry, d.drz);
+	vector3d pu = new_vector3d(-u.y, u.x, u.z);
+	vector3d qu = cross(u, pu);
+	vector3d sp = new_vector3d(d.lx, d.ly, d.lz);
+	matrix33d A = { u.x, pu.x, qu.x, u.y, pu.y, qu.y, u.z, pu.z, qu.z };
+	double cr = 0.0;
+	
+	double space = 1e-6;
+	std::list<vector4d> plist;
+	unsigned int nz = static_cast<unsigned int>(d.dz / (2.0 * d.maxr)) - 1;
+	double space_z = d.dz - 2.0 * d.maxr * nz;
+	space_z /= nz + 1;
+	for (unsigned int i = 0; i < d.dy; i++)
+	{
+		bool is_end_dx = false;
+		for(unsigned int z = 0; z < nz; z++)
+		{
+			double pr = 0.0;
+			double x_pos = 0;
+			double gab_z = (2.0 * d.maxr + space_z) * z + space_z;
+			while (1)
+			{
+				cr = d.minr + (d.minr != d.maxr ? (d.maxr - d.minr) * frand() : 0.0);
+				x_pos = x_pos + (pr + cr + space);
+				vector3d pp = new_vector3d(0.0, x_pos, gab_z);
+				if (pp.y + cr + space >= d.dx) break;
+				pp = sp + A * pp;
+				plist.push_back(new_vector4d(pp.x, pp.y, pp.z, cr));
+				pr = cr;
+				//cnt++;
+			}
+		}
+	}
+	if (plist.size())
+	{
+		unsigned int _np = plist.size();
+		vector4d* pos = xpo->AllocMemory(_np);
+		np += _np;
+		unsigned int cnt = 0;
+		for (std::list<vector4d>::iterator it = plist.begin(); it != plist.end(); it++)
+			pos[cnt++] = *it;
+	}
+	if (minimum_radius > d.minr) minimum_radius = d.minr;
+	//SetMassAndInertia(xpo);
+	SetMassAndInertia(xpo);
+	xpcos[name] = xpo;
+	xObjectManager::XOM()->addObject(xpo);
+	return xpo;
+}
+
 xParticleObject* xParticleManager::CreateCircleParticle(
 	std::string n, xMaterialType mt, unsigned int _np, xCircleParticleData& d)
 {

@@ -93,4 +93,7 @@ private:
 	QDockWidget* xcomm;
 	xCommandLine* xcl;
 	xChartWindow* xchart;
+
+	QString mbd_last_result;
+	QString dem_last_result;
 };

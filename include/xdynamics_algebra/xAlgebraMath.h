@@ -190,7 +190,7 @@ XDYNAMICS_API matrix33d Tilde(const vector3d& v);
 XDYNAMICS_API matrix33d Transpose(const matrix33d& A);
 XDYNAMICS_API int LinearSolve(int n, int nrhs, xMatrixD& a, int lda, xVectorD& b, int ldb);
 XDYNAMICS_API void coordinatePartitioning(xSparseD& lhs, int* uID);
-XDYNAMICS_API vector3d EulerParameterToEulerAngle(const euler_parameters& e);
+XDYNAMICS_API vector3d EulerParameterToEulerAngle(const euler_parameters e);
 XDYNAMICS_API euler_parameters EulerAngleToEulerParameters(const vector3d v3);
 XDYNAMICS_API euler_parameters CalculateUCEOM(matrix33d& J, euler_parameters& ep, euler_parameters& ev, vector3d& n_prime);
 // Conversion

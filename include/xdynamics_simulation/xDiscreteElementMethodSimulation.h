@@ -28,6 +28,7 @@ public:
 	double* Position();
 	double* Velocity();
 	void SpringDamperForce();
+	unsigned int setupByLastSimulationFile(std::string ldr);
 
 protected:
 	void clearMemory();

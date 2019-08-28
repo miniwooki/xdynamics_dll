@@ -23,6 +23,8 @@ public:
 	void exportPartData();
 	bool checkStopCondition();
 
+	unsigned int setupByLastSimulationFile(std::string lmr, std::string ldr);
+
 private:
 	//xSimulationStopCondition *stop_condition;
 	xDynamicsManager* xdm;

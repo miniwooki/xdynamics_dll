@@ -1,6 +1,7 @@
 #include "xdynamics_simulation/xMultiBodySimulation.h"
-
 #include <sstream>
+
+std::fstream *ex_of = NULL;
 
 xMultiBodySimulation::xMultiBodySimulation()
 	: xSimulation()
@@ -12,6 +13,7 @@ xMultiBodySimulation::xMultiBodySimulation()
 	, xpm(NULL)
 	, lagMul(NULL)
 	, dem_tsda(NULL)
+//	, of(NULL)
 {
 
 }
@@ -19,7 +21,7 @@ xMultiBodySimulation::xMultiBodySimulation()
 xMultiBodySimulation::~xMultiBodySimulation()
 {
 	if (xpm) delete[] xpm; xpm = NULL;
-	//if (lagMul) delete[] lagMul; lagMul = NULL;
+//	if (of) { of->close(); delete of; }
 }
 
 bool xMultiBodySimulation::Initialized()
@@ -48,6 +50,17 @@ void xMultiBodySimulation::SetZeroBodyForce()
 
 void xMultiBodySimulation::SaveStepResult(unsigned int part, double ct)
 {
+	ex_of = new std::fstream;
+	ex_of->open(xModel::makeFilePath(xModel::getModelName() + ".lmr"), std::ios::ate | ::ios::binary);
+	ex_of->write((char*)&part, sizeof(unsigned int));
+	ex_of->write((char*)&ct, sizeof(double));
+	ex_of->write((char*)q.Data(), sizeof(double) * mdim + xModel::OneDOF());
+	ex_of->write((char*)qd.Data(), sizeof(double) * mdim + xModel::OneDOF());
+	ex_of->write((char*)q_1.Data(), sizeof(double) * mdim + xModel::OneDOF());
+	ex_of->write((char*)rhs.Data(), sizeof(double) * tdim);
+	ex_of->close();
+	delete ex_of;
+	ex_of = NULL;
 	foreach(xPointMass* xpm, xmbd->Masses())
 	{
 		xpm->SaveStepResult(part, ct, q, qd, rhs);
@@ -86,10 +99,52 @@ void xMultiBodySimulation::ExportResults(std::fstream& of)
 	}
 }
 
+
+unsigned int xMultiBodySimulation::setupByLastSimulationFile(std::string lmr)
+{
+	unsigned int pt = 0;
+	double ct = 0.0;
+	std::fstream of;
+	of.open(lmr, std::ios::binary);
+	while (!of.eof())
+	{
+		of.read((char*)&pt, sizeof(unsigned int));
+		of.read((char*)&ct, sizeof(double));
+		of.read((char*)q.Data(), sizeof(double) * mdim + xModel::OneDOF());
+		of.read((char*)qd.Data(), sizeof(double) * mdim + xModel::OneDOF());
+		of.read((char*)q_1.Data(), sizeof(double) * mdim + xModel::OneDOF());
+		of.read((char*)rhs.Data(), sizeof(double) * tdim);
+		lagMul = rhs.Data() + mdim;
+		foreach(xPointMass* xpm, xmbd->Masses())
+		{
+			xpm->SaveStepResult(pt, ct, q, qd, rhs);
+		}
+		unsigned int sr = 0;
+		cjaco.zeros();
+		foreach(xKinematicConstraint* xkc, xmbd->Joints())
+		{
+			xkc->SaveStepResult(pt, ct, q, qd, lagMul, sr);
+			sr += xkc->NumConst();
+		}
+		foreach(xDrivingConstraint* xdc, xmbd->Drivings())
+		{
+			xdc->SaveStepResult(pt, ct, q, qd, lagMul, sr);
+			sr++;
+		}
+	}
+	
+	foreach(xPointMass* xpm, xmbd->Masses())
+	{
+		xpm->setNewPositionData(q);
+		xpm->setNewVelocityData(qd);
+	}		
+	return pt;
+}
+
 int xMultiBodySimulation::Initialize(xMultiBodyModel* _xmbd)
 {
+	//of = new std::fstream;
 	xmbd = _xmbd;
-
 	int nm = xmbd->NumMass();
 	int nr = 0;
 	mdim = nm * xModel::OneDOF();

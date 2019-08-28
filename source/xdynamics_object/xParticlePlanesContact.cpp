@@ -119,7 +119,7 @@ void xParticlePlanesContact::allocHostMemory(unsigned int n)
 void xParticlePlanesContact::updataPlaneObjectData(bool is_first_set_up)
 {
 	device_body_info *bi = NULL;
-	if (nmoving || is_first_set_up)
+	if (nContactObject || is_first_set_up)
 		bi = new device_body_info[nContactObject];
 	//else
 	//	return;
@@ -190,7 +190,7 @@ void xParticlePlanesContact::updataPlaneObjectData(bool is_first_set_up)
 				pm = dynamic_cast<xParticleCubeContact*>(xc)->CubeObject();
 			else if (xc->PairType() == PARTICLE_PANE)
 				pm = dynamic_cast<xParticlePlaneContact*>(xc)->PlaneObject();
-			if (pm->MovingObject() == false && !is_first_set_up) continue;
+			//if (pm->MovingObject() == false && !is_first_set_up) continue;
 			euler_parameters ep = pm->EulerParameters(), ed = pm->DEulerParameters();
 			bi[mcnt++] = {
 				pm->Mass(),
@@ -252,7 +252,7 @@ void xParticlePlanesContact::getPlaneContactForce()
 			xPlaneObject* o = xpl.value();
 			if (o->MovingObject())
 			{
-				std::cout << "plane force : [" << dbf[id].force.x << ", " << dbf[id].force.y << ", " << dbf[id].force.z << "]" << std::endl;
+				//std::cout << "plane force : [" << dbf[id].force.x << ", " << dbf[id].force.y << ", " << dbf[id].force.z << "]" << std::endl;
 				/*if (hbi[id].force.y != 0.0)
 					bool ddd = true;*/
 				o->addContactForce(dbf[id].force.x, dbf[id].force.y, dbf[id].force.z);

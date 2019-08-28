@@ -237,10 +237,6 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 			dxsdci = xdem->XSpringDamperForce()->xSpringDamperConnection();
 			dxsdc_data = xdem->XSpringDamperForce()->xSpringDamperConnectionList();
 			dxsdc_kc = xdem->XSpringDamperForce()->xSpringDamperCoefficientValue();
-			//dxsdc_body = xdem->XSpringDamperForce()->xSpringDamperBodyConnectionInformation();
-			/*if(nTsdaConnectionBodyData)
-				dxsd_cbd = xdem->XSpringDamperForce()->XSpringDamperBodyConnectionDataList();*/
-			//dxsd_free_length = xdem->XSpringDamperForce()->FreeLength();
 		}
 	}
 	if (isSaveMemory)
@@ -302,25 +298,15 @@ QString xDiscreteElementMethodSimulation::SaveStepResult(unsigned int pt, double
 			qf.write((char*)cpos, sizeof(double) * ns * 4);
 	}
 	qf.close();
-//	double total_energy = 0.0;
-	//vector4d *p = (vector4d*)pos;
-	//vector3d *v = (vector3d*)vel;
-	//for (unsigned int i = 0; i < np; i++)
-	//{
-	//	double mv = length(v[i]);
-	//	total_energy += 0.5 * mass[i] * mv * mv;// +mass[i] * length(xModel::gravity) * p[i].y;
-	//}
-	//std::cout << "total_energy : " << total_energy << std::endl;
-	/*qf.open(QIODevice::WriteOnly);*/
+	qf.open(xModel::makeFilePath(xModel::getModelName() + ".ldr"), std::ios::binary);
+	unsigned int fsize = fname.size();
+	qf.write((char*)&pt, sizeof(unsigned int));
+	qf.write((char*)&ct, sizeof(double));
+	qf.write((char*)&fsize, sizeof(unsigned int));
+	qf.write(fname.toStdString().c_str(), sizeof(char) * fsize);
+	qf.close();
 	partList.push_back(fname);
-	//vector4d* h_sphere = xcm->ContactParticlesMeshObjects()->GetCurrentSphereData();
-	//foreach(xParticleMeshObjectContact* cpm, xcm->ContactParticlesMeshObjects())
-	//{
-	//	xMeshObject* pobj = cpm->MeshObject();
-	//	QString m_path = fname + "/" + pobj->Name() + "/";
-	//	xUtilityFunctions::CreateDirectory(m_path.toUtf8().data());
-	//	m_path += pobj->Name() + Q
-	//}
+
 	return fname;
 }
 
@@ -372,40 +358,52 @@ void xDiscreteElementMethodSimulation::SpringDamperForce()
 		cu_calculate_spring_damper_force(dpos, dvel, dforce, dxsdci, dxsdc_data, dxsdc_kc, nTsdaConnectionList);
 		if (nTsdaConnectionBodyData)
 		{
-			/*device_body_info *dbi;
-			device_body_info *hbi = new device_body_info[nTsdaConnectionBody];
-			checkCudaErrors(cudaMalloc((void**)&dbi, sizeof(device_body_info) * nTsdaConnectionBody));
-			for (unsigned int i = 0; i < nTsdaConnectionBody; i++)
-			{
-				xParticleObject* xpo = dynamic_cast<xParticleObject*>(xDynamicsManager::This()->XObject()->XObject(dxsdc_body[i].cbody.toStdString()));
-				unsigned int mid = xpo->MassIndex();
-				euler_parameters ep = pm->EulerParameters();
-				euler_parameters ed = pm->DEulerParameters();
-				hbi[i] = {
-					pm->Position().x, pm->Position().y, pm->Position().z,
-					pm->Velocity().x, pm->Velocity().y, pm->Velocity().z,
-					ep.e0, ep.e1, ep.e2, ep.e3,
-					ed.e0, ed.e1, ed.e2, ed.e3,
-					0, 0, 0,
-					0, 0, 0 };
-			}
-			checkCudaErrors(cudaMemcpy(dbi, hbi, sizeof(device_body_info)*nTsdaConnectionBody, cudaMemcpyHostToDevice));*/
 			cu_calculate_spring_damper_connecting_body_force(
 				dpos, dvel, dep, davel, dmass, dforce, dmoment, dxsd_cbd, dxsdc_kc, nTsdaConnectionBodyData);
-			/*checkCudaErrors(cudaMemcpy(hbi, dbi, sizeof(device_body_info)*nTsdaConnectionBody, cudaMemcpyDeviceToHost));
-			for (unsigned int i = 0; i < nTsdaConnectionBody; i++)
-			{
-				xPointMass* pm = xDynamicsManager::This()->XMBDModel()->XMass(dxsdc_body[i].cbody.toStdString());
-				pm->addAxialForce(hbi[i].force.x, hbi[i].force.y, hbi[i].force.z);
-				pm->addEulerParameterMoment(hbi[i].moment.x, hbi[i].moment.y, hbi[i].moment.z, hbi[i].moment.w);
-			}
-			delete[] hbi;*/
 		}		
 	}
 	else
 	{
 		xdem->XSpringDamperForce()->xCalculateForceForDEM(dpos, dvel, dep, davel, dmass, dforce, dmoment);
 	}
+}
+
+unsigned int xDiscreteElementMethodSimulation::setupByLastSimulationFile(std::string ldr)
+{
+	unsigned int pt = 0;
+	double ct = 0.0;
+	unsigned int _ns = 0;
+	unsigned int _np = 0;
+	unsigned int fsize = 0;
+	std::fstream qf;
+	std::string fname;
+	qf.open(ldr, std::ios::binary | std::ios::in);
+	if (qf.is_open())
+	{
+		qf.read((char*)&pt, sizeof(unsigned int));
+		qf.read((char*)&ct, sizeof(double));
+		qf.read((char*)&fsize, sizeof(unsigned int));
+		char* _name = new char[255];
+		memset(_name, 0, sizeof(char) * 255);
+		qf.read((char*)_name, sizeof(char) * ns);
+		fname = _name;
+		qf.close();
+	}
+	qf.open(fname, std::ios::binary | std::ios::in);
+	if(qf.is_open())
+	{
+		qf.read((char*)&ct, sizeof(double));
+		qf.read((char*)&_np, sizeof(unsigned int));
+		qf.read((char*)&_ns, sizeof(unsigned int));
+		qf.read((char*)pos, sizeof(double) * _np * 4);
+		qf.read((char*)vel, sizeof(double) * _ns * 3);
+		qf.read((char*)ep, sizeof(double) * _ns * 4);
+		qf.read((char*)avel, sizeof(double) * _ns * 4);
+		if ((_np != _ns) && cpos)
+			qf.read((char*)cpos, sizeof(double) * _ns * 4);
+	}
+	qf.close();
+	return pt;
 }
 
 // vector4d xDiscreteElementMethodSimulation::GlobalSphereInertiaForce(const euler_parameters& ev, const double j, const euler_parameters& ep)

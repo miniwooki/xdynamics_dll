@@ -26,6 +26,7 @@ public:
 	void SaveStepResult(unsigned int part, double ct);
 	void ExportResults(std::fstream& of);
 	void SetZeroBodyForce();
+	unsigned int setupByLastSimulationFile(std::string lmr);
 	
 	virtual int Initialize(xMultiBodyModel* xmbd);
 	virtual int OneStepSimulation(double ct, unsigned int cstep) = 0;

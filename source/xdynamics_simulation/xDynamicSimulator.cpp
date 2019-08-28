@@ -193,6 +193,20 @@ void xDynamicsSimulator::exportPartData()
 	of.close();
 }
 
+unsigned int xDynamicsSimulator::setupByLastSimulationFile(std::string lmr, std::string ldr)
+{
+	unsigned int pt = 0;
+	if (!lmr.empty())
+	{
+		pt = xmbd->setupByLastSimulationFile(lmr);
+	}
+	if (!ldr.empty())
+	{
+		pt = xdem->setupByLastSimulationFile(ldr);
+	}
+	return pt;
+}
+
 bool xDynamicsSimulator::checkStopCondition()
 {
 	foreach(xObject* xo, xdm->XObject()->XObjects())

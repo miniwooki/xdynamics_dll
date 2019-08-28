@@ -164,6 +164,20 @@ xCubeParticleData xXLSReader::ReadCubeParticleData(std::string& _name, int r, in
 	return d;
 }
 
+xPlaneParticleData xXLSReader::ReadPlaneParticleData(std::string & _name, int r, int & c)
+{
+	xPlaneParticleData d = { 0, };
+	double *ptr = &d.dx;
+	std::string x;
+	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 0);
+	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 3);
+	x = sheet->readStr(r, c++); uf::xsplit(x, ",", 3, ptr + 6);
+	d.minr = sheet->readNum(r, c++);
+	d.maxr = sheet->readNum(r, c++);
+	int t_shape = (int)PLANE_SHAPE;
+	return d;
+}
+
 xLineParticleData xXLSReader::ReadLineParticleData(std::string & _name, int r, int & c)
 {
 	xLineParticleData d = { 0, };
@@ -454,7 +468,8 @@ void xXLSReader::ReadDEMParticle(xDiscreteElementMethodModel* xdem, xObjectManag
 			}
 			else if (form == PLANE_SHAPE)
 			{
-
+				xPlaneParticleData d = ReadPlaneParticleData(name, rc.x, rc.y);
+				xpo = xdem->XParticleManager()->CreatePlaneParticle(name, (xMaterialType)material, d);
 			}
 			else if (form == LINE_SHAPE)
 			{
@@ -466,25 +481,7 @@ void xXLSReader::ReadDEMParticle(xDiscreteElementMethodModel* xdem, xObjectManag
 			{
 				xCircleParticleData d = ReadCircleParticleData(name, rc.x, rc.y);
 				unsigned int p_np = xdem->XParticleManager()->NumParticle();
-			
 				unsigned int npcircle = xdem->XParticleManager()->GetNumCircleParticles(d.diameter, d.minr, d.maxr);
-				/*if (!IsEmptyCell(rc.x, rc.y))
-				{
-					vector2i _rc = new_vector2i(0, 0);
-					xUtilityFunctions::xsplit(sheet->readStr(rc.x, rc.y++), ",", 2, &_rc.x);
-					unsigned int _neach = 0;
-					_rc.x -= 1; _rc.y -= 1;
-					if (!IsEmptyCell(_rc.x, _rc.y))
-					{
-						np = sheet->readNum(_rc.x, _rc.y++);
-						neach = sheet->readNum(_rc.x, _rc.y++);
-						nstep = sheet->readNum(_rc.x, _rc.y);
-					}
-					if (!neach)
-						neach = npcircle;
-				}
-				else
-					np = xdem->XParticleManager()->GetNumCircleParticles(d.diameter, d.minr, d.maxr);*/
 				xpo = xdem->XParticleManager()->CreateCircleParticle(name.c_str(), (xMaterialType)material, npcircle, d);
 				
 			}
