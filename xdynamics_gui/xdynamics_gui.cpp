@@ -715,6 +715,11 @@ void xdynamics_gui::xSetupResultNavigatorByChangeTargetCombo(int cmt)
 	}
 }
 
+void xdynamics_gui::xUploadResultThisModel()
+{
+
+}
+
 void xdynamics_gui::xEditCommandLine()
 {
 	QLineEdit* e = (QLineEdit*)sender();

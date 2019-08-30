@@ -63,7 +63,10 @@ public:
 	void selectPlotItem(int);
 
 private:
+	void export_to_textfile(QTreeWidgetItem* citem);
+	void process_context_menu(QString txt, QTreeWidgetItem* citem);
 	QTreeWidget *tree;
+	QTreeWidgetItem* current_item;
 	QMap<tRoot, QTreeWidgetItem*> roots;
 	QMap<QString, QVector<xPointMass::pointmass_result>*> mass_results;
 	QMap<QString, QVector<xKinematicConstraint::kinematicConstraint_result>*> constraint_results;

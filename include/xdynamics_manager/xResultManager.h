@@ -2,6 +2,7 @@
 #define XRESULTMANAGER_H
 
 #include "xdynamics_decl.h"
+#include "xdynamics_object/xPointMass.h"
 #include <QtCore/QString>
 
 class XDYNAMICS_API xResultManager
@@ -11,6 +12,7 @@ public:
 	~xResultManager();
 
 	void xRun(const std::string _cpath, const std::string _cname);
+	static std::string ExportPointMassResult2TXT(std::string name, QVector<xPointMass::pointmass_result>* rst);
 
 private:
 	void setCurrentPath(std::string new_path);

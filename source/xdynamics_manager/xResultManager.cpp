@@ -2,6 +2,7 @@
 #include "xdynamics_algebra/xUtilityFunctions.h"
 #include "xdynamics_object/xPointMass.h"
 #include "xdynamics_object/xKinematicConstraint.h"
+#include <sstream>
 
 xResultManager::xResultManager()
 {
@@ -45,6 +46,37 @@ void xResultManager::xRun(const std::string _cpath, const std::string _cname)
 			break;
 		fflush(stdin);
 	}
+}
+
+std::string xResultManager::ExportPointMassResult2TXT(std::string name, QVector<xPointMass::pointmass_result>* rst)
+{
+	/*size_t end = file_name.find_last_of("/");*/
+	std::fstream ifs;
+	std::string new_file_name = xModel::makeFilePath(name + ".txt");
+	ifs.open(new_file_name, ios::out);
+	ifs << "time " << "px " << "py " << "pz " << "vx " << "vy " << "vz " << "ax " << "ay " << "az "
+		<< "avx " << "avy " << "avz " << "aax " << "aay " << "aaz "
+		<< "afx " << "afy " << "afz " << "amx " << "amy " << "amz "
+		<< "cfx " << "cfy " << "cfz " << "cmx " << "cmy " << "cmz "
+		<< "hfx " << "hfy " << "hfz " << "hmx " << "hmy " << "hmz "
+		<< "ep0 " << "ep1 " << "ep2 " << "ep3 "
+		<< "ev0 " << "ev1 " << "ev2 " << "ev3 "
+		<< "ea0 " << "ea1 " << "ea2 " << "ea3" << std::endl;
+
+	foreach(xPointMass::pointmass_result pr, *rst)
+	{
+		for (unsigned int j = 0; j < 46; j++)
+		{
+			double v = *(&(pr.time) + j);
+			ifs << v << " ";
+		}
+		ifs << std::endl;
+	}
+	ifs.close();
+	std::string rt_string;
+	stringstream ss(rt_string);
+	ss << name << " was exported to (" << new_file_name << ").";
+	return rt_string;
 }
 
 void xResultManager::setCurrentPath(std::string new_path)

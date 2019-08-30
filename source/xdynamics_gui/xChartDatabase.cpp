@@ -1,4 +1,5 @@
 #include "xChartDatabase.h"
+#include "xdynamics_manager/xResultManager.h"
 //#include "cmdWindow.h"
 #include <QAction>
 #include <QMenu>
@@ -62,15 +63,22 @@ void xChartDatabase::contextMenu(const QPoint& pos)
 	QTreeWidgetItem* item = tree->itemAt(pos);
 	if (!item->parent())
 		return;
+	current_item = item;
 	QAction *act = new QAction(tr("Property"), this);
+	QAction *export_txt = new QAction(tr("Export text file"), this);
 	act->setStatusTip(tr("property menu"));
-	//connect(act, SIGNAL(triggered()), this, SLOT(actProperty()));
+	export_txt->setStatusTip(tr("Export to text file"));
+	connect(export_txt, SIGNAL(triggered()), this, SLOT(act_export_to_textfile()));
+	//nonnect(act, SIGNAL(triggered()), this, SLOT(actProperty()));
 
 	QMenu menu(this);
 	menu.addAction(act);
+	menu.addAction(export_txt);
 
 	QPoint pt(pos);
-	menu.exec(tree->mapToGlobal(pos));
+	QAction *selectedMenu = menu.exec(tree->mapToGlobal(pos));
+	if(selectedMenu)
+		process_context_menu(selectedMenu->text(), item);
 }
 
 void xChartDatabase::clickItem(QTreeWidgetItem* item, int col)
@@ -145,6 +153,21 @@ void xChartDatabase::clickItem(QTreeWidgetItem* item, int col)
 void xChartDatabase::selectPlotItem(int id)
 {
 
+}
+
+void xChartDatabase::export_to_textfile(QTreeWidgetItem* citem)
+{
+	QString cname = citem->text(0);
+	xResultManager::ExportPointMassResult2TXT(cname.toStdString(), mass_results[cname]);
+}
+
+void xChartDatabase::process_context_menu(QString txt, QTreeWidgetItem* citem)
+{
+	//.QString txt = a->text();
+	if (txt == "Export text file" && citem)
+	{
+		export_to_textfile(citem);
+	}
 }
 
 xChartDatabase::~xChartDatabase()

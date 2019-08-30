@@ -62,6 +62,7 @@ private slots:
 	void xStopSimulationThread();
 	void xContextMenuProcess(QString nm, contextMenuType vot);
 	void xSetupResultNavigatorByChangeTargetCombo(int);
+	void xUploadResultThisModel();
 	
 private:
 	void setupMeshSphere();
