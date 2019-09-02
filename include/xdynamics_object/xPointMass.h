@@ -74,6 +74,7 @@ public:
 	vector3d HydroForce() const;
 	vector3d HydroMoment() const;
 	vector4d EulerParameterMoment() const;
+	double* getForcePointer();
 
 	QVector<pointmass_result>* XPointMassResultPointer();
 

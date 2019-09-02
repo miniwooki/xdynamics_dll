@@ -109,9 +109,9 @@ void xSimulationThread::run()
 			eachStep = 0;
 		}
 		sendProgress(cstep, "");
-
 	}
-	xds->savePartData(ct, 9999);
+	if (isStop || xSimulation::ConfirmStopSimulation())
+		xds->savePartData(ct, 9999);
 	elapsed_time = tme.elapsed() * 0.001;
 	total_time += elapsed_time;
 	sendProgress(-1, QString("=========  =======    ==========    ======   ========   =============  ====================\n"));

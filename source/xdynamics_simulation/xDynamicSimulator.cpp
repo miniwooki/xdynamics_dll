@@ -136,19 +136,6 @@ bool xDynamicsSimulator::xInitialize(
 				xLog::log("The initialization of smoothed particle hydrodynamics mode was succeeded.");
 		}
 	}
-	//if (xdem && xmbd)
-	//{
-	//	xSpringDamperForce *xsdf = xdm->XDEMModel()->XSpringDamperForce();
-	//	if (xsdf)
-	//	{
-	//		//xsdf->SetDEMParticlePosition(xdem->HostPosition(), xdem->HostVelocity());
-	//		xmbd->SetDEMSpringDamper(xsdf);
-	//	}
-	//	xmbd->setDEMPositionVelocity(xdem->Position(), xdem->Velocity());
-	//}
-// 	xuf::DeleteFileByEXT(xuf::xstring(xModel::path) + xuf::xstring(xModel::name), "bin");
-// 	xuf::DeleteFileByEXT(xuf::xstring(xModel::path) + xuf::xstring(xModel::name), "bpm");
-// 	xuf::DeleteFileByEXT(xuf::xstring(xModel::path) + xuf::xstring(xModel::name), "bkc");
 	savePartData(0, 0);
 	return true;
 }
@@ -172,9 +159,6 @@ bool xDynamicsSimulator::savePartData(double ct, unsigned int pt)
 
 void xDynamicsSimulator::exportPartData()
 {
-// 	QFile qf(xModel::path + xModel::name + "/result_list.rlt");
-// 	qf.open(QIODevice::WriteOnly);
-// 	QTextStream qts(&qf);
  	std::fstream of;
  	of.open((xModel::path + xModel::name + "/" + xModel::name + ".rlt").toStdString(), std::ios::out);
 	

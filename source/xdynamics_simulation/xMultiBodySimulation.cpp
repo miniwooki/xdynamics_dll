@@ -51,13 +51,22 @@ void xMultiBodySimulation::SetZeroBodyForce()
 void xMultiBodySimulation::SaveStepResult(unsigned int part, double ct)
 {
 	ex_of = new std::fstream;
-	ex_of->open(xModel::makeFilePath(xModel::getModelName() + ".lmr"), std::ios::ate | ::ios::binary);
+	std::string fname = xModel::makeFilePath(xModel::getModelName() + ".lmr");
+	//std::ifstream src(fname, ios_base::in | ios_base::binary);
+	//if (!src.is_open())
+	//{
+	//	ex_of->close();
+	//	ex_of->open(fname, ios_base::out | ios_base::binary);
+	//}
+	ex_of->open(fname, ios_base::out | ios_base::app | ios_base::binary);
 	ex_of->write((char*)&part, sizeof(unsigned int));
 	ex_of->write((char*)&ct, sizeof(double));
 	ex_of->write((char*)q.Data(), sizeof(double) * mdim + xModel::OneDOF());
 	ex_of->write((char*)qd.Data(), sizeof(double) * mdim + xModel::OneDOF());
 	ex_of->write((char*)q_1.Data(), sizeof(double) * mdim + xModel::OneDOF());
 	ex_of->write((char*)rhs.Data(), sizeof(double) * tdim);
+	foreach(xPointMass* xpm, xmbd->Masses())
+		ex_of->write((char*)xpm->getForcePointer(), sizeof(double) * 18);
 	ex_of->close();
 	delete ex_of;
 	ex_of = NULL;
@@ -105,7 +114,7 @@ unsigned int xMultiBodySimulation::setupByLastSimulationFile(std::string lmr)
 	unsigned int pt = 0;
 	double ct = 0.0;
 	std::fstream of;
-	of.open(lmr, std::ios::binary);
+	of.open(lmr, ios_base::in | ios_base::binary);
 	while (!of.eof())
 	{
 		of.read((char*)&pt, sizeof(unsigned int));
@@ -117,6 +126,7 @@ unsigned int xMultiBodySimulation::setupByLastSimulationFile(std::string lmr)
 		lagMul = rhs.Data() + mdim;
 		foreach(xPointMass* xpm, xmbd->Masses())
 		{
+			of.read((char*)xpm->getForcePointer(), sizeof(double) * 18);
 			xpm->SaveStepResult(pt, ct, q, qd, rhs);
 		}
 		unsigned int sr = 0;
