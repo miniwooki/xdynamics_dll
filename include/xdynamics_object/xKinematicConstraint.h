@@ -52,6 +52,7 @@ public:
 // 		double lx, double ly, double lz,
 // 		double spix, double spiy, double spiz, double fix, double fiy, double fiz, double gix, double giy, double giz,
 // 		double spjx, double spjy, double spjz, double fjx, double fjy, double fjz, double gjx, double gjy, double gjz);
+	void ImportResults(std::string f);
 	void ExportResults(std::fstream& of);
 	virtual void ConstraintEquation(xVectorD& rhs, xVectorD& q, xVectorD& qd, unsigned int sr, double mul) = 0;
 	virtual void ConstraintJacobian(xSparseD& lhs, xVectorD& q, xVectorD& qd, unsigned int sr) = 0;

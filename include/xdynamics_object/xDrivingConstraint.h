@@ -18,6 +18,7 @@ public:
 	QString Name();
 	void setStartTime(double st);
 	void setConstantVelocity(double cv);
+	void ImportResults(std::string f);
 	void ExportResults(std::fstream& of);
 	//unsigned int startRow() { return srow; }
 	//	unsigned int startColumn() { return scol; }

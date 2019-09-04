@@ -90,6 +90,7 @@ public:
 	void setZeroAllForce();
 	void SaveStepResult(unsigned int part, double time, xVectorD& q, xVectorD& qd, xVectorD& qdd);
 	void SaveStepResult(double time);
+	void ImportResults(std::string of);
 	void ExportResults(std::fstream& of);
 	void SetDataFromStructure(int id, xPointMassData& d);
 	void ImportInitialData();

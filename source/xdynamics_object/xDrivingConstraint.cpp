@@ -78,6 +78,25 @@ void xDrivingConstraint::setConstantVelocity(double cv)
 	cons_v = cv;
 }
 
+void xDrivingConstraint::ImportResults(std::string f)
+{
+	std::fstream fs;
+	fs.open(f, ios_base::in | ios_base::binary);
+	char t = 'e';
+	int identifier = 0;
+	fs.read((char*)&identifier, sizeof(int));
+	fs.read(&t, sizeof(char));
+	fs.read((char*)&nr_part, sizeof(unsigned int));
+	for (unsigned int i = 0; i < nr_part; i++)
+	{
+		xKinematicConstraint::kinematicConstraint_result kr = { 0, };
+		fs.read((char*)&kr, sizeof(xKinematicConstraint::kinematicConstraint_result));
+		kcrs.push_back(kr);
+	}
+	//fs.read((char*)kcrs.data(), sizeof(kinematicConstraint_result) * nr_part);
+	fs.close();
+}
+
 void xDrivingConstraint::ExportResults(std::fstream & of)
 {
 	std::ofstream ofs;

@@ -45,9 +45,6 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="xdynamics_gui.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\source\xdynamics_gui\xGLWidget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -132,11 +129,11 @@
     <ClCompile Include="..\source\xdynamics_gui\xResultWidget.cpp">
       <Filter>Source Files\widget</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xdynamics_gui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="xdynamics_gui.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
     <QtMoc Include="..\include\xdynamics_gui\xGLWidget.h">
       <Filter>Header Files</Filter>
     </QtMoc>
@@ -178,6 +175,9 @@
     </QtMoc>
     <QtMoc Include="..\include\xdynamics_gui\xResultWidget.h">
       <Filter>Header Files\widget</Filter>
+    </QtMoc>
+    <QtMoc Include="..\include\xdynamics_gui\xdynamics_gui.h">
+      <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

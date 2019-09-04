@@ -106,6 +106,7 @@ void xKinematicConstraint::AllocResultMemory(unsigned int _s)
 	if (kcrs.size())
 	{
 		kcrs.clear();/// delete[] kcrs;
+		nr_part = 0;
 		//kcrs = NULL;
 	}
 	//kcrs = new kinematicConstraint_result[_s];
@@ -136,6 +137,25 @@ void xKinematicConstraint::SetupDataFromStructure(xPointMass* base, xPointMass* 
 QVector<xKinematicConstraint::kinematicConstraint_result>* xKinematicConstraint::XKinematicConstraintResultPointer()
 {
 	return &kcrs;
+}
+
+void xKinematicConstraint::ImportResults(std::string f)
+{
+	std::fstream fs;
+	fs.open(f, ios_base::in | ios_base::binary);
+	char t = 'e';
+	int identifier = 0;
+	fs.read((char*)&identifier, sizeof(int));
+	fs.read(&t, sizeof(char));
+	fs.read((char*)&nr_part, sizeof(unsigned int));
+	for (unsigned int i = 0; i < nr_part; i++)
+	{
+		kinematicConstraint_result kr = { 0, };
+		fs.read((char*)&kr, sizeof(kinematicConstraint_result));
+		kcrs.push_back(kr);
+	}
+	//fs.read((char*)kcrs.data(), sizeof(kinematicConstraint_result) * nr_part);
+	fs.close();
 }
 
 void xKinematicConstraint::ExportResults(std::fstream& of)

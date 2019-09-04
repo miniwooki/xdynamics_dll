@@ -330,6 +330,7 @@ void xPointMass::AllocResultMomory(unsigned int _s)
 	if (pmrs.size())
 	{
 		pmrs.clear();// delete[] pmrs;
+		nr_part = 0;
 		//pmrs = NULL;
 	}
 	//pmrs = new pointmass_result[_s];
@@ -375,6 +376,24 @@ void xPointMass::SaveStepResult(double time)
 	};
 	pmrs.push_back(pmr);
 	nr_part++;
+}
+
+void xPointMass::ImportResults(std::string f)
+{
+	std::fstream fs;
+	fs.open(f, ios_base::in | ios_base::binary);
+	char t = 'e';
+	int identifier = 0;
+	fs.read((char*)&identifier, sizeof(int));
+	fs.read(&t, sizeof(char));
+	fs.read((char*)&nr_part, sizeof(unsigned int));
+	for (unsigned int i = 0; i < nr_part; i++)
+	{
+		pointmass_result pr = { 0, };
+		fs.read((char*)&pr, sizeof(pointmass_result));
+		pmrs.push_back(pr);
+	}
+	fs.close();
 }
 
 void xPointMass::ExportResults(std::fstream& of)
