@@ -161,7 +161,8 @@ void xDynamicsSimulator::exportPartData()
 {
  	std::fstream of;
  	of.open((xModel::path + xModel::name + "/" + xModel::name + ".rlt").toStdString(), std::ios::out);
-	
+	of << "SIMULATION" << endl;
+	of << xSimulation::dt << " " << xSimulation::st << " " << xSimulation::et << " " << xSimulation::npart << std::endl;
 	if (xmbd)
 	{
 		of << "MBD" << endl;

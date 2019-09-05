@@ -33,7 +33,7 @@ public:
 	double StiffnessRatio() const;
 	double RollingFactor() const;
 	double StiffMultiplyer() const;
-	void setContactForceModel(xContactForceModelType xcfmt);
+	static void setContactForceModel(xContactForceModelType xcfmt);
 	void setCohesion(double d);
 	void setRestitution(double d);
 	void setFriction(double d);
@@ -44,7 +44,7 @@ public:
 	static double3* deviceBodyMoment();
 	//contactForce_type ForceMethod() const { return f_type; }
 	xMaterialPair MaterialPropertyPair() const;
-	xContactForceModelType ContactForceModel() const;
+	static xContactForceModelType ContactForceModel();
 	device_contact_property* DeviceContactProperty() const;// { return dcp; }
 	xContactPairType PairType() const;
 
@@ -58,22 +58,6 @@ public:
 		double fric, double rfric, double coh);
 	// 		contactForce_type cft, double rest, double ratio, double fric);
 	void setMaterialPair(xMaterialPair _mpp);// { mpp = _mpp; }
-	/*void collision(
-		xContactPairList* pairs, unsigned int i, double ri, double rj,
-		double mi, double mj, vector3d& pos, vector3d& vel, vector3d& omega, 
-		double &res, vector3d& tmax, vector3d& F, vector3d& M, 
-		unsigned int nco, xClusterInformation* xci, vector4d* cpos);*/
-	/*static void collision(
-		xPairData* d, double ri, double rj,
-		double mi, double mj,
-		vector3d& pi, vector3d& pj,
-		vector3d& vi, vector3d& vj,
-		vector3d& oi, vector3d& oj,
-		vector3d& F, vector3d& M,
-		double& res, vector3d& tmax,
-		xContactMaterialParameters& cmp,
-		xMaterialPair* xmps);*/
-	//virtual void updateCollisionPair(unsigned int id, xContactPairList& xcpl, double r, vector3d pos, double rj = 0, vector3d posj = new_vector3d(0.0, 0.0, 0.0)) = 0;
 	virtual void cuda_collision(
 		double *pos, double *vel,
 		double *omega, double *mass,
@@ -103,7 +87,7 @@ protected:
 	QString name;
 	xContactPairType type;
 //	contactForce_type f_type;
-	xContactForceModelType force_model;
+	static xContactForceModelType force_model;
 	xMaterialPair mpp;
 	//contact_parameter cp;
  	device_contact_property* dcp;

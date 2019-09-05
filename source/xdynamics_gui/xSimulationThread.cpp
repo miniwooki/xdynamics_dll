@@ -33,8 +33,10 @@ bool xSimulationThread::xInitialize(xDynamicsManager* dm, double dt, unsigned in
 void xSimulationThread::setupByLastSimulationFile(QString lmr, QString ldr)
 {
 	//unsigned int pt = 0;
-	if(!lmr.isEmpty() || !ldr.isEmpty())
+	if (!lmr.isEmpty() || !ldr.isEmpty())
 		last_pt = xds->setupByLastSimulationFile(lmr.toStdString(), ldr.toStdString());
+	else
+		return;
 	for (unsigned int i = 0; i <= last_pt; i++)
 		sendProgress(i, QString("Upload DEM result for view - ") + QString("%1").arg(i));
 }

@@ -47,6 +47,7 @@
 #define FLUID_SHEAR_MODULUS 0.0
 
 #include <QtCore/QString>
+#include <string>
 //#include <string>
 
 enum xMaterialType
@@ -114,8 +115,21 @@ enum xShapeType
 	FROM_SHAPE = 999,
 	OBJECT = 100 
 };
+
+
 enum xContactForceModelType
-{ DHS = 0, HERTZ_MINDLIN_NO_SLIP };
+{ NO_DEFINE_CONTACT_MODEL = -1, DHS = 0, HERTZ_MINDLIN_NO_SLIP = 1 };
+
+inline std::string ForceModelString(xContactForceModelType ct)
+{
+	std::string s;
+	switch (ct)
+	{
+	case DHS: s = "Damped Hertzian-slideing model"; break;
+	case HERTZ_MINDLIN_NO_SLIP: s = "No slip Hertz-Mindlin model"; break;
+	}
+	return s;
+}
 
 enum xXlsInputDataType 
 { 
@@ -203,7 +217,7 @@ typedef struct{ double mass, ixx, iyy, izz, ixy, ixz, iyz, px, py, pz, e0, e1, e
 typedef struct{ double lx, ly, lz, fix, fiy, fiz, gix, giy, giz, fjx, fjy, fjz, gjx, gjy, gjz; }xJointData;
 typedef struct{ double Ei, Ej, Pri, Prj, Gi, Gj; }xMaterialPair;
 typedef struct{ double eq_e, eq_r, eq_m, eq_s, coh_r, coh_e, coh_s, kn, vn, ks, vs, fric, rfric, amp; }xContactParameters;
-typedef struct{ double restitution, friction, rolling_friction, cohesion, stiffness_ratio, stiffness_multiplyer; }xContactMaterialParameters;
+typedef struct { double restitution, friction, rolling_friction, cohesion, stiffness_ratio, stiffness_multiplyer; }xContactMaterialParameters;
 typedef struct{ double spix, spiy, spiz, spjx, spjy, spjz, k, c, init_l; }xTSDAData;
 typedef struct{ int correction, dim, type; double factor; }xKernelFunctionData;
 typedef struct{ double p0x, p0y, p0z, p1x, p1y, p1z, nx, ny, nz; }xLineObjectData;

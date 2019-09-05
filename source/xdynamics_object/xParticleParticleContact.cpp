@@ -143,7 +143,7 @@ void xParticleParticleContact::cppCollision(
 		//	d->isc = false;
 		//	continue;
 		//}
-		switch (force_model)
+		switch (xContact::ContactForceModel())
 		{
 		case DHS: DHSModel(c, d->gab, d->delta_s, d->dot_s, cohesion, rv, u, m_fn, m_ft); break;
 		case HERTZ_MINDLIN_NO_SLIP: Hertz_Mindlin(c, d->gab, d->delta_s, d->dot_s, cohesion, rv, u, m_fn, m_ft); break;

@@ -1,14 +1,12 @@
 #include "xdynamics_gui.h"
 #include "xdynamics_manager/xDynamicsManager.h"
 #include "xModelNavigator.h"
-//#include "xGLWidget.h"
 #include "xSimulationThread.h"
 #include "xdynamics_simulation/xSimulation.h"
 #include "xNewDialog.h"
 #include "xLineEditWidget.h"
 #include "xCommandLine.h"
 #include "xChartWindow.h"
-//#include "xPointMassWidget.h"
 #include <QtCore/QDir>
 #include <QtCore/QMimeData>
 #include <QtWidgets/QFileDialog>
@@ -259,8 +257,9 @@ bool xdynamics_gui::ReadModelResults(QString path)
 	QString dyn_type = "";
 	double dt = 0.0;
 	unsigned int st = 0;
-	unsigned int et = 0;
+	double et = 0;
 	unsigned int pt = 0;
+	if (!pbar) pbar = new QProgressBar;
 	qts >> s;
 	if (s == "SIMULATION")
 	{
@@ -269,78 +268,96 @@ bool xdynamics_gui::ReadModelResults(QString path)
 		for (unsigned int i = 0; i < pt; i++)
 		{
 			xvAnimationController::addTime(i, i * dt);
-		}		
+		}
 	}
+	pbar->setMaximum(pt);
+	QStringList mbd_rlist;
+	QStringList dem_rlist;
 	while (!qts.atEnd())
 	{
 		qts >> s;
 		if (s == "MBD" || s == "DEM")
 		{
 			dyn_type = s;
+			if (dyn_type == "DEM")
+			{
+				if (xgl->vParticles())
+				{
+					xgl->vParticles()->setBufferMemories(pt);
+					xnavi->addChild(xModelNavigator::RESULT_ROOT, "Particles");
+				}
+			}
 			continue;
 		}
 		if (dyn_type == "MBD")
+			mbd_rlist.push_back(s);
+		else if (dyn_type == "DEM")
+			dem_rlist.push_back(s);
+	}
+	pbar->setMaximum(mbd_rlist.size() + dem_rlist.size());
+	unsigned int cnt = 0;
+	foreach(QString f, mbd_rlist)
+	{
+		pbar->setValue(cnt++);
+		QString file_name = xUtilityFunctions::GetFileName(f.toStdString().c_str());
+		QString ext = xUtilityFunctions::FileExtension(f.toStdString().c_str());
+		if (ext == ".bpm")
 		{
-			QString file_name = xUtilityFunctions::GetFileName(s.toStdString().c_str());
-			QString ext = xUtilityFunctions::FileExtension(s.toStdString().c_str());
-			if (ext == ".bpm")
+			xPointMass* xpm = NULL;
+			if (xdm->XMBDModel())
+				xpm = xdm->XMBDModel()->XMass(file_name.toStdString());
+			if (xpm)
 			{
-				xPointMass* xpm = NULL;
-				if (xdm->XMBDModel())
-					xpm = xdm->XMBDModel()->XMass(file_name.toStdString());
-				if (xpm)
-				{
-					xpm->ImportResults(s.toStdString());
-					xcw->write(xCommandWindow::CMD_INFO, "Imported file : " + s);
-				}
-					
+				xpm->ImportResults(f.toStdString());
+				xcw->write(xCommandWindow::CMD_INFO, "Imported file : " + f);
 			}
-			if (ext == ".bkc")
-			{
-				xKinematicConstraint* xkc = NULL;
-				if (xdm->XMBDModel())
-					xkc = xdm->XMBDModel()->XJoint(file_name.toStdString());
-				if (xkc)
-				{
-					xkc->ImportResults(s.toStdString());
-					xcw->write(xCommandWindow::CMD_INFO, "Imported file : " + s);
-				}					
-				else
-				{
-					xDrivingConstraint* xdc = xdm->XMBDModel()->xDriving(file_name.toStdString());
-					if (xdc)
-					{
-						xdc->ImportResults(s.toStdString());
-						xcw->write(xCommandWindow::CMD_INFO, "Imported file : " + s);
-					}		
-				}					
-			} 
 		}
-		else if (s == "DEM")
+		if (ext == ".bkc")
 		{
-			unsigned int pt = 0;
-			while (!qts.atEnd())
+			xKinematicConstraint* xkc = NULL;
+			if (xdm->XMBDModel())
+				xkc = xdm->XMBDModel()->XJoint(file_name.toStdString());
+			if (xkc)
 			{
-				qts >> s;
-				if (!s.isEmpty())
+				xkc->ImportResults(f.toStdString());
+				xcw->write(xCommandWindow::CMD_INFO, "Imported file : " + f);
+			}
+			else
+			{
+				xDrivingConstraint* xdc = xdm->XMBDModel()->xDriving(file_name.toStdString());
+				if (xdc)
 				{
-					xgl->vParticles()->UploadParticleFromFile(pt++, s);
-					xvAnimationController::setTotalFrame(pt);
-					xgl->setupParticleBufferColorDistribution(pt);
-				}					
-			}			
-			if (wrst)
-			{
-				wrst->setMinMaxValue(
-					xgl->GetParticleMinValueFromColorMapType(),
-					xgl->GetParticleMaxValueFromColorMapType()
-				);
+					xdc->ImportResults(f.toStdString());
+					xcw->write(xCommandWindow::CMD_INFO, "Imported file : " + f);
+				}
 			}
 		}
 	}
+	unsigned int dem_cnt = 0;
+	foreach(QString f, dem_rlist)
+	{
+		pbar->setValue(cnt++);
+		xgl->vParticles()->UploadParticleFromFile(dem_cnt, f);
+		//	xvAnimationController::setTotalFrame(pt);
+		xgl->setupParticleBufferColorDistribution(dem_cnt++);
+		xcw->write(xCommandWindow::CMD_INFO, "Imported file : " + f);
+	}
+	if (wrst)
+	{
+		wrst->setMinMaxValue(
+			xgl->GetParticleMinValueFromColorMapType(),
+			xgl->GetParticleMaxValueFromColorMapType()
+		);
+	}
+
 	setupBindingPointer();
-	xvAnimationController::setTotalFrame(pt-1);
+	xvAnimationController::setTotalFrame(pt - 1);
 	qf.close();
+	if (pbar)
+	{
+		delete pbar;
+		pbar = NULL;
+	}
 	return true;
 }
 
@@ -478,7 +495,13 @@ QString xdynamics_gui::ReadXLSFile(QString xls_path)
 		xdm = new xDynamicsManager;
 		//xnavi->setDynamicManager(xdm);
 	}		
-	xdm->OpenModelXLS(xls_path.toStdString().c_str());
+	if (checkXerror(xdm->OpenModelXLS(xls_path.toStdString().c_str())))
+	{
+		delete xdm;
+		xdm = NULL;
+		xcw->write(xCommandWindow::CMD_ERROR, "Error in xls file\nCheck log file.");
+		return "";
+	}
 	int begin = xls_path.lastIndexOf("/");
 	int end = xls_path.lastIndexOf(".");
 	QString modelName = xls_path.mid(begin + 1, end - begin - 1);

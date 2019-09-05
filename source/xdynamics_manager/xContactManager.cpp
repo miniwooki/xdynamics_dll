@@ -71,8 +71,19 @@ xContactManager::~xContactManager()
 xContact* xContactManager::CreateContactPair(
 	std::string n, xContactForceModelType method, xObject* o1, xObject* o2, xContactParameterData& d)
 {
-	xContactPairType pt = getContactPair(o1->Shape(), o2->Shape());
 	xContact *c = NULL;
+	if (xContact::ContactForceModel() == NO_DEFINE_CONTACT_MODEL)
+		xContact::setContactForceModel(method);
+	else
+	{
+		if (xContact::ContactForceModel() != method)
+		{
+			xLog::log("Contact force model of " + n + " is not matched. " + ForceModelString(xContact::ContactForceModel()) + "!=" + ForceModelString(method));
+			return c;
+		}		
+	}
+	xContactPairType pt = getContactPair(o1->Shape(), o2->Shape());
+
 	switch (pt)
 	{
 	case PARTICLE_PARTICLE:	cpp = new xParticleParticleContact(n); c = cpp;	break;
@@ -87,7 +98,8 @@ xContact* xContactManager::CreateContactPair(
 		o1->Poisson(), o2->Poisson(),
 		o1->Shear(), o2->Shear()
 	};
-	c->setContactForceModel(method);
+	
+	//c->setContactForceModel(method);
 	c->setFirstObject(o1);
 	c->setSecondObject(o2);
 	c->setMaterialPair(mpp);

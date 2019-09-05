@@ -184,9 +184,10 @@ void xParticleMeshObjectsContact::particle_triangle_contact_force(
 		xmps[j].Gi, xmps[j].Gj,
 		cmp.restitution, cmp.stiffness_ratio,
 		cmp.friction, cmp.rolling_friction, cmp.cohesion);
-	switch (force_model)
+	switch (xContact::ContactForceModel())
 	{
 	case DHS: DHSModel(c, d->gab, d->delta_s, d->dot_s, cmp.cohesion, rv, u, m_fn, m_ft); break;
+	case HERTZ_MINDLIN_NO_SLIP: Hertz_Mindlin(c, d->gab, d->delta_s, d->dot_s, cohesion, rv, u, m_fn, m_ft); break;
 	}
 	RollingResistanceForce(c.rfric, r, 0.0, dcpr, m_fn, m_ft, res, tmax);
 	vector3d nforce = m_fn + m_ft;

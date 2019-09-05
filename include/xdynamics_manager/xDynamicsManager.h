@@ -15,7 +15,7 @@ class XDYNAMICS_API xDynamicsManager : public xModel
 {
 public:
 	enum modelType{ MBD = 0, DEM, SPH, OBJECT, CONTACT };
-	enum solverType{ ONLY_MBD = 0, ONLY_DEM, ONLY_SPH, COUPLED_MBD_DEM, COUPLED_MBD_SPH };
+	enum solverType{ NO_DEFINED_SOLVER_TYPE = -1, ONLY_MBD = 0, ONLY_DEM, ONLY_SPH, COUPLED_MBD_DEM, COUPLED_MBD_SPH };
 
 	xDynamicsManager();
 	~xDynamicsManager();
@@ -37,7 +37,7 @@ public:
 	xObjectManager* XObject(std::string& n);
 	xContactManager* XContact(std::string& n);
 
-	solverType OpenModelXLS(const char* n);
+	int OpenModelXLS(const char* n);
 
 private:
 	void setOnAirModel(modelType t, std::string n);

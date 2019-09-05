@@ -47,6 +47,8 @@ char * xDynamicsError::_xdynamicsGetErrorEnum(int error)
 		return "xdynamicsErrorMultiBodyModelInitialization";
 	case xdynamicsErrorMultiBodyModelRedundantCondition:
 		return "xdynamicsErrorMultiBodyModelRedundantCondition";
+	case xdynamicsErrorExcelModelingData:
+		return "xdynamicsErrorExcelModelingData";
 	}
 	return NULL;
 }

@@ -19,7 +19,8 @@ public:
 		xdynamicsErrorMultiBodyModelInitialization = 3,
 		xdynamicsErrorDiscreteElementMethodModelInitialization = 4,
 		xdynamicsErrorMultiBodyModelRedundantCondition = 5,
-		xdynamicsErrorIncompressibleSPHInitialization = 6
+		xdynamicsErrorIncompressibleSPHInitialization = 6,
+		xdynamicsErrorExcelModelingData = 7
 	};
 	xDynamicsError();
 	~xDynamicsError();
