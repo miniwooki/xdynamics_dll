@@ -6,7 +6,7 @@
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
-#include "../../xdynamics_gui.h"
+#include "../../../include/xdynamics_gui/xdynamics_gui.h"
 #include <QtCore/qbytearray.h>
 #include <QtCore/qmetatype.h>
 #if !defined(Q_MOC_OUTPUT_REVISION)
@@ -21,8 +21,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_xdynamics_gui_t {
-    QByteArrayData data[28];
-    char stringdata0[426];
+    QByteArrayData data[29];
+    char stringdata0[449];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -58,7 +58,8 @@ QT_MOC_LITERAL(23, 342, 19), // "xContextMenuProcess"
 QT_MOC_LITERAL(24, 362, 2), // "nm"
 QT_MOC_LITERAL(25, 365, 15), // "contextMenuType"
 QT_MOC_LITERAL(26, 381, 3), // "vot"
-QT_MOC_LITERAL(27, 385, 40) // "xSetupResultNavigatorByChange..."
+QT_MOC_LITERAL(27, 385, 40), // "xSetupResultNavigatorByChange..."
+QT_MOC_LITERAL(28, 426, 22) // "xUploadResultThisModel"
 
     },
     "xdynamics_gui\0xNew\0\0xSave\0xOpen\0"
@@ -72,7 +73,8 @@ QT_MOC_LITERAL(27, 385, 40) // "xSetupResultNavigatorByChange..."
     "xOnGeometrySelectionOfPointMass\0"
     "xStopSimulationThread\0xContextMenuProcess\0"
     "nm\0contextMenuType\0vot\0"
-    "xSetupResultNavigatorByChangeTargetCombo"
+    "xSetupResultNavigatorByChangeTargetCombo\0"
+    "xUploadResultThisModel"
 };
 #undef QT_MOC_LITERAL
 
@@ -82,7 +84,7 @@ static const uint qt_meta_data_xdynamics_gui[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-      20,   14, // methods
+      21,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -90,26 +92,27 @@ static const uint qt_meta_data_xdynamics_gui[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,  114,    2, 0x08 /* Private */,
-       3,    0,  115,    2, 0x08 /* Private */,
-       4,    0,  116,    2, 0x08 /* Private */,
-       5,    0,  117,    2, 0x08 /* Private */,
-       6,    0,  118,    2, 0x08 /* Private */,
-       7,    0,  119,    2, 0x08 /* Private */,
-       8,    1,  120,    2, 0x08 /* Private */,
-      10,    1,  123,    2, 0x08 /* Private */,
-      12,    1,  126,    2, 0x08 /* Private */,
-      14,    3,  129,    2, 0x08 /* Private */,
-      15,    0,  136,    2, 0x08 /* Private */,
-      16,    2,  137,    2, 0x08 /* Private */,
-      17,    0,  142,    2, 0x08 /* Private */,
-      18,    1,  143,    2, 0x08 /* Private */,
-      19,    0,  146,    2, 0x08 /* Private */,
-      20,    0,  147,    2, 0x08 /* Private */,
-      21,    0,  148,    2, 0x08 /* Private */,
-      22,    0,  149,    2, 0x08 /* Private */,
-      23,    2,  150,    2, 0x08 /* Private */,
-      27,    1,  155,    2, 0x08 /* Private */,
+       1,    0,  119,    2, 0x08 /* Private */,
+       3,    0,  120,    2, 0x08 /* Private */,
+       4,    0,  121,    2, 0x08 /* Private */,
+       5,    0,  122,    2, 0x08 /* Private */,
+       6,    0,  123,    2, 0x08 /* Private */,
+       7,    0,  124,    2, 0x08 /* Private */,
+       8,    1,  125,    2, 0x08 /* Private */,
+      10,    1,  128,    2, 0x08 /* Private */,
+      12,    1,  131,    2, 0x08 /* Private */,
+      14,    3,  134,    2, 0x08 /* Private */,
+      15,    0,  141,    2, 0x08 /* Private */,
+      16,    2,  142,    2, 0x08 /* Private */,
+      17,    0,  147,    2, 0x08 /* Private */,
+      18,    1,  148,    2, 0x08 /* Private */,
+      19,    0,  151,    2, 0x08 /* Private */,
+      20,    0,  152,    2, 0x08 /* Private */,
+      21,    0,  153,    2, 0x08 /* Private */,
+      22,    0,  154,    2, 0x08 /* Private */,
+      23,    2,  155,    2, 0x08 /* Private */,
+      27,    1,  160,    2, 0x08 /* Private */,
+      28,    0,  163,    2, 0x08 /* Private */,
 
  // slots: parameters
     QMetaType::Void,
@@ -132,6 +135,7 @@ static const uint qt_meta_data_xdynamics_gui[] = {
     QMetaType::Void,
     QMetaType::Void, QMetaType::QString, 0x80000000 | 25,   24,   26,
     QMetaType::Void, QMetaType::Int,    2,
+    QMetaType::Void,
 
        0        // eod
 };
@@ -162,6 +166,7 @@ void xdynamics_gui::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _i
         case 17: _t->xStopSimulationThread(); break;
         case 18: _t->xContextMenuProcess((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< contextMenuType(*)>(_a[2]))); break;
         case 19: _t->xSetupResultNavigatorByChangeTargetCombo((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 20: _t->xUploadResultThisModel(); break;
         default: ;
         }
     }
@@ -196,13 +201,13 @@ int xdynamics_gui::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 20)
+        if (_id < 21)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 20;
+        _id -= 21;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 20)
+        if (_id < 21)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 20;
+        _id -= 21;
     }
     return _id;
 }
