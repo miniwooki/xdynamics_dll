@@ -22,6 +22,7 @@
 *.exe
 *.dll
 *.lib
+*.ipdb
 
 # Files for the ART/Dalvik VM
 *.dex
