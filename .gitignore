@@ -55,8 +55,6 @@ captures/
 
 # Folder
 extern/
-xdynamics_gui/GeneratedFiles/Debug/
-xdynamics_gui/GeneratedFiles/Release/
 
 # IntelliJ
 *.iml
