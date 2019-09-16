@@ -9,6 +9,7 @@ class XDYNAMICS_API xSimulation
 {
 public:
 	enum deviceType{ CPU = 0, GPU };
+	enum SimulationType{ NO_DEFINED_SIMULATION_TYPE = -1, ONLY_MBD = 0, ONLY_DEM, ONLY_SPH, MBD_DEM, MBD_SPH, SPH_DEM };
 	enum MBDSolverType{ MBD_SOLVER = 0, EXPLICIT_RK4 = 1, IMPLICIT_HHT = 2, KINEMATIC = 10 };
 	enum DEMSolverType{ DEM_SOLVER = 0, EXPLICIT_VV = 1 };
 	enum SPHSolverType{ SPH_SOLVER = 0, INCOMPRESSIBLESPH, WEAKELYSPH };
@@ -43,11 +44,13 @@ public:
 	static unsigned int npart;
 	static unsigned int nstep;
 	static deviceType dev;
+	static SimulationType simulation_type;
 	static MBDSolverType mbd_solver_type;
 	static DEMSolverType dem_solver_type;
 	static SPHSolverType sph_solver_type;
 	double* dem_pos;
 	double* dem_vel;
+
 };
 
 #endif

@@ -1,7 +1,7 @@
 #include "xLog.h"
 #include "xdynamics_manager/xModel.h"
-#include <QtCore/QDate>
-#include <QtCore/QTime>
+//#include <QtCore/QDate>
+//#include <QtCore/QTime>
 
 std::ofstream *xLog::qf = NULL;
 
@@ -45,13 +45,13 @@ void xLog::launchLogSystem(std::string d)
 
 void xLog::log(std::string txt)
 {
-	QTime cTime = QTime::currentTime();
+	/*QTime cTime = QTime::currentTime();
 	QDate cDate = QDate::currentDate();
-	QString l = ">> " + cTime.toString() + "/" + cDate.toString() + " - " + QString::fromStdString(txt);
+	QString l = ">> " + cTime.toString() + "/" + cDate.toString() + " - " + QString::fromStdString(txt);*/
 	//QString k_l = kor(l.toLocal8Bit());
 	//char* local8b = l.toLocal8Bit().data()
-	std::cout << l.toLocal8Bit().data() << std::endl;
-	(*qf) << l.toStdString().c_str() << std::endl;
+	//std::cout << l.toLocal8Bit().data() << std::endl;
+	//(*qf) << l.toStdString().c_str() << std::endl;
 //	QTextStream qts(&qf);
 	//qts << l << endl;
 }

@@ -20,6 +20,7 @@ class wsimulation;
 class wpointmass;
 class wresult;
 class xChartWindow;
+class xColorControl;
 //class xSimulationThread;
 
 class xdynamics_gui : public QMainWindow
@@ -63,6 +64,7 @@ private slots:
 	void xContextMenuProcess(QString nm, contextMenuType vot);
 	void xSetupResultNavigatorByChangeTargetCombo(int);
 	void xUploadResultThisModel();
+	void xSetupParticleBufferColorDistribution(int);
 	
 private:
 	void setupMeshSphere();
@@ -94,6 +96,7 @@ private:
 	QDockWidget* xcomm;
 	xCommandLine* xcl;
 	xChartWindow* xchart;
+	xColorControl* xcc;
 
 	QString mbd_last_result;
 	QString dem_last_result;

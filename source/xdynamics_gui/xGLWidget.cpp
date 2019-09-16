@@ -13,7 +13,7 @@
 #include "xvCylinder.h"
 #include "xvAnimationController.h"
 #include "xModelNavigator.h"
-#include "xColorControl.h"
+//#include "xColorControl.h"
 #include <QShortcut>
 
 #ifndef M_PI
@@ -26,7 +26,7 @@ xGLWidget* ogl;
 xGLWidget::xGLWidget(int argc, char** argv, QWidget *parent)
 	: QGLWidget(parent)
 	, vp(NULL)
-	, xcc(NULL)
+	//, xcc(NULL)
 	, ground_marker(NULL)
 	, selectedObject(NULL)
 	, zRotationFlag(false)
@@ -73,7 +73,7 @@ xGLWidget::xGLWidget(int argc, char** argv, QWidget *parent)
 
 	QShortcut *a = new QShortcut(QKeySequence("Ctrl+F"), this);
 	connect(a, SIGNAL(activated()), this, SLOT(fitView()));
-	xcc = new xColorControl;
+	//xcc = new xColorControl;
 }
 
 xGLWidget::~xGLWidget()
@@ -81,7 +81,7 @@ xGLWidget::~xGLWidget()
 	makeCurrent();
 	glDeleteLists(coordinate, 1);
 	glObjectClear();
-	if (xcc) delete xcc; xcc = NULL;
+	//if (xcc) delete xcc; xcc = NULL;
 }
 
 xGLWidget* xGLWidget::GLObject()
@@ -696,29 +696,29 @@ void xGLWidget::setSketchSpace()
 void xGLWidget::setupParticleBufferColorDistribution(int n)
 {
 	//xColorControl xcc;
-	if (vp)
-	{
-		int sframe = n < 0 ? 0 : xvAnimationController::getTotalBuffers();
-		int cframe = xvAnimationController::getTotalBuffers();
-		
-		xColorControl::ColorMapType cmt = xcc->Target();
-		if (!xcc->isUserLimitInput())
-			xcc->setMinMax(vp->getMinValue(cmt), vp->getMaxValue(cmt));
-		unsigned int m_np = vp->NumParticles();
-		xcc->setLimitArray();
-		for (int i = sframe; i <= cframe; i++)
-		{
-			unsigned int idx = m_np * i;
-			float *pbuf = vp->PositionBuffers() + idx * 4;
-			float *vbuf = vp->VelocityBuffers() + idx * 3;
-			float *cbuf = vp->ColorBuffers() + idx * 4;
-			for (unsigned int j = 0; j < m_np; j++)
-			{
-				xcc->getColorRamp(pbuf + j * 4, vbuf + j * 3, cbuf + j * 4);
-				cbuf[j * 4 + 3] = 1.0;
-			}
-		}
-	}
+	//if (vp)
+	//{
+	//	int sframe = n < 0 ? 0 : xvAnimationController::getTotalBuffers();
+	//	int cframe = xvAnimationController::getTotalBuffers();
+	//	
+	//	xColorControl::ColorMapType cmt = xcc->Target();
+	//	if (!xcc->isUserLimitInput())
+	//		xcc->setMinMax(vp->getMinValue(cmt), vp->getMaxValue(cmt));
+	//	unsigned int m_np = vp->NumParticles();
+	//	xcc->setLimitArray();
+	//	for (int i = sframe; i <= cframe; i++)
+	//	{
+	//		unsigned int idx = m_np * i;
+	//		float *pbuf = vp->PositionBuffers() + idx * 4;
+	//		float *vbuf = vp->VelocityBuffers() + idx * 3;
+	//		float *cbuf = vp->ColorBuffers() + idx * 4;
+	//		for (unsigned int j = 0; j < m_np; j++)
+	//		{
+	//			xcc->getColorRamp(pbuf + j * 4, vbuf + j * 3, cbuf + j * 4);
+	//			cbuf[j * 4 + 3] = 1.0;
+	//		}
+	//	}
+	//}
 }
 
 void xGLWidget::sketchingMode()
@@ -802,12 +802,14 @@ void xGLWidget::sketchingMode()
 
 float xGLWidget::GetParticleMinValueFromColorMapType()
 {
-	return vp->getMinValue(xcc->Target());
+	return 0.f;
+	//return vp->getMinValue(xcc->Target());
 }
 
 float xGLWidget::GetParticleMaxValueFromColorMapType()
 {
-	return vp->getMaxValue(xcc->Target());
+	return 0.f;
+	//return vp->getMaxValue(xcc->Target());
 }
 
 void xGLWidget::paintGL()

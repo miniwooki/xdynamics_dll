@@ -108,7 +108,7 @@ unsigned int xCubeObject::create_sph_particles(double ps, unsigned int nlayers, 
 	return 0;
 }
 
-QVector<xCorner> xCubeObject::get_sph_boundary_corners()
-{
-	return QVector<xCorner>();
-}
+//QVector<xCorner> xCubeObject::get_sph_boundary_corners()
+//{
+//	return QVector<xCorner>();
+//}

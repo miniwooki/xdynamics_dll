@@ -2,7 +2,8 @@
 #define XMESHOBJECT_H
 
 #include "xdynamics_object/xPointMass.h"
-#include <QtCore/QList>
+#include <list>
+//#include <QtCore/QList>
 
 class XDYNAMICS_API xMeshObject : public xPointMass
 {
@@ -21,7 +22,7 @@ public:
 	int DefineShapeFromFile(vector3d & loc, std::string f);
 	void updateDeviceFromHost();
 
-	QString meshDataFile() const;// { return filePath; }
+	std::string meshDataFile() const;// { return filePath; }
 	double maxRadius() const;// { return maxRadii; }
 	unsigned int NumTriangle() const;// { return ntriangle; }
 	double* VertexList();// { return vertexList; }
@@ -34,11 +35,11 @@ public:
 	void ChangeVertexGlobal2Local();
 	std::string exportMeshData(std::string path);
 	virtual unsigned int create_sph_particles(double ps, unsigned int nlayers, vector3d* p = NULL, xMaterialType* t = NULL);
-	virtual QVector<xCorner> get_sph_boundary_corners();
+	//virtual QVector<xCorner> get_sph_boundary_corners();
 
 private:
 	void _fromSTLASCII(int _ntriangle, double* vList, vector3d& loc);
-	QList<triangle_info> _splitTriangle(triangle_info& ti, double to);
+	std::list<triangle_info> _splitTriangle(triangle_info& ti, double to);
 
 private:
 	unsigned int ntriangle;
@@ -49,7 +50,7 @@ private:
 	vector3d min_point;
 	//unsigned int *indexList;
 	double fit_size;
-	QString filePath;
+	xstring filePath;
 };
 
 #endif

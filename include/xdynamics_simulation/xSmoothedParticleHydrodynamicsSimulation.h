@@ -17,7 +17,7 @@ public:
 	virtual int Initialize(xSmoothedParticleHydrodynamicsModel* _xsph);
 	bool Initialized();
 	virtual int OneStepSimulation(double ct, unsigned int cstep) = 0;
-	QString SaveStepResult(unsigned int pt, double ct);
+	std::string SaveStepResult(unsigned int pt, double ct);
 
 protected:
 	void clearMemory();

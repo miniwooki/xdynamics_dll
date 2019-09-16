@@ -46,7 +46,7 @@ void xParticlePlanesContact::define(unsigned int id, xParticlePlaneContact* d)
 	xmp = d->MaterialPropertyPair();
 	hcmp[id] = cp;
 	xmps[id] = xmp;
-	pair_ip[id] = p;
+	pair_ip.insert(id, p);
 	hpi[id] = {
 		p->MovingObject(),
 		nContactObject,
@@ -57,7 +57,7 @@ void xParticlePlanesContact::define(unsigned int id, xParticlePlaneContact* d)
 		p->W2(), p->W3(), p->W4()
 	};
 	nContactObject++;
-	pair_contact[id] = d;
+	pair_contact.insert(id, d);
 }
 
 void xParticlePlanesContact::define(unsigned int id, xParticleCubeContact* d)
@@ -79,7 +79,7 @@ void xParticlePlanesContact::define(unsigned int id, xParticleCubeContact* d)
 		xmp = d->MaterialPropertyPair();
 		hcmp[id + i] = cp;
 		xmps[id + i] = xmp;
-		pair_ip[id + i] = p;
+		pair_ip.insert(id + i, p);
 		hpi[id + i] = {
 			d->CubeObject()->MovingObject(),
 			nContactObject,
@@ -91,7 +91,7 @@ void xParticlePlanesContact::define(unsigned int id, xParticleCubeContact* d)
 		};
 	}
 	nContactObject++;
-	pair_contact[id] = d;
+	pair_contact.insert(id, d);
 }
 
 void xParticlePlanesContact::allocHostMemory(unsigned int n)
@@ -108,10 +108,10 @@ void xParticlePlanesContact::updataPlaneObjectData(bool is_first_set_up)
 	if (nContactObject || is_first_set_up)
 		bi = new device_body_info[nContactObject];
 
-	QMapIterator<unsigned int, xPlaneObject*> it(pair_ip);
-	while (it.hasNext())
+	//QMapIterator<unsigned int, xPlaneObject*> it(pair_ip);
+	for (xmap<unsigned int, xPlaneObject*>::iterator it = pair_ip.begin(); it != pair_ip.end(); it.next())// (it.hasNext())
 	{
-		it.next();
+		//it.next();
 		unsigned int id = it.key();
 		xPlaneObject* p = it.value();
 		if (p->MovingObject())
@@ -139,9 +139,11 @@ void xParticlePlanesContact::updataPlaneObjectData(bool is_first_set_up)
 	if (xSimulation::Gpu())
 	{
 		unsigned int mcnt = 0;
-		foreach(xContact* xc, pair_contact)
+		for(xmap<unsigned int, xContact*>::iterator it = pair_contact.begin(); it != pair_contact.end(); it.next())
+		//foreach(xContact* xc, pair_contact)
 		{
 			xPointMass* pm = NULL;
+			xContact* xc = it.value();
 			if (xc->PairType() == PARTICLE_CUBE)
 				pm = dynamic_cast<xParticleCubeContact*>(xc)->CubeObject();
 			else if (xc->PairType() == PARTICLE_PANE)
@@ -187,12 +189,12 @@ void xParticlePlanesContact::getPlaneContactForce()
 {
 	if (nmoving)
 	{
-		QMapIterator<unsigned int, xPlaneObject*> xpl(pair_ip);
-		while (xpl.hasNext())
+		//QMapIterator<unsigned int, xPlaneObject*> xpl(pair_ip);
+		for (xmap<unsigned int, xPlaneObject*>::iterator it = pair_ip.begin(); it != pair_ip.end(); it.next())// (it.hasNext())
 		{
-			xpl.next();
-			unsigned int id = xpl.key();
-			xPlaneObject* o = xpl.value();
+			//xpl.next();
+			unsigned int id = it.key();
+			xPlaneObject* o = it.value();
 			if (o->MovingObject())
 			{
 				o->addContactForce(dbf[id].force.x, dbf[id].force.y, dbf[id].force.z);
@@ -298,8 +300,9 @@ bool xParticlePlanesContact::cpplCollision(
 		ci = i / neach;
 		cp = new_vector3d(cpos[ci].x, cpos[ci].y, cpos[ci].z);
 	}
-	foreach(xPairData* d, pairs->PlanePair())
+	for (xmap<unsigned int, xPairData*>::iterator it = pairs->ParticlePair().begin(); it != pairs->ParticlePair().end(); it.next())
 	{
+		xPairData* d = it.value();
 		xPlaneObject* pl = pair_ip[d->id];
 		vector3d m_fn = new_vector3d(0.0, 0.0, 0.0);
 		vector3d m_m = new_vector3d(0.0, 0.0, 0.0);

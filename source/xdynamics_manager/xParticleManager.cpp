@@ -1,7 +1,9 @@
 #include "xdynamics_manager/xParticleMananger.h"
 //#include "xdynamics_object/xParticleObject.h"
 #include "xdynamics_manager/xObjectManager.h"
-#include <QtCore/QRandomGenerator>
+#include <algorithm>
+#include <random>
+//#include <QtCore/QRandomGenerator>
 
 xParticleManager::xParticleManager()
 	: np(0)
@@ -100,13 +102,15 @@ double* xParticleManager::GetVelocityResultPointer(unsigned int pt)
 // 	return one_by_one;
 // }
 
-xParticleObject* xParticleManager::XParticleObject(QString& ws)
+xParticleObject* xParticleManager::XParticleObject(std::string ws)
 {
-	QStringList keys = xpcos.keys();
-	QStringList::const_iterator it = qFind(keys, ws);
-	if (it == keys.end() || !keys.size())
+	//QStringList keys = xpcos.keys();
+	if (!xpcos.size())
 		return NULL;
-	return xpcos[ws];
+	xmap<xstring, xParticleObject*>::iterator it = xpcos.find(ws);//QStringList::const_iterator it = qFind(keys, ws);
+	if (it == xpcos.end())
+		return NULL;
+	return it.value();// xpcos[ws];
 }
 
 unsigned int xParticleManager::nClusterObject()
@@ -218,7 +222,7 @@ void xParticleManager::setCriticalMaterial(double d, double y, double p)
 
 xParticleObject * xParticleManager::CreateLineParticle(std::string n, xMaterialType mt, unsigned int _np, xLineParticleData & d)
 {
-	QString name = QString::fromStdString(n);
+	xstring name = n;
 	xParticleObject* xpo = new xParticleObject(n);
 	vector4d* pos = xpo->AllocMemory(_np);
 	//double* mass = xpo->Mass();
@@ -253,7 +257,7 @@ xParticleObject * xParticleManager::CreateLineParticle(std::string n, xMaterialT
 	}
 	//xpo->set
 	SetMassAndInertia(xpo);
-	xpcos[name] = xpo;
+	xpcos.insert(name, xpo);
 	xObjectManager::XOM()->addObject(xpo);
 	return xpo;
 }
@@ -261,7 +265,7 @@ xParticleObject * xParticleManager::CreateLineParticle(std::string n, xMaterialT
 xParticleObject* xParticleManager::CreateParticleFromList(
 	std::string n, xMaterialType mt, unsigned int _np, vector4d* d, double* m)
 {
-	QString name = QString::fromStdString(n);
+	xstring name = n;
 	xParticleObject* xpo = new xParticleObject(n);
 	vector4d* pos = xpo->AllocMemory(_np);
 	double* ms = xpo->Mass();
@@ -287,7 +291,7 @@ xParticleObject* xParticleManager::CreateParticleFromList(
 	xpo->setMinRadius(min_r);
 	xpo->setMaxRadius(max_r);
 	SetMassAndInertia(xpo);
-	xpcos[name] = xpo;
+	xpcos.insert(name, xpo);
 	xObjectManager::XOM()->addObject(xpo);
 	return xpo;
 }
@@ -392,8 +396,9 @@ void xParticleManager::SetCurrentParticlesFromPartResult(std::string path)
 		qf.read((char*)m_avel, sizeof(vector4d) * m_ns);
 		if(m_cpos)
 			qf.read((char*)m_cpos, sizeof(vector4d) * m_ns);
-		foreach(xParticleObject* xpo, xpcos)
+		for(xmap<xstring, xParticleObject*>::iterator it = xpcos.begin(); it != xpcos.end(); it.next())//foreach(xParticleObject* xpo, xpcos)
 		{
+			xParticleObject* xpo = it.value();
 			unsigned int sid = xpo->StartIndex();
 			unsigned int xnp = xpo->NumParticle();
 			vector4d* xpo_pos = xpo->Position();
@@ -407,7 +412,7 @@ void xParticleManager::SetCurrentParticlesFromPartResult(std::string path)
 				memcpy(xpo_ep, m_ep, sizeof(vector4d) * xns);
 			}
 		//	qf.read((char*)m_pos, sizeof()
-			xpccs.erase(xpccs.find(xpo->Name()));
+			xpccs.erase(xpo->Name());
 		}
 		delete[] m_pos;
 		delete[] m_vel;
@@ -422,7 +427,7 @@ void xParticleManager::SetCurrentParticlesFromPartResult(std::string path)
 xParticleObject* xParticleManager::CreateCubeParticle(
 	std::string n, xMaterialType mt, unsigned int _np, xCubeParticleData& d)
 {
-	QString name = QString::fromStdString(n);
+	xstring name = n;
 	xParticleObject* xpo = new xParticleObject(n);
 	vector4d* pos = xpo->AllocMemory(_np);
 	//double* mass = xpo->Mass();
@@ -479,7 +484,7 @@ xParticleObject* xParticleManager::CreateCubeParticle(
 	}
 	//xpo->set
 	SetMassAndInertia(xpo);
-	xpcos[name] = xpo;
+	xpcos.insert(name, xpo);
 	xObjectManager::XOM()->addObject(xpo);
 	return xpo;
 }
@@ -487,7 +492,7 @@ xParticleObject* xParticleManager::CreateCubeParticle(
 xParticleObject* xParticleManager::CreatePlaneParticle(
 	std::string n, xMaterialType mt, xPlaneParticleData& d)
 {
-	QString name = QString::fromStdString(n);
+	xstring name = n;
 	xParticleObject* xpo = new xParticleObject(n);
 //	vector4d* pos = xpo->AllocMemory(_np);
 
@@ -554,7 +559,7 @@ xParticleObject* xParticleManager::CreatePlaneParticle(
 	if (minimum_radius > d.minr) minimum_radius = d.minr;
 	//SetMassAndInertia(xpo);
 	SetMassAndInertia(xpo);
-	xpcos[name] = xpo;
+	xpcos.insert(name, xpo);
 	xObjectManager::XOM()->addObject(xpo);
 	return xpo;
 }
@@ -562,7 +567,7 @@ xParticleObject* xParticleManager::CreatePlaneParticle(
 xParticleObject* xParticleManager::CreateCircleParticle(
 	std::string n, xMaterialType mt, unsigned int _np, xCircleParticleData& d)
 {
-	QString name = QString::fromStdString(n);
+	xstring name = n;
 	xParticleObject* xpo = new xParticleObject(n);
 	vector4d* pos = xpo->AllocMemory(_np);
 	//double* mass = xpo->Mass();
@@ -636,7 +641,7 @@ xParticleObject* xParticleManager::CreateCircleParticle(
 	}
 	if (minimum_radius > d.minr) minimum_radius = d.minr;
 	SetMassAndInertia(xpo);
-	xpcos[name] = xpo;
+	xpcos.insert(name, xpo);
 	xObjectManager::XOM()->addObject(xpo);
 	return xpo;
 }
@@ -645,7 +650,7 @@ xParticleObject* xParticleManager::CreateCircleParticle(
 xParticleObject* xParticleManager::CreateMassParticle(
 	std::string n, xMaterialType mt, double rad, xPointMassData& d)
 {
-	QString name = QString::fromStdString(n);
+	xstring name = n;
 	xParticleObject* xpo = new xParticleObject(n);
 	vector4d* pos = xpo->AllocMemory(1);
 	vector3d* iner = xpo->Inertia();
@@ -667,7 +672,7 @@ xParticleObject* xParticleManager::CreateMassParticle(
 	pos[0] = new_vector4d(d.px, d.py, d.pz, rad);
 	iner[0] = new_vector3d(d.ixx, d.iyy, d.izz);
 	mass[0] = d.mass;
-	xpcos[name] = xpo;
+	xpcos.insert(name, xpo);
 	xObjectManager::XOM()->addObject(xpo);
 	return xpo;
 }
@@ -679,7 +684,7 @@ xParticleObject * xParticleManager::CreateClusterParticle(
 	unsigned int neach = xo->NumElement();
 	unsigned int rnp = _np * neach;
 	double rad = xo->ElementRadius();
-	QString name = QString::fromStdString(n);
+	xstring name = n;
 	xMaterial xm = GetMaterialConstant(mt);
 	xParticleObject* xpo = new xParticleObject(n);
 	xpo->setStartIndex(np);
@@ -743,7 +748,7 @@ xParticleObject * xParticleManager::CreateClusterParticle(
 	}
 	SetClusterMassAndInertia(xpo);
 	//if (minimum_radius > rad) minimum_radius = rad;
-	xpcos[name] = xpo;
+	xpcos.insert(name, xpo);
 	xObjectManager::XOM()->addObject(xpo);
 	n_cluster_each += neach;
 	n_cluster_object++;
@@ -754,8 +759,9 @@ void xParticleManager::CopyClusterInformation(xClusterInformation * xci, double*
 {
 	unsigned int cnt = 0;
 	vector3d* rloc = (vector3d*)rcloc;
-	foreach(xParticleObject* xpo, xpcos)
+	for (xmap<xstring, xParticleObject*>::iterator it = xpcos.begin(); it != xpcos.end(); it.next())// foreach(xParticleObject* xpo, xpcos)
 	{
+		xParticleObject* xpo = it.value();
 		if (xpo->ShapeForm() == CLUSTER_SHAPE)
 		{
 			xci[cnt].sid = xpo->StartClusterIndex();
@@ -767,7 +773,7 @@ void xParticleManager::CopyClusterInformation(xClusterInformation * xci, double*
 	}
 }
 
-QMap<QString, xParticleObject*>& xParticleManager::XParticleObjects()
+xmap<xstring, xParticleObject*>& xParticleManager::XParticleObjects()
 {
 	return xpcos;
 }
@@ -775,8 +781,9 @@ QMap<QString, xParticleObject*>& xParticleManager::XParticleObjects()
 bool xParticleManager::CopyPosition(
 	double *pos, double* cpos, double* ep, unsigned int inp)
 {
-	foreach(xParticleObject* xpo, xpcos)
+	for (xmap<xstring, xParticleObject*>::iterator it = xpcos.begin(); it != xpcos.end(); it.next())// foreach(xParticleObject* xpo, xpcos)
 	{
+		xParticleObject* xpo = it.value();
 		xpo->CopyPosition(pos);
 		if (cpos && xpo->ShapeForm() == CLUSTER_SHAPE)
 			xpo->CopyClusterPosition(cpos, ep);
@@ -787,9 +794,9 @@ bool xParticleManager::CopyPosition(
 
 bool xParticleManager::CopyMassAndInertia(double * mass, double * inertia)
 {
-	foreach(xParticleObject* xpo, xpcos)
+	for (xmap<xstring, xParticleObject*>::iterator it = xpcos.begin(); it != xpcos.end(); it.next())// foreach(xParticleObject* xpo, xpcos)
 	{
-		xpo->CopyMassAndInertia(mass, (vector3d* )inertia);
+		it.value()->CopyMassAndInertia(mass, (vector3d* )inertia);
 	}
 	return false;
 }
@@ -883,8 +890,9 @@ void xParticleManager::ExportParticleDataForView(std::string path)
 	of.open(path, std::ios::out | std::ios::binary);
 	of.write((char*)&np, sizeof(unsigned int));
 	//double* m_mass = new double[np];
-	foreach(xParticleObject* po, xpcos)
+	for (xmap<xstring, xParticleObject*>::iterator it = xpcos.begin(); it != xpcos.end(); it.next())
 	{
+		xParticleObject* po = it.value();
 		unsigned int _sid = po->StartIndex();
 		unsigned int _np = po->NumParticle();
 		unsigned int _cnp = po->NumCluster();
@@ -893,7 +901,7 @@ void xParticleManager::ExportParticleDataForView(std::string path)
 		int mat = po->Material();
 		int ns = po->Name().size();
 		of.write((char*)&ns, sizeof(int));
-		of.write((char*)po->Name().toStdString().c_str(), sizeof(char) * ns);
+		of.write((char*)po->Name().c_str(), sizeof(char) * ns);
 		of.write((char*)&mat, sizeof(int));
 		of.write((char*)&_sid, sizeof(unsigned int));
 		of.write((char*)&_np, sizeof(unsigned int));
@@ -959,23 +967,25 @@ void xParticleManager::AllocParticleResultMemory(unsigned int npart, unsigned in
 
 void xParticleManager::AddParticleCreatingCondition(xParticleObject* xpo, xParticleCreateCondition& xpcc)
 {
-	xpccs[xpo->Name()] = xpcc;
-	QRandomGenerator qran;
-	QVector<unsigned int> iList;
+	xpccs.insert(xpo->Name(), xpcc);
+	random_device ran;
+	mt19937_64 rnd(ran());
+	uniform_int_distribution<int> range(0, xpo->EachCount() - 1);
+	vector<unsigned int> iList;
 	while (iList.size() != xpo->EachCount())
 	{
-		unsigned int ni = qran.bounded(xpo->EachCount());
-		if (qFind(iList.begin(), iList.end(), ni) != iList.end())
+		unsigned int ni = range(rnd);// ran.bounded(xpo->EachCount());
+		if (std::find(iList.begin(), iList.end(), ni) != iList.end())
 			continue;
 		iList.push_back(ni);
 	}
 
 	unsigned int it = 0;
 	unsigned int k = 0;
-	QVector<unsigned int>::iterator iter = iList.begin();
-	QVector<vector4d> pList;
-	QVector<double> mList;
-	QVector<vector3d> jList;
+	vector<unsigned int>::iterator iter = iList.begin();
+	vector<vector4d> pList;
+	vector<double> mList;
+	vector<vector3d> jList;
 	vector4d* mpos = xpo->Position();
 	double* mmass = xpo->Mass();
 	vector3d* miner = xpo->Inertia();
@@ -1027,18 +1037,19 @@ void xParticleManager::AddParticleCreatingCondition(xParticleObject* xpo, xParti
 unsigned int xParticleManager::ExcuteCreatingCondition(
 	double ct, unsigned int cstep, unsigned int cnp)
 {
-	foreach(xParticleCreateCondition xpcc, xpccs)
+	xmap<xstring, xParticleCreateCondition>::iterator it = xpccs.begin();
+	for(; it != xpccs.end(); it.next())
 	{
 		if (cstep == 1)
-			return xpcc.neach;
-		if (cnp > xpcc.sid && cnp < xpcc.sid + xpcc.count)
+			return it.value().neach;
+		if (cnp > it.value().sid && cnp < it.value().sid + it.value().count)
 		{
-			if (!(cstep % xpcc.nstep))
+			if (!(cstep % it.value().nstep))
 			{
-				if (cnp + xpcc.neach > np)
+				if (cnp + it.value().neach > np)
 					return np;
 				else
-					return cnp + xpcc.neach;
+					return cnp + it.value().neach;
 			}
 				
 		}

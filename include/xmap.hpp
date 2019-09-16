@@ -1,10 +1,10 @@
 #ifndef XMAP_HPP
 #define XMAP_HPP
 
-//#include "xstring.h"
+#include "xdynamics_decl.h"
 
 template< class Key, class T>
-class xmap
+class XDYNAMICS_API xmap
 {
 	struct xMapNode
 	{
@@ -18,23 +18,27 @@ class xmap
 	xMapNode* tail;
 	unsigned int sz;
 public:
-	xmap() : head(0), sz(0) {}
+	xmap() : head(0), tail(0), sz(0) {}
 	~xmap()
 	{
 		xMapNode *n = tail;
 		while (n != head)
 		{
 			xMapNode *tn = n;
-			n = n->right;
+			//n = n->right;
 			delete tn;
 			tn = NULL;
+			sz--;
 		}
 		if (head)
 		{
 			delete head;
 			head = NULL;
+			sz--;
 		}
 	}
+
+	unsigned int size() { return sz; }
 
 	void delete_all()
 	{
@@ -42,6 +46,8 @@ public:
 		for (; it != end(); it.next())
 		{
 			delete it.value();
+			//delete it.current_node();
+		//	sz--;
 		}
 	}
 
@@ -80,6 +86,46 @@ public:
 			//return NULL;// head->value;
 		}
 		return -1;
+	}
+
+	T take(Key k)
+	{
+		xMapNode* n = find_node(k);
+		if (n)
+		{
+			if (n != head)
+				n->right->left = n->left;
+			else
+				head = n->left;
+			if (n != tail)
+				n->left->right = n->right;
+			else
+				tail = n->right;
+			sz--;
+			T o = n->value;
+			delete n;
+			n = NULL;
+			return o;
+		}
+		return NULL;
+	}
+
+	void erase(Key k)
+	{
+		xMapNode* n = find_node(k);
+		if (n)
+		{
+			if (n != head)
+				n->right->left = n->left;
+			else
+				head = n->left;
+			if (n != tail)
+				n->left->right = n->right;
+			else
+				tail = n->right;
+			sz--;
+			delete n;
+		}
 	}
 
 	class iterator

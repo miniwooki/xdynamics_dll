@@ -47,7 +47,7 @@ private:
 		host_cylinder_info& cinfo, xCylinderObject* c_ptr, vector3d& pt, vector3d& u, vector3d& cp, double r, bool& isInnerContact);
 	double particle_cylinder_inner_base_or_top_contact_detection(
 		host_cylinder_info& cinfo, xCylinderObject* c_ptr, vector3d& pt, vector3d& u, vector3d& cp, double r);
-	QMap<unsigned int, xCylinderObject*> pair_ip;
+	xmap<unsigned int, xCylinderObject*> pair_ip;
 	unsigned int ncylinders;
 	unsigned int nmoving;
 	xContactMaterialParameters* hcmp;

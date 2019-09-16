@@ -96,8 +96,9 @@ int xIntegratorRK4::OneStepSimulation(double ct, unsigned int cstep)
 		int info = LinearSolve(sdim, 1, jaco_v, sdim, Constraints, sdim);
 		for (unsigned int i = 0; i < sdim; i++)
 			q(v[i] + xModel::OneDOF()) += Constraints(i);
-		foreach(xPointMass* xpm, xmbd->Masses())
-			xpm->setNewPositionData(q);
+		//foreach(xPointMass* xpm, xmbd->Masses())
+		for(xmap<xstring, xPointMass*>::iterator it = xmbd->Masses().begin(); it != xmbd->Masses().end(); it.next())
+			it.value()->setNewPositionData(q);
 		if (e_norm <= 1e-5)	break;
 	}
 
@@ -112,10 +113,8 @@ int xIntegratorRK4::OneStepSimulation(double ct, unsigned int cstep)
 		if (cid != -1) jaco_v(cjaco.ridx[i], cid) = cjaco.value[i];
 		else pi_v_vd(cjaco.ridx[i]) -= cjaco.value[i] * qd(cjaco.cidx[i] + xModel::OneDOF());
 	}
-	foreach(xDrivingConstraint* xdc, xmbd->Drivings())
-	{
-		xdc->DerivateEquation(pi_v_vd, q, qd, -1, ct, -1.0);
-	}
+	for(xmap<xstring, xDrivingConstraint*>::iterator it = xmbd->Drivings().begin(); it != xmbd->Drivings().end(); it.next())
+		it.value()->DerivateEquation(pi_v_vd, q, qd, -1, ct, -1.0);
 	int	ret = LinearSolve(sdim, 1, jaco_v, sdim, pi_v_vd, sdim);
 	for (unsigned int i = 0; i < sdim; i++)
 		qd(v[i] + xModel::OneDOF()) = pi_v_vd(i);
@@ -125,10 +124,9 @@ int xIntegratorRK4::OneStepSimulation(double ct, unsigned int cstep)
 		PrevVel(i) = qd(xModel::OneDOF() + i);
 	}
 
-	foreach(xPointMass* xpm, xmbd->Masses())
-	{
-		xpm->setNewVelocityData(qd);
-	}
+	for (xmap<xstring, xPointMass*>::iterator it = xmbd->Masses().begin(); it != xmbd->Masses().end(); it.next())
+		it.value()->setNewVelocityData(qd);
+
 
 	// RK4 Process
 	Step1();		// Step 1
@@ -180,8 +178,8 @@ void xIntegratorRK4::Step1()
 			q(xModel::OneDOF() + i) = PrevPos(i) + k1(i)*0.5*dt;
 			qd(xModel::OneDOF() + i) = PrevVel(i) + k1(mdim + i)*0.5*dt;
 		}
-		foreach(xPointMass* xpm, xmbd->Masses())
-			xpm->setNewData(q, qd);
+		for (xmap<xstring, xPointMass*>::iterator it = xmbd->Masses().begin(); it != xmbd->Masses().end(); it.next())
+			it.value()->setNewData(q, qd);
 	}
 }
 
@@ -197,8 +195,8 @@ void xIntegratorRK4::Step2()
 			qd(xModel::OneDOF() + i) = PrevVel(i) + k2(mdim + i)*0.5*dt;
 
 		}
-		foreach(xPointMass* xpm, xmbd->Masses())
-			xpm->setNewData(q, qd);
+		for (xmap<xstring, xPointMass*>::iterator it = xmbd->Masses().begin(); it != xmbd->Masses().end(); it.next())
+			it.value()->setNewData(q, qd);
 	}
 }
 
@@ -213,8 +211,8 @@ void xIntegratorRK4::Step3()
 			q(xModel::OneDOF() + i) = PrevPos(i) + k3(i)*dt;
 			qd(xModel::OneDOF() + i) = PrevVel(i) + k3(mdim + i)*dt;
 		}
-		foreach(xPointMass* xpm, xmbd->Masses())
-			xpm->setNewData(q, qd);
+		for (xmap<xstring, xPointMass*>::iterator it = xmbd->Masses().begin(); it != xmbd->Masses().end(); it.next())
+			it.value()->setNewData(q, qd);
 	}
 }
 
@@ -232,7 +230,7 @@ void xIntegratorRK4::Step4()
 			q(xModel::OneDOF() + i) = PrevPos(i) + dt*(k1(i) + 2 * k2(i) + 2 * k3(i) + k4(i)) / 6;
 			qd(xModel::OneDOF() + i) = PrevVel(i) + dt*(k1(mdim + i) + 2 * k2(mdim + i) + 2 * k3(mdim + i) + k4(mdim + i)) / 6;
 		}
-		foreach(xPointMass* xpm, xmbd->Masses())
-			xpm->setNewData(q, qd);
+		for (xmap<xstring, xPointMass*>::iterator it = xmbd->Masses().begin(); it != xmbd->Masses().end(); it.next())
+			it.value()->setNewData(q, qd);
 	}
 }

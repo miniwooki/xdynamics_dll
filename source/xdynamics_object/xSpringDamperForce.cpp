@@ -130,11 +130,11 @@ void xSpringDamperForce::SetupDataFromListData(xTSDAData&d, std::string data)
 				unsigned int cnt = 0;
 				fs >> nBodyConnection;
 				connection_body_info = new xSpringDamperBodyConnectionInfo[nBodyConnection];
-				QList<xSpringDamperBodyConnectionData> bc_list;
+				list<xSpringDamperBodyConnectionData> bc_list;
 				for (unsigned int i = 0; i < nBodyConnection; i++)
 				{
 					fs >> ch >> ch;
-					connection_body_info[i].cbody = QString::fromStdString(ch);
+					connection_body_info[i].cbody = ch.c_str();
 					connection_body_info[i].sid = cnt;
 					fs >> ch >> connection_body_info[i].nconnection;
 					for (unsigned int j = 0; j < connection_body_info[i].nconnection; j++)
@@ -150,9 +150,10 @@ void xSpringDamperForce::SetupDataFromListData(xTSDAData&d, std::string data)
 				if (nBodyConnectionData)
 				{
 					connection_body_data = new xSpringDamperBodyConnectionData[nBodyConnectionData];
-					foreach(xSpringDamperBodyConnectionData d, bc_list)
+					for(list<xSpringDamperBodyConnectionData>::iterator d = bc_list.begin(); d != bc_list.end(); d++)
+					//foreach(xSpringDamperBodyConnectionData d, bc_list)
 					{
-						connection_body_data[cnt++] = d;
+						connection_body_data[cnt++] = *d;
 					}
 				}
 			}
@@ -163,18 +164,20 @@ void xSpringDamperForce::SetupDataFromListData(xTSDAData&d, std::string data)
 	{
 		unsigned int ct = 0;
 		kc_value = new xSpringDamperCoefficient[cvalue.size()];
-		foreach(xSpringDamperCoefficient c, cvalue)
+		for(list<xSpringDamperCoefficient>::iterator c = cvalue.begin(); c != cvalue.end(); c++)
+		//foreach(xSpringDamperCoefficient c, cvalue)
 		{
-			kc_value[ct++] = c;
+			kc_value[ct++] = *c;
 		}
 	}
 	if (!xsdci)
 	{
 		xsdci = new xSpringDamperConnectionInformation[xsdcis.size()];
 		unsigned int ct = 0;
-		foreach(xSpringDamperConnectionInformation c, xsdcis)
+		for(list<xSpringDamperConnectionInformation>::iterator c = xsdcis.begin(); c != xsdcis.end(); c++)
+		//foreach(xSpringDamperConnectionInformation c, xsdcis)
 		{
-			xsdci[ct++] = c;
+			xsdci[ct++] = *c;
 		}
 		
 		
@@ -184,8 +187,9 @@ void xSpringDamperForce::SetupDataFromListData(xTSDAData&d, std::string data)
 		connection_data = new xSpringDamperConnectionData[cnt];
 		free_length = new double[cnt];
 		unsigned int ct = 0;
-		foreach(xSpringDamperConnectionData c, clist)
-			connection_data[ct++] = c;
+		for(list<xSpringDamperConnectionData>::iterator c = clist.begin(); c != clist.end(); c++)
+		//foreach(xSpringDamperConnectionData c, clist)
+			connection_data[ct++] = *c;
 	}
 	nkcvalue = cvalue.size();
 	nsdci = xsdcis.size();
@@ -284,7 +288,7 @@ void xSpringDamperForce::initializeFreeLength(double* pos, double* ep)
 	for (unsigned int i = 0; i < nBodyConnection; i++)
 	{
 		xSpringDamperBodyConnectionInfo info = connection_body_info[i];
-		xParticleObject* xpo = dynamic_cast<xParticleObject*>(xDynamicsManager::This()->XObject()->XObject(info.cbody.toStdString()));
+		xParticleObject* xpo = dynamic_cast<xParticleObject*>(xDynamicsManager::This()->XObject()->XObject(std::string(info.cbody)));
 		unsigned int mid = xpo->MassIndex();
 		for (unsigned int j = 0; j < info.nconnection; j++)
 		{
@@ -387,7 +391,7 @@ void xSpringDamperForce::xCalculateForceForDEM(
 	for (unsigned int i = 0; i < nBodyConnection; i++)
 	{
 		xSpringDamperBodyConnectionInfo info = connection_body_info[i];
-		xParticleObject* xpo = dynamic_cast<xParticleObject*>(xDynamicsManager::This()->XObject()->XObject(info.cbody.toStdString()));
+		xParticleObject* xpo = dynamic_cast<xParticleObject*>(xDynamicsManager::This()->XObject()->XObject(std::string(info.cbody)));
 		unsigned int mid = xpo->MassIndex();
 		//xPointMass* pm = xDynamicsManager::This()->XMBDModel()->XMass(info.cbody.toStdString());
 		vector3d ri = new_vector3d(p[mid].x, p[mid].y, p[mid].z);// pm->Position();

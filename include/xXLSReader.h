@@ -3,8 +3,9 @@
 
 #include "xdynamics_decl.h"
 #include "libxl.h"
+#include "xstring.h"
 //#include "xString."
-#include <QtCore/QString>
+//#include <QtCore/QString>
 
 using namespace libxl;
 

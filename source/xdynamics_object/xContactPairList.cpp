@@ -1,6 +1,6 @@
 #include "xdynamics_object/xContactPairList.h"
 #include "xdynamics_algebra/xAlgebraMath.h"
-#include <QtCore/QList>
+//#include <QtCore/QList>
 
 xContactPairList::xContactPairList()
 {
@@ -9,9 +9,12 @@ xContactPairList::xContactPairList()
 
 xContactPairList::~xContactPairList()
 {
-	qDeleteAll(plane_pair);
-	qDeleteAll(particle_pair);
-	qDeleteAll(cylinder_pair);
+	plane_pair.delete_all();// qDeleteAll(plane_pair);
+	particle_pair.delete_all();// qDeleteAll(particle_pair);
+	cylinder_pair.delete_all();// qDeleteAll(cylinder_pair);
+	triangle_pair.delete_all();
+	triangle_line_pair.delete_all();
+	triangle_point_pair.delete_all();
 }
 
 void xContactPairList::insertPlaneContactPair(xPairData* pd)
@@ -19,37 +22,32 @@ void xContactPairList::insertPlaneContactPair(xPairData* pd)
 	if (plane_pair[pd->id])
 		plane_pair[pd->id]->count += 1;
 	else
-		plane_pair[pd->id] = pd;
-// 	QList<unsigned int> keys = plane_pair.keys();//QStringList keys = objects.keys();
-// 	QList<unsigned int>::const_iterator it = qFind(plane_pair.keys(), pd.id);
-// 	if (it == keys.end() || !keys.size())
-// 		return NULL;
-// 	plane_pair[pd.id] = pd;
+		plane_pair.insert(pd->id, pd);
 }
 
 void xContactPairList::insertCylinderContactPair(xPairData * pd)
 {
-	cylinder_pair[pd->id] = pd;
+	cylinder_pair.insert(pd->id, pd);
 }
 
 void xContactPairList::insertParticleContactPair(xPairData* pd)
 {
-	particle_pair[pd->id] = pd;
+	particle_pair.insert(pd->id, pd);
 }
 
 void xContactPairList::insertTriangleContactPair(xTrianglePairData* pd)
 {
-	triangle_pair[pd->id] = pd;
+	triangle_pair.insert(pd->id, pd);
 }
 
 void xContactPairList::insertTriangleLineContactPair(xTrianglePairData * pd)
 {
-	triangle_line_pair[pd->id] = pd;
+	triangle_line_pair.insert(pd->id, pd);
 }
 
 void xContactPairList::insertTrianglePointContactPair(xTrianglePairData * pd)
 {
-	triangle_point_pair[pd->id] = pd;
+	triangle_point_pair.insert(pd->id, pd);
 }
 
 void xContactPairList::deletePlanePairData(unsigned int i)
@@ -146,83 +144,83 @@ bool xContactPairList::TriangleContactCheck(double r, vector3d& pos, xTrianglePa
 	return b;
 }
 
-QMap<unsigned int, xPairData*>& xContactPairList::PlanePair()
+xmap<unsigned int, xPairData*>& xContactPairList::PlanePair()
 {
 	return plane_pair;
 }
 
-QMap<unsigned int, xPairData*>& xContactPairList::CylinderPair()
+xmap<unsigned int, xPairData*>& xContactPairList::CylinderPair()
 {
 	return cylinder_pair;
 }
 
 xPairData* xContactPairList::PlanePair(unsigned int i)
 {
-	QMap<unsigned int, xPairData*>::const_iterator it = plane_pair.find(i);
-	if (it == plane_pair.constEnd())
+	xmap<unsigned int, xPairData*>::iterator it = plane_pair.find(i);
+	if (it == plane_pair.end())
 		return NULL;
-	return plane_pair[i];
+	return it.value();// plane_pair[i];
 }
 
-QMap<unsigned int, xPairData*>& xContactPairList::ParticlePair()
+xmap<unsigned int, xPairData*>& xContactPairList::ParticlePair()
 {
 	return particle_pair;
 }
 
 xPairData* xContactPairList::ParticlePair(unsigned int i)
 {
-	QMap<unsigned int, xPairData*>::const_iterator it = particle_pair.find(i);
-	if (it == particle_pair.constEnd())
+	xmap<unsigned int, xPairData*>::iterator it = particle_pair.find(i);
+	if (it == particle_pair.end())
 		return NULL;
-	return particle_pair[i];
+	return it.value();// particle_pair[i];
 }
 
 xPairData * xContactPairList::CylinderPair(unsigned int i)
 {
-	QMap<unsigned int, xPairData*>::const_iterator it = cylinder_pair.find(i);
-	if (it == cylinder_pair.constEnd())
+	xmap<unsigned int, xPairData*>::iterator it = cylinder_pair.find(i);
+	if (it == cylinder_pair.end())
 		return NULL;
-	return cylinder_pair[i];
+	return it.value();// cylinder_pair[i];
 }
 
-QMap<unsigned int, xTrianglePairData*>& xContactPairList::TrianglePair()
+xmap<unsigned int, xTrianglePairData*>& xContactPairList::TrianglePair()
 {
 	return triangle_pair;
 }
 
-QMap<unsigned int, xTrianglePairData*>& xContactPairList::TriangleLinePair()
+xmap<unsigned int, xTrianglePairData*>& xContactPairList::TriangleLinePair()
 {
 	return triangle_line_pair;
 }
 
-QMap<unsigned int, xTrianglePairData*>& xContactPairList::TrianglePointPair()
+xmap<unsigned int, xTrianglePairData*>& xContactPairList::TrianglePointPair()
 {
 	return triangle_point_pair;
 }
 
 xTrianglePairData* xContactPairList::TrianglePair(unsigned int i)
 {
-	QMap<unsigned int, xTrianglePairData*>::const_iterator it = triangle_pair.find(i);
-	if (it == triangle_pair.constEnd())
+	xmap<unsigned int, xTrianglePairData*>::iterator it = triangle_pair.find(i);
+	if (it == triangle_pair.end())
 		return NULL;
 
-	return triangle_pair[i];
+	return it.value();// triangle_pair[i];
 }
 
 xTrianglePairData * xContactPairList::TriangleLinePair(unsigned int i)
 {
-	QMap<unsigned int, xTrianglePairData*>::const_iterator it = triangle_line_pair.find(i);
-	if (it == triangle_line_pair.constEnd())
+	xmap<unsigned int, xTrianglePairData*>::iterator it = triangle_line_pair.find(i);
+	if (it == triangle_line_pair.end())
 		return NULL;
 
-	return triangle_line_pair[i];
+	return it.value();// triangle_line_pair[i];
 }
 
 xTrianglePairData * xContactPairList::TrianglePointPair(unsigned int i)
 {
-	QMap<unsigned int, xTrianglePairData*>::const_iterator it = triangle_point_pair.find(i);
-	if (it == triangle_point_pair.constEnd())
+	xmap<unsigned int, xTrianglePairData*>::iterator it = triangle_point_pair.find(i);
+	if (it == triangle_point_pair.end())
 		return NULL;
 
-	return triangle_point_pair[i];
+	return it.value();// triangle_point_pair[i];
 }

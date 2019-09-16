@@ -125,8 +125,3 @@ unsigned int xPlaneObject::create_sph_particles(double ps, unsigned int nlayers,
 	
 	return count;
 }
-
-QVector<xCorner> xPlaneObject::get_sph_boundary_corners()
-{
-	return QVector<xCorner>();
-}

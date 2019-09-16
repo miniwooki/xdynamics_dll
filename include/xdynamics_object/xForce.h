@@ -32,8 +32,8 @@ public:
 
 protected:
 	fType type;
-	QString name;
-	QString base, action;
+	xstring name;
+	xstring base, action;
 	int i, j;
 	xPointMass *i_ptr;
 	xPointMass *j_ptr;

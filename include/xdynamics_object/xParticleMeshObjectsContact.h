@@ -3,8 +3,8 @@
 
 #include "xdynamics_object/xConatct.h"
 #include "xdynamics_object/xParticleMeshObjectContact.h"
-#include <QtCore/QMap>
-#include <QtCore/QString>
+//#include <QtCore/QMap>
+//#include <QtCore/QString>
 
 class xMeshObject;
 
@@ -43,7 +43,7 @@ public:
 	vector4d* HostSphereData() { return hsphere; }
 	vector4d* GetCurrentSphereData();
 	unsigned int NumSphereData();
-	unsigned int define(QMap<QString, xParticleMeshObjectContact*>& cppos);
+	unsigned int define(xmap<xstring, xParticleMeshObjectContact*>& cppos);
 	bool cppolyCollision(
 		xContactPairList* pairs, unsigned int i, double r, double m,
 		vector3d& p, vector3d& v, vector3d& o,
@@ -96,7 +96,7 @@ private:
 	//double* dvertexList;
 	host_mesh_info* hpi;
 	device_triangle_info* dpi;
-	QMap<unsigned int, xMeshObject*> pair_ip;
+	xmap<unsigned int, xMeshObject*> pair_ip;
 	//host_mesh_mass_info *hpmi;
 //	double* dep;
 	device_body_info *dbi;

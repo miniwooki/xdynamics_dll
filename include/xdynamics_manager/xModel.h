@@ -5,10 +5,10 @@
 #include "xdynamics_algebra/xAlgebraMath.h"
 #include "xdynamics_algebra/xUtilityFunctions.h"
 #include "xLog.h"
-#include "xString.h"
+#include "xstring.h"
 #include <fstream>
-#include <QtCore/QString>
-#include <QtCore/QMap>
+//#include <QtCore/QString>
+//#include <QtCore/QMap>
 
 #define RESULT_FILE_IDENTIFIER 11472162
 
@@ -27,8 +27,8 @@ public:
 	static void initialize();
 	static int OneDOF();
 	static xPointMass* Ground();
-	static void setModelName(const QString n);
-	static void setModelPath(const QString p);
+	static void setModelName(const std::string n);
+	static void setModelPath(const std::string p);
 	static void setGravity(double g, int d);
 	static void setGravity(double x, double y, double z);
 	static void launchLogSystem(std::string lpath);
@@ -40,8 +40,8 @@ public:
 	static xPointMass* ground;
 	static angle_type angle;
 	static unit_type unit;
-	static QString name;
-	static QString path;
+	static xstring name;
+	static xstring path;
 	static vector3d gravity;
 	//static resultStorage *rs;
 	//static int count;

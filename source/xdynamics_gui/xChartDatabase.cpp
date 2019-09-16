@@ -1,12 +1,15 @@
 #include "xChartDatabase.h"
+#include "xdynamics_manager/xMultiBodyModel.h"
 #include "xdynamics_manager/xResultManager.h"
-//#include "cmdWindow.h"
+///#include "cmdWindow.h"
+#include "xmap.hpp"
 #include <QAction>
 #include <QMenu>
 #include <QDebug>
 
 xChartDatabase::xChartDatabase(QWidget* parent)
 	: QDockWidget(parent)
+	, time(NULL)
 {
 	setWindowTitle("Result database");
 	tree = new QTreeWidget;
@@ -158,7 +161,7 @@ void xChartDatabase::selectPlotItem(int id)
 void xChartDatabase::export_to_textfile(QTreeWidgetItem* citem)
 {
 	QString cname = citem->text(0);
-	xResultManager::ExportPointMassResult2TXT(cname.toStdString(), mass_results[cname]);
+	xrm->ExportPointMassResult2TXT(cname.toStdString());
 }
 
 void xChartDatabase::process_context_menu(QString txt, QTreeWidgetItem* citem)
@@ -203,22 +206,35 @@ QComboBox* xChartDatabase::plotItemComboBox()
 	return plot_item;
 }
 
+void xChartDatabase::setResultManager(xResultManager * _xrm)
+{
+	xrm = _xrm;
+}
+
 QString xChartDatabase::plotTarget()
 {
 	return target;
 }
 
-void xChartDatabase::upload_mbd_results(xMultiBodyModel* xmbd)
+xResultManager * xChartDatabase::result_manager_ptr()
 {
-	foreach(xPointMass* xpm, xmbd->Masses())
+	return xrm;
+}
+
+void xChartDatabase::upload_mbd_results(xMultiBodyModel* _xmbd)
+{
+	//xmap<xstring, xPointMass*> *xxx = _xmbd->Masses_ptr();
+	//xPointMass* xxx = _xmbd->XMass("");
+	/*for (xmap<xstring, xPointMass*>::iterator it = xmbd->Masses().begin(); it != xmbd->Masses().end(); it.next())
 	{
+		xPointMass* xpm = it.value();
 		mass_results[xpm->Name()] = xpm->XPointMassResultPointer();
 		addChild(MASS_ROOT, xpm->Name());
 	}
-	foreach(xKinematicConstraint* xkc, xmbd->Joints())
+	for(xmap<xstring, xKinematicConstraint*>::iterator it = xmbd->Joints().begin(); it != xmbd->Joints().end(); it.next())
 	{
+		xKinematicConstraint* xkc = it.value();
 		constraint_results[xkc->Name()] = xkc->XKinematicConstraintResultPointer();
 		addChild(KCONSTRAINT_ROOT, xkc->Name());
-	}
-		
+	}*/
 }

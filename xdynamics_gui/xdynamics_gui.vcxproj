@@ -147,6 +147,7 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\source\xColorControl.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xCallOut.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xChartAxis.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xChartControl.cpp" />
@@ -154,7 +155,6 @@
     <ClCompile Include="..\source\xdynamics_gui\xChartSpline.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xChartView.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xChartWindow.cpp" />
-    <ClCompile Include="..\source\xdynamics_gui\xColorControl.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xdynamics_gui.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xPointMassWidget.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xAnimationTool.cpp" />
@@ -203,11 +203,11 @@
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles;.;$(USING_CUDA_SAMPLE_VERSION)\common\inc;.\GeneratedFiles\$(ConfigurationName);$(USING_QT_VERSION)\include\QtCore;$(USING_QT_VERSION)\include\QtGui;$(USING_QT_VERSION)\include\QtANGLE;$(USING_QT_VERSION)\include\QtOpenGL;$(USING_QT_VERSION)\include\QtOpenGLExtensions;$(USING_QT_VERSION)\include\QtWidgets;$(USING_IRRLICHT_VERSION)\include;C:\xdynamics\include\xdynamics_gui;C:\xdynamics\include;$(USING_QT_VERSION)\include\QtCharts;$(USING_QT_VERSION)\include;$(USING_CUDA_VERSION)\include;$(QTDIR)\include\QtCharts;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets</IncludePath>
       <Define Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_USE_MATH_DEFINES;UNICODE;_UNICODE;WIN32;WIN64;QT_NO_DEBUG;NDEBUG;QT_CHARTS_LIB;QT_CORE_LIB;QT_GUI_LIB;QT_OPENGL_LIB;QT_WIDGETS_LIB;%(PreprocessorDefinitions)</Define>
     </QtMoc>
+    <ClInclude Include="..\include\xColorControl.h" />
     <ClInclude Include="..\include\xdynamics_gui\xCallOut.h" />
     <QtMoc Include="..\include\xdynamics_gui\xChartDatabase.h" />
     <ClInclude Include="..\include\xdynamics_gui\xChartSpline.h" />
     <QtMoc Include="..\include\xdynamics_gui\xChartView.h" />
-    <ClInclude Include="..\include\xdynamics_gui\xColorControl.h" />
     <ClInclude Include="..\include\xdynamics_gui\xCommandLine.h" />
     <QtMoc Include="..\include\xdynamics_gui\xLineEditWidget.h" />
     <ClInclude Include="..\include\xdynamics_gui\xChartAxis.h" />

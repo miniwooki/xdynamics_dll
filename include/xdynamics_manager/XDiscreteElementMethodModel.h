@@ -18,7 +18,7 @@ public:
 	xSpringDamperForce* CreateForceElement(std::string _name, xForce::fType _type, std::string bn, std::string an);
 
 private:
-	QString name;
+	xstring name;
 	xParticleManager *xpmgr;
 	xSpringDamperForce* tsda;
 };

@@ -103,7 +103,7 @@ bool xSmoothedParticleHydrodynamicsSimulation::Initialized()
 	return isInitialize;
 }
 
-QString xSmoothedParticleHydrodynamicsSimulation::SaveStepResult(unsigned int pt, double ct)
+std::string xSmoothedParticleHydrodynamicsSimulation::SaveStepResult(unsigned int pt, double ct)
 {
 	return "";
 }

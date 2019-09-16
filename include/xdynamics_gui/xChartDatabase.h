@@ -4,7 +4,11 @@
 #include <QDockWidget>
 #include <QTreeWidget>
 #include <QComboBox>
-#include "xdynamics_manager/xMultiBodyModel.h"
+#include "xdynamics_object/xPointMass.h"
+#include "xdynamics_object/xKinematicConstraint.h"
+
+class xMultiBodyModel;
+class xResultManager;
 
 inline QStringList get_point_mass_chart_list()
 {
@@ -52,10 +56,12 @@ public:
 	QStringList selectedLists();
 	tRoot selectedType();
 	QComboBox* plotItemComboBox();
+	void setResultManager(xResultManager* _xrm);
 	QString plotTarget();
-	void upload_mbd_results(xMultiBodyModel* xmbd);
-	QMap<QString, QVector<xPointMass::pointmass_result>*>& MassResults() { return mass_results; }
-	QMap<QString, QVector<xKinematicConstraint::kinematicConstraint_result>*>& JointResults() { return constraint_results; }
+	xResultManager* result_manager_ptr();
+	void upload_mbd_results(xMultiBodyModel* _xmbd);
+	QMap<QString, xPointMass::pointmass_result*>& MassResults() { return mass_results; }
+	QMap<QString, xKinematicConstraint::kinematicConstraint_result*>& JointResults() { return constraint_results; }
 
 	private slots:
 	void contextMenu(const QPoint&);
@@ -67,13 +73,15 @@ private:
 	void process_context_menu(QString txt, QTreeWidgetItem* citem);
 	QTreeWidget *tree;
 	QTreeWidgetItem* current_item;
+	double* time;
 	QMap<tRoot, QTreeWidgetItem*> roots;
-	QMap<QString, QVector<xPointMass::pointmass_result>*> mass_results;
-	QMap<QString, QVector<xKinematicConstraint::kinematicConstraint_result>*> constraint_results;
+	QMap<QString, xPointMass::pointmass_result*> mass_results;
+	QMap<QString, xKinematicConstraint::kinematicConstraint_result*> constraint_results;
 	QStringList sLists;
 	tRoot tSelected;
 	QComboBox *plot_item;
 	QString target;
+	xResultManager* xrm;
 
 signals:
 	void ClickedItem(int, QString);

@@ -4,6 +4,8 @@
 #include "xdynamics_manager/xDynamicsManager.h"
 //#include <QtCore/QFile>
 #include <fstream>
+#include <sstream>
+#include <iomanip>
 #include <cuda_runtime.h>
 #include <helper_cuda.h>
 
@@ -149,7 +151,7 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 				for (unsigned int i = 0; i < nTsdaConnectionBody; i++)
 				{
 					unsigned int sid = dxsdc_body[i].sid;
-					xParticleObject* xpo = dynamic_cast<xParticleObject*>(xDynamicsManager::This()->XObject()->XObject(dxsdc_body[i].cbody.toStdString()));
+					xParticleObject* xpo = dynamic_cast<xParticleObject*>(xDynamicsManager::This()->XObject()->XObject(std::string(dxsdc_body[i].cbody)));
 					unsigned int mid = xpo->MassIndex();
 					for (unsigned int j = 0; j < dxsdc_body[i].nconnection; j++)
 					{
@@ -241,6 +243,7 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 	}
 	if (isSaveMemory)
 		xdem->XParticleManager()->AllocParticleResultMemory(xSimulation::npart, np);
+	xDynamicsManager::This()->XResult()->alloc_dem_result_memory(np, ns);
 	//dynamic_cast<neighborhood_cell*>(dtor)->reorderElements(pos, (double*)cm->HostSphereData(), np, nPolySphere);
 	return xDynamicsError::xdynamicsSuccess;
 }
@@ -250,9 +253,9 @@ bool xDiscreteElementMethodSimulation::Initialized()
 	return isInitilize;
 }
 
-QString xDiscreteElementMethodSimulation::SaveStepResult(unsigned int pt, double ct)
+bool xDiscreteElementMethodSimulation::SaveStepResult(unsigned int pt)
 {
-	double *rp = NULL;
+	/*double *rp = NULL;
 	double *rv = NULL;
 	if (isSaveMemory)
 	{
@@ -268,23 +271,24 @@ QString xDiscreteElementMethodSimulation::SaveStepResult(unsigned int pt, double
 			memcpy(rp, dpos, sizeof(double) * np * 4);
 			memcpy(rv, dvel, sizeof(double) * ns * 3);
 		}
-	}
+	}*/
 	if (xSimulation::Gpu())
 	{
 		checkCudaErrors(cudaMemcpy(pos, dpos, sizeof(double) * np * 4, cudaMemcpyDeviceToHost));
 		checkCudaErrors(cudaMemcpy(vel, dvel, sizeof(double) * ns * 3, cudaMemcpyDeviceToHost));
 		checkCudaErrors(cudaMemcpy(ep, dep, sizeof(double) * ns * 4, cudaMemcpyDeviceToHost));
 		checkCudaErrors(cudaMemcpy(avel, davel, sizeof(double) * ns * 4, cudaMemcpyDeviceToHost));
+		checkCudaErrors(cudaMemcpy(acc, dacc, sizeof(double) * ns * 3, cudaMemcpyDeviceToHost));
+		checkCudaErrors(cudaMemcpy(aacc, daacc, sizeof(double) * ns * 4, cudaMemcpyDeviceToHost));
 		if (np != ns)
 			checkCudaErrors(cudaMemcpy(cpos, dcpos, sizeof(double) * ns * 4, cudaMemcpyDeviceToHost));
 	}
-	//char pname[256] = { 0, };
- 	QString fname = xModel::path + xModel::name;
-	QString part_name;
-	part_name.sprintf("part%04d", pt);
-	fname.sprintf("%s/part%04d.bin", fname.toUtf8().data(), pt);
-	std::fstream qf(fname.toStdString());
-	qf.open(fname.toStdString(), std::ios::binary | std::ios::out);
+	return xDynamicsManager::This()->XResult()->save_dem_result(pt, cpos, pos, vel, acc, ep, avel, aacc, np, ns);
+ 	/*std::string fname;
+	stringstream ss(fname);
+	ss << (xModel::path + xModel::name).toStdString() << "/part" << setw(4) << setfill('0') << pt << ".bin";
+	std::fstream qf(fname);
+	qf.open(fname, std::ios::binary | std::ios::out);
 	if (qf.is_open())
 	{
 		qf.write((char*)&ct, sizeof(double));
@@ -303,18 +307,18 @@ QString xDiscreteElementMethodSimulation::SaveStepResult(unsigned int pt, double
 	qf.write((char*)&pt, sizeof(unsigned int));
 	qf.write((char*)&ct, sizeof(double));
 	qf.write((char*)&fsize, sizeof(unsigned int));
-	qf.write(fname.toStdString().c_str(), sizeof(char) * fsize);
+	qf.write(fname.c_str(), sizeof(char) * fsize);
 	qf.close();
-	partList.push_back(fname);
-
-	return fname;
+	partList.push_back(fname);*/
 }
 
 void xDiscreteElementMethodSimulation::ExportResults(std::fstream& of)
 {
-	foreach(QString s, partList)
+	xlist<xstring>::iterator it = partList.begin();
+	while (it.has_next())
 	{
-		of << s.toStdString() << endl;
+		of << it.value() << std::endl;
+		it.next();
 	}
 }
 
@@ -366,6 +370,11 @@ void xDiscreteElementMethodSimulation::SpringDamperForce()
 	{
 		xdem->XSpringDamperForce()->xCalculateForceForDEM(dpos, dvel, dep, davel, dmass, dforce, dmoment);
 	}
+}
+
+unsigned int xDiscreteElementMethodSimulation::num_particles()
+{
+	return np;
 }
 
 unsigned int xDiscreteElementMethodSimulation::setupByLastSimulationFile(std::string ldr)

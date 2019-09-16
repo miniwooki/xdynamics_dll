@@ -1,4 +1,7 @@
 #include "xstring.h"
+#include <sstream>
+#include <string>
+#include <iostream>
 
 //#include "xstringList.h"
 //#include "xdynamics_algebra/xUtilityFunctions.h"
@@ -50,9 +53,15 @@ xstring::xstring(const std::string & s)
 
 xstring::~xstring()
 {
-	//std::cout << "delete - " << wc << std::endl;
-	if(wc) 
+	//
+	if (wc)
+	{
+#ifdef _DEBUG
+		std::cout << "delete - " << wc << std::endl;
+#endif
 		delete[] wc; wc = NULL;// SysFreeString(wc);
+	}
+		
 }
 
 void xstring::operator=(const xstring& _xs)
@@ -146,6 +155,25 @@ void xstring::split(const char* c, int n, double* data)
 	std::vector<std::string> d = _n_split(std::string(wc), *c);
 	for (size_t i = 0; i < n; i++)
 		data[i] = atof(d.at(i).c_str());
+}
+
+unsigned int xstring::n_split_string(const char * c)
+{
+	std::string input = this->toStdString();
+	std::istringstream ss(input);
+	std::string token;
+	unsigned int cnt = 0;
+	while (std::getline(ss, token, *c)) {
+		cnt++;
+	}
+	return cnt;
+}
+
+void xstring::split(const char* c, int n, std::string* data)
+{
+	std::vector<std::string> d = _n_split(std::string(wc), *c);
+	for (size_t i = 0; i < n; i++)
+		data[i] = d.at(i);
 }
 
 std::string xstring::toStdString()

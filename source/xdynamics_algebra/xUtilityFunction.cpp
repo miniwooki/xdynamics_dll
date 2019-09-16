@@ -3,40 +3,40 @@
 #include "xdynamics_algebra/xAlgebraMath.h"
 /*#include "boost/filesystem.hpp"*/
 #include <ctime>
+#include <sstream>
 #include <filesystem>
-#include <QtCore/QDir>
-#include <QtCore/QFile>
-//#include <QtWidgets/QtWidgets>
-#include <QtCore/QStringList>
 
 //using namespace boost::filesystem;
 
-std::string xUtilityFunctions::xstring(int v)
-{
-	return QString("%1").arg(v).toStdString();
-}
-
-std::string xUtilityFunctions::xstring(unsigned int v)
-{
-	return QString("%1").arg(v).toStdString();
-}
-
-std::string xUtilityFunctions::xstring(double v)
-{
-	return QString("%1").arg(v).toStdString();
-}
+//std::string xUtilityFunctions::xstring(int v)
+//{
+//	stringstream(s)
+//	return QString("%1").arg(v).toStdString();
+//}
+//
+//std::string xUtilityFunctions::xstring(unsigned int v)
+//{
+//	return QString("%1").arg(v).toStdString();
+//}
+//
+//std::string xUtilityFunctions::xstring(double v)
+//{
+//	return QString("%1").arg(v).toStdString();
+//}
 
 void xUtilityFunctions::CreateDirectory(const char* _path)
 {
-	QString path = QString::fromStdString(_path);
+	/*QString path = QString::fromStdString(_path);
 	if (!QDir(path).exists())
 		QDir().mkdir(path);
+	*/
 // 	try
 // 	{
-// 		boost::filesystem::path p(_path);
-// 		if (!boost::filesystem::exists(p))
-// 			boost::filesystem::create_directory(p);
-// 	}
+	
+ 	filesystem::path p(_path);
+	if (!filesystem::exists(p))
+		filesystem::create_directory(p);
+
 // 	catch (boost::filesystem::filesystem_error& ex)
 // 	{
 // 		std::cout << ex.what() << std::endl;
@@ -52,17 +52,17 @@ vector3d xUtilityFunctions::QuaternionRotation(vector4d & q, vector3d & v)
 	return p_hat;
 }
 
-std::string xUtilityFunctions::xstring(std::string v)
-{
-	return QString::fromStdString(v).toStdString();
-}
+//std::string xUtilityFunctions::xstring(std::string v)
+//{
+//	return QString::fromStdString(v).toStdString();
+//}
 
-QString xUtilityFunctions::GetFileName(const char* pn)
+std::string xUtilityFunctions::GetFileName(const char* pn)
 {
-	QString path = QString::fromStdString(pn);
-	int begin = path.lastIndexOf('/');
-	int end = path.lastIndexOf('.');
-	return path.mid(begin+1, end - begin-1);
+	std::string path = pn;// QString::fromStdString(pn);
+	int begin = path.find_last_of('/') + 1;// finlastIndexOf('/');
+	int end = path.find_last_of('.');// lastIndexOf('.');
+	return path.substr(begin, end - begin);// path.mid(begin + 1, end - begin - 1);
 // 	QString b;
 // 	try
 // 	{
@@ -77,16 +77,18 @@ QString xUtilityFunctions::GetFileName(const char* pn)
 // 	return b;
 }
 
-QString xUtilityFunctions::FileExtension(const char* f)
+std::string xUtilityFunctions::FileExtension(const char* f)
 {
-	QString path = QString::fromStdString(f);
-	int begin = path.lastIndexOf('.');
-	return path.mid(begin);
+	//std::string path = f;
+	////int begin = path.find_last_of('/') + 1;// finlastIndexOf('/');
+	//int begin = path.find_last_of('.') + 1;// lastIndexOf('.');
+	////int begin = path.lastIndexOf('.');
+	//return path.substr(begin, path.size() - begin);
 // 	
 // 	try
 // 	{
-// 		boost::filesystem::path p(f);
-// 		b = boost::filesystem::extension(p).c_str();
+	filesystem::path p(f);
+ 	return p.extension().string();
 // 	}
 // 	catch (boost::filesystem::filesystem_error& ex)
 // 	{
@@ -98,13 +100,13 @@ QString xUtilityFunctions::FileExtension(const char* f)
 
 bool xUtilityFunctions::ExistFile(const char* n)
 {
-	QString path = QString::fromStdString(n);
-	return QFile().exists(path);
-// 	bool b = false;
+	//QString path = QString::fromStdString(n);
+	// QFile().exists(path);
+// 	/bool b = false;
 // 	try
 // 	{
-// 		boost::filesystem::path p(n);
-// 		b = boost::filesystem::exists(p);
+	filesystem::path p(n);
+	return filesystem::exists(p);
 // 	}
 // 	catch (boost::filesystem::filesystem_error& ex)
 // 	{
@@ -116,27 +118,24 @@ bool xUtilityFunctions::ExistFile(const char* n)
 
 void xUtilityFunctions::DirectoryFileList(const char* _path)
 {
-	QString path = QString::fromStdString(_path);
-	QDir d(path);
-	QStringList ls = d.entryList();
-	foreach(QString s, ls)
-	{
-		std::cout << "     " << s.toLocal8Bit().data() << std::endl;
-	}
+	//QString path = QString::fromStdString(_path);
+	//QDir d(path);
+	//QStringList ls = d.entryList();
+	//foreach(QString s, ls)
+	//{
+	//	std::cout << "     " << s.toLocal8Bit().data() << std::endl;
+	//}
 // 	try
 // 	{
-// 		boost::filesystem::path p(_path);
-// 		if (boost::filesystem::exists(p))
-// 		{
-// 			std::cout << std::endl << "File list of " << _path << std::endl;
-// 			for (auto i = directory_iterator(p); i != directory_iterator(); i++)
-// 			{
-// 				if (!is_directory(i->path()))
-// 				{
-// 					std::cout << "     " << i->path().filename().string() << std::endl;
-// 				}
-// 			}
-// 		}
+	filesystem::path p(_path);
+	if (filesystem::exists(p))
+	{
+		std::cout << std::endl << "File list of " << _path << std::endl;
+		for (auto& p: std::filesystem::directory_iterator(p))
+		{
+			std::cout << "     " << p.path() << std::endl;
+		}
+	}
 // 	}
 // 	catch (boost::filesystem::filesystem_error& ex)
 // 	{
@@ -199,121 +198,107 @@ int xUtilityFunctions::FindNumString(const string& s, const char* c)
 	return ns;
 }
 
-void xUtilityFunctions::xsplit(const std::string& s, const char* c, int n, int* data)
-{
-	QString d = QString::fromStdString(s);
-	QStringList ds = d.split(c);
-	for (int i = 0; i < n; i++)
-		data[i] = ds.at(i).toInt();
-}
-
-void xUtilityFunctions::xsplit(const std::string& s, const char* c, vector2i& data)
-{
-	QString d = QString::fromStdString(s);
-	QStringList ds = d.split(c);
-	data.x = ds.at(0).toDouble();
-	data.y = ds.at(1).toDouble();
-}
-
-void xUtilityFunctions::xsplit(const std::string& s, const char* c, int n, double* data)
-{
-	QString d = QString::fromStdString(s);
-	QStringList ds = d.split(c);
-	for (int i = 0; i < n; i++)
-		data[i] = ds.at(i).toDouble();
-// 	basic_string<char>::size_type start = 0, end;
-// 	static const basic_string<char>::size_type npos = -1;
-// 	int ns = 0;
-// 	int len = (int)strlen(c);
-// 	while (1)
-// 	{
-// 		end = s.find(c, start);
-// 		string cs = s.substr(start, end - start);
-// 		data[ns] = atof(cs.c_str());
-// 		start = end + len;
-// 		ns++;
-// 		if (end == npos)
-// 			break;
-// 	}
-}
-
-bool xUtilityFunctions::xsplit(const char* wc, const char* c, int n, int* data)
-{
-	QString d = toWideCharToQString(wc);
-	QStringList ds = d.split(c);
-	if (ds.size() != n)
-		return false;
-	for (int i = 0; i < n; i++)
-		data[i] = ds.at(i).toInt();
-	return true;
-// 	string s = WideChar2String(wc);
-// 	basic_string<char>::size_type start = 0, end;
-// 	static const basic_string<char>::size_type npos = -1;
-// 	int ns = 0;
-// 	int len = (int)strlen(c);
-// 	while (1)
-// 	{
-// 		end = s.find(c, start);
-// 		string cs = s.substr(start, end - start);
-// 		data[ns] = atoi(cs.c_str());
-// 		start = end + len;
-// 		ns++;
-// 		if (end == npos)
-// 			break;
-// 	}
-}
-
-void xUtilityFunctions::xsplit(const char* wc, const char* c, int n, double* data)
-{
-	QString d = toWideCharToQString(wc);
-	QStringList ds = d.split(c);
-	for (int i = 0; i < n; i++)
-		data[i] = ds.at(i).toDouble();
-// 	string s = WideChar2String(wc);
-// 	basic_string<char>::size_type start = 0, end;
-// 	static const basic_string<char>::size_type npos = -1;
-// 	int ns = 0;
-// 	int len = (int)strlen(c);
-// 	while (1)
-// 	{
-// 		end = s.find(c, start);
-// 		string cs = s.substr(start, end - start);
-// 		data[ns] = atof(cs.c_str());
-// 		start = end + len;
-// 		ns++;
-// 		if (end == npos)
-// 			break;
-// 	}
-}
-
-unsigned int xUtilityFunctions::xsplitn(const char* s, const char* c)
-{
-	QString d = toWideCharToQString(s);
-	return d.split(c).size();
-}
-
-void xUtilityFunctions::xsplit(const char* wc, const char* c, int n, std::string* data)
-{
-	QString d = toWideCharToQString(wc);
-	QStringList ds = d.split(c);
-	for (int i = 0; i < n; i++)
-		data[i] = ds.at(i).toStdString();
-	// 	string s = WideChar2String(wc);
-	// 	basic_string<char>::size_type start = 0, end;
-	// 	static const basic_string<char>::size_type npos = -1;
-	// 	int ns = 0;
-	// 	int len = (int)strlen(c);
-	// 	while (1)
-	// 	{
-	// 		end = s.find(c, start);
-	// 		string cs = s.substr(start, end - start);
-	// 		data[ns] = atof(cs.c_str());
-	// 		start = end + len;
-	// 		ns++;
-	// 		if (end == npos)
-	// 			break;
-	// 	}
-}
+//void xUtilityFunctions::xsplit(const std::string& s, const char* c, int n, int* data)
+//{
+//	QString d = QString::fromStdString(s);
+//	QStringList ds = d.split(c);
+//	for (int i = 0; i < n; i++)
+//		data[i] = ds.at(i).toInt();
+//}
+//
+//void xUtilityFunctions::xsplit(const std::string& s, const char* c, vector2i& data)
+//{
+//	QString d = QString::fromStdString(s);
+//	QStringList ds = d.split(c);
+//	data.x = ds.at(0).toDouble();
+//	data.y = ds.at(1).toDouble();
+//}
+//
+//void xUtilityFunctions::xsplit(const std::string& s, const char* c, int n, double* data)
+//{
+//	QString d = QString::fromStdString(s);
+//	QStringList ds = d.split(c);
+//	for (int i = 0; i < n; i++)
+//		data[i] = ds.at(i).toDouble();
+//}
+//
+//bool xUtilityFunctions::xsplit(const char* wc, const char* c, int n, int* data)
+//{
+//	QString d = toWideCharToQString(wc);
+//	QStringList ds = d.split(c);
+//	if (ds.size() != n)
+//		return false;
+//	for (int i = 0; i < n; i++)
+//		data[i] = ds.at(i).toInt();
+//	return true;
+//// 	string s = WideChar2String(wc);
+//// 	basic_string<char>::size_type start = 0, end;
+//// 	static const basic_string<char>::size_type npos = -1;
+//// 	int ns = 0;
+//// 	int len = (int)strlen(c);
+//// 	while (1)
+//// 	{
+//// 		end = s.find(c, start);
+//// 		string cs = s.substr(start, end - start);
+//// 		data[ns] = atoi(cs.c_str());
+//// 		start = end + len;
+//// 		ns++;
+//// 		if (end == npos)
+//// 			break;
+//// 	}
+//}
+//
+//void xUtilityFunctions::xsplit(const char* wc, const char* c, int n, double* data)
+//{
+//	QString d = toWideCharToQString(wc);
+//	QStringList ds = d.split(c);
+//	for (int i = 0; i < n; i++)
+//		data[i] = ds.at(i).toDouble();
+//// 	string s = WideChar2String(wc);
+//// 	basic_string<char>::size_type start = 0, end;
+//// 	static const basic_string<char>::size_type npos = -1;
+//// 	int ns = 0;
+//// 	int len = (int)strlen(c);
+//// 	while (1)
+//// 	{
+//// 		end = s.find(c, start);
+//// 		string cs = s.substr(start, end - start);
+//// 		data[ns] = atof(cs.c_str());
+//// 		start = end + len;
+//// 		ns++;
+//// 		if (end == npos)
+//// 			break;
+//// 	}
+//}
+//
+//unsigned int xUtilityFunctions::xsplitn(const char* s, const char* c)
+//{
+//	QString d = toWideCharToQString(s);
+//	return d.split(c).size();
+//}
+//
+//void xUtilityFunctions::xsplit(const char* wc, const char* c, int n, std::string* data)
+//{
+//	QString d = toWideCharToQString(wc);
+//	QStringList ds = d.split(c);
+//	for (int i = 0; i < n; i++)
+//		data[i] = ds.at(i).toStdString();
+//	// 	string s = WideChar2String(wc);
+//	// 	basic_string<char>::size_type start = 0, end;
+//	// 	static const basic_string<char>::size_type npos = -1;
+//	// 	int ns = 0;
+//	// 	int len = (int)strlen(c);
+//	// 	while (1)
+//	// 	{
+//	// 		end = s.find(c, start);
+//	// 		string cs = s.substr(start, end - start);
+//	// 		data[ns] = atof(cs.c_str());
+//	// 		start = end + len;
+//	// 		ns++;
+//	// 		if (end == npos)
+//	// 			break;
+//	// 	}
+//}
 
 // void xUtilityFunctions::Split2WString(const char* wc, const char* c, int& n, wstring* data)
 // {
@@ -510,22 +495,17 @@ double xUtilityFunctions::CriticalTimeStep(double min_rad, double rho, double E,
 	return 0.2 * min_dt;
 }
 
-std::string xUtilityFunctions::xstring(QString v)
-{
-	return v.toStdString();
-}
-
 void xUtilityFunctions::DeleteFilesInDirectory(std::string path)
 {
-	QString dDir = QString::fromStdString(path) + "/";
-	QDir dir = QDir(dDir);
-	QStringList delFileList;
-	delFileList = dir.entryList(QStringList("*.*"), QDir::Files | QDir::NoSymLinks);
-	//qDebug() << "The number of *.bin file : " << delFileList.length();
-	for (int i = 0; i < delFileList.length(); i++){
-		QString deleteFilePath = dDir + delFileList[i];
-		QFile::remove(deleteFilePath);
-	}
+	//QString dDir = QString::fromStdString(path) + "/";
+	//QDir dir = QDir(dDir);
+	//QStringList delFileList;
+	//delFileList = dir.entryList(QStringList("*.*"), QDir::Files | QDir::NoSymLinks);
+	////qDebug() << "The number of *.bin file : " << delFileList.length();
+	//for (int i = 0; i < delFileList.length(); i++){
+	//	QString deleteFilePath = dDir + delFileList[i];
+	//	QFile::remove(deleteFilePath);
+	//}
 // 	qDebug() << "Complete delete.";
 // 	QString qpath = QString::fromStdString(path);
 // 	QDir dir = QDir(qpath);
@@ -541,14 +521,14 @@ void xUtilityFunctions::DeleteFilesInDirectory(std::string path)
 void xUtilityFunctions::DeleteFileByEXT(std::string path, std::string ext)
 {
 	// QString dDir = model::path + model::name;
-	QString qpath = QString::fromStdString(path);
-	QString qext = QString::fromStdString(ext);
-	QDir dir = QDir(qpath);
-	QStringList delFileList;
-	delFileList = dir.entryList(QStringList("*." + qext), QDir::Files | QDir::NoSymLinks);
-	//qDebug() << "The number of *.bin file : " << delFileList.length();
-	for (int i = 0; i < delFileList.length(); i++){
-		QString deleteFilePath = qpath + "/" + delFileList[i];
-		QFile::remove(deleteFilePath);
-	}
+	//QString qpath = QString::fromStdString(path);
+	//QString qext = QString::fromStdString(ext);
+	//QDir dir = QDir(qpath);
+	//QStringList delFileList;
+	//delFileList = dir.entryList(QStringList("*." + qext), QDir::Files | QDir::NoSymLinks);
+	////qDebug() << "The number of *.bin file : " << delFileList.length();
+	//for (int i = 0; i < delFileList.length(); i++){
+	//	QString deleteFilePath = qpath + "/" + delFileList[i];
+	//	QFile::remove(deleteFilePath);
+	//}
 }

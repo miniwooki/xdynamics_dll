@@ -29,7 +29,7 @@ public:
 
 	void draw(GLenum eMode, int wHeight, int protype, double z);
 	
-	
+	void bind_result_buffers(float* pos_buffer, float* vel_buffer, float* color_buffer);
 	bool defineFromViewFile(QString path);
 	bool defineFromListFile(QString path);
 	bool defineFromRelativePosition(vector3d& p, euler_parameters& ep);
@@ -70,24 +70,14 @@ private:
 
 	unsigned int r_np;
 	unsigned int np;
-//	unsigned int *np_buffer;
-	//float *buffer;
-	float *buffers;
+	float *pbuffers;
 	float *vbuffers;
-	float *color_buffers;
-//	float *color_buffer;
+	float *cbuffers;
 	float *pos;
 	float *color;
 	double *r_pos;
 	bool isSetColor;
-	float max_position[3];
-	float min_position[3];
-	float max_velocity[3];
-	float min_velocity[3];
-	float max_position_mag;
-	float min_position_mag;
-	float max_velocity_mag;
-	float min_velocity_mag;
+	
 	float pscale;
 	QMap<QString, particleGroupData> pgds;
 	shaderProgram program;

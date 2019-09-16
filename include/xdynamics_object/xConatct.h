@@ -5,7 +5,8 @@
 #include "xdynamics_parallel/xParallelDEM_decl.cuh"
 #include "xdynamics_algebra/xAlgebraMath.h"
 #include "xdynamics_object/xContactPairList.h"
-#include <QtCore/QString>
+#include "xstring.h"
+//#include <QtCore/QString>
 
 class xObject;
 
@@ -21,7 +22,7 @@ public:
 // 	void setIgnoreTime(double _t) { ignore_time = _t; }
 	bool IsEnabled();
 	void setEnabled(bool b);
-	QString Name() const;
+	xstring Name() const;
 	xObject* FirstObject() const;
 	xObject* SecondObject() const;
 	void setFirstObject(xObject* o1);
@@ -84,7 +85,7 @@ protected:
 		vector3d Fn, vector3d Ft, double& Mr, vector3d& Tmax);
 	bool is_enabled;
 	double ignore_time;
-	QString name;
+	xstring name;
 	xContactPairType type;
 //	contactForce_type f_type;
 	static xContactForceModelType force_model;

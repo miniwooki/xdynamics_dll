@@ -39,7 +39,7 @@ void xParticleCylindersContact::define(unsigned int i, xParticleCylinderContact 
 	xmp = d->MaterialPropertyPair();
 	hcmp[i] = cp;
 	xmps[i] = xmp;
-	pair_ip[i] = c_ptr;
+	pair_ip.insert(i, c_ptr);
 	hci[i] = { 
 		c_ptr->MovingObject(),
 		i,
@@ -99,18 +99,17 @@ void xParticleCylindersContact::getCylinderContactForce()
 		//device_body_info *hbi = new device_body_info[nmoving];
 	//	checkCudaErrors(cudaMemcpy(hbf, db_force, sizeof(device_body_info) * ncylinders, cudaMemcpyDeviceToHost));
 	//	checkCudaErrors(cudaMemcpy(hbm, db_moment, sizeof(device_body_info) * ncylinders, cudaMemcpyDeviceToHost));
-		QMapIterator<unsigned int, xCylinderObject*> xcy(pair_ip);
-		while (xcy.hasNext())
+		xmap<unsigned int, xCylinderObject*>::iterator it = pair_ip.begin();// xcy(pair_ip);
+		while (it.has_next())
 		{
-			xcy.next();
-			unsigned int id = xcy.key();
-			xCylinderObject* o = xcy.value();
+			unsigned int id = it.key();
+			xCylinderObject* o = it.value();
 			if (o->MovingObject())
 			{
 				o->addContactForce(dbf[id].force.x, dbf[id].force.y, dbf[id].force.z);
 				o->addContactMoment(dbf[id].moment.x, dbf[id].moment.y, dbf[id].moment.z);
 			}
-
+			it.next();
 		}
 	}	
 }
@@ -254,8 +253,10 @@ void xParticleCylindersContact::updateCollisionPair(
 	xContactPairList& xcpl, double r, vector3d pos)
 {
 	unsigned int cnt = 0;
-	foreach(xCylinderObject* c_ptr, pair_ip)
+	for(xmap<unsigned int, xCylinderObject*>::iterator it = pair_ip.begin(); it != pair_ip.end(); it.next())
+		//foreach(xCylinderObject* c_ptr, pair_ip)
 	{
+		xCylinderObject* c_ptr = it.value();
 		host_cylinder_info cinfo = hci[cnt++];
 		//xCylinderObject* c_ptr = pcyl->CylinderObject();
 		//int id = c_ptr->ObjectID();
@@ -407,8 +408,9 @@ bool xParticleCylindersContact::pcylCollision(
 		ci = i / neach;
 		cp = new_vector3d(cpos[ci].x, cpos[ci].y, cpos[ci].z);
 	}
-	foreach(xPairData* d, pairs->CylinderPair())
+	for(xmap<unsigned int, xPairData*>::iterator it = pairs->CylinderPair().begin(); it != pairs->CylinderPair().end(); it.next())
 	{
+		xPairData* d = it.value();
 		unsigned int id = d->id >= 1000 ? d->id - 1000 : d->id;
 		xCylinderObject* cy = pair_ip[id];
 		xMaterialPair mpp = xmps[id];

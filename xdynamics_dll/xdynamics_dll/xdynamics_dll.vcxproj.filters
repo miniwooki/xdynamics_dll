@@ -276,6 +276,9 @@
     <ClCompile Include="..\..\source\xdynamics_object\xParticleCylindersContact.cpp">
       <Filter>소스 파일\xdynamics_object\contactPair</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\xColorControl.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\xdynamics_decl.h">
@@ -493,6 +496,12 @@
     </ClInclude>
     <ClInclude Include="..\..\include\xdynamics_object\xParticleCylindersContact.h">
       <Filter>헤더 파일\xdynamics_object\contactPair</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xlist.hpp">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xColorControl.h">
+      <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

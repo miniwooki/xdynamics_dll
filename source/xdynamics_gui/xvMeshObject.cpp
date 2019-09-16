@@ -146,7 +146,7 @@ vector4f xvMeshObject::FitSphereToTriangle(vector3f& P, vector3f& Q, vector3f& R
 
 QString xvMeshObject::GenerateFitSphereFile(float ft)
 {
-	QString path = kor(getenv("USERPROFILE")) + "/Documents/xdynamics/" + Name() + ".txt";
+	QString path = getenv("USERPROFILE") + QString("/Documents/xdynamics/") + Name() + ".txt";
 	//		unsigned int a, b, c;
 	vector3f *vertice = (vector3f*)vertexList;
 	QFile qf(path);
@@ -212,7 +212,7 @@ void xvMeshObject::draw(GLenum eMode)
 		{
 			double t = 180 / M_PI;
 			unsigned int idx = xvAnimationController::getFrame();
-			xPointMass::pointmass_result pmr = xvObject::pmrs->at(idx);
+			xPointMass::pointmass_result pmr = xvObject::pmrs[idx];
 			glTranslated(pmr.pos.x, pmr.pos.y, pmr.pos.z);
 			vector3d euler = EulerParameterToEulerAngle(pmr.ep);
 			glRotated(t*euler.x, 0, 0, 1);

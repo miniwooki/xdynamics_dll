@@ -15,9 +15,12 @@ xMultiBodyModel::xMultiBodyModel(std::string _name)
 xMultiBodyModel::~xMultiBodyModel()
 {
 	//qDeleteAll(masses);
-	qDeleteAll(forces);
+	if(forces.size()) forces.delete_all();
+	if(dconstraints.size()) dconstraints.delete_all();
+	if(constraints.size()) constraints.delete_all();
+	/*qDeleteAll(forces);
 	qDeleteAll(dconstraints);
-	qDeleteAll(constraints);
+	qDeleteAll(constraints);*/
 }
 
 unsigned int xMultiBodyModel::NumMass()
@@ -35,22 +38,27 @@ unsigned int xMultiBodyModel::NumDrivingConstraint()
 	return dconstraints.size();
 }
 
-QMap<QString, xPointMass*>& xMultiBodyModel::Masses()
+xmap<xstring, xPointMass*>& xMultiBodyModel::Masses()
 {
 	return masses;
 }
 
-QMap<QString, xKinematicConstraint*>& xMultiBodyModel::Joints()
+xmap<xstring, xPointMass*>* xMultiBodyModel::Masses_ptr()
+{
+	return &masses;
+}
+
+xmap<xstring, xKinematicConstraint*>& xMultiBodyModel::Joints()
 {
 	return constraints;
 }
 
-QMap<QString, xForce*>& xMultiBodyModel::Forces()
+xmap<xstring, xForce*>& xMultiBodyModel::Forces()
 {
 	return forces;
 }
 
-QMap<QString, xDrivingConstraint*>& xMultiBodyModel::Drivings()
+xmap<xstring, xDrivingConstraint*>& xMultiBodyModel::Drivings()
 {
 	return dconstraints;
 }
@@ -59,58 +67,60 @@ xPointMass* xMultiBodyModel::XMass(std::string& _ws)
 {
 	if (_ws == "ground")
 		return xModel::Ground();
-	QString ws = QString::fromStdString(_ws);
-	QStringList keys = masses.keys();
-	QStringList::const_iterator it = qFind(keys, ws);
-	if (it == keys.end())
+	xstring ws = _ws;
+	//QString ws = QString::fromStdString(_ws);
+	//QStringList keys = masses.keys();
+	xmap<xstring, xPointMass*>::iterator it = masses.find(ws);
+	//QStringList::const_iterator it = qFind(keys, ws);
+	if (it == masses.end())
 		return NULL;
-	return masses[ws];
+	return it.value();// masses[ws];
 }
 
 xKinematicConstraint* xMultiBodyModel::XJoint(std::string& _ws)
 {
-	QString ws = QString::fromStdString(_ws);
-	QStringList keys = constraints.keys();
-	QStringList::const_iterator it = qFind(keys, ws);
-	if (it == keys.end())
+	xstring ws = _ws;// QString ws = QString::fromStdString(_ws);
+	xmap<xstring, xKinematicConstraint*>::iterator it = constraints.find(ws);
+	//QStringList::const_iterator it = qFind(keys, ws);
+	if (it == constraints.end())
 		return NULL;
-	return constraints[ws];
+	return it.value();// constraints[ws];
 }
 
 xForce* xMultiBodyModel::XForce(std::string& _ws)
 {
-	QString ws = QString::fromStdString(_ws);
-	QStringList keys = forces.keys();
-	QStringList::const_iterator it = qFind(keys, ws);
-	if (it == keys.end())
+	xstring ws = _ws;// QString ws = QString::fromStdString(_ws);
+	//QStringList keys = forces.keys();
+	xmap<xstring, xForce*>::iterator it = forces.find(ws);//QStringList::const_iterator it = qFind(keys, ws);
+	if (it == forces.end())
 		return NULL;
-	return forces[ws];
+	return it.value();// forces[ws];
 }
 
 xDrivingConstraint* xMultiBodyModel::xDriving(std::string& _ws)
 {
-	QString ws = QString::fromStdString(_ws);
-	QStringList keys = dconstraints.keys();
-	QStringList::const_iterator it = qFind(keys, ws);
-	if (it == keys.end())
+	xstring ws = _ws;// QString ws = QString::fromStdString(_ws);
+	//QStringList keys = dconstraints.keys();
+	xmap<xstring, xDrivingConstraint*>::iterator it = dconstraints.find(ws);//QStringList::const_iterator it = qFind(keys, ws);
+	if (it == dconstraints.end())
 		return NULL;
-	return dconstraints[ws];
+	return it.value();
 }
 
 xPointMass* xMultiBodyModel::CreatePointMass(std::string _name)
 {
-	QString name = QString::fromStdString(_name);
+	xstring name = _name;
 	xPointMass* xpm = NULL;
 	if (xObjectManager::XOM()->XObject(_name))
 	{
 		xpm = (dynamic_cast<xPointMass*>(xObjectManager::XOM()->XObject(_name)));
-		masses[name] = xpm;
+		masses.insert(name, xpm);// = xpm;
 // 		if (xpm->Shape() == MESH_SHAPE)
 // 			dynamic_cast<xMeshObject*>(xObjectManager::XOM()->XObject(_name))->translation()
 		return xpm;
 	}
 	xpm = new xPointMass(_name);
-	masses[name] = xpm;
+	masses.insert(name, xpm);
 	xObjectManager::XOM()->addObject(xpm);
 	xLog::log("Create PointMass : " + _name);
 	//std::cout << "Create point mass - " << _name.c_str() << ", Num. mass - " << masses.size() << std::endl;
@@ -120,7 +130,7 @@ xPointMass* xMultiBodyModel::CreatePointMass(std::string _name)
 xKinematicConstraint* xMultiBodyModel::CreateKinematicConstraint(
 	std::string _name, xKinematicConstraint::cType _type, std::string _i, std::string _j)
 {
-	QString name = QString::fromStdString(_name);
+	xstring name = _name;
 	xKinematicConstraint* xkc = NULL;
 	switch (_type)
 	{
@@ -145,13 +155,13 @@ xKinematicConstraint* xMultiBodyModel::CreateKinematicConstraint(
 		//std::cout << "Create universal constraint - " << _name.c_str() << ", Num. constraint - " << constraints.size() << std::endl;
 		break;
 	}
-	constraints[name] = xkc;
+	constraints.insert(name, xkc);// = xkc;
 	return xkc;
 }
 
 xForce* xMultiBodyModel::CreateForceElement(std::string _name, xForce::fType _type, std::string bn, std::string an)
 {
-	QString name = QString::fromStdString(_name);
+	xstring name = _name;
 	xForce* xf = NULL;
 	switch (_type)
 	{
@@ -175,15 +185,15 @@ xForce* xMultiBodyModel::CreateForceElement(std::string _name, xForce::fType _ty
 		xf->setBaseBodyName(bn);
 		xf->setActionBodyName(an);
 	}
-	forces[name] = xf;
+	forces.insert(name, xf);
 	return xf;
 }
 
 xDrivingConstraint* xMultiBodyModel::CreateDrivingConstraint(std::string _name, xKinematicConstraint* _kc)
 {
-	QString name = QString::fromStdString(_name);
+	xstring name = _name;
 	xDrivingConstraint* xdc = new xDrivingConstraint(_name, _kc);
-	dconstraints[name] = xdc;
+	dconstraints.insert(name, xdc);
 	xLog::log("Create Driving : " + _name);
 	//std::cout << "Create driving constraint - " << _name.c_str() << ", Num. driving constraint - " << dconstraints.size() << std::endl;
 	return xdc;

@@ -3,7 +3,7 @@
 
 #include "xdynamics_decl.h"
 #include <fstream>
-#include <QtCore/QString>
+//#include <QtCore/QString>
 
 class XDYNAMICS_API xViewExporter
 {
@@ -14,9 +14,6 @@ public:
 	void Open(std::string path);
 	void Write(char* c, unsigned int sz);
 	void Close();
-	
-private:
-	QString path;
 };
 
 #endif

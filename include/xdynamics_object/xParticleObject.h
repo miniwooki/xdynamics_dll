@@ -43,7 +43,7 @@ public:
 	vector3d* Inertia() const;
 
 	virtual unsigned int create_sph_particles(double ps, unsigned int nlayers, vector3d* p = NULL, xMaterialType* t = NULL);
-	virtual QVector<xCorner> get_sph_boundary_corners();
+	//virtual QVector<xCorner> get_sph_boundary_corners();
 // 	static unsigned int calculateNumCubeParticles(double dx, double dy, double dz, double min_radius, double max_radius);
 // 	static unsigned int calculateNumPlaneParticles(double dx, unsigned int ny, double dy, double min_radius, double max_radius);
 // 	static unsigned int calculateNumCircleParticles(double d, unsigned int ny, double min_radius, double max_radius);

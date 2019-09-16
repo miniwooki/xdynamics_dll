@@ -3,7 +3,7 @@
 
 #include "xdynamics_object/xPointMass.h"
 //#include "xdynamics_object/xPlaneObject.h"
-#include <QtCore/QString>
+//#include <QtCore/QString>
 
 //class xPlaneObject;
 
@@ -39,7 +39,7 @@ public:
 	void SetupDataFromStructure(xCylinderObjectData& d);
 
 	virtual unsigned int create_sph_particles(double ps, unsigned int nlayers, vector3d* p = NULL, xMaterialType* t = NULL);
-	virtual QVector<xCorner> get_sph_boundary_corners();
+	//virtual QVector<xCorner> get_sph_boundary_corners();
 
 private:
 	//xPlaneObject *planes;

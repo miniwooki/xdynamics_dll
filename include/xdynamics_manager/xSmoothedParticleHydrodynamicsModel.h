@@ -4,7 +4,7 @@
 #include "xdynamics_decl.h"
 #include "xModel.h"
 #include "xdynamics_manager/xParticleMananger.h"
-#include <QtCore/QVector>
+//#include <QtCore/QVector>
 
 class xKernelFunction;
 class xObjectManager;
@@ -55,7 +55,7 @@ private:
 	unsigned int CreateOverlapCornerDummyParticle(unsigned int id, vector3d& p, vector3d& n1, vector3d& n2, bool isOnlyCount);
 
 private:
-	QString name;
+	xstring name;
 
 	unsigned int dim;
 	unsigned int np;
@@ -85,7 +85,7 @@ private:
 	xKernelFunction *xker;
 	//xParticleManager *xpmgr;
 
-	QVector<xOverlapCorner> overlappingCorners;
+	//QVector<xOverlapCorner> overlappingCorners;
 };
 
 #endif

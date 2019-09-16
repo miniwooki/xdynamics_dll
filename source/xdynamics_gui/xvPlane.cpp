@@ -59,7 +59,7 @@ void xvPlane::draw(GLenum eMode)
 		{
 			double t = 180 / M_PI;
 			unsigned int idx = xvAnimationController::getFrame();
-			xPointMass::pointmass_result pmr = xvObject::pmrs->at(idx);
+			xPointMass::pointmass_result pmr = xvObject::pmrs[idx];
 			glTranslated(pmr.pos.x, pmr.pos.y, pmr.pos.z);
 			vector3d euler = EulerParameterToEulerAngle(pmr.ep);
 			glRotated(t*euler.x, 0, 0, 1);

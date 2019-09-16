@@ -1,4 +1,5 @@
 #include "xdynamics_simulation/xMultiBodySimulation.h"
+#include "xdynamics_manager/xDynamicsManager.h"
 #include <sstream>
 
 std::fstream *ex_of = NULL;
@@ -13,7 +14,6 @@ xMultiBodySimulation::xMultiBodySimulation()
 	, xpm(NULL)
 	, lagMul(NULL)
 	, dem_tsda(NULL)
-//	, of(NULL)
 {
 
 }
@@ -21,7 +21,6 @@ xMultiBodySimulation::xMultiBodySimulation()
 xMultiBodySimulation::~xMultiBodySimulation()
 {
 	if (xpm) delete[] xpm; xpm = NULL;
-//	if (of) { of->close(); delete of; }
 }
 
 bool xMultiBodySimulation::Initialized()
@@ -35,75 +34,67 @@ void xMultiBodySimulation::SetDEMSpringDamper(xSpringDamperForce* dem_t)
 	for (unsigned int i = 0; i < dem_tsda->NumSpringDamperBodyConnection(); i++)
 	{
 		xSpringDamperBodyConnectionInfo info = dem_tsda->xSpringDamperBodyConnectionInformation()[i];
-		xPointMass* pm = xmbd->XMass(info.cbody.toStdString());
+		xPointMass* pm = xmbd->XMass(std::string(info.cbody));
 		dem_tsda->ConvertGlobalToLocalOfBodyConnectionPosition(i, pm);
 	}
 }
 
 void xMultiBodySimulation::SetZeroBodyForce()
 {
-	foreach(xPointMass* xpm, xmbd->Masses())
+	xmap<xstring, xPointMass*>::iterator it = xmbd->Masses().begin();
+	while (it.has_next())
 	{
-		xpm->setZeroAllForce();
+		it.value()->setZeroAllForce();
+		it.next();
 	}
 }
 
-void xMultiBodySimulation::SaveStepResult(unsigned int part, double ct)
+bool xMultiBodySimulation::SaveStepResult(unsigned int part)
 {
-	ex_of = new std::fstream;
-	std::string fname = xModel::makeFilePath(xModel::getModelName() + ".lmr");
-	//std::ifstream src(fname, ios_base::in | ios_base::binary);
-	//if (!src.is_open())
-	//{
-	//	ex_of->close();
-	//	ex_of->open(fname, ios_base::out | ios_base::binary);
-	//}
-	ex_of->open(fname, ios_base::out | ios_base::app | ios_base::binary);
-	ex_of->write((char*)&part, sizeof(unsigned int));
-	ex_of->write((char*)&ct, sizeof(double));
-	ex_of->write((char*)q.Data(), sizeof(double) * mdim + xModel::OneDOF());
-	ex_of->write((char*)qd.Data(), sizeof(double) * mdim + xModel::OneDOF());
-	ex_of->write((char*)q_1.Data(), sizeof(double) * mdim + xModel::OneDOF());
-	ex_of->write((char*)rhs.Data(), sizeof(double) * tdim);
-	foreach(xPointMass* xpm, xmbd->Masses())
-		ex_of->write((char*)xpm->getForcePointer(), sizeof(double) * 18);
-	ex_of->close();
-	delete ex_of;
-	ex_of = NULL;
-	foreach(xPointMass* xpm, xmbd->Masses())
+	xResultManager* xrm = xDynamicsManager::This()->XResult();
+	xmap<xstring, xPointMass*>::iterator it = xmbd->Masses().begin();
+	while (it.has_next())
 	{
-		xpm->SaveStepResult(part, ct, q, qd, rhs);
+		xrm->save_mass_result(part, it.value());
+		it.next();
 	}
+		
 	unsigned int sr = 0;
 	cjaco.zeros();
-	foreach(xKinematicConstraint* xkc, xmbd->Joints())
+	for(xmap<xstring, xKinematicConstraint*>::iterator it = xmbd->Joints().begin(); it != xmbd->Joints().end(); it.next())
 	{
-		xkc->SaveStepResult(part, ct, q, qd, lagMul, sr);
-		sr += xkc->NumConst();
+		xKinematicConstraint::kinematicConstraint_result kcr = it.value()->GetStepResult(part, q, qd, lagMul, sr);
+		xrm->save_joint_result(part, it.value()->Name(), kcr);
+		sr += it.value()->NumConst();
 	}
-	foreach(xDrivingConstraint* xdc, xmbd->Drivings())
+	for (xmap<xstring, xDrivingConstraint*>::iterator it = xmbd->Drivings().begin(); it != xmbd->Drivings().end(); it.next())
 	{
-		xdc->SaveStepResult(part, ct, q, qd, lagMul, sr);
+		xKinematicConstraint::kinematicConstraint_result kcr = it.value()->GetStepResult(part, xSimulation::ctime, q, qd, lagMul, sr);
+		xrm->save_joint_result(part, it.value()->Name(), kcr);
 		sr++;
 	}
+	return xrm->save_generalized_coordinate_result(q.Data(), qd.Data(), q_1.Data(), rhs.Data());
 }
 
 void xMultiBodySimulation::ExportResults(std::fstream& of)
 {
-	foreach(xPointMass* xpm, xmbd->Masses())
+	xmap<xstring, xPointMass*>::iterator it = xmbd->Masses().begin();
+	while (it.has_next())
 	{
+		xPointMass* xpm = it.value();
 		xpm->ExportResults(of);
 		xpm->ExportInitialData();
+		it.next();
 	}
 	unsigned int sr = 0;
-	foreach(xKinematicConstraint* xkc, xmbd->Joints())
+	for (xmap<xstring, xKinematicConstraint*>::iterator it = xmbd->Joints().begin(); it != xmbd->Joints().end(); it.next())
 	{
-		xkc->ExportResults(of);
-		sr += xkc->NumConst();
+		it.value()->ExportResults(of);
+		sr += it.value()->NumConst();
 	}
-	foreach(xDrivingConstraint* xdc, xmbd->Drivings())
+	for (xmap<xstring, xDrivingConstraint*>::iterator it = xmbd->Drivings().begin(); it != xmbd->Drivings().end(); it.next())
 	{
-		xdc->ExportResults(of);
+		it.value()->ExportResults(of);
 		sr++;
 	}
 }
@@ -115,7 +106,9 @@ unsigned int xMultiBodySimulation::setupByLastSimulationFile(std::string lmr)
 	double ct = 0.0;
 	std::fstream of;
 	of.open(lmr, ios_base::in | ios_base::binary);
-	while (!of.eof())
+	
+	
+	/*while (!of.eof())
 	{
 		of.read((char*)&pt, sizeof(unsigned int));
 		of.read((char*)&ct, sizeof(double));
@@ -124,30 +117,33 @@ unsigned int xMultiBodySimulation::setupByLastSimulationFile(std::string lmr)
 		of.read((char*)q_1.Data(), sizeof(double) * mdim + xModel::OneDOF());
 		of.read((char*)rhs.Data(), sizeof(double) * tdim);
 		lagMul = rhs.Data() + mdim;
-		foreach(xPointMass* xpm, xmbd->Masses())
+		xmap<xstring, xPointMass*>::iterator it = xmbd->Masses().begin();
+		while (it.has_next())
 		{
+			xPointMass* xpm = it.value();
 			of.read((char*)xpm->getForcePointer(), sizeof(double) * 18);
 			xpm->SaveStepResult(pt, ct, q, qd, rhs);
+			it.next();
 		}
 		unsigned int sr = 0;
 		cjaco.zeros();
-		foreach(xKinematicConstraint* xkc, xmbd->Joints())
+		for (xmap<xstring, xKinematicConstraint*>::iterator it = xmbd->Joints().begin(); it != xmbd->Joints().end(); it.next())
 		{
-			xkc->SaveStepResult(pt, ct, q, qd, lagMul, sr);
-			sr += xkc->NumConst();
+			it.value()->SaveStepResult(pt, ct, q, qd, lagMul, sr);
+			sr += it.value()->NumConst();
 		}
-		foreach(xDrivingConstraint* xdc, xmbd->Drivings())
+		for (xmap<xstring, xDrivingConstraint*>::iterator it = xmbd->Drivings().begin(); it != xmbd->Drivings().end(); it.next())
 		{
-			xdc->SaveStepResult(pt, ct, q, qd, lagMul, sr);
+			it.value()->SaveStepResult(pt, ct, q, qd, lagMul, sr);
 			sr++;
 		}
 	}
 	
-	foreach(xPointMass* xpm, xmbd->Masses())
+	for (xmap<xstring, xPointMass*>::iterator it = xmbd->Masses().begin(); it != xmbd->Masses().end(); it.next())
 	{
-		xpm->setNewPositionData(q);
-		xpm->setNewVelocityData(qd);
-	}		
+		it.value()->setNewPositionData(q);
+		it.value()->setNewVelocityData(qd);
+	}*/		
 	return pt;
 }
 
@@ -159,6 +155,7 @@ int xMultiBodySimulation::Initialize(xMultiBodyModel* _xmbd)
 	int nr = 0;
 	mdim = nm * xModel::OneDOF();
 	sdim = nm;
+	xDynamicsManager::This()->XResult()->set_num_generailzed_coordinates(mdim);
 	q.alloc(mdim + xModel::OneDOF());// = new double[mdim];
 	q_1.alloc(mdim + xModel::OneDOF());
 	qd.alloc(mdim + xModel::OneDOF());// = new double[mdim];
@@ -172,8 +169,10 @@ int xMultiBodySimulation::Initialize(xMultiBodyModel* _xmbd)
 	q(idx + 5) = ground->EulerParameters().e2;
 	q(idx + 6) = ground->EulerParameters().e3;
 	unsigned int sid = 0;
-	foreach(xPointMass* xpm, xmbd->Masses())
+	xmap<xstring, xPointMass*>::iterator it = xmbd->Masses().begin();
+	while (it.has_next())
 	{
+		xPointMass* xpm = it.value();
 		xpm->setXpmIndex(++sid);
 		xpm->ImportInitialData();
 		idx = xpm->xpmIndex() * xModel::OneDOF();
@@ -186,10 +185,13 @@ int xMultiBodySimulation::Initialize(xMultiBodyModel* _xmbd)
 		q(idx + 6) = xpm->EulerParameters().e3;	qd(idx + 6) = xpm->DEulerParameters().e3;
 		xpm->setupInertiaMatrix();
 		xpm->setupTransformationMatrix();
-		xpm->AllocResultMomory(xSimulation::npart);
+	//	xpm->AllocResultMomory(xSimulation::npart);
+		xDynamicsManager::This()->XResult()->alloc_mass_result_memory(xpm->Name());
+		it.next();
 	}
-	foreach(xKinematicConstraint* xkc, xmbd->Joints())
+	for (xmap<xstring, xKinematicConstraint*>::iterator it = xmbd->Joints().begin(); it != xmbd->Joints().end(); it.next())
 	{
+		xKinematicConstraint* xkc = it.value();
 		sdim += xkc->NumConst();
 		std::string bn = xkc->BaseBodyName();
 		std::string an = xkc->ActionBodyName();
@@ -198,15 +200,18 @@ int xMultiBodySimulation::Initialize(xMultiBodyModel* _xmbd)
 		xkc->setBaseBodyIndex(base_idx);
 		xkc->setActionBodyIndex(action_idx);
 		xkc->AllocResultMemory(xSimulation::npart);
+		xDynamicsManager::This()->XResult()->alloc_joint_result_memory(xkc->Name());
 		//xkc->set
 	}
-	foreach(xDrivingConstraint* xdc, xmbd->Drivings())
+	for (xmap<xstring, xDrivingConstraint*>::iterator it = xmbd->Drivings().begin(); it != xmbd->Drivings().end(); it.next())
 	{
-		xdc->define(q);
+		it.value()->define(q);
+		xDynamicsManager::This()->XResult()->alloc_joint_result_memory(it.value()->Name());
 		sdim++;
 	}
-	foreach(xForce* xf, xmbd->Forces())
+	for(xmap<xstring, xForce*>::iterator it = xmbd->Forces().begin(); it != xmbd->Forces().end(); it.next())
 	{
+		xForce* xf = it.value();
 		std::string bn = xf->BaseBodyName();
 		std::string an = xf->ActionBodyName();
 		int base_idx = bn == "ground" ? 0 : xmbd->XMass(bn)->xpmIndex();
@@ -215,6 +220,7 @@ int xMultiBodySimulation::Initialize(xMultiBodyModel* _xmbd)
 		xf->setActionBodyIndex(action_idx);
 		//xf->setBaseLocalCoordinate();
 	}
+	xDynamicsManager::This()->XResult()->set_num_constraints_equations(sdim);
 	dof = mdim - sdim;
 	std::stringstream wss;
 	wss << dof;
@@ -223,13 +229,6 @@ int xMultiBodySimulation::Initialize(xMultiBodyModel* _xmbd)
 		xLog::log(std::string("There are ") + wss.str() + std::string("redundant constraint equations"));
 		return xDynamicsError::xdynamicsErrorMultiBodyModelRedundantCondition;
 	}
-// 	else if (dof == 0)
-// 	{
-// // 		tdim = sdim;
-// // 		lhs.alloc(sdim, sdim);// new_matrix(tdim, tdim);
-// // 		cjaco.alloc(sdim, sdim);
-// // 		rhs.alloc(sdim);// = new double[tdim];
-// 	}
 	else
 	{
 		tdim = mdim + sdim;
@@ -244,8 +243,10 @@ void xMultiBodySimulation::ConstructMassMatrix(double mul)
 {
 	lhs.zeros();
 	unsigned int src = 0;
-	foreach(xPointMass* xpm, xmbd->Masses())
+	xmap<xstring, xPointMass*>::iterator it = xmbd->Masses().begin();
+	while (it.has_next())
 	{
+		xPointMass* xpm = it.value();
 		src = (xpm->xpmIndex() - 1) * xModel::OneDOF();
 		int idx = xpm->xpmIndex() * xModel::OneDOF();
 		euler_parameters e = xpm->EulerParameters();// new_euler_parameters(q(idx + 3), q(idx + 4), q(idx + 5), q(idx + 6));
@@ -256,6 +257,7 @@ void xMultiBodySimulation::ConstructMassMatrix(double mul)
 		lhs(src + 4, src + 3) = LTJL.a10; lhs(src + 4, src + 4) = LTJL.a11; lhs(src + 4, src + 5) = LTJL.a12; lhs(src + 4, src + 6) = LTJL.a13;
 		lhs(src + 5, src + 3) = LTJL.a20; lhs(src + 5, src + 4) = LTJL.a21; lhs(src + 5, src + 5) = LTJL.a22; lhs(src + 5, src + 6) = LTJL.a23;
 		lhs(src + 6, src + 3) = LTJL.a30; lhs(src + 6, src + 4) = LTJL.a31; lhs(src + 6, src + 5) = LTJL.a32; lhs(src + 6, src + 6) = LTJL.a33;
+		it.next();
 	}
 }
 
@@ -264,42 +266,27 @@ void xMultiBodySimulation::ConstructContraintJacobian()
 	unsigned int sr = 0;
 	unsigned int sc = 0;
 	cjaco.zeros();
-	foreach(xKinematicConstraint* xkc, xmbd->Joints())
+	for (xmap<xstring, xKinematicConstraint*>::iterator it = xmbd->Joints().begin(); it != xmbd->Joints().end(); it.next())
 	{
-		xkc->ConstraintJacobian(cjaco, q, qd, sr);
-		sr += xkc->NumConst();
+		it.value()->ConstraintJacobian(cjaco, q, qd, sr);
+		sr += it.value()->NumConst();
 	}
-	foreach(xDrivingConstraint* xdc, xmbd->Drivings())
+	for (xmap<xstring, xDrivingConstraint*>::iterator it = xmbd->Drivings().begin(); it != xmbd->Drivings().end(); it.next())
 	{
-		xdc->ConstraintJacobian(cjaco, q, qd, sr, xSimulation::ctime);
+		it.value()->ConstraintJacobian(cjaco, q, qd, sr, xSimulation::ctime);
 		sr++;
 	}
 	unsigned int id = 0;
-	foreach(xPointMass* xpm, xmbd->Masses())
+	xmap<xstring, xPointMass*>::iterator it = xmbd->Masses().begin();
+	while (it.has_next())
 	{
+		xPointMass* xpm = it.value();
 		id = xpm->xpmIndex() * xModel::OneDOF();
 		sc = (xpm->xpmIndex() - 1) * xModel::OneDOF();
 		euler_parameters e = 2.0 * xpm->EulerParameters();// new_vector4d(q(id + 3), q(id + 4), q(id + 5), q(id + 6));
 		cjaco.insert(sr++, sc + 3, new_vector4d(e.e0, e.e1, e.e2, e.e3));
+		it.next();
 	}
-	
-// 	xKinematicConstraint* xkc = xmbd->BeginKinematicConstraint();
-// 	while (xkc != xmbd->EndKinematicConstraint())
-// 	{
-// 		xkc->ConstraintJacobian(cjaco, q, qd, sr);
-// 		sr += xkc->NumConst();
-// 		xkc = xmbd->NextKinematicConstraint();
-// 	}
-// 	xPointMass* xpm = xmbd->BeginPointMass();
-// 	unsigned int id = 0;
-// 	while (xpm != xmbd->EndPointMass())
-// 	{
-// 		id = xpm->xpmIndex() * xModel::OneDOF();
-// 		sc = (xpm->xpmIndex() - 1) * xModel::OneDOF();
-// 		vector4d e = 2.0 * new_vector4d(q(id + 3), q(id + 4), q(id + 5), q(id + 6));
-// 		cjaco.insert(sr++, sc + 3, e);
-// 		xpm = xmbd->NextPointMass();
-// 	}
 }
 
 void xMultiBodySimulation::ConstructForceVector(xVectorD& v)
@@ -307,32 +294,13 @@ void xMultiBodySimulation::ConstructForceVector(xVectorD& v)
 	euler_parameters e, ev;
 	vector3d f;
 	vector4d m;
-	//xPointMass* xpm = xmbd->BeginPointMass();
 	unsigned int j = 0;
-	/*if (dem_tsda)
+	for (xmap<xstring, xForce*>::iterator it = xmbd->Forces().begin(); it != xmbd->Forces().end(); it.next())
+		it.value()->xCalculateForce(q, qd);
+	xmap<xstring, xPointMass*>::iterator it = xmbd->Masses().begin();
+	while (it.has_next())
 	{
-		for (unsigned int i = 0; i < dem_tsda->NumSpringDamperBodyConnection(); i++)
-		{
-			xSpringDamperBodyConnectionInfo info = dem_tsda->xSpringDamperBodyConnectionInformation()[i];
-			xPointMass* pm = xmbd->XMass(info.cbody.toStdString());
-			dem_tsda->xCalculateForceFromDEM(i, pm, dem_pos, dem_vel);
-		}
-
-	}*/
-		
-	foreach(xForce* xf, xmbd->Forces())
-	{
-		xf->xCalculateForce(q, qd);
-	}
-	foreach(xPointMass* xpm, xmbd->Masses())
-	{
-	/*	if (xpm->Name() == "wheel")
-		{
-			xpm->setAxialForce(0, 0, 5.0);
-			xpm->setAxialMoment(0.001, 0.001, 0.001);
-		}*/
-			
-	//	i = xpm->xpmIndex() * 7;
+		xPointMass* xpm = it.value();
 		e = xpm->EulerParameters();// new_euler_parameters(q(i + 3), q(i + 4), q(i + 5), q(i + 6));
 		ev = xpm->DEulerParameters();// new_euler_parameters(qd(i + 3), qd(i + 4), qd(i + 5), qd(i + 6));
 		f = xpm->Mass() * xModel::gravity + xpm->ContactForce() + xpm->AxialForce() + xpm->HydroForce();
@@ -343,101 +311,75 @@ void xMultiBodySimulation::ConstructForceVector(xVectorD& v)
 		v(j + 3) = m.x; v(j + 4) = m.y; v(j + 5) = m.z; v(j + 6) = m.w;
 		//i += xModel::OneDOF();
 		j += xModel::OneDOF();
+		it.next();
 	}
-
-	
-// 	while (xpm != xmbd->EndPointMass())
-// 	{
-// 		i = xpm->xpmIndex() * 7;
-// 		e = new_euler_parameters(q(i + 3), q(i + 4), q(i + 5), q(i + 6));
-// 		ev = new_euler_parameters(qd(i + 3), qd(i + 4), qd(i + 5), qd(i + 6));
-// 		f = xpm->Mass() * xModel::gravity + xpm->ContactForce() + xpm->AxialForce() + xpm->HydroForce();
-// 		m = 2.0 * (xpm->ContactMoment() + xpm->AxialMoment() + xpm->HydroMoment()) * GMatrix(e);
-// 		m += CalculateInertiaForce(ev, xpm->Inertia(), e);
-// 		v(j + 0) = f.x; v(j + 1) = f.y; v(j + 2) = f.z;
-// 		v(j + 3) = m.x; v(j + 4) = m.y; v(j + 5) = m.z; v(j + 6) = m.w;
-// 		i += xModel::OneDOF();
-// 		j += xModel::OneDOF();
-// 		xpm = xmbd->NextPointMass();
-// 	}
 }
 
 void xMultiBodySimulation::ConstructConstraintEquation(xVectorD& v, int sr, double mul /*= 1.0*/)
 {
 	//unsigned int sr = mdim;
-	foreach(xKinematicConstraint* xkc, xmbd->Joints())
+	for (xmap<xstring, xKinematicConstraint*>::iterator it = xmbd->Joints().begin(); it != xmbd->Joints().end(); it.next())
 	{
-		xkc->ConstraintEquation(v, q, qd, sr, mul);
-		sr += xkc->NumConst();
+		it.value()->ConstraintEquation(v, q, qd, sr, mul);
+		sr += it.value()->NumConst();
 	}
-	
-// 	xKinematicConstraint* xkc = xmbd->BeginKinematicConstraint();
-// 	while (xkc != xmbd->EndKinematicConstraint())
-// 	{
-// 		xkc->ConstraintEquation(v, q, qd, sr, mul);
-// 		sr += xkc->NumConst();
-// 		xkc = xmbd->NextKinematicConstraint();
-// 	}
-	foreach(xDrivingConstraint* xdc, xmbd->Drivings())
+	for (xmap<xstring, xDrivingConstraint*>::iterator it = xmbd->Drivings().begin(); it != xmbd->Drivings().end(); it.next())
 	{
-		xdc->ConstraintEquation(v, q, qd, sr, xSimulation::ctime, mul);
+		it.value()->ConstraintEquation(v, q, qd, sr, xSimulation::ctime, mul);
 		sr++;
 	}
-	foreach(xPointMass* xpm, xmbd->Masses())
+	xmap<xstring, xPointMass*>::iterator it = xmbd->Masses().begin();
+	while (it.has_next())
 	{
+		xPointMass* xpm = it.value();
 		unsigned int id = xpm->xpmIndex() * xModel::OneDOF();
 		euler_parameters e = xpm->EulerParameters();// new_euler_parameters(q(id + 3), q(id + 4), q(id + 5), q(id + 6));
 		v(sr++) = mul * (dot(e, e) - 1.0);
+		it.next();
 	}
-	
-// 	xPointMass* xpm = xmbd->BeginPointMass();
-// 	while (xpm != xmbd->EndPointMass())
-// 	{
-// 		unsigned int id = xpm->xpmIndex() * xModel::OneDOF();
-// 		euler_parameters e = new_euler_parameters(q(id + 3), q(id + 4), q(id + 5), q(id + 6));
-// 		v(sr++) = mul * (dot(e, e) - 1.0);
-// 		xpm = xmbd->NextPointMass();
-// 	}
 }
 
 void xMultiBodySimulation::ConstructConstraintDerivative(xVectorD& v, int sr, double mul /*= 1.0*/)
 {
-	//v.zeros();
-	foreach(xKinematicConstraint* xkc, xmbd->Joints())
+	for (xmap<xstring, xKinematicConstraint*>::iterator it = xmbd->Joints().begin(); it != xmbd->Joints().end(); it.next())
+		sr += it.value()->NumConst();
+	for (xmap<xstring, xDrivingConstraint*>::iterator it = xmbd->Drivings().begin(); it != xmbd->Drivings().end(); it.next())
 	{
-		sr += xkc->NumConst();
-	}
-	foreach(xDrivingConstraint* xdc, xmbd->Drivings())
-	{
-		xdc->ConstraintDerivative(v, q, qd, sr, xSimulation::ctime, mul);
+		it.value()->ConstraintDerivative(v, q, qd, sr, xSimulation::ctime, mul);
 		sr++;
 	}
-	foreach(xPointMass* xpm, xmbd->Masses())
+	xmap<xstring, xPointMass*>::iterator it = xmbd->Masses().begin();
+	while (it.has_next())
 	{
+		xPointMass* xpm = it.value();
 		unsigned int id = xpm->xpmIndex() * xModel::OneDOF();
 		euler_parameters e = xpm->EulerParameters();// new_euler_parameters(q(id + 3), q(id + 4), q(id + 5), q(id + 6));
 		v(sr++) = mul * (dot(e, e) - 1.0);
+		it.next();
 	}
 }
 
 void xMultiBodySimulation::ConstructConstraintGamma(xVectorD& v, int sr /*= 0.0*/, double mul /*= 1.0*/)
 {
 	//v.zeros();
-	foreach(xKinematicConstraint* xkc, xmbd->Joints())
+	for (xmap<xstring, xKinematicConstraint*>::iterator it = xmbd->Joints().begin(); it != xmbd->Joints().end(); it.next())
 	{
-		xkc->GammaFunction(v, q, qd, sr, mul);
-		sr += xkc->NumConst();
+		it.value()->GammaFunction(v, q, qd, sr, mul);
+		sr += it.value()->NumConst();
 	}
-	foreach(xDrivingConstraint* xdc, xmbd->Drivings())
+	for(xmap<xstring, xDrivingConstraint*>::iterator it = xmbd->Drivings().begin(); it != xmbd->Drivings().end(); it.next())
 	{
-		xdc->ConstraintGamma(v, q, qd, sr, xSimulation::ctime, mul);
+		it.value()->ConstraintGamma(v, q, qd, sr, xSimulation::ctime, mul);
 		sr++;
 	}
-	foreach(xPointMass* xpm, xmbd->Masses())
+	xmap<xstring, xPointMass*>::iterator it = xmbd->Masses().begin();
+	while (it.has_next())
 	{
+		xPointMass* xpm = it.value();
 		unsigned int id = xpm->xpmIndex() * xModel::OneDOF();
 		euler_parameters e = xpm->DEulerParameters();// new_euler_parameters(qd(id + 3), qd(id + 4), qd(id + 5), qd(id + 6));
 		v(sr++) = mul * 2.0 * dot(e, e);
+		it.next();
 	}
 }
 
@@ -445,14 +387,4 @@ vector4d xMultiBodySimulation::CalculateInertiaForce(const euler_parameters& ev,
 {
 	matrix34d Gd = GMatrix(ev);
 	return 8.0 * Gd * (J * (Gd * ep));
-// 	double GvP0 = -ev.e1*ep.e0 + ev.e0*ep.e1 + ev.e3*ep.e2 - ev.e2*ep.e3;
-// 	double GvP1 = -ev.e2*ep.e0 - ev.e3*ep.e1 + ev.e0*ep.e2 + ev.e1*ep.e3;
-// 	double GvP2 = -ev.e3*ep.e0 + ev.e2*ep.e1 - ev.e1*ep.e2 + ev.e0*ep.e3;
-// 	return vector4d
-// 	{
-// 		8 * (-ev.e1*J.a00*GvP0 - ev.e2*J.a11*GvP1 - ev.e3*J.a22*GvP2),
-// 		8 * (ev.e0*J.a00*GvP0 - ev.e3*J.a11*GvP1 + ev.e2*J.a22*GvP2),
-// 		8 * (ev.e3*J.a00*GvP0 + ev.e0*J.a11*GvP1 - ev.e1*J.a22*GvP2),
-// 		8 * (-ev.e2*J.a00*GvP0 + ev.e1*J.a11*GvP1 + ev.e0*J.a22*GvP2) 
-// 	};
 }

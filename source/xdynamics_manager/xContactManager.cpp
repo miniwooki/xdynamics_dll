@@ -37,7 +37,7 @@ xContactManager::xContactManager()
 
 xContactManager::~xContactManager()
 {
-	qDeleteAll(cots);
+	if (cots.size()) cots.delete_all();//qDeleteAll(cots);
 // 	if (cpp) delete cpp; cpp = NULL;
  	if (cpmeshes) delete cpmeshes; cpmeshes = NULL;
  	if (cpplane) delete cpplane; cpplane = NULL;
@@ -89,7 +89,7 @@ xContact* xContactManager::CreateContactPair(
 	case PARTICLE_PARTICLE:	cpp = new xParticleParticleContact(n); c = cpp;	break;
 	case PARTICLE_CUBE:	c = new xParticleCubeContact(n, o1, o2); break;
 	case PARTICLE_PANE:	c = new xParticlePlaneContact(n); break;
-	case PARTICLE_MESH_SHAPE: c = new xParticleMeshObjectContact(n, o1, o2); cpmesh[c->Name()] = dynamic_cast<xParticleMeshObjectContact*>(c); break;
+	case PARTICLE_MESH_SHAPE: c = new xParticleMeshObjectContact(n, o1, o2); cpmesh.insert(c->Name(), dynamic_cast<xParticleMeshObjectContact*>(c)); break;
 	case PARTICLE_CYLINDER: c = new xParticleCylinderContact(n, o1, o2); break;
 	}
 	xMaterialPair mpp =
@@ -108,8 +108,8 @@ xContact* xContactManager::CreateContactPair(
 	c->setFriction(d.mu);
 	c->setCohesion(d.coh);
 	c->setRollingFactor(d.rf);
-	QString name = QString::fromStdString(n);
-	cots[name] = c;
+	xstring name = n;
+	cots.insert(name, c);
 	//c->setContactParameters(rest, ratio, fric, cohesion);
 	return c;
 }
@@ -128,19 +128,19 @@ unsigned int xContactManager::setupParticlesMeshObjectsContact()
 void xContactManager::setupParticlesCylindersContact()
 {
 	unsigned int n = 0;
-	foreach(xContact* xc, cots)
-		if (xc->PairType() == xContactPairType::PARTICLE_CYLINDER)
+	for(xmap<xstring, xContact*>::iterator it = cots.begin(); it != cots.end(); it.next())
+		if (it.value()->PairType() == xContactPairType::PARTICLE_CYLINDER)
 			n++;
 	if (!n) return;
 	if (n && !cpcylinders)
 		cpcylinders = new xParticleCylindersContact;
 	cpcylinders->allocHostMemory(n);
 	unsigned int cnt = 0;
-	foreach(xContact* xc, cots)
+	for (xmap<xstring, xContact*>::iterator it = cots.begin(); it != cots.end(); it.next())
 	{
-		if (xc->PairType() == xContactPairType::PARTICLE_CYLINDER)
+		if (it.value()->PairType() == xContactPairType::PARTICLE_CYLINDER)
 		{
-			cpcylinders->define(cnt, dynamic_cast<xParticleCylinderContact*>(xc));
+			cpcylinders->define(cnt, dynamic_cast<xParticleCylinderContact*>(it.value()));
 			cnt++;//	case xContactPairType::PARTICLE_CUBE: cpplane->define(n, dynamic_cast<xParticleCubeContact*>(xc)); n += 6; break;
 		}
 	}
@@ -155,9 +155,9 @@ void xContactManager::setNumClusterObject(unsigned int nc)
 void xContactManager::setupParticlesPlanesContact()
 {
 	unsigned int n = 0;
-	foreach(xContact* xc, cots)
+	for (xmap<xstring, xContact*>::iterator it = cots.begin(); it != cots.end(); it.next())
 	{
-		switch (xc->PairType())
+		switch (it.value()->PairType())
 		{
 		case xContactPairType::PARTICLE_PANE: n++; break;
 		case xContactPairType::PARTICLE_CUBE: n += 6; break;
@@ -168,37 +168,39 @@ void xContactManager::setupParticlesPlanesContact()
 		cpplane = new xParticlePlanesContact;
 	cpplane->allocHostMemory(n);
 	n = 0;
-	foreach(xContact* xc, cots)
+	for (xmap<xstring, xContact*>::iterator it = cots.begin(); it != cots.end(); it.next())
 	{
-		switch (xc->PairType())
+		switch (it.value()->PairType())
 		{
-		case xContactPairType::PARTICLE_PANE: cpplane->define(n, dynamic_cast<xParticlePlaneContact*>(xc)); n++; break;
-		case xContactPairType::PARTICLE_CUBE: cpplane->define(n, dynamic_cast<xParticleCubeContact*>(xc)); n += 6; break;
+		case xContactPairType::PARTICLE_PANE: cpplane->define(n, dynamic_cast<xParticlePlaneContact*>(it.value())); n++; break;
+		case xContactPairType::PARTICLE_CUBE: cpplane->define(n, dynamic_cast<xParticleCubeContact*>(it.value())); n += 6; break;
 		}
 	}
 }
 
 void xContactManager::insertContact(xContact* c)
 {
-	QString qname = c->Name();
+	//QString qname = c->Name();
 	if (c->PairType() == xContactPairType::PARTICLE_MESH_SHAPE)
 	{
 	}
 	//	cppos[c->Name()] = dynamic_cast<contact_particles_polygonObject*>(c);
 	else
-		cots[qname] = c;
+		cots.insert(c->Name(), c);
 }
 
-xContact* xContactManager::Contact(QString n)
+xContact* xContactManager::Contact(std::string n)
 {
-	QStringList keys = cots.keys();
-	QStringList::const_iterator it = qFind(keys, n);
-	if (it == keys.end() || !keys.size())
+	xstring xn = n;
+	//QStringList keys = cots.keys();
+//	QStringList::const_iterator it = qFind(keys, n);
+	xmap<xstring, xContact*>::iterator it = cots.find(xn);
+	if (it == cots.end() || !cots.size())
 		return NULL;
-	return cots[n];
+	return it.value();// cots[n];
 }
 
-QMap<QString, xContact*>& xContactManager::Contacts()
+xmap<xstring, xContact*>& xContactManager::Contacts()
 {
 	return cots;
 }
@@ -434,8 +436,9 @@ void xContactManager::deviceCollision(
 				unsigned int cnt = 0;
 				device_body_force *dbfm = cpmeshes->deviceBodyForceAndMoment();
 				memset(dbfm, 0, sizeof(device_body_force) * cpmeshes->NumContact());
-				foreach(xParticleMeshObjectContact* cpm, cpmesh)
+				for (xmap<xstring, xParticleMeshObjectContact*>::iterator it = cpmesh.begin(); it != cpmesh.end(); it.next())// (xParticleMeshObjectContact* cpm, cpmesh)
 				{
+					xParticleMeshObjectContact* cpm = it.value();
 					ePolySphere = cpm->MeshObject()->NumTriangle();
 					cu_cluster_meshes_contact(
 						cpmeshes->deviceTrianglesInfo(),
@@ -512,8 +515,9 @@ void xContactManager::deviceCollision(
 				unsigned int cnt = 0;
 				device_body_force *dbfm = cpmeshes->deviceBodyForceAndMoment();
 				memset(dbfm, 0, sizeof(device_body_force) * cpmeshes->NumContactObjects());
-				foreach(xParticleMeshObjectContact* cpm, cpmesh)
+				for (xmap<xstring, xParticleMeshObjectContact*>::iterator it = cpmesh.begin(); it != cpmesh.end(); it.next())
 				{
+					xParticleMeshObjectContact* cpm = it.value();
 					ePolySphere = cpm->MeshObject()->NumTriangle();
 					cu_particle_polygonObject_collision(
 						cpmeshes->deviceTrianglesInfo(),

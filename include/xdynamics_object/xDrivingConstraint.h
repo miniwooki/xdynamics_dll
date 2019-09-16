@@ -15,7 +15,7 @@ public:
 	~xDrivingConstraint();
 
 	void define(xVectorD& q);
-	QString Name();
+	std::string Name();
 	void setStartTime(double st);
 	void setConstantVelocity(double cv);
 	void ImportResults(std::string f);
@@ -32,20 +32,20 @@ public:
 	void ConstraintDerivative(xVectorD& rhs, xVectorD& q, xVectorD& qd, unsigned int sr, double ct, double mul);
 	void ConstraintJacobian(xSparseD& lhs, xVectorD& q, xVectorD& qd, unsigned int sr, double ct);
 	void DerivateJacobian(xMatrixD& lhs, xVectorD& q, xVectorD& q_1, double* lm, unsigned int sr, double mul, double ct);
-	void SaveStepResult(unsigned int part, double ct, xVectorD& q, xVectorD& q_1, double* L, unsigned int sr);
+	xKinematicConstraint::kinematicConstraint_result GetStepResult(unsigned int part,double ct, xVectorD& q, xVectorD& q_1, double* L, unsigned int sr);
 	void DerivateEquation(xVectorD& v, xVectorD& q, xVectorD& qd, int sr, double ct, double mul);
 
 private:
 	double RelativeAngle(double ct, vector3d& gi, vector3d& fi, vector3d& fj);
 
-	QString name;
+	xstring name;
 	int type;
 	double plus_time;
 	double start_time;
 	//int maxnnz;
 	double init_v;
 	double cons_v;
-	QVector<xKinematicConstraint::kinematicConstraint_result> kcrs;
+//	QVector<xKinematicConstraint::kinematicConstraint_result> kcrs;
 	double theta;
 	//unsigned int srow;
 	//unsigned int scol;

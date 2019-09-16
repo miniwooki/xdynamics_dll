@@ -89,8 +89,8 @@ void xRevoluteConstraint::DerivateJacobian(xMatrixD& lhs, xVectorD& q, xVectorD&
 	dot_1_differentialJacobian(lhs, gi, hj, ei, ej, mul * lm[4]);
 }
 
-void xRevoluteConstraint::SaveStepResult(
-	unsigned int part, double ct, xVectorD& q, xVectorD& qd, double* L, unsigned int sr)
+xKinematicConstraint::kinematicConstraint_result xRevoluteConstraint::GetStepResult(
+	unsigned int part, xVectorD& q, xVectorD& qd, double* L, unsigned int sr)
 {
 	unsigned int sc = 0;
 // 	unsigned int si = i * xModel::OneDOF();
@@ -124,10 +124,11 @@ void xRevoluteConstraint::SaveStepResult(
 		rf = sce * L3 + lm[3] * r0 + lm[4] * r1;
 		kcr.jrforce = 0.5 * LMatrix(ej) * rf;
 	}
-	kcr.time = ct;
 	kcr.location = ri + Ai * spi;
-	kcrs.push_back(kcr);
+
+	//kcrs.push_back(kcr);
 	nr_part++;
+	return kcr;
 }
 
 void xRevoluteConstraint::GammaFunction(xVectorD& rhs, xVectorD& q, xVectorD& qd, unsigned int sr, double mul)

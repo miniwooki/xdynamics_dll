@@ -4,6 +4,7 @@
 #include "xdynamics_decl.h"
 #include "xdynamics_object/xParticleObject.h"
 #include "xModel.h"
+#include "xmap.hpp"
 
 //class xParticleObject;
 class xClusterObject;
@@ -23,8 +24,8 @@ public:
 	void CopyClusterInformation(xClusterInformation* xci, double* rcloc);
 	bool SetClusterMassAndInertia(xParticleObject* xpo);
 	bool SetMassAndInertia(xParticleObject* xpo);
-	QMap<QString, xParticleObject*>& XParticleObjects();
-	xParticleObject* XParticleObject(QString& ws);
+	xmap<xstring, xParticleObject*>& XParticleObjects();
+	xParticleObject* XParticleObject(std::string ws);
 	void ExportParticleDataForView(std::string path);
 // 	void setRealTimeCreating(bool b);
 // 	bool OneByOneCreating();
@@ -86,8 +87,8 @@ private:
 	//unsigned int num_xpo;
 	//unsigned int per_np;
 	//double per_time;
-	QMap<QString, xParticleObject*> xpcos;
-	QMap<QString, xParticleCreateCondition> xpccs;
+	xmap<xstring, xParticleObject*> xpcos;
+	xmap<xstring, xParticleCreateCondition> xpccs;
 
 	double *r_pos;
 	double *r_vel;

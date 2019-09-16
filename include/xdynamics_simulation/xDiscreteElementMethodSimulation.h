@@ -6,7 +6,8 @@
 #include "xdynamics_manager/xContactManager.h"
 #include "xdynamics_algebra/xNeiborhoodCell.h"
 #include "xdynamics_manager/XDiscreteElementMethodModel.h"
-#include <QtCore/QString>
+#include "xlist.hpp"
+//#include <QtCore/QString>
 
 class XDYNAMICS_API xDiscreteElementMethodSimulation : public xSimulation
 {
@@ -20,7 +21,7 @@ public:
 	/*bool initialize_f(contactManager* _cm);*/
 	virtual int OneStepSimulation(double ct, unsigned int cstep) = 0;
 	/*bool oneStepAnalysis_f(double ct, unsigned int cstep);*/
-	QString SaveStepResult(unsigned int pt, double ct);
+	bool SaveStepResult(unsigned int pt);
 	void ExportResults(std::fstream& of);
 	void EnableSaveResultToMemory(bool b);
 	double CriticalTimeStep(double min_rad);
@@ -28,6 +29,7 @@ public:
 	double* Position();
 	double* Velocity();
 	void SpringDamperForce();
+	unsigned int num_particles();
 	unsigned int setupByLastSimulationFile(std::string ldr);
 
 protected:
@@ -87,7 +89,7 @@ protected:
 	xSpringDamperBodyConnectionData *dxsdc_body_data;
 	device_tsda_connection_body_data *dxsd_cbd;
 
-	QList<QString> partList;
+	xlist<xstring> partList;
 };
 
 #endif

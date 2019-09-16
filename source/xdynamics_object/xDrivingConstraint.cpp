@@ -1,5 +1,6 @@
 ﻿#include "xdynamics_object/xDrivingConstraint.h"
 #include "xdynamics_object/xKinematicConstraint.h"
+#include <sstream>
 
 xDrivingConstraint::xDrivingConstraint()
 	: type(ROTATION_DRIVING)
@@ -31,7 +32,7 @@ xDrivingConstraint::xDrivingConstraint(std::string _name, xKinematicConstraint* 
 	else if (kconst->Type() == xKinematicConstraint::TRANSLATIONAL)
 		type = TRANSLATION_DRIVING;
 
-	name = QString::fromStdString(_name);// wsprintfW(name, TEXT("%s"), _name);
+	name = _name;// wsprintfW(name, TEXT("%s"), _name);
 }
 
 xDrivingConstraint::~xDrivingConstraint()
@@ -63,9 +64,9 @@ void xDrivingConstraint::define(xVectorD& q)
 	}
 }
 
-QString xDrivingConstraint::Name()
+std::string xDrivingConstraint::Name()
 {
-	return name;
+	return name.toStdString();
 }
 
 void xDrivingConstraint::setStartTime(double st)
@@ -80,43 +81,46 @@ void xDrivingConstraint::setConstantVelocity(double cv)
 
 void xDrivingConstraint::ImportResults(std::string f)
 {
-	std::fstream fs;
-	fs.open(f, ios_base::in | ios_base::binary);
-	char t = 'e';
-	int identifier = 0;
-	fs.read((char*)&identifier, sizeof(int));
-	fs.read(&t, sizeof(char));
-	fs.read((char*)&nr_part, sizeof(unsigned int));
-	for (unsigned int i = 0; i < nr_part; i++)
-	{
-		xKinematicConstraint::kinematicConstraint_result kr = { 0, };
-		fs.read((char*)&kr, sizeof(xKinematicConstraint::kinematicConstraint_result));
-		kcrs.push_back(kr);
-	}
-	//fs.read((char*)kcrs.data(), sizeof(kinematicConstraint_result) * nr_part);
-	fs.close();
+	//std::fstream fs;
+	//fs.open(f, ios_base::in | ios_base::binary);
+	//char t = 'e';
+	//int identifier = 0;
+	//fs.read((char*)&identifier, sizeof(int));
+	//fs.read(&t, sizeof(char));
+	//fs.read((char*)&nr_part, sizeof(unsigned int));
+	//for (unsigned int i = 0; i < nr_part; i++)
+	//{
+	//	xKinematicConstraint::kinematicConstraint_result kr = { 0, };
+	//	fs.read((char*)&kr, sizeof(xKinematicConstraint::kinematicConstraint_result));
+	//	kcrs.push_back(kr);
+	//}
+	////fs.read((char*)kcrs.data(), sizeof(kinematicConstraint_result) * nr_part);
+	//fs.close();
 }
 
 void xDrivingConstraint::ExportResults(std::fstream & of)
 {
-	std::ofstream ofs;
-	QString _path = xModel::path + xModel::name + "/" + name + ".bkc";
-	//QString _path = QString(xModel::path) + QString(xModel::name) + "/" + QString(name) + ".bkc";
-	ofs.open(_path.toStdString().c_str(), ios::binary | ios::out);
-	char t = 'k';
-	int identifier = RESULT_FILE_IDENTIFIER;
-	ofs.write((char*)&identifier, sizeof(int));
-	ofs.write(&t, sizeof(char));
-	ofs.write((char*)&nr_part, sizeof(unsigned int));
-	ofs.write((char*)kcrs.data(), sizeof(xKinematicConstraint::kinematicConstraint_result) * nr_part);
-	// 	ofs << "time " << "px " << "py " << "pz " << "vx " << "vy " << "vz " << "ax " << "ay " << "az " 
-	// 		<< "avx " << "avy " << "avz "x << "aax " << "aay " << "aaz " 
-	// 		<< "afx " << "afy " << "afz " << "amx " << "amy " << "amz " 
-	// 		<< "afx " << "afy " << "afz " << "amx " << "amy " << "amz "
-	// 		<< "afx " << "afy " << "afz " << "amx " << "amy " << "amz "
-	ofs.close();
-	xLog::log("Exported : " + _path.toStdString());
-	of << _path.toStdString() << endl;
+	//std::ofstream ofs;
+	//std::string _path;
+	//stringstream ss(_path);
+	//ss << (xModel::path + xModel::name + "/").toStdString() + name.toStdString() + ".bkc";
+	////QString _path = xModel::path + xModel::name + "/" + name + ".bkc";
+	////QString _path = QString(xModel::path) + QString(xModel::name) + "/" + QString(name) + ".bkc";
+	//ofs.open(_path, ios::binary | ios::out);
+	//char t = 'k';
+	//int identifier = RESULT_FILE_IDENTIFIER;
+	//ofs.write((char*)&identifier, sizeof(int));
+	//ofs.write(&t, sizeof(char));
+	//ofs.write((char*)&nr_part, sizeof(unsigned int));
+	//ofs.write((char*)kcrs.data(), sizeof(xKinematicConstraint::kinematicConstraint_result) * nr_part);
+	//// 	ofs << "time " << "px " << "py " << "pz " << "vx " << "vy " << "vz " << "ax " << "ay " << "az " 
+	//// 		<< "avx " << "avy " << "avz "x << "aax " << "aay " << "aaz " 
+	//// 		<< "afx " << "afy " << "afz " << "amx " << "amy " << "amz " 
+	//// 		<< "afx " << "afy " << "afz " << "amx " << "amy " << "amz "
+	//// 		<< "afx " << "afy " << "afz " << "amx " << "amy " << "amz "
+	//ofs.close();
+	//xLog::log("Exported : " + _path);
+	//of << _path << endl;
 }
 
 void xDrivingConstraint::ConstraintGamma(xVectorD& rhs, xVectorD& q, xVectorD& qd, unsigned int sr, double ct, double mul)
@@ -327,7 +331,7 @@ void xDrivingConstraint::DerivateJacobian(xMatrixD& lhs, xVectorD& q, xVectorD& 
 	}
 }
 
-void xDrivingConstraint::SaveStepResult(
+xKinematicConstraint::kinematicConstraint_result xDrivingConstraint::GetStepResult(
 	unsigned int part, double ct, xVectorD& q, xVectorD& qd, double* L, unsigned int sr)
 {
 	unsigned int i = kconst->IndexBaseBody() * xModel::OneDOF();
@@ -384,10 +388,10 @@ void xDrivingConstraint::SaveStepResult(
 		}
 			//lhs.insert(sr, jc, zv, D2);*/
 	}
-	kcr.time = ct;
 	kcr.location = ri + Ai * kconst->Spi();
-	kcrs.push_back(kcr);
+	//kcrs.push_back(kcr);
 	nr_part++;
+	return kcr;
 }
 
 void xDrivingConstraint::DerivateEquation(xVectorD& v, xVectorD& q, xVectorD& qd, int sr, double ct, double mul)
@@ -424,17 +428,29 @@ void xDrivingConstraint::DerivateEquation(xVectorD& v, xVectorD& q, xVectorD& qd
 
 double xDrivingConstraint::RelativeAngle(double ct, vector3d& gi, vector3d& fi, vector3d& fj)
 {
-	
-	double prad = 0.0;
+	double df = dot(fi, fj);
+	double dg = dot(gi, fj);
+	double a = acos(dot(fi, fj));
+	double b = asin(dot(fi, fj));
+	double stheta = 0.0;
+	if (dg >= 0 && abs(df) <= 0.8) stheta = acos(df);
+	else if ((abs(df) > 0.8 && dg >= 0) || (abs(df) > 0.2 && dg < 0)) stheta = M_PI - asin(dg);
+	else if ((abs(df) <= 0.2 && dg < 0) || (abs(df) < 0.8 && dg < 0)) stheta = 2.0 * M_PI - acos(df);
+//	else if (a < 0 && b < 0) stheta = M_PI + b;
+	//else if (a >= 0 && b < 0) stheta = 2.0 * M_PI - a;
+
+	/*double prad = 0.0;
 	if (start_time > ct)
 		prad = init_v + 0.0 * ct;
 	else
 		prad = init_v + cons_v * (ct - start_time + plus_time);
-	if (prad > 0.8 * M_PI + n * M_PI)
-		n++;
-	double s = M_PI_2 - asin(dot(gi, fj));
-	double c = acos(dot(fi, fj));
-	double stheta = n * M_PI_2 + (n % 2  ? s : c);
+	double ctr = 0.8 * M_PI + 0.5 * n * M_PI;
+	if (prad > ctr)
+		n++;*/
+	//d/*ouble s = M_PI_2 - asin(dot(gi, fj));
+	//double c = n * M_PI - acos(dot(fi, fj));
+	//double stheta = n * M_PI_2 + (n % 2  ? s : c);*/
+	std::cout << "stheta : " << stheta << std::endl;
 	return stheta;// xUtilityFunctions::AngleCorrection(prad, stheta);
 }
 

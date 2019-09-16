@@ -46,8 +46,9 @@
 #define FLUID_POISSON_RATIO 0.0
 #define FLUID_SHEAR_MODULUS 0.0
 
-#include <QtCore/QString>
+//#include <QtCore/QString>
 #include <string>
+//#include "xstring.h"
 //#include <string>
 
 enum xMaterialType
@@ -67,10 +68,10 @@ enum xMaterialType
 	USER_INPUT 
 };
 
-inline QString NameOfMaterial(int i)
+inline std::string NameOfMaterial(int i)
 {
 	xMaterialType xmt = (xMaterialType)(i);
-	QString n;
+	std::string n;
 	switch (xmt)
 	{
 	case NO_MATERIAL: n = "No Material"; break;
@@ -230,7 +231,7 @@ typedef struct { unsigned int sid, count, neach; }xClusterInformation;
 typedef struct { unsigned int id, sid, ntsda; }xSpringDamperConnectionInformation;
 typedef struct { unsigned int jd, kc_id; double init_l; }xSpringDamperConnectionData;
 typedef struct { double k, c; }xSpringDamperCoefficient;
-typedef struct { QString cbody; unsigned int sid, nconnection; }xSpringDamperBodyConnectionInfo;
+typedef struct { const char* cbody; unsigned int sid, nconnection; }xSpringDamperBodyConnectionInfo;
 typedef struct{ unsigned int ci, kc_id; double init_l, rx, ry, rz; }xSpringDamperBodyConnectionData;
 /*typedef struct{ double tstart, dpdt }xObjectMovingCondition;*/
 

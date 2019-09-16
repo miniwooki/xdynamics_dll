@@ -11,7 +11,7 @@
 //#include "xdynamics_object/xParticleCylinderContact.h"
 #include "xdynamics_object/xParticleCylindersContact.h"
 
-#include <QtCore/qlist.h>
+//#include <QtCore/qlist.h>
 
 class xObject;
 class xContact;
@@ -36,9 +36,9 @@ public:
 	//double* HostSphereData();
 	//float* SphereData_f();
 	void insertContact(xContact* c);
-	xContact* Contact(QString n);// { return cots[n]; }
+	xContact* Contact(std::string n);// { return cots[n]; }
 	//QMap<QString, QString>& Logs() { return logs; }
-	QMap<QString, xContact*>& Contacts();// { return cots; }
+	xmap<xstring, xContact*>& Contacts();// { return cots; }
 	xParticleParticleContact* ContactParticles();// { return cpp; }
 	xParticleMeshObjectsContact* ContactParticlesMeshObjects();// { return cpmeshes; }
 	xParticlePlanesContact* ContactParticlesPlanes();
@@ -120,8 +120,8 @@ private:
 	double* d_RRes;
 	vector3d* Tmax;
 	double* RRes;
-	QMap<QString, xContact*> cots;
-	QMap<QString, xParticleMeshObjectContact*> cpmesh;
+	xmap<xstring, xContact*> cots;
+	xmap<xstring, xParticleMeshObjectContact*> cpmesh;
 	//QMap<QString, xParticleCylinderContact*> cpcylinder;
 	xContactPairList* xcpl;
 	//QMap<QString, contact_particles_polygonObject*> cppos;

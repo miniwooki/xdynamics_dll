@@ -9,7 +9,7 @@ xDiscreteElementMethodModel::xDiscreteElementMethodModel()
 }
 
 xDiscreteElementMethodModel::xDiscreteElementMethodModel(std::string _name)
-	: name(QString::fromStdString(_name))
+	: name(_name)
 	, xpmgr(NULL)
 	, tsda(NULL)
 {
@@ -34,7 +34,6 @@ xSpringDamperForce* xDiscreteElementMethodModel::XSpringDamperForce()
 
 xSpringDamperForce* xDiscreteElementMethodModel::CreateForceElement(std::string _name, xForce::fType _type, std::string bn, std::string an)
 {
-	QString name = QString::fromStdString(_name);
 //	xForce* xf = NULL;
 	switch (_type)
 	{

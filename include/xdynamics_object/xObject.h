@@ -3,8 +3,9 @@
 
 #include "xdynamics_decl.h"
 #include "xdynamics_algebra/xAlgebraMath.h"
-#include <QtCore/QString>
-#include <QtCore/QVector>
+#include "xstring.h"
+//#include <QtCore/QString>
+//#include <QtCore/QVector>
 
 class XDYNAMICS_API xObject
 {
@@ -15,7 +16,7 @@ public:
 	virtual ~xObject();
 
 	virtual unsigned int create_sph_particles(double ps, unsigned int nlayers, vector3d* p = NULL, xMaterialType* t = NULL);
-	virtual QVector<xCorner> get_sph_boundary_corners();
+	//virtual QVector<xCorner> get_sph_boundary_corners();
 
 	static void initialize();
 	void setObjectID(int _id);
@@ -25,7 +26,7 @@ public:
 	void setMovingObject(bool ismo);
 	void setShapeType(xShapeType xst);
 	void setMaterialType(xMaterialType xmt);
-	void setConnectedGeometryName(QString n);
+	void setConnectedGeometryName(std::string n);
 	void setCompulsionMovingObject(bool b);
 	void setMovingConstantMovingVelocity(vector3d v);
 
@@ -39,14 +40,14 @@ public:
 	xShapeType Shape() const;
 	xMaterialType Material() const;
 
-	QString Name() const;
-	QString ConnectedGeometryName() const;
+	std::string Name() const;
+	std::string ConnectedGeometryName() const;
 	int ObjectID() const;
 
 protected:
 	static int count;
-	QString name;			// Object name
-	QString connected_geometry_name;
+	xstring name;			// Object name
+	xstring connected_geometry_name;
 	xShapeType shape;
 	xMaterialType material;
 	bool is_compulsion_moving_object;

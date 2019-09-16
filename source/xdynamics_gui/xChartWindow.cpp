@@ -88,10 +88,9 @@ void xChartWindow::setChartData(xDynamicsManager* xdm)
 {
 	if (xdm)
 	{
-		if (xdm->XMBDModel())
-		{
+		tree->setResultManager(xdm->XResult());
+		if(xdm->XMBDModel())
 			tree->upload_mbd_results(xdm->XMBDModel());
-		}
 	}	
 }
 
@@ -188,9 +187,12 @@ void xChartWindow::joint_plot()
 	double max_v = -FLT_MAX;
 	double min_v = FLT_MAX;
 	QString ytitle;
-	QVector<xKinematicConstraint::kinematicConstraint_result>* pmr = tree->JointResults()[select_item_name];
-	foreach(xKinematicConstraint::kinematicConstraint_result r, *pmr)
+	xKinematicConstraint::kinematicConstraint_result* pmr = tree->JointResults()[select_item_name];
+	double *time = tree->result_manager_ptr()->get_times();
+	for(unsigned int i = 0 ; i < tree->result_manager_ptr()->get_num_parts(); i++)
+	/*foreach(xKinematicConstraint::kinematicConstraint_result r, *pmr)*/
 	{
+		xKinematicConstraint::kinematicConstraint_result r = pmr[i];
 		double v = 0.0;
 		switch (it - 1)
 		{
@@ -210,8 +212,8 @@ void xChartWindow::joint_plot()
 		case 13: v = r.jrforce.y; ytitle = "Torque(Nm)"; break;
 		case 14: v = r.jrforce.z; ytitle = "Torque(Nm)"; break;
 		}
-		series->append(r.time, v);
-		et = r.time;
+		series->append(time[i], v);
+		et = time[i];
 		if (max_v < v) max_v = v;
 		if (min_v > v) min_v = v;
 	}
@@ -223,7 +225,7 @@ void xChartWindow::joint_plot()
 // 	if (plotItem == "Wave height")
 // 	{
 // 		double t = 0;
-// 		foreach(QString str, sLists)
+// 		foreach(QString str, sLists)c
 // 		{
 // 			sensor *s = sph_model::SPHModel()->Sensors()[str];
 // 			double stime = s->samplingTime();
@@ -266,9 +268,11 @@ void xChartWindow::body_plot()
  	double max_v = -FLT_MAX;
  	double min_v = FLT_MAX;
  	QString ytitle;
-	QVector<xPointMass::pointmass_result>* pmr = tree->MassResults()[select_item_name];
-	foreach(xPointMass::pointmass_result r, *pmr)
+	xPointMass::pointmass_result* pmr = tree->MassResults()[select_item_name];
+	double *time = tree->result_manager_ptr()->get_times();
+	for (unsigned int i = 0; i < tree->result_manager_ptr()->get_num_parts(); i++)
 	{
+		xPointMass::pointmass_result r = pmr[i];
 		double v = 0.0;
 		switch (it-1)
 		{
@@ -288,8 +292,8 @@ void xChartWindow::body_plot()
 		case 13: v = r.alpha.y; ytitle = "Ang. Acceleration(rad/s^2)"; break;
 		case 14: v = r.alpha.z; ytitle = "Ang. Acceleration(rad/s^2)"; break;
 		}
-		series->append(r.time, v);
-		et = r.time;
+		series->append(time[i], v);
+		et = time[i];// r.time;
 		if (max_v < v) max_v = v;
 		if (min_v > v) min_v = v;
  	}

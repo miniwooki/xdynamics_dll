@@ -210,7 +210,6 @@ private:
 	float maxView[3];
 	//float up[3];
 	xvObject* selectedObject;
-	xColorControl* xcc;
 
 signals:
 	void changedAnimationFrame();

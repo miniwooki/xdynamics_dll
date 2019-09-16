@@ -31,22 +31,7 @@ private:
 	static char *_xdynamicsGetErrorEnum(int error);
 	static char err[255];
 };
-// 
-// 
-// 
-// template<typename T>
-// void check(T result, char const *const func, const char* const file, int const line)
-// {
-// 	if (result)
-// 	{
-// 		fprintf(stderr, "XDynamics error at %s:%d code=%d(%s) \"%s\" \n", file, line, static_cast<unsigned int>(result), _xdynamicsGetErrorEnum(result), func);
-// 		XDYNAMICS_RESET;
-// 		exit(EXIT_FAILURE);
-// 	}
-// }
 
 #define checkXerror(val) xDynamicsError::_check ( (val), #val, __FILE__, __LINE__ )
-//
-//
-//
+
 #endif

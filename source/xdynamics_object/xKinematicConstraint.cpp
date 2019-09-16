@@ -1,4 +1,5 @@
 #include "xdynamics_object/xKinematicConstraint.h"
+#include <sstream>
 
 xKinematicConstraint::xKinematicConstraint()
 	: i(-2)
@@ -27,7 +28,7 @@ xKinematicConstraint::xKinematicConstraint(std::string _name, cType _type, std::
 	//memset(name, 0, sizeof(*this) - sizeof(name));
 	int mem_sz = sizeof(vector3d) * 6;
 	memset(&location.x, 0, mem_sz);
-	name = QString::fromStdString(_name);// wsprintfW(name, TEXT("%s"), _name);
+	name = _name;// wsprintfW(name, TEXT("%s"), _name);
 	switch (_type)
 	{
 	case FIXED: nConst = 6; break;
@@ -36,8 +37,8 @@ xKinematicConstraint::xKinematicConstraint(std::string _name, cType _type, std::
 	case TRANSLATIONAL: nConst = 5; break;
 	case UNIVERSAL: nConst = 4; break;
 	}
-	base = QString::fromStdString(_i);
-	action = QString::fromStdString(_j);
+	base = _i;
+	action = _j;
 	//djaco.alloc(49 * 4);
 }
 
@@ -46,9 +47,9 @@ xKinematicConstraint::~xKinematicConstraint()
 	//if (kcrs) delete[] kcrs; kcrs = NULL;
 }
 
-QString xKinematicConstraint::Name()
+std::string xKinematicConstraint::Name()
 {
-	return name;
+	return name.toStdString();
 }
 
 xKinematicConstraint::cType xKinematicConstraint::Type()
@@ -103,12 +104,12 @@ void xKinematicConstraint::setActionBodyIndex(int _j)
 
 void xKinematicConstraint::AllocResultMemory(unsigned int _s)
 {
-	if (kcrs.size())
-	{
-		kcrs.clear();/// delete[] kcrs;
-		nr_part = 0;
-		//kcrs = NULL;
-	}
+	//if (kcrs.size())
+	//{
+	//	kcrs.clear();/// delete[] kcrs;
+	//	nr_part = 0;
+	//	//kcrs = NULL;
+	//}
 	//kcrs = new kinematicConstraint_result[_s];
 }
 
@@ -134,50 +135,53 @@ void xKinematicConstraint::SetupDataFromStructure(xPointMass* base, xPointMass* 
 	hj = cross(fj, gj);
 }
 
-QVector<xKinematicConstraint::kinematicConstraint_result>* xKinematicConstraint::XKinematicConstraintResultPointer()
-{
-	return &kcrs;
-}
+//QVector<xKinematicConstraint::kinematicConstraint_result>* xKinematicConstraint::XKinematicConstraintResultPointer()
+//{
+//	return &kcrs;
+//}
 
 void xKinematicConstraint::ImportResults(std::string f)
 {
-	std::fstream fs;
-	fs.open(f, ios_base::in | ios_base::binary);
-	char t = 'e';
-	int identifier = 0;
-	fs.read((char*)&identifier, sizeof(int));
-	fs.read(&t, sizeof(char));
-	fs.read((char*)&nr_part, sizeof(unsigned int));
-	for (unsigned int i = 0; i < nr_part; i++)
-	{
-		kinematicConstraint_result kr = { 0, };
-		fs.read((char*)&kr, sizeof(kinematicConstraint_result));
-		kcrs.push_back(kr);
-	}
-	//fs.read((char*)kcrs.data(), sizeof(kinematicConstraint_result) * nr_part);
-	fs.close();
+	//std::fstream fs;
+	//fs.open(f, ios_base::in | ios_base::binary);
+	//char t = 'e';
+	//int identifier = 0;
+	//fs.read((char*)&identifier, sizeof(int));
+	//fs.read(&t, sizeof(char));
+	//fs.read((char*)&nr_part, sizeof(unsigned int));
+	//for (unsigned int i = 0; i < nr_part; i++)
+	//{
+	//	kinematicConstraint_result kr = { 0, };
+	//	fs.read((char*)&kr, sizeof(kinematicConstraint_result));
+	//	kcrs.push_back(kr);
+	//}
+	////fs.read((char*)kcrs.data(), sizeof(kinematicConstraint_result) * nr_part);
+	//fs.close();
 }
 
 void xKinematicConstraint::ExportResults(std::fstream& of)
 {
-	std::ofstream ofs;
-	QString _path = xModel::path + xModel::name + "/" + name + ".bkc";
-	//QString _path = QString(xModel::path) + QString(xModel::name) + "/" + QString(name) + ".bkc";
-	ofs.open(_path.toStdString().c_str(), ios::binary | ios::out);
-	char t = 'k';
-	int identifier = RESULT_FILE_IDENTIFIER;
-	ofs.write((char*)&identifier, sizeof(int));
-	ofs.write(&t, sizeof(char));
-	ofs.write((char*)&nr_part, sizeof(unsigned int));
-	ofs.write((char*)kcrs.data(), sizeof(kinematicConstraint_result) * nr_part);
-	// 	ofs << "time " << "px " << "py " << "pz " << "vx " << "vy " << "vz " << "ax " << "ay " << "az " 
-	// 		<< "avx " << "avy " << "avz " << "aax " << "aay " << "aaz " 
-	// 		<< "afx " << "afy " << "afz " << "amx " << "amy " << "amz " 
-	// 		<< "afx " << "afy " << "afz " << "amx " << "amy " << "amz "
-	// 		<< "afx " << "afy " << "afz " << "amx " << "amy " << "amz "
-	ofs.close();
-	xLog::log("Exported : " + _path.toStdString());
-	of << _path.toStdString() << endl;
+	//std::ofstream ofs;
+	//std::string _path;
+	//stringstream ss(_path);
+	//ss << (xModel::path + xModel::name + "/").toStdString() + name.toStdString() + ".bkc";
+	////QString _path = xModel::path + xModel::name + "/" + name + ".bkc";
+	////QString _path = QString(xModel::path) + QString(xModel::name) + "/" + QString(name) + ".bkc";
+	//ofs.open(_path, ios::binary | ios::out);
+	//char t = 'k';
+	//int identifier = RESULT_FILE_IDENTIFIER;
+	//ofs.write((char*)&identifier, sizeof(int));
+	//ofs.write(&t, sizeof(char));
+	//ofs.write((char*)&nr_part, sizeof(unsigned int));
+	//ofs.write((char*)kcrs.data(), sizeof(kinematicConstraint_result) * nr_part);
+	//// 	ofs << "time " << "px " << "py " << "pz " << "vx " << "vy " << "vz " << "ax " << "ay " << "az " 
+	//// 		<< "avx " << "avy " << "avz " << "aax " << "aay " << "aaz " 
+	//// 		<< "afx " << "afy " << "afz " << "amx " << "amy " << "amz " 
+	//// 		<< "afx " << "afy " << "afz " << "amx " << "amy " << "amz "
+	//// 		<< "afx " << "afy " << "afz " << "amx " << "amy " << "amz "
+	//ofs.close();
+	//xLog::log("Exported : " + _path);
+	//of << _path << endl;
 	//std::cout << "Exported : " << _path.text() << std::endl;
 }
 

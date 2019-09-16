@@ -79,8 +79,8 @@ void xUniversalConstraint::DerivateJacobian(xMatrixD& lhs, xVectorD& q, xVectorD
 	//dot_1_differentialJacobian(lhs, gi, hj, ei, ej, mul * lm[4]);
 }  
 
-void xUniversalConstraint::SaveStepResult(
-	unsigned int part, double ct, xVectorD& q, xVectorD& qd, double* L, unsigned int sr)
+xKinematicConstraint::kinematicConstraint_result xUniversalConstraint::GetStepResult(
+	unsigned int part, xVectorD& q, xVectorD& qd, double* L, unsigned int sr)
 {
 	unsigned int sc = 0;
 // 	unsigned int si = i * xModel::OneDOF();
@@ -112,10 +112,10 @@ void xUniversalConstraint::SaveStepResult(
 		rf = sce * L3 + lm[3] * d1c;
 		kcr.jrforce = 0.5 * LMatrix(ej) * rf;
 	}
-	kcr.time = ct;
 	kcr.location = ri + Ai * spi;
-	kcrs.push_back(kcr);
+	//kcrs.push_back(kcr);
 	nr_part++;
+	return kcr;
 }
 
 void xUniversalConstraint::GammaFunction(xVectorD& rhs, xVectorD& q, xVectorD& qd, unsigned int sr, double mul)

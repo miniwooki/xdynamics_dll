@@ -4,6 +4,7 @@
 //#include "stdafx.h"
 #include "xdynamics_object/xPointMass.h"
 #include "xdynamics_manager/xModel.h"
+#include <sstream>
 
 
 xPointMass::xPointMass(xShapeType _s)
@@ -280,9 +281,9 @@ double * xPointMass::getForcePointer()
 	return &af.x;
 }
 
-QVector<xPointMass::pointmass_result>* xPointMass::XPointMassResultPointer()
+double * xPointMass::getPositionPointer()
 {
-	return &pmrs;
+	return &pos.x;
 }
 
 // Declaration operate functions
@@ -327,12 +328,12 @@ vector3d xPointMass::toGlobal(const vector3d& v)
 
 void xPointMass::AllocResultMomory(unsigned int _s)
 {
-	if (pmrs.size())
-	{
-		pmrs.clear();// delete[] pmrs;
-		nr_part = 0;
-		//pmrs = NULL;
-	}
+	//if (pmrs.size())
+	//{
+	//	pmrs.clear();// delete[] pmrs;
+	//	nr_part = 0;
+	//	//pmrs = NULL;
+	//}
 	//pmrs = new pointmass_result[_s];
 }
 
@@ -343,75 +344,78 @@ void xPointMass::setZeroAllForce()
 
 void xPointMass::SaveStepResult(unsigned int part, double time, xVectorD& q, xVectorD& qd, xVectorD& qdd)
 {
-	int i = xpmIndex() * xModel::OneDOF();
-	int _i = (xpmIndex() - 1) * xModel::OneDOF();
-	euler_parameters e = new_euler_parameters(q(i + 3), q(i + 4), q(i + 5), q(i + 6));
-	euler_parameters ed = new_euler_parameters(qd(i + 3), qd(i + 4), qd(i + 5), qd(i + 6));
-	euler_parameters edd = new_euler_parameters(qdd(_i + 3), qdd(_i + 4), qdd(_i + 5), qdd(_i + 6));
-	vector3d aa = 2.0 * GMatrix(e) * edd;// m->getEP().G() * m->getEA();
-	vector3d av = 2.0 * GMatrix(e) * ed;// m->getEP().G() * m->getEV();
-	pointmass_result pmr = 
-	{
-		time,
-		new_vector3d(q(i + 0), q(i + 1), q(i + 2)),
-		new_vector3d(qd(i + 0), qd(i + 1), qd(i + 2)),
-		new_vector3d(qdd(_i + 0), qdd(_i + 1), qdd(_i + 2)),
-		av, aa, af, am, cf, cm, hf, hm, e, ed, edd
-	};
-	pmrs.push_back(pmr);
-	nr_part++;
+	//int i = xpmIndex() * xModel::OneDOF();
+	//int _i = (xpmIndex() - 1) * xModel::OneDOF();
+	//euler_parameters e = new_euler_parameters(q(i + 3), q(i + 4), q(i + 5), q(i + 6));
+	//euler_parameters ed = new_euler_parameters(qd(i + 3), qd(i + 4), qd(i + 5), qd(i + 6));
+	//euler_parameters edd = new_euler_parameters(qdd(_i + 3), qdd(_i + 4), qdd(_i + 5), qdd(_i + 6));
+	//vector3d aa = 2.0 * GMatrix(e) * edd;// m->getEP().G() * m->getEA();
+	//vector3d av = 2.0 * GMatrix(e) * ed;// m->getEP().G() * m->getEV();
+	//pointmass_result pmr = 
+	//{
+	//	time,
+	//	new_vector3d(q(i + 0), q(i + 1), q(i + 2)),
+	//	new_vector3d(qd(i + 0), qd(i + 1), qd(i + 2)),
+	//	new_vector3d(qdd(_i + 0), qdd(_i + 1), qdd(_i + 2)),
+	//	av, aa, af, am, cf, cm, hf, hm, e, ed, edd
+	//};
+	//pmrs.push_back(pmr);
+	//nr_part++;
 }
 
 void xPointMass::SaveStepResult(double time)
 {
-	vector3d aa = 2.0 * GMatrix(ep) * ea;// m->getEP().G() * m->getEA();
-	vector3d av = 2.0 * GMatrix(ep) * ev;// m->getEP().G() * m->getEV();
-	pointmass_result pmr =
-	{
-		time,
-		pos,
-		vel,
-		acc,
-		av, aa, af, am, cf, cm, hf, hm, ep, ev, ea
-	};
-	pmrs.push_back(pmr);
-	nr_part++;
+	//vector3d aa = 2.0 * GMatrix(ep) * ea;// m->getEP().G() * m->getEA();
+	//vector3d av = 2.0 * GMatrix(ep) * ev;// m->getEP().G() * m->getEV();
+	//pointmass_result pmr =
+	//{
+	//	time,
+	//	pos,
+	//	vel,
+	//	acc,
+	//	av, aa, af, am, cf, cm, hf, hm, ep, ev, ea
+	//};
+	//pmrs.push_back(pmr);
+	//nr_part++;
 }
 
 void xPointMass::ImportResults(std::string f)
 {
-	std::fstream fs;
-	fs.open(f, ios_base::in | ios_base::binary);
-	char t = 'e';
-	int identifier = 0;
-	fs.read((char*)&identifier, sizeof(int));
-	fs.read(&t, sizeof(char));
-	fs.read((char*)&nr_part, sizeof(unsigned int));
-	for (unsigned int i = 0; i < nr_part; i++)
-	{
-		pointmass_result pr = { 0, };
-		fs.read((char*)&pr, sizeof(pointmass_result));
-		pmrs.push_back(pr);
-	}
-	fs.close();
+	//std::fstream fs;
+	//fs.open(f, ios_base::in | ios_base::binary);
+	//char t = 'e';
+	//int identifier = 0;
+	//fs.read((char*)&identifier, sizeof(int));
+	//fs.read(&t, sizeof(char));
+	//fs.read((char*)&nr_part, sizeof(unsigned int));
+	//for (unsigned int i = 0; i < nr_part; i++)
+	//{
+	//	pointmass_result pr = { 0, };
+	//	fs.read((char*)&pr, sizeof(pointmass_result));
+	//	pmrs.push_back(pr);
+	//}
+	//fs.close();
 }
 
 void xPointMass::ExportResults(std::fstream& of)
 {
-	std::ofstream ofs;
-	QString _path = xModel::path + xModel::name + "/" + name + ".bpm";
-	//QString _path = QString(xModel::path) + QString(xModel::name) + "/" + QString(name.text()) + ".bpm";
-	ofs.open(_path.toStdString(), ios::binary | ios::out);
-	char t = 'p';
-	int identifier = RESULT_FILE_IDENTIFIER;
-	ofs.write((char*)&identifier, sizeof(int));
-	ofs.write(&t, sizeof(char));
-	ofs.write((char*)&nr_part, sizeof(unsigned int));
-	ofs.write((char*)pmrs.data(), sizeof(pointmass_result) * nr_part);
+	//std::ofstream ofs;
+	//std::string _path;
+	//stringstream ss(_path);
+	//ss << (xModel::path + xModel::name + "/").toStdString() + name.toStdString() + ".bpm";
+	////QString _path = xModel::path + xModel::name + "/" + name + ".bpm";
+	////QString _path = QString(xModel::path) + QString(xModel::name) + "/" + QString(name.text()) + ".bpm";
+	//ofs.open(_path, ios::binary | ios::out);
+	//char t = 'p';
+	//int identifier = RESULT_FILE_IDENTIFIER;
+	//ofs.write((char*)&identifier, sizeof(int));
+	//ofs.write(&t, sizeof(char));
+	//ofs.write((char*)&nr_part, sizeof(unsigned int));
+	//ofs.write((char*)pmrs.data(), sizeof(pointmass_result) * nr_part);
 
-	ofs.close();
-	xLog::log("Exported : " + _path.toStdString());
-	of << _path.toStdString() << endl;
+	//ofs.close();
+	//xLog::log("Exported : " + _path);
+	//of << _path << endl;
 	//std::cout << "Exported : " << _path.text() << std::endl;
 }
 

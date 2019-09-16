@@ -2,7 +2,8 @@
 #define XCONTACTPAIRLIST_H
 
 #include "xdynamics_decl.h"
-#include <QtCore/QMap>
+#include "xmap.hpp"
+//#include <QtCore/QMap>
 
 class XDYNAMICS_API xContactPairList
 {
@@ -33,12 +34,12 @@ public:
 
 	bool TriangleContactCheck(double r, vector3d& pos, xTrianglePairData* d);
 
-	QMap<unsigned int, xPairData*>& PlanePair();
-	QMap<unsigned int, xPairData*>& CylinderPair();
-	QMap<unsigned int, xPairData*>& ParticlePair();
-	QMap<unsigned int, xTrianglePairData*>& TrianglePair();
-	QMap<unsigned int, xTrianglePairData*>& TriangleLinePair();
-	QMap<unsigned int, xTrianglePairData*>& TrianglePointPair();
+	xmap<unsigned int, xPairData*>& PlanePair();
+	xmap<unsigned int, xPairData*>& CylinderPair();
+	xmap<unsigned int, xPairData*>& ParticlePair();
+	xmap<unsigned int, xTrianglePairData*>& TrianglePair();
+	xmap<unsigned int, xTrianglePairData*>& TriangleLinePair();
+	xmap<unsigned int, xTrianglePairData*>& TrianglePointPair();
 
 	xPairData* PlanePair(unsigned int i);
 	xPairData* ParticlePair(unsigned int i);
@@ -48,12 +49,12 @@ public:
 	xTrianglePairData* TrianglePointPair(unsigned int i);
 
 private:
-	QMap<unsigned int, xPairData*> plane_pair;
-	QMap<unsigned int, xPairData*> cylinder_pair;
-	QMap<unsigned int, xPairData*> particle_pair;
-	QMap<unsigned int, xTrianglePairData*> triangle_pair;
-	QMap<unsigned int, xTrianglePairData*> triangle_line_pair;
-	QMap<unsigned int, xTrianglePairData*> triangle_point_pair;
+	xmap<unsigned int, xPairData*> plane_pair;
+	xmap<unsigned int, xPairData*> cylinder_pair;
+	xmap<unsigned int, xPairData*> particle_pair;
+	xmap<unsigned int, xTrianglePairData*> triangle_pair;
+	xmap<unsigned int, xTrianglePairData*> triangle_line_pair;
+	xmap<unsigned int, xTrianglePairData*> triangle_point_pair;
 };
 
 #endif

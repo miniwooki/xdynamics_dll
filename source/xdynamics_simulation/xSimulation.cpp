@@ -3,6 +3,7 @@
 double xSimulation::init_dt = 0.0;
 double xSimulation::dt = 0.0001;
 xSimulation::deviceType xSimulation::dev = xSimulation::CPU;
+xSimulation::SimulationType xSimulation::simulation_type = xSimulation::NO_DEFINED_SIMULATION_TYPE;
 xSimulation::MBDSolverType xSimulation::mbd_solver_type = xSimulation::MBD_SOLVER;
 xSimulation::DEMSolverType xSimulation::dem_solver_type = xSimulation::DEM_SOLVER;
 xSimulation::SPHSolverType xSimulation::sph_solver_type = xSimulation::SPH_SOLVER;

@@ -23,7 +23,7 @@ public:
 	//bool initialize(xMultiBodyModel* xmbd);
 	//bool OneStepAnalysis(double ct, unsigned int cstep);
 	//void setImplicitTolerance(double _eps);
-	void SaveStepResult(unsigned int part, double ct);
+	bool SaveStepResult(unsigned int part);
 	void ExportResults(std::fstream& of);
 	void SetZeroBodyForce();
 	unsigned int setupByLastSimulationFile(std::string lmr);

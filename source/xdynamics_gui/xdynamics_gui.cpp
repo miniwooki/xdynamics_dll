@@ -7,6 +7,7 @@
 #include "xLineEditWidget.h"
 #include "xCommandLine.h"
 #include "xChartWindow.h"
+#include "xColorControl.h"
 #include <QtCore/QDir>
 #include <QtCore/QMimeData>
 #include <QtWidgets/QFileDialog>
@@ -33,6 +34,7 @@ xdynamics_gui::xdynamics_gui(int _argc, char** _argv, QWidget *parent)
 	, xcomm(NULL)
 	, xcl(NULL)
 	, xchart(NULL)
+	, xcc(NULL)
 	, myAnimationBar(NULL)
 	//, simThread(NULL)
 	, isOnViewModel(false)
@@ -114,7 +116,7 @@ void xdynamics_gui::xGetResultWidget(wresult *w)
 	wrst = w;
 	if (xdm->XDEMModel())
 	{
-		connect(w, SIGNAL(clickedApplyButton(int)), xgl, SLOT(setupParticleBufferColorDistribution(int)));
+		connect(w, SIGNAL(clickedApplyButton(int)), this, SLOT(xSetupParticleBufferColorDistribution(int)));
 		connect(w, SIGNAL(changedTargetCombo(int)), this, SLOT(xSetupResultNavigatorByChangeTargetCombo(int)));
 	}
 	
@@ -129,6 +131,7 @@ xdynamics_gui::~xdynamics_gui()
 	if (xcomm) delete xcomm; xcomm = NULL;
 	if (xcl) delete xcl; xcl = NULL;
 	if (xchart) delete xchart; xchart = NULL;
+	if (xcc) delete xcc; xcc = NULL;
 	xvAnimationController::releaseTimeMemory();
 }
 
@@ -193,7 +196,7 @@ bool xdynamics_gui::ReadViewModel(QString path)
 						xPointMass* xpm = xdm->XMBDModel()->XMass(name.toStdString());
 						if (xpm)
 						{
-							xpm->setConnectedGeometryName(xvo->Name());							
+							xpm->setConnectedGeometryName(xvo->Name().toStdString());							
 							vector3d p = xpm->Position();
 							xvo->setPosition(static_cast<float>(p.x), static_cast<float>(p.y), static_cast<float>(p.z));								
 						}
@@ -299,8 +302,8 @@ bool xdynamics_gui::ReadModelResults(QString path)
 	foreach(QString f, mbd_rlist)
 	{
 		pbar->setValue(cnt++);
-		QString file_name = xUtilityFunctions::GetFileName(f.toStdString().c_str());
-		QString ext = xUtilityFunctions::FileExtension(f.toStdString().c_str());
+		QString file_name = QString::fromStdString(xUtilityFunctions::GetFileName(f.toStdString().c_str()));
+		QString ext = QString::fromStdString(xUtilityFunctions::FileExtension(f.toStdString().c_str()));
 		if (ext == ".bpm")
 		{
 			xPointMass* xpm = NULL;
@@ -450,7 +453,7 @@ void xdynamics_gui::OpenFile(QString s)
 			QString p = s.left(begin) + ".vmd";
 			if (!ReadViewModel(p))
 			{
-				xcw->write(xCommandWindow::CMD_ERROR, kor("해석 결과에 부합하는 모델을 찾을 수 없습니다."));
+				xcw->write(xCommandWindow::CMD_ERROR, "Can't find the model relate with analysis results.");// 해석 결과에 부합하는 모델을 찾을 수 없습니다.");
 				return;
 			}
 			else isOnViewModel = true;
@@ -485,7 +488,7 @@ void xdynamics_gui::OpenFile(QString s)
 			dem_last_result = s;
 	}
 	else
-		xcw->write(xCommandWindow::CMD_ERROR, kor("지원하지 않는 파일 형식입니다."));
+		xcw->write(xCommandWindow::CMD_ERROR, "Unsupported file format.");
 }
 
 QString xdynamics_gui::ReadXLSFile(QString xls_path)
@@ -631,22 +634,31 @@ void xdynamics_gui::setupBindingPointer()
 {
 	if (xdm)
 	{
+		if (!xcc) 
+			xcc = new xColorControl;
+		xResultManager* xrm = xdm->XResult();
 		if (xdm->XMBDModel())
 		{
-			foreach(xPointMass* pm, xdm->XMBDModel()->Masses())
+			for (xmap<xstring, xPointMass*>::iterator it = xdm->XMBDModel()->Masses().begin(); it != xdm->XMBDModel()->Masses().end(); it.next())
+			//foreach(xPointMass* pm, xdm->XMBDModel()->Masses())
 			{
-				QString n = pm->ConnectedGeometryName();
+				xPointMass* pm = it.value();
+				QString n = QString::fromStdString(pm->Name());
 				xvObject* obj = xgl->Object(n);
+				xPointMass::pointmass_result* pmrs = NULL;
+				pmrs = xrm->get_mass_result_ptr(n.toStdString());
 				if (obj)
-					obj->bindPointMassResultsPointer(pm->XPointMassResultPointer());
-				obj = xgl->Object(pm->Name() + "_marker");
-				if (obj)
-					obj->bindPointMassResultsPointer(pm->XPointMassResultPointer());
+					if(pmrs)
+						obj->bindPointMassResultsPointer(pmrs);
+					
+				obj = xgl->Object(QString::fromStdString(pm->Name()) + "_marker");
+				if (obj && pmrs)
+					obj->bindPointMassResultsPointer(pmrs);
 			}
 		}
 		else
 		{
-			foreach(xObject* xo, xdm->XObject()->CompulsionMovingObjects())
+		/*	foreach(xObject* xo, xdm->XObject()->CompulsionMovingObjects())
 			{
 				xPointMass* pm = dynamic_cast<xPointMass*>(xo);
 				xvObject* obj = xgl->Object(xo->Name());
@@ -655,7 +667,14 @@ void xdynamics_gui::setupBindingPointer()
 				obj = xgl->Object(xo->Name() + "_marker");
 				if (obj)
 					obj->bindPointMassResultsPointer(pm->XPointMassResultPointer());
-			}
+			}*/
+		}
+		if (xdm->XDEMModel())
+		{
+			xgl->vParticles()->bind_result_buffers(
+				xrm->get_particle_position_result_ptr(),
+				xrm->get_particle_velocity_result_ptr(),
+				xrm->get_particle_color_result_ptr());
 		}
 	}
 }
@@ -712,21 +731,24 @@ void xdynamics_gui::xRecieveProgress(int pt, QString ch)
 // 		//myAnimationBar->AnimationSlider()->setMaximum(pt);
  		 		
  		xcw->write(xCommandWindow::CMD_INFO, ch);
- 		if (xgl->vParticles())
+		xdm->XResult()->setup_particle_buffer_color_distribution(xcc, pt, pt);
+		xvAnimationController::setTotalFrame(pt);
+ 		/*if (xgl->vParticles())
  		{
  			QString fileName;
 			fileName.sprintf("Part%04d", pt);
- 			xgl->vParticles()->UploadParticleFromFile(pt, path + xModel::name + "/" + fileName + ".bin");
+			xgl->vParticles()->UploadParticleFromFile(pt, path + QString::fromStdString(xModel::name.toStdString() + "/") + fileName + ".bin");
  		}
- 		xvAnimationController::setTotalFrame(pt);
-		xgl->setupParticleBufferColorDistribution(pt);
+ 		
+		
 		if (wrst)
 		{
 			wrst->setMinMaxValue(
 				xgl->GetParticleMinValueFromColorMapType(),
 				xgl->GetParticleMaxValueFromColorMapType()
 			);
-		}
+		}*/
+
 	}
 	else if (pt == -1 && !ch.isEmpty())
 	{
@@ -745,14 +767,16 @@ void xdynamics_gui::xRecieveProgress(int pt, QString ch)
 
 void xdynamics_gui::xSetupResultNavigatorByChangeTargetCombo(int cmt)
 {
-	if (wrst)
+	if (wrst && xcc)
 	{
+		if (!xdm)
+			return;
 		xColorControl::setTarget((xColorControl::ColorMapType)cmt);
 		if (!xColorControl::isUserLimitInput())
 		{
 			wrst->setMinMaxValue(
-				xgl->GetParticleMinValueFromColorMapType(),
-				xgl->GetParticleMaxValueFromColorMapType()
+				xdm->XResult()->get_min_result_value(xcc->Target()),
+				xdm->XResult()->get_max_result_value(xcc->Target())
 			);
 		}
 	}
@@ -766,10 +790,18 @@ void xdynamics_gui::xUploadResultThisModel()
 	//qf.open(QIODevice::ReadOnly);
 	if (!isOnViewModel)
 	{
-		xcw->write(xCommandWindow::CMD_ERROR, kor("해당 결과에 부합하는 모델이 정의되지 않았습니다."));
+		xcw->write(xCommandWindow::CMD_ERROR, "No model is defined that matches the result.");
 		return;
 	}
 	if (ReadModelResults(path)) setupAnimationTool();
+}
+
+void xdynamics_gui::xSetupParticleBufferColorDistribution(int ef)
+{
+	if (xdm && xcc)
+	{
+		xdm->XResult()->setup_particle_buffer_color_distribution(xcc, 0, ef);
+	}
 }
 
 void xdynamics_gui::xEditCommandLine()
@@ -856,12 +888,14 @@ void xdynamics_gui::xGeometrySelection(QString n)
 					{
 						//QString n = pm->Name();
 						xvObject* obj = xgl->Object(n);
-						obj->setConnectedMassName(pm->Name());
-						pm->setConnectedGeometryName(obj->Name());
-						if (pm->XPointMassResultPointer())
-							obj->bindPointMassResultsPointer(pm->XPointMassResultPointer());
+						obj->setConnectedMassName(QString::fromStdString(pm->Name()));
+						pm->setConnectedGeometryName(obj->Name().toStdString());
+						xPointMass::pointmass_result* pmrs = NULL;
+						pmrs = xdm->XResult()->get_mass_result_ptr(n.toStdString());
+						if (pmrs)
+							obj->bindPointMassResultsPointer(pmrs);
 						wpm->LEGeometry->setText(obj->Name());
-						xcw->write(xCommandWindow::CMD_INFO, "The geometry(" + obj->Name() + ") is connected to point mass(" + pm->Name() + ").");
+						xcw->write(xCommandWindow::CMD_INFO, "The geometry(" + obj->Name() + ") is connected to point mass(" + QString::fromStdString(pm->Name()) + ").");
 					}
 				}
 			}
@@ -911,7 +945,7 @@ void xdynamics_gui::xContextMenuProcess(QString nm, contextMenuType vot)
 
 void xdynamics_gui::deleteFileByEXT(QString ext)
 {
-	QString dDir = path + xModel::name;
+	QString dDir = path + QString::fromStdString(xModel::name.toStdString());
 	QDir dir = QDir(dDir);
 	QStringList delFileList;
 	delFileList = dir.entryList(QStringList("*." + ext), QDir::Files | QDir::NoSymLinks);
@@ -935,10 +969,7 @@ void xdynamics_gui::xRunSimulationThread(double dt, unsigned int st, double et)
 	sThread->xInitialize(xdm, dt, st, et);
 	xvAnimationController::allocTimeMemory(xSimulation::npart);
 	if (xgl->vParticles())
-	{
-		xgl->vParticles()->setBufferMemories(xSimulation::npart);
 		xnavi->addChild(xModelNavigator::RESULT_ROOT, "Particles");
-	}
 
 	connect(sThread, SIGNAL(finishedThread()), this, SLOT(xExitSimulationThread()));
 	connect(sThread, SIGNAL(sendProgress(int, QString)), this, SLOT(xRecieveProgress(int, QString)));

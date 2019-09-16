@@ -2,7 +2,7 @@
 #define XLINEOBJECT_H
 
 #include "xdynamics_object/xPointMass.h"
-#include <QtCore/QString>
+//#include <QtCore/QString>
 
 class XDYNAMICS_API xLineObject : public xPointMass
 {
@@ -20,7 +20,7 @@ public:
 	void SetupDataFromStructure(xLineObjectData& d);
 
 	virtual unsigned int create_sph_particles(double ps, unsigned int nlayers, vector3d* p = NULL, xMaterialType* t = NULL);
-	virtual QVector<xCorner> get_sph_boundary_corners();
+	//virtual QVector<xCorner> get_sph_boundary_corners();
 
 private:
 	double len;

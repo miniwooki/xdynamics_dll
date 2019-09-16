@@ -44,7 +44,8 @@ public:
 	void setPosition(float x, float y, float z);
 	void setBlendAlpha(float v) { blend_alpha = v; }
 	void uploadPointMassResults(QString fname);
-	void bindPointMassResultsPointer(QVector<xPointMass::pointmass_result>* _pmrs);
+	//void insertObjectFrameData(vector3d rp, euler_parameters rep);
+	void bindPointMassResultsPointer(xPointMass::pointmass_result* _pmrs);
  	QColor& Color() { return clr; }
 	void setColor(QColor ct) { clr = ct; }
  	void setDrawingMode(GLenum dm) { drawingMode = dm; }
@@ -76,7 +77,9 @@ protected:
 	vector3f ang;
 	vector3f local_min;
 	vector3f local_max;
-	QVector<xPointMass::pointmass_result>* pmrs;
+	xPointMass::pointmass_result* pmrs;
+	/*QVector<vector3d> r_pos;
+	QVector<euler_parameters> r_ep;*/
 };
 
 #endif

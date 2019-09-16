@@ -11,6 +11,8 @@
 #include "xdynamics_object/xCylinderObject.h"
 #include "xdynamics_object/xClusterObject.h"
 
+#include "xmap.hpp"
+
 class xParticleManager;
 
 class XDYNAMICS_API xObjectManager
@@ -22,7 +24,7 @@ public:
 	void addObject(xObject* obj);
 	static xObjectManager* XOM();
 	xObject* XObject(std::string& ws);
-	QMap<QString, xObject*>& XObjects();
+	xmap<xstring, xObject*>& XObjects();
 	
 	xPointMass* setMovingConstantMovingVelocity(std::string _name, double* v);
 	void UpdateMovingObjects(double ct);
@@ -35,11 +37,11 @@ public:
 	xCylinderObject* CreateCylinderShapeObject(std::string _name, int _xmt);
 
 	void CreateSPHBoundaryParticles(xParticleManager* xpm);
-	QMap<QString, xObject*>& CompulsionMovingObjects();
+	xmap<xstring, xObject*>& CompulsionMovingObjects();
 
 private:
-	QMap<QString, xObject*> objects;
-	QMap<QString, xObject*> compulsion_moving_objects;
+	xmap<xstring, xObject*> objects;
+	xmap<xstring, xObject*> compulsion_moving_objects;
 };
 
 #endif

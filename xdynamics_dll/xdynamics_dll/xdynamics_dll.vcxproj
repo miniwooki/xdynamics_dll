@@ -104,14 +104,15 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>ADD_;WIN32;WIN64;_DEBUG;_WINDOWS;_USRDLL;XDYNAMICS_DLL_EXPORTS;LAPACK_COMPLEX_STRUCTURE;HAVE_LAPACK_CONFIG_H;_USE_MATH_DEFINES;QT_CORE_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\xdynamics\include;$(LAPACK_64)\inc;C:\xDynamics\extern\libxl-3.8.4.0\include_cpp;$(USING_QT_VERSION)\include;$(USING_CUDA_SAMPLE_VERSION)\common\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\xdynamics\include;$(LAPACK_64)\inc;C:\xDynamics\extern\libxl-3.8.4.0\include_cpp;$(USING_CUDA_SAMPLE_VERSION)\common\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4819</DisableSpecificWarnings>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(LAPACK_64)\lib;C:\xDynamics\extern\libxl-3.8.4.0\lib64;C:\xdynamics\lib;$(USING_QT_VERSION)\lib;$(USING_CUDA_VERSION)\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>cudart.lib;Qt5Cored.lib;libxl.lib;liblapacke.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(LAPACK_64)\lib;C:\xDynamics\extern\libxl-3.8.4.0\lib64;C:\xdynamics\lib;$(USING_CUDA_VERSION)\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>cudart.lib;libxl.lib;liblapacke.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CudaCompile>
       <CodeGeneration>compute_30,sm_30;compute_35,sm_35;compute_52,sm_52</CodeGeneration>
@@ -149,7 +150,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;LAPACK_COMPLEX_STRUCTURE;HAVE_LAPACK_CONFIG_H;_USE_MATH_DEFINES;QT_CORE_LIB;_CRT_SECURE_NO_WARNINGS;NDEBUG;_WINDOWS;_USRDLL;XDYNAMICS_DLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\xdynamics\include;$(LAPACK_64)\inc;C:\xDynamics\extern\libxl-3.8.4.0\include_cpp;$(USING_QT_VERSION)\include;$(USING_CUDA_SAMPLE_VERSION)\common\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\xdynamics\include;$(LAPACK_64)\inc;C:\xDynamics\extern\libxl-3.8.4.0\include_cpp;$(USING_CUDA_SAMPLE_VERSION)\common\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4819</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -157,8 +158,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(LAPACK_64)\lib;C:\xDynamics\extern\libxl-3.8.4.0\lib64;C:\xdynamics\lib;$(USING_QT_VERSION)\lib;$(USING_CUDA_VERSION)\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>cudart.lib;Qt5Core.lib;libxl.lib;liblapacke.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(LAPACK_64)\lib;C:\xDynamics\extern\libxl-3.8.4.0\lib64;C:\xdynamics\lib;$(USING_CUDA_VERSION)\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>cudart.lib;libxl.lib;liblapacke.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CudaCompile>
       <CodeGeneration>compute_30,sm_30;compute_35,sm_35;compute_52,sm_52</CodeGeneration>
@@ -169,6 +170,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\source\xColorControl.cpp" />
     <ClCompile Include="..\..\source\xDynamicsError.cpp" />
     <ClCompile Include="..\..\source\xdynamics_algebra\xAlgebraMath.cpp" />
     <ClCompile Include="..\..\source\xdynamics_algebra\xAlgebraType.cpp" />
@@ -250,6 +252,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\include\xColorControl.h" />
     <ClInclude Include="..\..\include\xdynamics.h" />
     <ClInclude Include="..\..\include\xDynamicsError.h" />
     <ClInclude Include="..\..\include\xdynamics_algebra\xAlgebraMath.h" />
@@ -317,6 +320,7 @@
     <ClInclude Include="..\..\include\xdynamics_simulation\xMultiBodySimulation.h" />
     <ClInclude Include="..\..\include\xdynamics_simulation\xSimulation.h" />
     <ClInclude Include="..\..\include\xdynamics_simulation\xSmoothedParticleHydrodynamicsSimulation.h" />
+    <ClInclude Include="..\..\include\xlist.hpp" />
     <ClInclude Include="..\..\include\xLog.h" />
     <ClInclude Include="..\..\include\xmap.hpp" />
     <ClInclude Include="..\..\include\xstring.h" />

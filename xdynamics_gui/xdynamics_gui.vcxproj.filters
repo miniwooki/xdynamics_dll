@@ -117,9 +117,6 @@
     <ClCompile Include="..\source\xdynamics_gui\xChartDatabase.cpp">
       <Filter>Source Files\chart</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\xdynamics_gui\xColorControl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\source\xdynamics_gui\xPointMassWidget.cpp">
       <Filter>Source Files\widget</Filter>
     </ClCompile>
@@ -130,6 +127,9 @@
       <Filter>Source Files\widget</Filter>
     </ClCompile>
     <ClCompile Include="..\source\xdynamics_gui\xdynamics_gui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xColorControl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -278,11 +278,11 @@
     <ClInclude Include="..\include\xdynamics_gui\xChartSpline.h">
       <Filter>Header Files\plot</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\xdynamics_gui\xColorControl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_wresult.h">
       <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xColorControl.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

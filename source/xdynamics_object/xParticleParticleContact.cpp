@@ -93,8 +93,10 @@ void xParticleParticleContact::cppCollision(
 	xClusterInformation* xci,
 	unsigned int nco)
 {
- 	foreach(xPairData* d, pairs->ParticlePair())
+	for(xmap<unsigned int, xPairData*>::iterator it = pairs->ParticlePair().begin(); it != pairs->ParticlePair().end(); it.next())
+ 	//foreach(xPairData* d, pairs->ParticlePair())
 	{
+		xPairData* d = it.value();
 		vector3d m_fn = new_vector3d(0, 0, 0);
 		vector3d m_m = new_vector3d(0, 0, 0);
 		vector3d m_ft = new_vector3d(0, 0, 0);

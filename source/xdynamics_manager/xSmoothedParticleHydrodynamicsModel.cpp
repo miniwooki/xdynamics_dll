@@ -1,6 +1,6 @@
 #include "xdynamics_manager/xSmoothedParticleHydrodynamicsModel.h"
 #include "xdynamics_manager/xObjectManager.h"
-#include <QtCore/QVector>
+//#include <QtCore/QVector>
 
 xSmoothedParticleHydrodynamicsModel *xsph_ptr = NULL;
 
@@ -19,7 +19,7 @@ xSmoothedParticleHydrodynamicsModel::xSmoothedParticleHydrodynamicsModel()
 }
 
 xSmoothedParticleHydrodynamicsModel::xSmoothedParticleHydrodynamicsModel(std::string _name)
-	: name(QString::fromStdString(_name))
+	: name(_name)
 	, bound(DUMMY_PARTICLE_METHOD)
 	, pos(NULL)
 	, vel(NULL)
@@ -88,135 +88,135 @@ xSPHCorrectionType xSmoothedParticleHydrodynamicsModel::CorrectionType()
 
 bool xSmoothedParticleHydrodynamicsModel::CheckCorner(vector3d p)
 {
-	foreach(xOverlapCorner xoc, overlappingCorners)
+	/*foreach(xOverlapCorner xoc, overlappingCorners)
 	{
 		vector3d position = new_vector3d(xoc.c1.px, xoc.c1.py, xoc.c1.pz);
 		if (length(position - p) < 1e-9)
 			return true;
-	}
+	}*/
 	return false;
 }
 
 void xSmoothedParticleHydrodynamicsModel::DefineCorners(xObjectManager* xobj)
 {
-	QVector<xCorner> corners;
-	bool exist_corner3 = false;
-	foreach(xObject* xo, xobj->XObjects())
-	{
-		if (xo->Material() != BOUNDARY)
-			continue;
-		QVector<xCorner> objCorners = xo->get_sph_boundary_corners();
-		for (int i = 0; i < objCorners.size(); i++)
-		{
-			for (int j = 0; j < corners.size(); j++)
-			{
-				xCorner xc0 = objCorners[i];
-				xCorner xc1 = corners[j];
-				vector3d p0 = new_vector3d(xc0.px, xc0.py, xc0.pz);
-				vector3d p1 = new_vector3d(xc1.px, xc1.py, xc1.pz);
-				if (length(p0 - p1) < 1e-9) // if same position between two corners
-				{
-					if (xo->Shape() == PLANE_SHAPE){
-						// if geometry is plane
-						for (int k = 0; k < overlappingCorners.size(); k++){
-							xOverlapCorner c = overlappingCorners[k];
-							p1 = new_vector3d(c.c1.px, c.c1.py, c.c1.pz);
-							if (length(p1 - p0) < 1e-9){
-								p1 = new_vector3d(c.c2.px, c.c2.py, c.c2.pz);
-								if (length(p1 - p0) < 1e-9){
-									overlappingCorners[k].c3 = objCorners[i];
-									overlappingCorners[k].cnt = 1;
-									exist_corner3 = true;
-								}
-							}
-						}
-					}
-					if (!exist_corner3){
-						xOverlapCorner c = { 0, 0, 0, 0, 0, objCorners[i], corners[j], corners[i], false };
-						overlappingCorners.push_back(c);
-					}
-					else{
-						exist_corner3 = false;
-					}
-					break;
-				}
-			}
-			corners.push_back(objCorners[i]);
-		}
-	}
+	//QVector<xCorner> corners;
+	//bool exist_corner3 = false;
+	//foreach(xObject* xo, xobj->XObjects())
+	//{
+	//	if (xo->Material() != BOUNDARY)
+	//		continue;
+	//	QVector<xCorner> objCorners = xo->get_sph_boundary_corners();
+	//	for (int i = 0; i < objCorners.size(); i++)
+	//	{
+	//		for (int j = 0; j < corners.size(); j++)
+	//		{
+	//			xCorner xc0 = objCorners[i];
+	//			xCorner xc1 = corners[j];
+	//			vector3d p0 = new_vector3d(xc0.px, xc0.py, xc0.pz);
+	//			vector3d p1 = new_vector3d(xc1.px, xc1.py, xc1.pz);
+	//			if (length(p0 - p1) < 1e-9) // if same position between two corners
+	//			{
+	//				if (xo->Shape() == PLANE_SHAPE){
+	//					// if geometry is plane
+	//					for (int k = 0; k < overlappingCorners.size(); k++){
+	//						xOverlapCorner c = overlappingCorners[k];
+	//						p1 = new_vector3d(c.c1.px, c.c1.py, c.c1.pz);
+	//						if (length(p1 - p0) < 1e-9){
+	//							p1 = new_vector3d(c.c2.px, c.c2.py, c.c2.pz);
+	//							if (length(p1 - p0) < 1e-9){
+	//								overlappingCorners[k].c3 = objCorners[i];
+	//								overlappingCorners[k].cnt = 1;
+	//								exist_corner3 = true;
+	//							}
+	//						}
+	//					}
+	//				}
+	//				if (!exist_corner3){
+	//					xOverlapCorner c = { 0, 0, 0, 0, 0, objCorners[i], corners[j], corners[i], false };
+	//					overlappingCorners.push_back(c);
+	//				}
+	//				else{
+	//					exist_corner3 = false;
+	//				}
+	//				break;
+	//			}
+	//		}
+	//		corners.push_back(objCorners[i]);
+	//	}
+	//}
 }
 
 void xSmoothedParticleHydrodynamicsModel::CreateParticles(xObjectManager* xobj)
 {
-	DefineCorners(xobj);
-	unsigned int count = 0;
-	foreach(xObject* xo, xobj->XObjects())
-		count += xo->create_sph_particles(pspace, nlayers);
-	np = count;
-	np += CreateOverlapCornerDummyParticles(np, false);
-	if (!pos) pos = new vector3d[np];
-	if (!vel) vel = new vector3d[np];
-	if (!type) type = new xMaterialType[np];
-	count = 0;
-	foreach(xObject* xo, xobj->XObjects())
-		count += xo->create_sph_particles(pspace, nlayers, pos, type);
-	count += CreateOverlapCornerDummyParticles(count, true);
-	for (unsigned int i = 0; i < np; i++)
-	{
-		switch (type[i])
-		{
-		case FLUID: nfluid++; break;
-		case BOUNDARY: nbound++; break;
-		case DUMMY: ndummy++; break;
-		}
-	}
-	dim = ker_data.dim;
-	p_volume = pow(pspace, dim);
-	p_mass = p_volume * ref_rho;
-// 	foreach(xParticleObject* xpo, xpmgr->XParticleObjects())
-// 	{
-// 		if (xpo->Material() == FLUID)
-// 			nfluid += xpo->NumParticle();
-// 		else if (xpo->Material() == BOUNDARY)
-// 		{
-// 			unsigned int nb = xpo->NumParticle();
-// 			nbound += nb;
-// 			ndummy += nb * nlayers;
-// 		}
-// 	}
-// 	CreateOverlapCornerDummyParticles(false);
-// 	np = nfluid + nbound + ndummy + noverlap;
-// 	if (!all_particles)
-// 		all_particles = new vector3d[np];
-// 	nfluid = nbound = ndummy = noverlap = 0;
-// 	foreach(xParticleObject* xpo, xpmgr->XParticleObjects())
-// 	{
-// 		if (xpo->Material() == FLUID)
-// 		{
-// 			vector4d* p = xpo->Position();
-// 			nfluid = xpo->NumParticle();
-// 			for (unsigned int i = 0; i < nfluid; i++)
-// 			{
-// 				all_particles[i] = new_vector3d(p[i].x, p[i].y, p[i].z);
-// 			}
-// 		}
-// 		else if (xpo->Material() == BOUNDARY)
-// 		{
-// 			unsigned int nb = xpo->NumParticle();
-// 			unsigned int sid = nfluid + nbound;
-// 			vector3d n = xobj->XObjects()[xpo->Name()]->
-// 			nbound += nb;
-// 			vector4d* p = xpo->Position();
-// 			for (unsigned int i = sid; i < sid + nb; i++)
-// 			{
-// 				all_particles[i + ndummy] = new_vector3d(p[i].x, p[i].y, p[i].z);
-// 				for (unsigned int j = i; j < i + nlayers; i++)
-// 				{
-// 					all_particles[j] = new_vector3d
-// 				}
-// 			}
-// 		}
-// 	}
+//	DefineCorners(xobj);
+//	unsigned int count = 0;
+//	foreach(xObject* xo, xobj->XObjects())
+//		count += xo->create_sph_particles(pspace, nlayers);
+//	np = count;
+//	np += CreateOverlapCornerDummyParticles(np, false);
+//	if (!pos) pos = new vector3d[np];
+//	if (!vel) vel = new vector3d[np];
+//	if (!type) type = new xMaterialType[np];
+//	count = 0;
+//	foreach(xObject* xo, xobj->XObjects())
+//		count += xo->create_sph_particles(pspace, nlayers, pos, type);
+//	count += CreateOverlapCornerDummyParticles(count, true);
+//	for (unsigned int i = 0; i < np; i++)
+//	{
+//		switch (type[i])
+//		{
+//		case FLUID: nfluid++; break;
+//		case BOUNDARY: nbound++; break;
+//		case DUMMY: ndummy++; break;
+//		}
+//	}
+//	dim = ker_data.dim;
+//	p_volume = pow(pspace, dim);
+//	p_mass = p_volume * ref_rho;
+//// 	foreach(xParticleObject* xpo, xpmgr->XParticleObjects())
+//// 	{
+//// 		if (xpo->Material() == FLUID)
+//// 			nfluid += xpo->NumParticle();
+//// 		else if (xpo->Material() == BOUNDARY)
+//// 		{
+//// 			unsigned int nb = xpo->NumParticle();
+//// 			nbound += nb;
+//// 			ndummy += nb * nlayers;
+//// 		}
+//// 	}
+//// 	CreateOverlapCornerDummyParticles(false);
+//// 	np = nfluid + nbound + ndummy + noverlap;
+//// 	if (!all_particles)
+//// 		all_particles = new vector3d[np];
+//// 	nfluid = nbound = ndummy = noverlap = 0;
+//// 	foreach(xParticleObject* xpo, xpmgr->XParticleObjects())
+//// 	{
+//// 		if (xpo->Material() == FLUID)
+//// 		{
+//// 			vector4d* p = xpo->Position();
+//// 			nfluid = xpo->NumParticle();
+//// 			for (unsigned int i = 0; i < nfluid; i++)
+//// 			{
+//// 				all_particles[i] = new_vector3d(p[i].x, p[i].y, p[i].z);
+//// 			}
+//// 		}
+//// 		else if (xpo->Material() == BOUNDARY)
+//// 		{
+//// 			unsigned int nb = xpo->NumParticle();
+//// 			unsigned int sid = nfluid + nbound;
+//// 			vector3d n = xobj->XObjects()[xpo->Name()]->
+//// 			nbound += nb;
+//// 			vector4d* p = xpo->Position();
+//// 			for (unsigned int i = sid; i < sid + nb; i++)
+//// 			{
+//// 				all_particles[i + ndummy] = new_vector3d(p[i].x, p[i].y, p[i].z);
+//// 				for (unsigned int j = i; j < i + nlayers; i++)
+//// 				{
+//// 					all_particles[j] = new_vector3d
+//// 				}
+//// 			}
+//// 		}
+//// 	}
 }
 
 void xSmoothedParticleHydrodynamicsModel::ExportParticleDataForView(std::string& path)
@@ -370,37 +370,37 @@ unsigned int xSmoothedParticleHydrodynamicsModel::CreateOverlapCornerDummyPartic
 unsigned int xSmoothedParticleHydrodynamicsModel::CreateOverlapCornerDummyParticles(unsigned int overlap_sid, bool isOnlyCount)
 {
 	unsigned int count = 0;
-	foreach(xOverlapCorner xoc, overlappingCorners)
-	{
-//		overlappingCorner *oc = &md->overlappingCorners[i];
-		vector3d tan1 = new_vector3d(xoc.c1.tx, xoc.c1.ty, xoc.c1.tz);
-		vector3d tan2 = new_vector3d(xoc.c2.tx, xoc.c2.ty, xoc.c2.tz);
-		vector3d tv = tan1 - tan2;
-		vector3d tu = tv / length(tv);
-		if (!isOnlyCount){
-			unsigned int id = overlap_sid + count;
-			pos[id] = new_vector3d(xoc.c1.px, xoc.c1.py, xoc.c1.pz);
-			type[id] = BOUNDARY;
-			//particle* p = md->setParticle(id, BOUNDARY, 0.0, oc->c1.position, oc->iniVel);
-			//
-// 			p->setID(id);
-// 			p->setIsCorner(true);
-// 			p->setTangent(tu);
-// 			p->setNormal(oc->c1.normal);
-// 			p->setNormal2(oc->c2.normal);
-			//				p->setAuxVelocity(oc->iniVel);
-		}
-		count++;
-		//double dot = oc->c1.normal.dot(oc->c2.tangent);
-		vector3d c1p = new_vector3d(xoc.c1.px, xoc.c1.py, xoc.c1.pz);
-		vector3d c1n = new_vector3d(xoc.c1.nx, xoc.c1.ny, xoc.c1.nz);
-		vector3d c2n = new_vector3d(xoc.c2.nx, xoc.c2.ny, xoc.c2.nz);
-		if (/*dot <= 0 && */bound == DUMMY_PARTICLE_METHOD)
-			count += CreateOverlapCornerDummyParticle(overlap_sid + count, c1p, c1n, c2n, isOnlyCount);
-// 		else if (oc->inner && tboundary == DUMMY_PARTICLE_METHOD)
-// 			count += 1 + createCornerDummyParticles(md->overlappingCornerStartIndex + count, oc->c1.position, oc->iniVel, oc->c1.normal, oc->c2.normal, isOnlyCount);
-// 		else
-// 			count += 1;
-	}
+//	foreach(xOverlapCorner xoc, overlappingCorners)
+//	{
+////		overlappingCorner *oc = &md->overlappingCorners[i];
+//		vector3d tan1 = new_vector3d(xoc.c1.tx, xoc.c1.ty, xoc.c1.tz);
+//		vector3d tan2 = new_vector3d(xoc.c2.tx, xoc.c2.ty, xoc.c2.tz);
+//		vector3d tv = tan1 - tan2;
+//		vector3d tu = tv / length(tv);
+//		if (!isOnlyCount){
+//			unsigned int id = overlap_sid + count;
+//			pos[id] = new_vector3d(xoc.c1.px, xoc.c1.py, xoc.c1.pz);
+//			type[id] = BOUNDARY;
+//			//particle* p = md->setParticle(id, BOUNDARY, 0.0, oc->c1.position, oc->iniVel);
+//			//
+//// 			p->setID(id);
+//// 			p->setIsCorner(true);
+//// 			p->setTangent(tu);
+//// 			p->setNormal(oc->c1.normal);
+//// 			p->setNormal2(oc->c2.normal);
+//			//				p->setAuxVelocity(oc->iniVel);
+//		}
+//		count++;
+//		//double dot = oc->c1.normal.dot(oc->c2.tangent);
+//		vector3d c1p = new_vector3d(xoc.c1.px, xoc.c1.py, xoc.c1.pz);
+//		vector3d c1n = new_vector3d(xoc.c1.nx, xoc.c1.ny, xoc.c1.nz);
+//		vector3d c2n = new_vector3d(xoc.c2.nx, xoc.c2.ny, xoc.c2.nz);
+//		if (/*dot <= 0 && */bound == DUMMY_PARTICLE_METHOD)
+//			count += CreateOverlapCornerDummyParticle(overlap_sid + count, c1p, c1n, c2n, isOnlyCount);
+//// 		else if (oc->inner && tboundary == DUMMY_PARTICLE_METHOD)
+//// 			count += 1 + createCornerDummyParticles(md->overlappingCornerStartIndex + count, oc->c1.position, oc->iniVel, oc->c1.normal, oc->c2.normal, isOnlyCount);
+//// 		else
+//// 			count += 1;
+//	}
 	return count;
 }

@@ -20,7 +20,7 @@ xContact::xContact()
 }
 
 xContact::xContact(std::string _name, xContactPairType xcpt)
-	: name(QString::fromStdString(_name))
+	: name(_name)
 	, type(xcpt)
 	, dcp(NULL)
 	, iobj(NULL)
@@ -253,7 +253,7 @@ void xContact::RollingResistanceForce(
 
 bool xContact::IsEnabled() { return is_enabled; }
 void xContact::setEnabled(bool b) { is_enabled = b; }
-QString xContact::Name() const { return name; }
+xstring xContact::Name() const { return name; }
 xObject* xContact::FirstObject() const { return iobj; }
 xObject* xContact::SecondObject() const { return jobj; }
 double xContact::Cohesion() const { return cohesion; }

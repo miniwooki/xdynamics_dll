@@ -3,8 +3,8 @@
 
 #include "xdynamics_object/xConatct.h"
 #include "xdynamics_object/xParticlePlaneContact.h"
-#include <QtCore/QMap>
-#include <QtCore/QString>
+//#include <QtCore/QMap>
+//#include <QtCore/QString>
 
 class xPlaneObject;
 
@@ -79,8 +79,8 @@ private:
 	device_plane_info* dpi;
 	device_body_info* dbi;
 	device_body_force* dbf;
-	QMap<unsigned int, xPlaneObject*> pair_ip;
-	QMap<unsigned int, xContact*> pair_contact;
+	xmap<unsigned int, xPlaneObject*> pair_ip;
+	xmap<unsigned int, xContact*> pair_contact;
 
 	//device_plane_info *hpmi;
 	//device_mesh_mass_info *dpmi;

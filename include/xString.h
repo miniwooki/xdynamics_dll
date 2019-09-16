@@ -2,13 +2,12 @@
 #define XSTRING_H
 
 #include "xdynamics_decl.h"
-
-#include <iostream>
+//#include <iostream>
 #include <vector>
 
 using namespace std;
 
-class xstring
+class XDYNAMICS_API xstring
 {
 public:
 	xstring();
@@ -29,6 +28,8 @@ public:
 	int size() const;
 	void split(const char* c, int n, int* data);
 	void split(const char* c, int n, double* data);
+	void split(const char* c, int n, std::string* data);
+	unsigned int n_split_string(const char* c);
 	std::string toStdString();
 	const std::string toStdString() const;
 	//static void get_split_data(xString* ls,  int* data);

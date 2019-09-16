@@ -5,8 +5,8 @@
 
 //using namespace boost::filesystem;
 
-QString xModel::name = "Model1";
-QString xModel::path = kor(getenv("USERPROFILE")) + "/Documents/xdynamics/";
+xstring xModel::name = "Model1";
+xstring xModel::path = xstring(getenv("USERPROFILE")) + xstring("/Documents/xdynamics/");
 xPointMass* xModel::ground = NULL;
 xModel::angle_type xModel::angle = xModel::EULER_PARAMETERS;
 vector3d xModel::gravity = new_vector3d(0.0, -9.80665, 0.0);
@@ -17,21 +17,12 @@ xModel::unit_type xModel::unit = MKS;
 
 xModel::xModel()
 {
-	//xLog();
-// 	char* pv = NULL;
-// 	size_t len = 0;
-// 	_wdupenv_s(&pv, &len, "USERPROFILE");
-// 	path = pv;// wsprintfW(path, TEXT("%s"), pv);
-// 	//char wcarr[11] = { 0, };
-// 	//MultiByteToWideChar(CP_ACP, NULL, "/Documents/", -1, wcarr, 11 * 2);
-// 	path = path + "/Documents/xdynamics/";
-// 		//lstrcatW(path, "/Documents/xdynamics/");
-// 	delete pv;
+
 }
 
 xModel::xModel(const std::string _name)
 {
-	name = QString::fromStdString(_name);
+	name = _name;
 	std::cout << _name << std::endl;
 	xUtilityFunctions::CreateDirectory(path.toStdString().c_str());
 	if (!ground)
@@ -52,7 +43,7 @@ xModel::~xModel()
 void xModel::initialize()
 {
 	name = "Model1";
-	path = kor(getenv("USERPROFILE")) + "/Documents/xdynamics/";
+	path = xstring(getenv("USERPROFILE")) + xstring("/Documents/xdynamics/");
 	ground = NULL;
 	angle = xModel::EULER_PARAMETERS;
 	gravity = new_vector3d(0.0, -9.80665, 0.0);
@@ -71,15 +62,15 @@ xPointMass* xModel::Ground()
 	return ground;
 }
 
-void xModel::setModelName(const QString n)
+void xModel::setModelName(const std::string n)
 {
 	if (name != n)
 	{
 		name = n;// wsprintfW(name, TEXT("%s"), n);
-		QString full_path = path + name + "/";
-		xUtilityFunctions::CreateDirectory(full_path.toStdString().c_str());
-		launchLogSystem(full_path.toStdString());
-		xLog::log("Change Directory : " + full_path.toStdString());
+		std::string full_path = path.toStdString() + n + "/";
+		xUtilityFunctions::CreateDirectory(full_path.c_str());
+		launchLogSystem(full_path);
+		xLog::log("Change Directory : " + full_path);
 	}
 	else
 	{
@@ -87,7 +78,7 @@ void xModel::setModelName(const QString n)
 	}
 }
 
-void xModel::setModelPath(const QString p)
+void xModel::setModelPath(const std::string p)
 {
 	path = p;// wsprintfW(path, TEXT("%s"), p);
 }

@@ -4,52 +4,23 @@
 xvCylinder::xvCylinder()
 	: xvObject()
 {
-	/*origin[0] = origin[1] = origin[2] = 0.f;*/
-// 	setIndexList();
-// 	setNormalList();
+
 }
 
 xvCylinder::xvCylinder(QString& _name)
 	: xvObject(V_CYLINDER, _name)
 {
-// 	setIndexList();
-// 	setNormalList();
+
 }
 
 bool xvCylinder::makeCylinderGeometry(xCylinderObjectData& d)
 {
-	//pos = new_vector3f(0.0f, 0.1f, 0.25f);
-// 	len = 1.f;
-// 	r_top = 0.2f;
-// 	r_bottom = 0.2f;
-// 	p0[0] = 0.0f;
-// 	p0[1] = -0.5f; 
-// 	p0[2] = 0.0f;
-// 	p1[0] = 0.0f;
-// 	p1[1] = 0.5f;
-// 	p1[2] = 0.0f;
-	//xCylinderObjectData dd = { 1.0, 0.2, 0.2, 0.0, -0.5, 0.0, 0.0, 0.5, 0.0 };
 	pos.x = 0.5*(d.p1x + d.p0x);
 	pos.y = 0.5*(d.p1y + d.p0y);
 	pos.z = 0.5*(d.p1z + d.p0z);
 	data = d;
 	display = this->define();
 
-// 	pos.x = (d.p1x + d.p0x) * 0.5f;
-// 	pos.y = (d.p1y + d.p0y) * 0.5f;
-// 	pos.z = (d.p1z + d.p0z) * 0.5f;
-// 	vertice[0] = d.p0x - pos.x; vertice[1] = d.p0y - pos.y;	vertice[2] = d.p0z - pos.z;
-// 	vertice[3] = d.p0x - pos.x;	vertice[4] = d.p1y - pos.y; vertice[5] = d.p0z - pos.z;
-// 	vertice[6] = d.p0x - pos.x; vertice[7] = d.p0y - pos.y;	vertice[8] = d.p1z - pos.z;
-// 	vertice[9] = d.p0x - pos.x;	vertice[10] = d.p1y - pos.y; vertice[11] = d.p1z - pos.z;
-// 	vertice[12] = d.p1x - pos.x; vertice[13] = d.p0y - pos.y; vertice[14] = d.p1z - pos.z;
-// 	vertice[15] = d.p1x - pos.x; vertice[16] = d.p1y - pos.y; vertice[17] = d.p1z - pos.z;
-// 	vertice[18] = d.p1x - pos.x; vertice[19] = d.p0y - pos.y; vertice[20] = d.p0z - pos.z;
-// 	vertice[21] = d.p1x - pos.x; vertice[22] = d.p1y - pos.y; vertice[23] = d.p0z - pos.z;
-// 
-// 	//cpos = pos0;
-// 	display = this->define();
-// 	data = d;
 	return true;
 }
 
@@ -67,7 +38,7 @@ void xvCylinder::draw(GLenum eMode)
 		{
 			double t = 180 / M_PI;
 			unsigned int idx = xvAnimationController::getFrame();
-			xPointMass::pointmass_result pmr = xvObject::pmrs->at(idx);
+			xPointMass::pointmass_result pmr = xvObject::pmrs[idx];
 			glTranslated(pmr.pos.x, pmr.pos.y, pmr.pos.z);
 			vector3d euler = EulerParameterToEulerAngle(pmr.ep);
 			glRotated(t*euler.x, 0, 0, 1);

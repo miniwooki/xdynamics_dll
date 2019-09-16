@@ -83,7 +83,7 @@ void xSimulationThread::run()
 		if (isStop || xSimulation::ConfirmStopSimulation())
 			break;
 		cstep++;
-		//cout << cstep << endl;
+		qDebug() <<  cstep << endl;
 		eachStep++;
 		ct += xSimulation::dt;
 		xSimulation::setCurrentTime(ct);

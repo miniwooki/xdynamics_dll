@@ -93,8 +93,8 @@ void xTranslationConstraint::DerivateJacobian(xMatrixD& lhs, xVectorD& q, xVecto
 	dot_1_differentialJacobian(lhs, fi, fj, ei, ej, mul * lm[4]);
 }
 
-void xTranslationConstraint::SaveStepResult(
-	unsigned int part, double ct, xVectorD& q, xVectorD& qd, double* L, unsigned int sr)
+xKinematicConstraint::kinematicConstraint_result xTranslationConstraint::GetStepResult(
+	unsigned int part, xVectorD& q, xVectorD& qd, double* L, unsigned int sr)
 {
 	unsigned int sc = 0;
 // 	unsigned int idx = i * xModel::OneDOF();
@@ -139,10 +139,10 @@ void xTranslationConstraint::SaveStepResult(
 		rf = r0 + r1 + r2 + r3 + r4;
 		kcr.jrforce = 0.5 * LMatrix(ei) * rf;
 	}
-	kcr.time = ct;
 	kcr.location = ri + Ai * spi;
-	kcrs.push_back(kcr);
+	//kcrs.push_back(kcr);
 	nr_part++;
+	return kcr;
 }
 
 void xTranslationConstraint::GammaFunction(xVectorD& rhs, xVectorD& q, xVectorD& qd, unsigned int sr, double mul)

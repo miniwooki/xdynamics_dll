@@ -3,8 +3,8 @@
 
 //#include "xdynamics_decl.h"
 #include "xdynamics_object/xObject.h"
-#include <QtCore/QTextStream>
-#include <QtCore/QVector>
+//#include <QtCore/QTextStream>
+//#include <QtCore/QVector>
 
 class XDYNAMICS_API xPointMass : public xObject
 {
@@ -13,9 +13,24 @@ class XDYNAMICS_API xPointMass : public xObject
 public:
 	typedef struct  
 	{
-		double time;
-		vector3d pos, vel, acc, omega, alpha, af, am, cf, cm, hf, hm;
-		euler_parameters ep, ev, ea;
+		vector3d pos;			// position
+		vector3d vel;			// velocity
+		euler_parameters ep;	// euler parameters
+		euler_parameters ev;	// first derivative of euler parameters
+
+		vector3d af;			// axial force
+		vector3d am;			// axial moment
+		vector3d cf;			// contact force
+		vector3d cm;			// contact moment
+		vector3d hf;			// hydro force
+		vector3d hm;			// hydro moment
+		vector4d em;
+
+		vector3d omega;			// angular velocity
+		vector3d alpha;			// angular acceleration
+
+		vector3d acc;			// acceleration
+		euler_parameters ea;	// second derivative of euler parameters
 	}pointmass_result;
 
 	xPointMass(xShapeType _s = NO_SHAPE);
@@ -75,8 +90,8 @@ public:
 	vector3d HydroMoment() const;
 	vector4d EulerParameterMoment() const;
 	double* getForcePointer();
-
-	QVector<pointmass_result>* XPointMassResultPointer();
+	double* getPositionPointer();
+	//QVector<pointmass_result>* XPointMassResultPointer();
 
 	// Declaration operate functions
 	void setupTransformationMatrix();
@@ -133,7 +148,7 @@ protected:
 
 	matrix33d A;			// transformation matrix
 
-	QVector<pointmass_result> pmrs;
+	//QVector<pointmass_result> pmrs;
 
 	xSimulationStopCondition stop_condition;
 

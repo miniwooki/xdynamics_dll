@@ -5,8 +5,7 @@
 #include "xdynamics_simulation/xIncompressibleSPH.h"
 #include "xdynamics_simulation/xKinematicAnalysis.h"
 #include "xdynamics_global.h"
-#include <QtCore/QTime>
-#include <QtCore/QDate>
+#include <chrono>
 
 typedef xUtilityFunctions xuf;
 
@@ -70,6 +69,9 @@ bool xDynamicsSimulator::xInitialize(
  	if(_et) xSimulation::et = _et;
 	xSimulation::nstep = static_cast<unsigned int>((xSimulation::et / xSimulation::dt));
 	xSimulation::npart = static_cast<unsigned int>((nstep / xSimulation::st)) + 1;
+	xdm->initialize_result_manager(xSimulation::npart);
+	//xdm->XResult()->set_num_parts(xSimulation::npart);
+	//xdm->XResult()->alloc_time_momory(xSimulation::npart);
 	if (_xmbd)
 	{
 		xmbd = _xmbd;
@@ -109,7 +111,9 @@ bool xDynamicsSimulator::xInitialize(
 			xLog::log("An uninitialized multibody model has been detected.");
 			//int ret = xmbd->Initialize(xdm->XMBDModel());
 			if (!checkXerror(xmbd->Initialize(xdm->XMBDModel())))
+			{
 				xLog::log("The initialization of multibody model was succeeded.");
+			}				
 		}
 	}
 	if (xdem)
@@ -119,7 +123,10 @@ bool xDynamicsSimulator::xInitialize(
 			xLog::log("An uninitialized discrete element method model has been detected.");
 			//int ret = xdem->Initialize(xdm->XDEMModel(), xdm->XContact());
 			if (!checkXerror(xdem->Initialize(xdm->XDEMModel(), xdm->XContact())))
+			{
 				xLog::log("The initialization of discrete element method model was succeeded.");
+			}
+				
 		}
 		if (xmbd)
 		{
@@ -136,24 +143,32 @@ bool xDynamicsSimulator::xInitialize(
 				xLog::log("The initialization of smoothed particle hydrodynamics mode was succeeded.");
 		}
 	}
+	
 	savePartData(0, 0);
 	return true;
 }
 
 bool xDynamicsSimulator::savePartData(double ct, unsigned int pt)
 {
-	if (xmbd)
-		xmbd->SaveStepResult(pt, ct);
 	if (xdem)
+	{
+		xdem->SaveStepResult(pt);
+	}
+	if (xmbd)
+	{
+		xmbd->SaveStepResult(pt);
+	}
+	/*if (xdem)
 	{
 		xdem->SaveStepResult(pt, ct);
 		if (!xmbd)
 		{
 			xdm->XObject()->SaveResultCompulsionMovingObjects(ct);
 		}
-	}		
+	}		*/
 	if (xsph)
 		xsph->SaveStepResult(pt, ct);
+	xdm->XResult()->export_step_data_to_file(pt, ct);
 	return true;
 }
 
@@ -194,9 +209,10 @@ unsigned int xDynamicsSimulator::setupByLastSimulationFile(std::string lmr, std:
 
 bool xDynamicsSimulator::checkStopCondition()
 {
-	foreach(xObject* xo, xdm->XObject()->XObjects())
+	xmap<xstring, xObject*>* _xobjs = &xdm->XObject()->XObjects();
+	for (xmap<xstring, xObject*>::iterator it = _xobjs->begin(); it != _xobjs->end(); it.next())// (xObject* xo, xdm->XObject()->XObjects())
 	{
-		xPointMass* xpm = dynamic_cast<xPointMass*>(xo);
+		xPointMass* xpm = dynamic_cast<xPointMass*>(it.value());
 		if (xpm)
 		{
 			if (xpm->checkStopCondition())
@@ -259,10 +275,11 @@ bool xDynamicsSimulator::xRunSimulation()
 	xLog::log("PART       SimTime    TotalSteps    Steps    Time/Sec   TotalTime/Sec  Finish time         ");
 	xLog::log("=========  =======    ==========    ======   ========   =============  ====================");
 	//xTime tme;
-	QTime tme;
+	/*QTime tme;
 	QTime startTime = tme.currentTime();
 	QDate startDate = QDate::currentDate();
-	tme.start();
+	tme.start();*/
+	chrono::system_clock::time_point start = chrono::system_clock::now();
 	while (cstep < nstep)
 	{
 		cstep++;
@@ -287,7 +304,9 @@ bool xDynamicsSimulator::xRunSimulation()
 		if (!((cstep) % xSimulation::st))
 		{
 			previous_time = elapsed_time;
-			elapsed_time = tme.elapsed() * 0.001;
+			chrono::system_clock::time_point end = chrono::system_clock::now();
+			chrono::duration<double> sec = end - start;
+			elapsed_time = sec.count();// tme.elapsed() * 0.001;
 			total_time += elapsed_time - previous_time;
 			part++;
 			if (savePartData(ct, part))
@@ -298,12 +317,13 @@ bool xDynamicsSimulator::xRunSimulation()
 			eachStep = 0;
 		}
 	}
-	//tme.stop();
-	elapsed_time = tme.elapsed() * 0.001;
+	chrono::system_clock::time_point end = chrono::system_clock::now();
+	chrono::duration<double> sec = end - start;
+	elapsed_time = sec.count();// tme.elapsed() * 0.001;
 	total_time += elapsed_time;
 	xLog::log("=========  =======    ==========    ======   ========   =============  ====================\n");
-	exportPartData();
-	QTime endTime = QTime::currentTime();
+//	exportPartData();
+	/*QTime endTime = QTime::currentTime();
 	QDate endDate = QDate::currentDate();
 	int minute = static_cast<int>(total_time / 60.0);
 	int hour = static_cast<int>(minute / 60.0);
@@ -311,91 +331,6 @@ bool xDynamicsSimulator::xRunSimulation()
 	xLog::log(
 		"     Starting time/date     = " + startTime.toString().toStdString() + " / " + startDate.toString().toStdString() + "\n" +
 		"     Ending time/date       = " + endTime.toString().toStdString() + " / " + endDate.toString().toStdString() + "\n" +
-		"     CPU + GPU time         = " + QString("%1").arg(total_time).toStdString() + " second  ( " + QString("%1").arg(hour).toStdString() + " h. " + QString("%1").arg(minute).toStdString() + " m. " + QString("%1").arg(second).toStdString() + " s. )");
+		"     CPU + GPU time         = " + QString("%1").arg(total_time).toStdString() + " second  ( " + QString("%1").arg(hour).toStdString() + " h. " + QString("%1").arg(minute).toStdString() + " m. " + QString("%1").arg(second).toStdString() + " s. )");*/
 	return true;
-// 		QMutexLocker locker(&m_mutex);
-// 		if (isStop)
-// 			break;
-// 		cstep++;
-// 		eachStep++;
-// 		ct += simulation::dt;
-// 		qDebug() << ct;
-// 
-// 		simulation::setCurrentTime(ct);
-// 		if (gms.size())
-// 		{
-// 			foreach(object* o, gms)
-// 			{
-// 				if (ct >= o->MotionCondition().st)
-// 					o->UpdateGeometryMotion(simulation::dt);
-// 			}
-// 		}
-// 		if (dem)
-// 		{
-// 			model::isSinglePrecision ?
-// 				dem->oneStepAnalysis_f(ct, cstep) :
-// 				dem->oneStepAnalysis(ct, cstep);
-// 			//qDebug() << "dem done";
-// 		}
-// 
-// 		if (mbd)
-// 		{
-// 			mbd_state = mbd->oneStepAnalysis(ct, cstep);
-// 			if (event_trigger::IsEvnetTrigger())
-// 			{
-// 				sendProgress(part, event_trigger::OnMessage());
-// 			}
-// 			if (mbd_state == -1)
-// 			{
-// 				//errors::Error(mbd->MbdModel()->modelName());
-// 				//break;
-// 			}
-// 			else if (mbd_state == 1)
-// 			{
-// 				if (mg->ContactManager())
-// 					mg->ContactManager()->update();// ContactParticlesPolygonObjects()->updatePolygonObjectData();
-// 			}
-// 		}
-// 
-// 		if (!((cstep) % simulation::st))
-// 		{
-// 			double dur_time = tme.elapsed() * 0.001;
-// 			total_time += dur_time;
-// 			part++;
-// 			if (savePart(ct, part))
-// 			{
-// 				ch.clear();
-// 				qts << qSetFieldWidth(0) << "| "
-// 					<< qSetFieldWidth(nFit(15, part)) << part
-// 					<< qSetFieldWidth(nFit(20, ct)) << ct
-// 					<< qSetFieldWidth(nFit(20, eachStep)) << eachStep
-// 					<< qSetFieldWidth(nFit(20, cstep)) << cstep
-// 					<< qSetFieldWidth(nFit(20, dur_time)) << dur_time
-// 					// 					<< qSetFieldWidth(17) << ct 
-// 					// 					<< qSetFieldWidth(12) << eachStep 
-// 					// 					<< qSetFieldWidth(13) << cstep 
-// 					// 					/*<< qSetFieldWidth(22)*/ << dur_time 
-// 					<< "|";
-// 				sendProgress(part, ch);
-// 				ch.clear();
-// 			}
-// 			eachStep = 0;
-// 		}
-// 	}
-// 	model::rs->exportEachResult2TXT(model::path);
-// 	saveFinalResult(ct);
-// 	processResultData();
-// 	sendProgress(0, "__line__");
-// 	QTime endingTime = tme.currentTime();
-// 	QDate endingDate = QDate::currentDate();
-// 	double dtime = tme.elapsed() * 0.001;
-// 	int minute = static_cast<int>(dtime / 60.0);
-// 	int hour = static_cast<int>(minute / 60.0);
-// 	qts.setFieldWidth(0);
-// 	int cgtime = endingTime.second() - startingTime.msec();
-// 	qts << "     Starting time/date     = " << startingTime.toString() << " / " << startingDate.toString() << endl
-// 		<< "     Ending time/date      = " << endingTime.toString() << " / " << endingDate.toString() << endl
-// 		<< "     CPU + GPU time       = " << dtime << " second  ( " << hour << " h. " << minute << " m. " << dtime << " s. )";
-// 	sendProgress(-1, ch); ch.clear();
-// 	emit finishedThread();
 }

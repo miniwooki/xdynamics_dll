@@ -60,15 +60,23 @@ unsigned int xParticleMeshObjectsContact::NumSphereData()
 	return npolySphere;
 }
 
-unsigned int xParticleMeshObjectsContact::define(QMap<QString, xParticleMeshObjectContact*>& cpmesh)
+unsigned int xParticleMeshObjectsContact::define(xmap<xstring, xParticleMeshObjectContact*>& cpmesh)
 {
-	foreach(xParticleMeshObjectContact* cpm, cpmesh)
+	xmap<xstring, xParticleMeshObjectContact*>::iterator it;
+	for (it = cpmesh.begin(); it != cpmesh.end(); it.next())
 	{
-		xMeshObject* pobj = cpm->MeshObject();
+		xMeshObject* pobj = it.value()->MeshObject();
 		if (pobj->MovingObject() || pobj->CompulsionMovingObject())
 			nmoving++;
 		npolySphere += pobj->NumTriangle();
 	}
+	//foreach(xParticleMeshObjectContact* cpm, cpmesh)
+	//{
+	//	xMeshObject* pobj = cpm->MeshObject();
+	//	if (pobj->MovingObject() || pobj->CompulsionMovingObject())
+	//		nmoving++;
+	//	npolySphere += pobj->NumTriangle();
+	//}
 	nPobjs = cpmesh.size();
 	hsphere = new vector4d[npolySphere];
 	hlocal = new vector3d[npolySphere];
@@ -88,8 +96,9 @@ unsigned int xParticleMeshObjectsContact::define(QMap<QString, xParticleMeshObje
 	unsigned int ePolySphere = 0;
 	double maxRadii = 0.0;
 	unsigned int idx = 0;
-	foreach(xParticleMeshObjectContact* cpm, cpmesh)
+	for (it = cpmesh.begin(); it != cpmesh.end(); it.next())
 	{
+		xParticleMeshObjectContact* cpm = it.value();
 		xContactMaterialParameters cp = { 0, };
 		xMaterialPair xmp = { 0, };
 		xMeshObject* pobj = cpm->MeshObject();
@@ -103,7 +112,7 @@ unsigned int xParticleMeshObjectsContact::define(QMap<QString, xParticleMeshObje
 		xmp = cpm->MaterialPropertyPair();
 		hcp[idx] = cp;
 		xmps[idx] = xmp;
-		pair_ip[idx] = pobj;
+		pair_ip.insert(idx, pobj);
 		ePolySphere += pobj->NumTriangle();
 		unsigned int vi = 0;
 		//vector3d* hlocal = new vector3d[npolySphere];
@@ -222,24 +231,23 @@ bool xParticleMeshObjectsContact::cppolyCollision(
 		ci = i / neach;
 		cp = new_vector3d(cpos[ci].x, cpos[ci].y, cpos[ci].z);
 	}
-	
-	foreach(xTrianglePairData* d, pairs->TrianglePair())
+	for(xmap<unsigned int, xTrianglePairData*>::iterator it = pairs->TrianglePair().begin(); it != pairs->TrianglePair().end(); it.next())
 	{
-		particle_triangle_contact_force(d, r, m, cp, v, o, res, tmax, F, M);
+		particle_triangle_contact_force(it.value(), r, m, cp, v, o, res, tmax, F, M);
 	}
 	if (!pairs->TrianglePair().size())
 	{
-		foreach(xTrianglePairData* d, pairs->TriangleLinePair())
+		for (xmap<unsigned int, xTrianglePairData*>::iterator it = pairs->TriangleLinePair().begin(); it != pairs->TriangleLinePair().end(); it.next())
 		{
-			particle_triangle_contact_force(d, r, m, cp, v, o, res, tmax, F, M);
+			particle_triangle_contact_force(it.value(), r, m, cp, v, o, res, tmax, F, M);
 		}
 			
 	}
 	if (!pairs->TrianglePair().size() && !pairs->TriangleLinePair().size())
 	{
-		foreach(xTrianglePairData* d, pairs->TrianglePointPair())
+		for (xmap<unsigned int, xTrianglePairData*>::iterator it = pairs->TrianglePointPair().begin(); it != pairs->TrianglePointPair().end(); it.next())
 		{
-			particle_triangle_contact_force(d, r, m, cp, v, o, res, tmax, F, M);
+			particle_triangle_contact_force(it.value(), r, m, cp, v, o, res, tmax, F, M);
 		}
 	}
 		
@@ -344,8 +352,9 @@ void xParticleMeshObjectsContact::updateMeshObjectData(bool is_first_set_up)
 			bi = new device_body_info[nPobjs];
 		//checkCudaErrors(cudaMemcpy(dpmi, hpmi, sizeof(device_mesh_mass_info) * nPobjs, cudaMemcpyHostToDevice));
 		//checkCudaErrors(cudaMemcpy(dep, hep, sizeof(double4) * nPobjs, cudaMemcpyHostToDevice));
-		foreach(xMeshObject* pobj, pair_ip)
+		for(xmap<unsigned int, xMeshObject*>::iterator it = pair_ip.begin(); it != pair_ip.end(); it.next())
 		{
+			xMeshObject* pobj = it.value();
 			euler_parameters ep = pobj->EulerParameters(), ed = pobj->DEulerParameters();
 			bi[mcnt] = {
 				pobj->Mass(),
@@ -357,18 +366,18 @@ void xParticleMeshObjectsContact::updateMeshObjectData(bool is_first_set_up)
 			checkCudaErrors(cudaMemcpy(dbi, bi, sizeof(device_body_info) * nPobjs, cudaMemcpyHostToDevice));
 			mcnt++;
 		}
-		foreach(xMeshObject* pobj, pair_ip)
+		for (xmap<unsigned int, xMeshObject*>::iterator it = pair_ip.begin(); it != pair_ip.end(); it.next())
 		{
-			ePolySphere += pobj->NumTriangle();
+			ePolySphere += it.value()->NumTriangle();
 			cu_update_meshObjectData(dvList, dsphere, dlocal, dpi, dbi, ePolySphere - bPolySphere);
-			bPolySphere += pobj->NumTriangle();// ePolySphere;
+			bPolySphere += it.value()->NumTriangle();// ePolySphere;
 		}
 	}
 	else
 	{
-		foreach(xMeshObject* mesh, pair_ip)
+		for (xmap<unsigned int, xMeshObject*>::iterator it = pair_ip.begin(); it != pair_ip.end(); it.next())
 		{
-			//xMeshObject* pobj = cpm->MeshObject();
+			xMeshObject* mesh = it.value();
 			vector3d *vList = (vector3d *)mesh->VertexList();
 			ePolySphere += mesh->NumTriangle();
 			unsigned int vi = 0;
@@ -380,18 +389,6 @@ void xParticleMeshObjectsContact::updateMeshObjectData(bool is_first_set_up)
 				unsigned int id = hpi[i].id;
 				vector3d pos = mesh->Position();
 				euler_parameters ep = mesh->EulerParameters();
-				//host_mesh_mass_info m = hpmi[id];
-				//vector3d pos = new_vector3d(m.px, m.py, m.pz);// [hpi[i].id].pos;
-				//euler_parameters ep = new_euler_parameters(
-				//	hep[id * 4 + 0],
-				//	hep[id * 4 + 1],
-				//	hep[id * 4 + 2],
-				//	hep[id * 4 + 3]);
-				/*hpi[i].P = pos + ToGlobal(ep, vList[vi++]);
-				hpi[i].Q = pos + ToGlobal(ep, vList[vi++]);
-				hpi[i].R = pos + ToGlobal(ep, vList[vi++]);
-				vector3d ctri = xUtilityFunctions::CenterOfTriangle(hpi[i].P, hpi[i].Q, hpi[i].R);
-				double rad = length(ctri - hpi[i].P);*/
 				vector3d gsph = pos + ToGlobal(ep, hlocal[i]);
 				hsphere[i] = new_vector4d(gsph.x, gsph.y, gsph.z, hsphere[i].w);
 				///hsphere[i] = new_vector4d(ctri.x, ctri.y, ctri.z, rad);
@@ -435,18 +432,18 @@ void xParticleMeshObjectsContact::getMeshContactForce()
 {
 	if (nmoving)
 	{
-		QMapIterator<unsigned int, xMeshObject*> xmo(pair_ip);
-		while (xmo.hasNext())
+		xmap<unsigned int, xMeshObject*>::iterator it = pair_ip.begin();
+		while (it.has_next())
 		{
-			xmo.next();
-			unsigned int id = xmo.key();
-			xMeshObject* o = xmo.value();
+			unsigned int id = it.key();
+			xMeshObject* o = it.value();
 			if (o->MovingObject())
 			{
 				//std::cout << "mesh contact force : [" << dbf[id].force.x << ", " << dbf[id].force.y << ", " << dbf[id].force.z << "]" << std::endl;
 				o->addContactForce(dbf[id].force.x, dbf[id].force.y, dbf[id].force.z);
 				o->addContactMoment(dbf[id].moment.x, dbf[id].moment.y, dbf[id].moment.z);
 			}
+			it.next();
 		}
 	}
 //	checkCudaErrors(cudaMemcpy(hpmi, dpmi, sizeof(device_mesh_mass_info) * nPobjs, cudaMemcpyDeviceToHost));
@@ -543,20 +540,6 @@ void xParticleMeshObjectsContact::updateCollisionPairLineOrVertex(
 	double cdist = r - dist;
 	if (cdist > 0)
 	{
-		/*vector3d qp = hmi.Q - hmi.P;
-		vector3d rp = hmi.R - hmi.P;
-		vector3d unit = -cross(qp, rp);*/
-
-		//cpt = 0.5 * (jpos + pos);
-		//unit = -unit / length(unit);
-		//bool overlab = checkOverlab(ctype, ocpt, cpt, ounit, unit);
-
-		/*if (overlab)
-			return false;
-
-		ocpt = cpt;
-		ounit = unit;
-		*(&(ctype.x) + t) += 1;*/
 		if (xcpl.IsNewTriangleContactPair(oid))
 		{
 			xTrianglePairData* pd = new xTrianglePairData;
@@ -603,9 +586,11 @@ void xParticleMeshObjectsContact::cudaMemoryAlloc(unsigned int np)
 	checkCudaErrors(cudaMemcpy(dlocal, hlocal, sizeof(vector3d) * npolySphere, cudaMemcpyHostToDevice));
 	unsigned int bPolySphere = 0;
 	unsigned int ePolySphere = 0;
-	foreach(xMeshObject* pobj, pair_ip)
+	for(xmap<unsigned int, xMeshObject*>::iterator it = pair_ip.begin(); it != pair_ip.end(); it.next())
+	//foreach(xMeshObject* pobj, pair_ip)
 	{
 		//polygonObject* pobj = cppo->PolygonObject();
+		xMeshObject* pobj = it.value();
 		double *vList = pobj->VertexList();
 		ePolySphere += pobj->NumTriangle();
 		//unsigned int *iList = pobj->IndexList();
@@ -641,8 +626,9 @@ void xParticleMeshObjectsContact::cuda_collision(
 
 void xParticleMeshObjectsContact::setZeroCollisionForce()
 {
-	foreach(xPointMass* pobj, pair_ip)
+	for (xmap<unsigned int, xMeshObject*>::iterator it = pair_ip.begin(); it != pair_ip.end(); it.next())
 	{
+		xPointMass* pobj = it.value();
 		pobj->setContactForce(0.0, 0.0, 0.0);
 		pobj->setContactMoment(0.0, 0.0, 0.0);
 	}

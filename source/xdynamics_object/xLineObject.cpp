@@ -81,16 +81,16 @@ unsigned int xLineObject::create_sph_particles(double ps, unsigned int nlayers, 
 	
 	return count;
 }
-
-QVector<xCorner> xLineObject::get_sph_boundary_corners()
-{
-	vector3d t0 = normalize(spoint - epoint);
-	vector3d t1 = normalize(epoint - spoint);
-	xCorner c1 = { spoint.x, spoint.y, spoint.z, normal.x, normal.y, normal.z, t0.x, t0.y, t0.z };
-	xCorner c2 = { epoint.x, epoint.y, epoint.z, normal.x, normal.y, normal.z, t1.x, t1.y, t1.z };
-	QVector<xCorner> list(2);
-	list[0] = c1;
-	list[1] = c2;
-	return list;
-}
+//
+//QVector<xCorner> xLineObject::get_sph_boundary_corners()
+//{
+//	vector3d t0 = normalize(spoint - epoint);
+//	vector3d t1 = normalize(epoint - spoint);
+//	xCorner c1 = { spoint.x, spoint.y, spoint.z, normal.x, normal.y, normal.z, t0.x, t0.y, t0.z };
+//	xCorner c2 = { epoint.x, epoint.y, epoint.z, normal.x, normal.y, normal.z, t1.x, t1.y, t1.z };
+//	QVector<xCorner> list(2);
+//	list[0] = c1;
+//	list[1] = c2;
+//	return list;
+//}
 

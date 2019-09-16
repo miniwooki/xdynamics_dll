@@ -10,6 +10,7 @@
 #include "xdynamics_object/xUniversalConstraint.h"
 #include "xdynamics_object/xDrivingConstraint.h"
 #include "xdynamics_object/xRotationalAxialForce.h"
+#include "xmap.hpp"
 
 class XDYNAMICS_API xMultiBodyModel 
 {
@@ -22,10 +23,11 @@ public:
 	unsigned int NumConstraint();
 	unsigned int NumDrivingConstraint();
 
-	QMap<QString, xPointMass*>& Masses();
-	QMap<QString, xKinematicConstraint*>& Joints();
-	QMap<QString, xForce*>& Forces();
-	QMap<QString, xDrivingConstraint*>& Drivings();
+	xmap<xstring, xPointMass*>& Masses();
+	xmap<xstring, xPointMass*>* Masses_ptr();
+	xmap<xstring, xKinematicConstraint*>& Joints();
+	xmap<xstring, xForce*>& Forces();
+	xmap<xstring, xDrivingConstraint*>& Drivings();
 	xPointMass* XMass(std::string& ws);
 	xKinematicConstraint* XJoint(std::string& ws);
 	xForce* XForce(std::string& ws);
@@ -39,10 +41,10 @@ public:
 	//void InsertPointMassFromShape(xPointMass* pm);
 
 private:
-	QMap<QString, xPointMass*> masses;
-	QMap<QString, xForce*> forces;
-	QMap<QString, xKinematicConstraint*> constraints;
-	QMap<QString, xDrivingConstraint*> dconstraints;
+	xmap<xstring, xPointMass*> masses;
+	xmap<xstring, xForce*> forces;
+	xmap<xstring, xKinematicConstraint*> constraints;
+	xmap<xstring, xDrivingConstraint*> dconstraints;
 };
 
 #endif

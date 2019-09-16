@@ -87,7 +87,7 @@ void xvObject::setPosition(float x, float y, float z)
 
 void xvObject::uploadPointMassResults(QString fname)
 {
-	if (pmrs && isBindPmrs == true)
+	/*if (pmrs && isBindPmrs == true)
 	{
 		pmrs->clear();
 	}
@@ -106,15 +106,13 @@ void xvObject::uploadPointMassResults(QString fname)
 	{
 		pmrs->push_back(pmr[i]);
 	}
-	isBindPmrs = false;
+	isBindPmrs = false;*/
 }
 
-void xvObject::bindPointMassResultsPointer(QVector<xPointMass::pointmass_result>* _pmrs)
+void xvObject::bindPointMassResultsPointer(xPointMass::pointmass_result* _pmrs)
 {
 	if (pmrs && isBindPmrs == false)
 	{
-		//qDeleteAll(pmrs);
-		pmrs->clear();
 		pmrs = NULL;
 	}
 	pmrs = _pmrs;

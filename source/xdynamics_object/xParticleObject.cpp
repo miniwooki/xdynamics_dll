@@ -255,11 +255,6 @@ unsigned int xParticleObject::create_sph_particles(double ps, unsigned int nlaye
 	return 0;
 }
 
-QVector<xCorner> xParticleObject::get_sph_boundary_corners()
-{
-	return QVector<xCorner>();
-}
-
 void xParticleObject::setMinRadius(double _mr)
 {
 	min_radius = _mr;

@@ -67,8 +67,8 @@ void xSphericalConstraint::DerivateJacobian(xMatrixD& lhs, xVectorD& q, xVectorD
 	spherical_differentialJacobian(lhs, mul * L);
 }
 
-void xSphericalConstraint::SaveStepResult(
-	unsigned int part, double ct, xVectorD& q, xVectorD& qd, double* L, unsigned int sr)
+xKinematicConstraint::kinematicConstraint_result xSphericalConstraint::GetStepResult(
+	unsigned int part, xVectorD& q, xVectorD& qd, double* L, unsigned int sr)
 {
 	unsigned int sc = 0;
 // 	unsigned int si = i * xModel::OneDOF();
@@ -97,10 +97,11 @@ void xSphericalConstraint::SaveStepResult(
 		rf = sce * L3;
 		kcr.jrforce = 0.5 * LMatrix(ej) * rf;
 	}
-	kcr.time = ct;
 	kcr.location = ri + i_ptr->toGlobal(spi);// Ai * spi;
-	kcrs.push_back(kcr);
+//	kcrs.push_back(kcr);
+	
 	nr_part++;
+	return kcr;
 }
 
 void xSphericalConstraint::GammaFunction(xVectorD& rhs, xVectorD& q, xVectorD& qd, unsigned int sr, double mul)

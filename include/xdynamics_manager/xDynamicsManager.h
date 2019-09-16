@@ -8,6 +8,7 @@
 #include "xdynamics_manager/xSmoothedParticleHydrodynamicsModel.h"
 #include "xdynamics_manager/xObjectManager.h"
 #include "xdynamics_manager/xContactManager.h"
+#include "xdynamics_manager/xResultManager.h"
 
 class xDynamicsSimulator;
 
@@ -24,12 +25,14 @@ public:
 
 	bool getSimulatorFromCommand(int argc, char* argv[]);
 	void CreateModel(std::string str, modelType t, bool isOnAir = true);
+	void initialize_result_manager(unsigned int npt);
 
 	xMultiBodyModel* XMBDModel();
 	xDiscreteElementMethodModel* XDEMModel();
 	xSmoothedParticleHydrodynamicsModel* XSPHModel();
 	xObjectManager* XObject();
 	xContactManager* XContact();
+	xResultManager* XResult();
 
 	xMultiBodyModel* XMBDModel(std::string& n);
 	xDiscreteElementMethodModel* XDEMModel(std::string& n);
@@ -41,16 +44,17 @@ public:
 
 private:
 	void setOnAirModel(modelType t, std::string n);
-	QMap<QString, xMultiBodyModel*> xmbds;
-	QMap<QString, xDiscreteElementMethodModel*> xdems;
-	QMap<QString, xSmoothedParticleHydrodynamicsModel*> xsphs;
+	xmap<xstring, xMultiBodyModel*> xmbds;
+	xmap<xstring, xDiscreteElementMethodModel*> xdems;
+	xmap<xstring, xSmoothedParticleHydrodynamicsModel*> xsphs;
 	xmap<xstring, xObjectManager*> xoms;
-	QMap<QString, xContactManager*> xcms;
+	xmap<xstring, xContactManager*> xcms;
 	xMultiBodyModel* xmbd;
 	xDiscreteElementMethodModel* xdem;
 	xSmoothedParticleHydrodynamicsModel* xsph;
 	xObjectManager *xom;
 	xContactManager *xcm;
+	xResultManager *xrm;
 // 
 // private:
 // 	void xDeleteMXMBD();

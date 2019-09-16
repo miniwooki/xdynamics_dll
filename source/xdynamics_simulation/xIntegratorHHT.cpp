@@ -120,10 +120,8 @@ void xIntegratorHHT::PredictionStep(double ct, unsigned int cstep)
 		q(i + dof) = ipp(i) + dt2acc * rhs(i);
 		qd(i + dof) = ipv(i) + rhs(i) * xSimulation::dt * gamma;
 	}
-	foreach(xPointMass* xpm, xmbd->Masses())
-	{
-		xpm->setNewData(q, qd);
-	}
+	for(xmap<xstring, xPointMass*>::iterator it = xmbd->Masses().begin(); it != xmbd->Masses().end(); it.next())
+		it.value()->setNewData(q, qd);
 }
 
 int xIntegratorHHT::CorrectionStep(double ct, unsigned int cstep)
@@ -174,10 +172,10 @@ int xIntegratorHHT::CorrectionStep(double ct, unsigned int cstep)
 			q(i + odof) = ipp(i) + dt2acc * rhs(i);
 			qd(i + odof) = ipv(i) + xSimulation::dt * gamma * rhs(i);
 		}
-		foreach(xPointMass* xpm, xmbd->Masses())
-		{
-			xpm->setNewData(q, qd);
-		}
+
+		for (xmap<xstring, xPointMass*>::iterator it = xmbd->Masses().begin(); it != xmbd->Masses().end(); it.next())
+			it.value()->setNewData(q, qd);
+
 		if (e_norm <= eps) break;
 	}
 	return xDynamicsError::xdynamicsSuccess;
@@ -190,8 +188,9 @@ void xIntegratorHHT::MassJacobian(double mul)
 	//xPointMass* xpm = xmbd->BeginPointMass();
 	unsigned int id = 0;
 	unsigned int src = 0;
-	foreach(xPointMass* xpm, xmbd->Masses())// (xpm != xmbd->EndPointMass())
+	for (xmap<xstring, xPointMass*>::iterator it = xmbd->Masses().begin(); it != xmbd->Masses().end(); it.next())
 	{
+		xPointMass* xpm = it.value();
 		id = xpm->xpmIndex() * xModel::OneDOF();
 		src = (xpm->xpmIndex() - 1) * xModel::OneDOF();
 		e = new_euler_parameters(q(id + 3), q(id + 4), q(id + 5), q(id + 6));
@@ -208,8 +207,9 @@ void xIntegratorHHT::ForceJacobian(double gt, double btt)
 	euler_parameters ev;
 	//xPointMass* xpm = xmbd->BeginPointMass();
 	unsigned int id = 0, src = 0;
-	foreach(xPointMass* xpm, xmbd->Masses())//while (xpm != xmbd->EndPointMass())
+	for (xmap<xstring, xPointMass*>::iterator it = xmbd->Masses().begin(); it != xmbd->Masses().end(); it.next())
 	{
+		xPointMass* xpm = it.value();
 		id = xpm->xpmIndex() * xModel::OneDOF();
 		src = (xpm->xpmIndex() - 1) * xModel::OneDOF();
 		e = new_euler_parameters(q(id + 3), q(id + 4), q(id + 5), q(id + 6));
@@ -219,10 +219,10 @@ void xIntegratorHHT::ForceJacobian(double gt, double btt)
 		lhs.plus(src + 3, src + 3, data);
 	//	xpm = xmbd->NextPointMass();
 	}
-	foreach(xForce* xf, xmbd->Forces())
+	for (xmap<xstring, xForce*>::iterator it = xmbd->Forces().begin(); it != xmbd->Forces().end(); it.next())// (xForce* xf, xmbd->Forces())
 	{
-		xf->xDerivate(lhs, q, qd, -btt);
-		xf->xDerivateVelocity(lhs, q, qd, -gt);
+		it.value()->xDerivate(lhs, q, qd, -btt);
+		it.value()->xDerivateVelocity(lhs, q, qd, -gt);
 	}
 }
 
@@ -230,17 +230,19 @@ void xIntegratorHHT::ConstructJacobian(double btt)
 {
 	unsigned int sr = 0;
 	//xKinematicConstraint* xkc = xmbd->BeginKinematicConstraint();
-	foreach(xKinematicConstraint* xkc, xmbd->Joints())//(xkc != xmbd->EndKinematicConstraint())
+	for(xmap<xstring, xKinematicConstraint*>::iterator it = xmbd->Joints().begin(); it != xmbd->Joints().end(); it.next())
+//	foreach(xKinematicConstraint* xkc, xmbd->Joints())//(xkc != xmbd->EndKinematicConstraint())
 	{
-		xkc->DerivateJacobian(lhs, q, qd, lagMul + sr, sr, btt);
-		sr += xkc->NumConst();
+		it.value()->DerivateJacobian(lhs, q, qd, lagMul + sr, sr, btt);
+		sr += it.value()->NumConst();
 		//xkc = xmbd->NextKinematicConstraint();
 	}
 
 	//xPointMass* xpm = xmbd->BeginPointMass();
-	foreach(xPointMass* xpm, xmbd->Masses())// (xpm != xmbd->EndPointMass())
+	for (xmap<xstring, xPointMass*>::iterator it = xmbd->Masses().begin(); it != xmbd->Masses().end(); it.next())
 	{
-		unsigned int id = (xpm->xpmIndex() - 1) * xModel::OneDOF();
+		//xPointMass* xpm = it.value();
+		unsigned int id = (it.value()->xpmIndex() - 1) * xModel::OneDOF();
 		double lm = 2.0 * btt * lagMul[sr++];
 		lhs(id + 3, id + 3) += lm;
 		lhs(id + 4, id + 4) += lm;

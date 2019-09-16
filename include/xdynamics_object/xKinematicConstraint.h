@@ -14,7 +14,6 @@ public:
 	enum cType{ FIXED = 0, SPHERICAL, REVOLUTE, TRANSLATIONAL, UNIVERSAL, CABLE, GEAR, COINCIDE };
 	typedef struct
 	{
-		double time;
 		vector3d location;
 		vector3d iaforce;
 		vector3d irforce;
@@ -25,7 +24,7 @@ public:
 	xKinematicConstraint(std::string _name, cType _type, std::string _i, std::string _j);
 	virtual ~xKinematicConstraint();
 
-	QString Name();
+	std::string Name();
 	cType Type();
 	unsigned int NumConst();
 	int IndexBaseBody();
@@ -48,7 +47,7 @@ public:
 	void AllocResultMemory(unsigned int _s);
 	void setLocation(double x, double y, double z);
 	void SetupDataFromStructure(xPointMass* base, xPointMass* action, xJointData& d);
-	QVector<kinematicConstraint_result>* XKinematicConstraintResultPointer();
+	//QVector<kinematicConstraint_result>* XKinematicConstraintResultPointer();
 // 		double lx, double ly, double lz,
 // 		double spix, double spiy, double spiz, double fix, double fiy, double fiz, double gix, double giy, double giz,
 // 		double spjx, double spjy, double spjz, double fjx, double fjy, double fjz, double gjx, double gjy, double gjz);
@@ -57,7 +56,7 @@ public:
 	virtual void ConstraintEquation(xVectorD& rhs, xVectorD& q, xVectorD& qd, unsigned int sr, double mul) = 0;
 	virtual void ConstraintJacobian(xSparseD& lhs, xVectorD& q, xVectorD& qd, unsigned int sr) = 0;
 	virtual void DerivateJacobian(xMatrixD& lhs, xVectorD& q, xVectorD& qd, double* lm, unsigned int sr, double mul) = 0;
-	virtual void SaveStepResult(unsigned int part, double ct, xVectorD& q, xVectorD& qd, double* L, unsigned int sr) = 0;
+	virtual kinematicConstraint_result GetStepResult(unsigned int part, xVectorD& q, xVectorD& qd, double* L, unsigned int sr) = 0;
 	virtual void GammaFunction(xVectorD& rhs, xVectorD& q, xVectorD& qd, unsigned int sr, double mul) = 0;
 
 
@@ -86,15 +85,15 @@ protected:
 // 	vector4d relative_distance_constraintJacobian_e_j(vector3d& global_hi, euler_parameters& ej);
 // 	double dot_1_differential(vector3d& ai, vector3d& aj, euler_parameters& pi, euler_parameters& pj, euler_parameters& dpi, euler_parameters& dpj);
 // 	double dot_2_differential(vector3d& ai, vector3d& dri, vector3d& drj, vector3d& dij, euler_parameters& pi, euler_parameters& pj, euler_parameters& dpi, euler_parameters& dpj);
-	QString name;
-	QVector<kinematicConstraint_result> kcrs;
+	xstring name;
+	//QVector<kinematicConstraint_result> kcrs;
 	unsigned int nConst;		// The number of constraint 
 	unsigned int nr_part;	
 	//friend class xDrivingConstraint;
 	int i, j;
 	xPointMass *i_ptr;
 	xPointMass *j_ptr;
-	QString base, action;
+	xstring base, action;
 	cType type;					// Joint type
 	vector3d location;			// Joint location
 	vector3d spi;				// Local position for i body

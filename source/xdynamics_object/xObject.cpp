@@ -17,7 +17,7 @@ xObject::xObject(xShapeType _s)
 }
 
 xObject::xObject(std::string _name, xShapeType _s)
-	: name(QString::fromStdString(_name))
+	: name(_name)
 	, id(-1)
 	, vol(0)
 	, d(0)
@@ -55,10 +55,10 @@ unsigned int xObject::create_sph_particles(double ps, unsigned int nlayers, vect
 	return 0;
 }
 
-QVector<xCorner> xObject::get_sph_boundary_corners()
-{
-	return QVector<xCorner>();
-}
+//QVector<xCorner> xObject::get_sph_boundary_corners()
+//{
+//	return QVector<xCorner>();
+//}
 
 void xObject::initialize()
 {
@@ -70,14 +70,14 @@ void xObject::setObjectID(int _id)
 	id = _id;
 }
 
-QString xObject::Name() const
+std::string xObject::Name() const
 {
-	return name;
+	return name.toStdString();
 }
 
-QString xObject::ConnectedGeometryName() const
+std::string xObject::ConnectedGeometryName() const
 {
-	return connected_geometry_name;
+	return connected_geometry_name.toStdString();
 }
 
 int xObject::ObjectID() const
@@ -154,7 +154,7 @@ void xObject::setMaterialType(xMaterialType xmt)
 	material = xmt;
 }
 
-void xObject::setConnectedGeometryName(QString n)
+void xObject::setConnectedGeometryName(std::string n)
 {
 	connected_geometry_name = n;
 }

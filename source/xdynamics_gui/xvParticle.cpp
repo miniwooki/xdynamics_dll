@@ -26,9 +26,6 @@ xvParticle::xvParticle()
 	, isSetColor(false)
 	, pos(NULL)
 	, color(NULL)
-	, buffers(NULL)
-	, vbuffers(NULL)
-	, color_buffers(NULL)
 	, r_pos(NULL)
 	, pscale(0)
 	, isDefine(false)
@@ -36,23 +33,13 @@ xvParticle::xvParticle()
 	m_posVBO = 0;
 	m_colorVBO = 0;
 	m_program = 0;
-	max_position[0] = max_position[1] = max_position[2] = -FLT_MAX;
-	min_position[0] = min_position[1] = min_position[2] = FLT_MAX;
-	max_velocity[0] = max_velocity[1] = max_velocity[2] = -FLT_MAX;
-	min_velocity[0] = min_velocity[1] = min_velocity[2] = FLT_MAX;
-	max_position_mag = -FLT_MAX;
-	min_position_mag = FLT_MAX;
-	max_velocity_mag = -FLT_MAX;
-	min_velocity_mag = FLT_MAX;
+	pbuffers = vbuffers = cbuffers = NULL;
 }
 
 xvParticle::~xvParticle()
 {
 	if (pos) delete[] pos; pos = NULL;
 	if (color) delete[] color; color = NULL;
-	if (buffers) delete[] buffers; buffers = NULL;
-	if (vbuffers) delete[] vbuffers; vbuffers = NULL;
-	if (color_buffers) delete[] color_buffers; color_buffers = NULL;
 	if (r_pos) delete[] r_pos; r_pos = NULL;
 	if (m_posVBO){
 		glDeleteBuffers(1, &m_posVBO);
@@ -74,16 +61,16 @@ void xvParticle::draw(GLenum eModem, int wHeight, int protype, double z)
 	if (xvAnimationController::Play())
 	{
 		unsigned int idx = xvAnimationController::getFrame();
-		pbuf = buffers + idx * np * 4;
-		cbuf = color_buffers + idx * np * 4;// model::rs->getPartColor(idx);
+		pbuf = pbuffers + idx * np * 4;
+		cbuf = cbuffers + idx * np * 4;// model::rs->getPartColor(idx);
 	}
 	else
 	{
 		unsigned int idx = xvAnimationController::getFrame();
 		if (idx)
 		{
-			pbuf = buffers + idx * np * 4;
-			cbuf = color_buffers + idx * np * 4;
+			pbuf = pbuffers + idx * np * 4;
+			cbuf = cbuffers + idx * np * 4;
 			//buffer = model::rs->getPartPosition(idx);
 			//color_buffer = model::rs->getPartColor(idx);
 		}
@@ -200,6 +187,13 @@ void xvParticle::_drawPoints(float* pos_buffer, float* color_buffer)
 // }
 
 
+void xvParticle::bind_result_buffers(float * pos_buffer, float * vel_buffer, float * color_buffer)
+{
+	pbuffers = pos_buffer;
+	vbuffers = vel_buffer;
+	cbuffers = color_buffer;
+}
+
 bool xvParticle::defineFromViewFile(QString path)
 {
 	QFile qf(path);
@@ -291,122 +285,122 @@ void xvParticle::setParticlePosition(double* p, unsigned int n)
 
 bool xvParticle::UploadParticleFromFile(unsigned int i, QString path)
 {
-	//qDebug() << i;
-	double ct = 0.0;
-	unsigned int neach = 1;
-	unsigned int inp = 0;
-	unsigned int ins = 0;
-	unsigned int sid = 0;
-	unsigned int vid = 0;
-	QFile qf(path);
-	qf.open(QIODevice::ReadOnly);
-	qf.read((char*)&ct, sizeof(double));
-	qf.read((char*)&inp, sizeof(unsigned int));
-	qf.read((char*)&ins, sizeof(unsigned int));
-	if (np != inp)
-	{
-		return false;
-	}
-	if (inp != ins)
-		neach = inp / ins;
-	sid = inp * i * 4;
-	vid = inp * i * 3;
-	double *_pos = new double[inp * 4];
-	double *_vel = new double[ins * 3];
-	qf.read((char*)_pos, sizeof(double) * inp * 4);
-	qf.read((char*)_vel, sizeof(double) * ins * 3);
-	qf.close();
-	xvAnimationController::addTime(i, ct);
-	for (unsigned int j = 0; j < inp; j++)
-	{
-		unsigned int s = j * 4;
-		
-		vector4f p = new_vector4f(
-			static_cast<float>(_pos[s + 0]),
-			static_cast<float>(_pos[s + 1]),
-			static_cast<float>(_pos[s + 2]),
-			static_cast<float>(_pos[s + 3]));
+	////qDebug() << i;
+	//double ct = 0.0;
+	//unsigned int neach = 1;
+	//unsigned int inp = 0;
+	//unsigned int ins = 0;
+	//unsigned int sid = 0;
+	//unsigned int vid = 0;
+	//QFile qf(path);
+	//qf.open(QIODevice::ReadOnly);
+	//qf.read((char*)&ct, sizeof(double));
+	//qf.read((char*)&inp, sizeof(unsigned int));
+	//qf.read((char*)&ins, sizeof(unsigned int));
+	//if (np != inp)
+	//{
+	//	return false;
+	//}
+	//if (inp != ins)
+	//	neach = inp / ins;
+	//sid = inp * i * 4;
+	//vid = inp * i * 3;
+	//double *_pos = new double[inp * 4];
+	//double *_vel = new double[ins * 3];
+	//qf.read((char*)_pos, sizeof(double) * inp * 4);
+	//qf.read((char*)_vel, sizeof(double) * ins * 3);
+	//qf.close();
+	//xvAnimationController::addTime(i, ct);
+	//for (unsigned int j = 0; j < inp; j++)
+	//{
+	//	unsigned int s = j * 4;
+	//	
+	//	vector4f p = new_vector4f(
+	//		static_cast<float>(_pos[s + 0]),
+	//		static_cast<float>(_pos[s + 1]),
+	//		static_cast<float>(_pos[s + 2]),
+	//		static_cast<float>(_pos[s + 3]));
 
-		s += sid;
-		buffers[s + 0] = p.x;// static_cast<float>(_pos[s + 0]);
-		buffers[s + 1] = p.y;// static_cast<float>(_pos[s + 1]);
-		buffers[s + 2] = p.z;// static_cast<float>(_pos[s + 2]);
-		buffers[s + 3] = p.w;// static_cast<float>(_pos[s + 3]);
-		if (max_position[0] < p.x) max_position[0] = p.x;// buffers[s + 0];
-		if (max_position[1] < p.y) max_position[1] = p.y;// buffers[s + 1];
-		if (max_position[2] < p.z) max_position[2] = p.z;// buffers[s + 2];
+	//	s += sid;
+	//	buffers[s + 0] = p.x;// static_cast<float>(_pos[s + 0]);
+	//	buffers[s + 1] = p.y;// static_cast<float>(_pos[s + 1]);
+	//	buffers[s + 2] = p.z;// static_cast<float>(_pos[s + 2]);
+	//	buffers[s + 3] = p.w;// static_cast<float>(_pos[s + 3]);
+	//	if (max_position[0] < p.x) max_position[0] = p.x;// buffers[s + 0];
+	//	if (max_position[1] < p.y) max_position[1] = p.y;// buffers[s + 1];
+	//	if (max_position[2] < p.z) max_position[2] = p.z;// buffers[s + 2];
 
-		if (min_position[0] > p.x) min_position[0] = p.x;// buffers[s + sid + 0];
-		if (min_position[1] > p.y) min_position[1] = p.y;// buffers[s + sid + 1];
-		if (min_position[2] > p.z) min_position[2] = p.z;// buffers[s + sid + 2];
-		float p_mag = sqrt(p.x * p.x + p.y * p.y + p.z * p.z);
-		if (max_position_mag < p_mag) max_position_mag = p_mag;
-		if (min_position_mag > p_mag) min_position_mag = p_mag;
-		vector3f vv = new_vector3f(0, 0, 0);
-		unsigned int v = j * 3;
-		if (inp != ins)
-			v = (j / neach) * 3;
-		vv = new_vector3f(
-			static_cast<float>(_vel[v + 0]),
-			static_cast<float>(_vel[v + 1]),
-			static_cast<float>(_vel[v + 2]));
+	//	if (min_position[0] > p.x) min_position[0] = p.x;// buffers[s + sid + 0];
+	//	if (min_position[1] > p.y) min_position[1] = p.y;// buffers[s + sid + 1];
+	//	if (min_position[2] > p.z) min_position[2] = p.z;// buffers[s + sid + 2];
+	//	float p_mag = sqrt(p.x * p.x + p.y * p.y + p.z * p.z);
+	//	if (max_position_mag < p_mag) max_position_mag = p_mag;
+	//	if (min_position_mag > p_mag) min_position_mag = p_mag;
+	//	vector3f vv = new_vector3f(0, 0, 0);
+	//	unsigned int v = j * 3;
+	//	if (inp != ins)
+	//		v = (j / neach) * 3;
+	//	vv = new_vector3f(
+	//		static_cast<float>(_vel[v + 0]),
+	//		static_cast<float>(_vel[v + 1]),
+	//		static_cast<float>(_vel[v + 2]));
 
-		v = j * 3 + vid;
-		
-		vbuffers[v + 0] = vv.x;// static_cast<float>(_vel[v + 0]);
-		vbuffers[v + 1] = vv.y;// static_cast<float>(_vel[v + 1]);
-		vbuffers[v + 2] = vv.z;// static_cast<float>(_vel[v + 2]);
+	//	v = j * 3 + vid;
+	//	
+	//	vbuffers[v + 0] = vv.x;// static_cast<float>(_vel[v + 0]);
+	//	vbuffers[v + 1] = vv.y;// static_cast<float>(_vel[v + 1]);
+	//	vbuffers[v + 2] = vv.z;// static_cast<float>(_vel[v + 2]);
 
-		if (max_velocity[0] < vv.x) max_velocity[0] = vv.x;// vbuffers[v + vid + 0];
-		if (max_velocity[1] < vv.y) max_velocity[1] = vv.y;// vbuffers[v + vid + 1];
-		if (max_velocity[2] < vv.z) max_velocity[2] = vv.z;// vbuffers[v + vid + 2];
+	//	if (max_velocity[0] < vv.x) max_velocity[0] = vv.x;// vbuffers[v + vid + 0];
+	//	if (max_velocity[1] < vv.y) max_velocity[1] = vv.y;// vbuffers[v + vid + 1];
+	//	if (max_velocity[2] < vv.z) max_velocity[2] = vv.z;// vbuffers[v + vid + 2];
 
-		if (min_velocity[0] > vv.x) min_velocity[0] = vv.x;// vbuffers[v + vid + 0];
-		if (min_velocity[1] > vv.y) min_velocity[1] = vv.y;// vbuffers[v + vid + 1];
-		if (min_velocity[2] > vv.z) min_velocity[2] = vv.z;// vbuffers[v + vid + 2];
+	//	if (min_velocity[0] > vv.x) min_velocity[0] = vv.x;// vbuffers[v + vid + 0];
+	//	if (min_velocity[1] > vv.y) min_velocity[1] = vv.y;// vbuffers[v + vid + 1];
+	//	if (min_velocity[2] > vv.z) min_velocity[2] = vv.z;// vbuffers[v + vid + 2];
 
-		float v_mag = sqrt(vv.x * vv.x + vv.y * vv.y + vv.z * vv.z);// [v + 0] * vbuffers[v + 0] + vbuffers[v + 1] * vbuffers[v + 1] + vbuffers[v + 2] * vbuffers[v + 2]);
-		
-		if (max_velocity_mag < v_mag) max_velocity_mag = v_mag;
-		if (min_velocity_mag > v_mag) min_velocity_mag = v_mag;
-		color_buffers[s + 0] = 0.0f;
-		color_buffers[s + 1] = 0.0f;
-		color_buffers[s + 2] = 1.0f;
-		color_buffers[s + 3] = 1.0f;
+	//	float v_mag = sqrt(vv.x * vv.x + vv.y * vv.y + vv.z * vv.z);// [v + 0] * vbuffers[v + 0] + vbuffers[v + 1] * vbuffers[v + 1] + vbuffers[v + 2] * vbuffers[v + 2]);
+	//	
+	//	if (max_velocity_mag < v_mag) max_velocity_mag = v_mag;
+	//	if (min_velocity_mag > v_mag) min_velocity_mag = v_mag;
+	//	color_buffers[s + 0] = 0.0f;
+	//	color_buffers[s + 1] = 0.0f;
+	//	color_buffers[s + 2] = 1.0f;
+	//	color_buffers[s + 3] = 1.0f;
 
 
-	}
-	delete[] _pos;
-	delete[] _vel;
+	//}
+	//delete[] _pos;
+	//delete[] _vel;
 	return true;
 }
 
 bool xvParticle::UploadParticleFromRelativePosition(unsigned int i, vector3d & p, euler_parameters & ep)
 {
-	matrix33d A = GlobalTransformationMatrix(ep);
-	unsigned int sid = np * i * 4;
-	unsigned int vid = np * i * 3;
-	xvAnimationController::addTime(i, 0);
-	for (unsigned int j = 0; j < np; j++)
-	{
-		unsigned int s = j * 4 + sid;
-		unsigned int v = j * 3 + vid;
-		vector3d rp = new_vector3d(r_pos[s + 0], r_pos[s + 1], r_pos[s + 2]);
-		vector3d gp = p + A * rp;
-		buffers[s + 0] = static_cast<float>(gp.x);
-		buffers[s + 1] = static_cast<float>(gp.y);
-		buffers[s + 2] = static_cast<float>(gp.z);
-		buffers[s + 3] = static_cast<float>(r_pos[s + 3]);
+	//matrix33d A = GlobalTransformationMatrix(ep);
+	//unsigned int sid = np * i * 4;
+	//unsigned int vid = np * i * 3;
+	//xvAnimationController::addTime(i, 0);
+	//for (unsigned int j = 0; j < np; j++)
+	//{
+	//	unsigned int s = j * 4 + sid;
+	//	unsigned int v = j * 3 + vid;
+	//	vector3d rp = new_vector3d(r_pos[s + 0], r_pos[s + 1], r_pos[s + 2]);
+	//	vector3d gp = p + A * rp;
+	//	buffers[s + 0] = static_cast<float>(gp.x);
+	//	buffers[s + 1] = static_cast<float>(gp.y);
+	//	buffers[s + 2] = static_cast<float>(gp.z);
+	//	buffers[s + 3] = static_cast<float>(r_pos[s + 3]);
 
-		vbuffers[v + 0] = 0.0f;// static_cast<float>(_vel[v + 0]);
-		vbuffers[v + 1] = 0.0f;//static_cast<float>(_vel[v + 1]);
-		vbuffers[v + 2] = 0.0f;// static_cast<float>(_vel[v + 2]);
+	//	vbuffers[v + 0] = 0.0f;// static_cast<float>(_vel[v + 0]);
+	//	vbuffers[v + 1] = 0.0f;//static_cast<float>(_vel[v + 1]);
+	//	vbuffers[v + 2] = 0.0f;// static_cast<float>(_vel[v + 2]);
 
-		color_buffers[s + 0] = 0.0f;
-		color_buffers[s + 1] = 0.0f;
-		color_buffers[s + 2] = 1.0f;
-		color_buffers[s + 3] = 1.0f;
-	}
+	//	color_buffers[s + 0] = 0.0f;
+	//	color_buffers[s + 1] = 0.0f;
+	//	color_buffers[s + 2] = 1.0f;
+	//	color_buffers[s + 3] = 1.0f;
+	//}
 	return false;
 }
 
@@ -444,12 +438,12 @@ void xvParticle::resizePositionMemory(unsigned int n0, unsigned int n1)
 
 float * xvParticle::ColorBuffers()
 {
-	return color_buffers;
+	return cbuffers;
 }
 
 float * xvParticle::PositionBuffers()
 {
-	return buffers;
+	return pbuffers;
 }
 
 float * xvParticle::VelocityBuffers()
@@ -460,7 +454,7 @@ float * xvParticle::VelocityBuffers()
 float xvParticle::getMinValue(xColorControl::ColorMapType cmt)
 {
 	float v = 0.0;
-	switch (cmt)
+	/*switch (cmt)
 	{
 	case xColorControl::COLORMAP_POSITION_X: v = min_position[0]; break;
 	case xColorControl::COLORMAP_POSITION_Y: v = min_position[1]; break;
@@ -470,14 +464,14 @@ float xvParticle::getMinValue(xColorControl::ColorMapType cmt)
 	case xColorControl::COLORMAP_VELOCITY_Z: v = min_velocity[2]; break;
 	case xColorControl::COLORMAP_POSITION_MAG: v = min_position_mag; break;
 	case xColorControl::COLORMAP_VELOCITY_MAG: v = min_velocity_mag; break;
-	}
+	}*/
 	return v;
 }
 
 float xvParticle::getMaxValue(xColorControl::ColorMapType cmt)
 {
 	float v = 0.0;
-	switch (cmt)
+	/*switch (cmt)
 	{
 	case xColorControl::COLORMAP_POSITION_X: v = max_position[0]; break;
 	case xColorControl::COLORMAP_POSITION_Y: v = max_position[1]; break;
@@ -487,7 +481,7 @@ float xvParticle::getMaxValue(xColorControl::ColorMapType cmt)
 	case xColorControl::COLORMAP_VELOCITY_Z: v = max_velocity[2]; break;
 	case xColorControl::COLORMAP_POSITION_MAG: v = max_position_mag; break;
 	case xColorControl::COLORMAP_VELOCITY_MAG: v = max_velocity_mag; break;
-	}
+	}*/
 	return v;
 }
 
@@ -610,7 +604,7 @@ void xvParticle::openResultFromFile(unsigned int idx)
 
 void xvParticle::setBufferMemories(unsigned int sz)
 {
-	if (buffers)
+	/*if (buffers)
 		delete[] buffers;
 	buffers = new float[sz * np * 4];
 	if (vbuffers)
@@ -618,7 +612,7 @@ void xvParticle::setBufferMemories(unsigned int sz)
 	vbuffers = new float[sz * np * 3];
 	if (color_buffers)
 		delete[] color_buffers;
-	color_buffers = new float[sz * np * 4];
+	color_buffers = new float[sz * np * 4];*/
 	
 }
 
@@ -629,7 +623,7 @@ QString xvParticle::NameOfGroupData(QString& n)
 
 QString xvParticle::MaterialOfGroupData(QString& n)
 {
-	return NameOfMaterial(pgds[n].mat);
+	return QString::fromStdString(NameOfMaterial(pgds[n].mat));
 }
 
 unsigned int xvParticle::NumParticlesOfGroupData(QString& n)

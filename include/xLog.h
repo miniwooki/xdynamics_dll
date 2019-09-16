@@ -2,8 +2,8 @@
 #define XLOG_H
 
 #include "xdynamics_decl.h"
-#include <QtCore/QFile>
-#include <QtCore/QTextStream>
+//#include <QtCore/QFile>
+//#include <QtCore/QTextStream>
 
 class XDYNAMICS_API xLog
 {
