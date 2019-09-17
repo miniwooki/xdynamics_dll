@@ -277,6 +277,15 @@ int xDynamicsManager::OpenModelXLS(const char* n)
 	return xDynamicsError::xdynamicsSuccess;
 }
 
+bool xDynamicsManager::upload_model_results(std::string path)
+{
+	if (xrm)
+		delete xrm;
+	xrm = new xResultManager;
+	xrm->upload_model_results(path);
+	return true;
+}
+
 void xDynamicsManager::CreateModel(std::string n, modelType t, bool isOnAir /*= false*/)
 {
 	//xstring qname = xModel::name;

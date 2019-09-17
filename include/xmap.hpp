@@ -21,11 +21,19 @@ public:
 	xmap() : head(0), tail(0), sz(0) {}
 	~xmap()
 	{
+		//iterator it = this->begin();
+		//while (it.has_next())
+		//{
+		//	delete it.current_node();
+		//	//it.current_node() = NULL;
+		//	sz--;
+		//	it.next();
+		//}
 		xMapNode *n = tail;
 		while (n != head)
 		{
 			xMapNode *tn = n;
-			//n = n->right;
+			n = n->right;
 			delete tn;
 			tn = NULL;
 			sz--;

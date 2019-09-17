@@ -5,6 +5,7 @@
 #include <sstream>
 #include <fstream>
 #include <iomanip>
+#include <filesystem>
 
 xResultManager::xResultManager()
 	: time(NULL)
@@ -141,6 +142,69 @@ void xResultManager::setup_particle_buffer_color_distribution(xColorControl* xcc
 			}
 		}
 	}
+}
+
+bool xResultManager::upload_model_results(std::string path)
+{
+	std::string file_path;
+	stringstream ss(file_path);
+	unsigned int _npart = 0;
+	//ss << path << "/part" << setw(4) << setfill('0') << _npart++ << ".bin";
+	//std::fstream fs;
+	//fs.open(ss.str(), std::ios::in | std::ios::binary);
+	/*double ct = 0.0;
+	char id = '0';*/
+	while (1)
+	{
+		ss.clear();
+		ss << path << "/part" << setw(4) << setfill('0') << _npart << ".bin";
+		filesystem::path p(ss.str());
+		if (filesystem::exists(p))
+			_npart++;
+		else
+			break;
+	}
+	nparts = _npart;
+		_npart++;
+		fs.read((char*)&ct, sizeof(double));
+		fs.read(&id, sizeof(char));
+		if (id == 'd')
+		{
+			unsigned int _np = 0;
+			unsigned int _nc = 0;
+			fs.read((char*)&_np, sizeof(unsigned int));
+			fs.read((char*)&_nc, sizeof(unsigned int));
+			
+		}
+		if (nparticles)
+		{
+			char id = 'd';
+			qf.write(&id, sizeof(char));
+			qf.write((char*)&nparticles, sizeof(unsigned int));
+			qf.write((char*)&nclusters, sizeof(unsigned int));
+			qf.write((char*)c_particle_pos, sizeof(double) * nparticles * 4);
+			qf.write((char*)c_particle_vel, sizeof(double) * nclusters * 3);
+			qf.write((char*)c_particle_acc, sizeof(double) * nclusters * 3);
+			qf.write((char*)c_particle_ep, sizeof(double) * nclusters * 4);
+			qf.write((char*)c_particle_ev, sizeof(double) * nclusters * 4);
+			qf.write((char*)c_particle_ea, sizeof(double) * nclusters * 4);
+			//qf.write((char*)avel, sizeof(double) * ns * 4);
+			if ((nparticles != nclusters) && c_cluster_pos)
+				qf.write((char*)c_cluster_pos, sizeof(double) * nclusters * 4);
+		}
+		if (ngeneralized_coordinates)
+		{
+			char id = 'm';
+			unsigned int mdim = ngeneralized_coordinates + xModel::OneDOF();
+			unsigned int tdim = ngeneralized_coordinates + nconstraints;
+			qf.write(&id, sizeof(char));
+			qf.write((char*)c_generalized_coord_q, sizeof(double) * mdim);
+			qf.write((char*)c_generalized_coord_qd, sizeof(double) * mdim);
+			qf.write((char*)c_generalized_coord_q_1, sizeof(double) * mdim);
+			qf.write((char*)c_generalized_coord_rhs, sizeof(double) * tdim);
+		}
+	}
+	return true;
 }
 
 float xResultManager::get_min_result_value(xColorControl::ColorMapType cmt)

@@ -64,14 +64,21 @@ bool xDynamicsSimulator::xInitialize(
 	xDiscreteElementMethodSimulation* _xdem,
 	xSmoothedParticleHydrodynamicsSimulation* _xsph)
 {
+	std::string c_path = xModel::makeFilePath(xModel::getModelName() + ".cdn");
+	std::fstream fs;
+	fs.open(c_path, std::ios::out || std::ios::binary);
+	if (!fs.is_open())
+	{
+		return false;
+	}
  	if(_dt) xSimulation::dt = _dt;
  	if(_st) xSimulation::st = _st;
  	if(_et) xSimulation::et = _et;
 	xSimulation::nstep = static_cast<unsigned int>((xSimulation::et / xSimulation::dt));
 	xSimulation::npart = static_cast<unsigned int>((nstep / xSimulation::st)) + 1;
+	fs.write((char*)&xSimulation::nstep, sizeof(unsigned int));
+	fs.write((char*)&xSimulation::npart, sizeof(unsigned int));                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
 	xdm->initialize_result_manager(xSimulation::npart);
-	//xdm->XResult()->set_num_parts(xSimulation::npart);
-	//xdm->XResult()->alloc_time_momory(xSimulation::npart);
 	if (_xmbd)
 	{
 		xmbd = _xmbd;

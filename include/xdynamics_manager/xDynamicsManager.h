@@ -41,6 +41,7 @@ public:
 	xContactManager* XContact(std::string& n);
 
 	int OpenModelXLS(const char* n);
+	bool upload_model_results(std::string path);
 
 private:
 	void setOnAirModel(modelType t, std::string n);

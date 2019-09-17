@@ -45,6 +45,8 @@ public:
 	void ExportPointMassResult2TXT(std::string n);
 	void setup_particle_buffer_color_distribution(xColorControl* xcc, int sframe, int cframe);
 
+	bool upload_model_results(std::string path);
+
 private:
 	void setCurrentPath(std::string new_path);
 	void setCurrentName(std::string new_name);

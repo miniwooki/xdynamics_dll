@@ -253,6 +253,11 @@ bool xdynamics_gui::ReadViewModel(QString path)
 
 bool xdynamics_gui::ReadModelResults(QString path)
 {
+	//QString file_path = path + "part0000.bin"
+	if (xdm)
+	{
+		xdm->upload_model_results(path);
+	}
 	QFile qf(path);
 	qf.open(QIODevice::ReadOnly);
 	QTextStream qts(&qf);
@@ -785,7 +790,7 @@ void xdynamics_gui::xSetupResultNavigatorByChangeTargetCombo(int cmt)
 void xdynamics_gui::xUploadResultThisModel()
 {
 	//QFile qf;
-	QString path = QString::fromStdString(xModel::makeFilePath(xModel::getModelName() + ".rlt"));
+	QString path = QString::fromStdString("");
 //	qf.setFileName(path);
 	//qf.open(QIODevice::ReadOnly);
 	if (!isOnViewModel)
@@ -976,7 +981,7 @@ void xdynamics_gui::xRunSimulationThread(double dt, unsigned int st, double et)
 	if (!pbar) pbar = new QProgressBar;
 	pbar->setMaximum(xSimulation::nstep);
 
-	sThread->setupByLastSimulationFile(mbd_last_result, dem_last_result);
+	//sThread->setupByLastSimulationFile(mbd_last_result, dem_last_result);
 
 	ui.statusBar->addWidget(pbar, 1);
 	setupBindingPointer();

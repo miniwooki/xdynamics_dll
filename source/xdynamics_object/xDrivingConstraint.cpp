@@ -11,7 +11,9 @@ xDrivingConstraint::xDrivingConstraint()
 	, theta(0.0)
 	, kconst(NULL)
 	, n(0)
+	, n_rev(0)
 	, srow(0)
+	, udrl(0)
 {
 
 }
@@ -25,7 +27,9 @@ xDrivingConstraint::xDrivingConstraint(std::string _name, xKinematicConstraint* 
 	, theta(0.0)
 	, kconst(_kc)
 	, n(0)
+	, n_rev(0)
 	, srow(0)
+	, udrl(0)
 {
 	if (kconst->Type() == xKinematicConstraint::REVOLUTE)
 		type = ROTATION_DRIVING;
@@ -177,10 +181,16 @@ void xDrivingConstraint::ConstraintEquation(xVectorD& rhs, xVectorD& q, xVectorD
 	}
 	else if (type == ROTATION_DRIVING)
 	{
+		double accum_theta = (init_v + cons_v * (ct - start_time + plus_time));
+		accum_theta -= n_rev * 2.0 * M_PI;
+	//	if (accum_theta >= (n_rev + 1) * 2.0 * M_PI)
+		//	n_rev++;
+	//	accum_theta -= n_rev * 2.0 * M_PI;
+			
 		if (start_time > ct)
 			v = theta - (init_v + 0.0 * ct);
 		else
-			v = theta - (init_v + cons_v * (ct - start_time + plus_time));
+			v = theta - accum_theta;
 		rhs(sr) = mul * v;
 	}
 }
@@ -431,11 +441,16 @@ double xDrivingConstraint::RelativeAngle(double ct, vector3d& gi, vector3d& fi, 
 	double df = dot(fi, fj);
 	double dg = dot(gi, fj);
 	double a = acos(dot(fi, fj));
-	double b = asin(dot(fi, fj));
+	double b = asin(dg);
+	double a_deg = a * 180 / M_PI;
+	double b_deg = b * 180 / M_PI;
 	double stheta = 0.0;
-	if (dg >= 0 && abs(df) <= 0.8) stheta = acos(df);
-	else if ((abs(df) > 0.8 && dg >= 0) || (abs(df) > 0.2 && dg < 0)) stheta = M_PI - asin(dg);
-	else if ((abs(df) <= 0.2 && dg < 0) || (abs(df) < 0.8 && dg < 0)) stheta = 2.0 * M_PI - acos(df);
+	int p_udrl = udrl;
+	double p_theta = theta;
+	if ((df <= 0.2 && df > -0.8) && dg > 0) { udrl = UP_RIGHT;  stheta = acos(df); }
+	else if ((df < -0.8 && df >= -1.1 && dg > 0) || (df > -1.1 && df <= -0.2 && dg < 0)) { udrl = UP_LEFT; stheta = M_PI - asin(dg); }
+	else if ((df > -0.2 && df <= 0.8) && dg < 0) { udrl = DOWN_LEFT; stheta = 2.0 * M_PI - acos(df); }
+	else if ((df > 0.8 && df < 1.1 && dg < 0) || (df <= 1.1 && df > 0.2 && dg > 0)) { udrl = DOWN_RIGHT; stheta = 2.0 * M_PI + asin(dg); }
 //	else if (a < 0 && b < 0) stheta = M_PI + b;
 	//else if (a >= 0 && b < 0) stheta = 2.0 * M_PI - a;
 
@@ -450,7 +465,14 @@ double xDrivingConstraint::RelativeAngle(double ct, vector3d& gi, vector3d& fi, 
 	//d/*ouble s = M_PI_2 - asin(dot(gi, fj));
 	//double c = n * M_PI - acos(dot(fi, fj));
 	//double stheta = n * M_PI_2 + (n % 2  ? s : c);*/
-	std::cout << "stheta : " << stheta << std::endl;
+	if (p_theta >= 2.0 * M_PI && stheta < 2.0 * M_PI)
+		n_rev--;
+	if (p_theta > M_PI && p_theta < 2.0 * M_PI && stheta >= 2.0 * M_PI)
+		n_rev++;
+
+	if(stheta >= 2.0 * M_PI)
+		stheta -= 2.0 * M_PI;
+	//std::cout << "stheta : " << stheta << std::endl;
 	return stheta;// xUtilityFunctions::AngleCorrection(prad, stheta);
 }
 
