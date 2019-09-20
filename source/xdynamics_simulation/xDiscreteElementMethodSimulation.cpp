@@ -377,6 +377,11 @@ unsigned int xDiscreteElementMethodSimulation::num_particles()
 	return np;
 }
 
+unsigned int xDiscreteElementMethodSimulation::num_clusters()
+{
+	return ns;
+}
+
 unsigned int xDiscreteElementMethodSimulation::setupByLastSimulationFile(std::string ldr)
 {
 	unsigned int pt = 0;
@@ -413,6 +418,41 @@ unsigned int xDiscreteElementMethodSimulation::setupByLastSimulationFile(std::st
 	}
 	qf.close();
 	return pt;
+}
+
+unsigned int xDiscreteElementMethodSimulation::set_dem_data(
+	double * _cpos, double * _pos, double * _vel, double * _acc, double * _ep, double * _ev, double * _ea)
+{
+	memcpy(pos, _pos, sizeof(double) * np * 4);
+	memcpy(vel, _vel, sizeof(double) * ns * 3);
+	memcpy(acc, _acc, sizeof(double) * ns * 3);
+	memcpy(ep, _ep, sizeof(double) * ns * 4);
+	memcpy(avel, _ev, sizeof(double) * ns * 4);
+	memcpy(aacc, _ea, sizeof(double) * ns * 4);
+	if (np != ns)
+		memcpy(cpos, _cpos, sizeof(double) * ns * 4);
+	if (xSimulation::Gpu())
+	{
+		checkCudaErrors(cudaMemcpy(dpos, pos, sizeof(double) * np * 4, cudaMemcpyHostToDevice));
+		checkCudaErrors(cudaMemcpy(dvel, vel, sizeof(double) * ns * 3, cudaMemcpyHostToDevice));
+		checkCudaErrors(cudaMemcpy(dacc, acc, sizeof(double) * ns * 3, cudaMemcpyHostToDevice));
+		checkCudaErrors(cudaMemcpy(dep, ep, sizeof(double) * ns * 4, cudaMemcpyHostToDevice));
+		checkCudaErrors(cudaMemcpy(davel, avel, sizeof(double) * ns * 4, cudaMemcpyHostToDevice));
+		checkCudaErrors(cudaMemcpy(daacc, aacc, sizeof(double) * ns * 4, cudaMemcpyHostToDevice));
+		if(np != ns)
+			checkCudaErrors(cudaMemcpy(dcpos, cpos, sizeof(double) * ns * 4, cudaMemcpyHostToDevice));
+	}
+	else
+	{
+		dpos = pos;
+		dvel = vel;
+		dacc = acc;
+		dep = ep;
+		davel = avel;
+		daacc = aacc;
+		dcpos = cpos;
+	}
+	return 0;
 }
 
 // vector4d xDiscreteElementMethodSimulation::GlobalSphereInertiaForce(const euler_parameters& ev, const double j, const euler_parameters& ep)

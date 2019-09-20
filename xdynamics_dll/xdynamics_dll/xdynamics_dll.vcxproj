@@ -104,7 +104,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>ADD_;WIN32;WIN64;_DEBUG;_WINDOWS;_USRDLL;XDYNAMICS_DLL_EXPORTS;LAPACK_COMPLEX_STRUCTURE;HAVE_LAPACK_CONFIG_H;_USE_MATH_DEFINES;QT_CORE_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\xdynamics\include;$(LAPACK_64)\inc;C:\xDynamics\extern\libxl-3.8.4.0\include_cpp;$(USING_CUDA_SAMPLE_VERSION)\common\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\xdynamics\include;$(LAPACK_64)\inc;C:\xDynamics\extern\libxl-3.8.4.0\include_cpp;$(USING_CUDA_SAMPLE_VERSION)\common\inc;C:\xdynamics\extern\ExcelFormat;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4819</DisableSpecificWarnings>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
@@ -150,7 +150,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;LAPACK_COMPLEX_STRUCTURE;HAVE_LAPACK_CONFIG_H;_USE_MATH_DEFINES;QT_CORE_LIB;_CRT_SECURE_NO_WARNINGS;NDEBUG;_WINDOWS;_USRDLL;XDYNAMICS_DLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\xdynamics\include;$(LAPACK_64)\inc;C:\xDynamics\extern\libxl-3.8.4.0\include_cpp;$(USING_CUDA_SAMPLE_VERSION)\common\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\xdynamics\include;$(LAPACK_64)\inc;C:\xDynamics\extern\libxl-3.8.4.0\include_cpp;$(USING_CUDA_SAMPLE_VERSION)\common\inc;C:\xdynamics\extern\ExcelFormat;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4819</DisableSpecificWarnings>
     </ClCompile>
     <Link>

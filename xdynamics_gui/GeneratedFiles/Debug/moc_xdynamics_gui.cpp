@@ -21,8 +21,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_xdynamics_gui_t {
-    QByteArrayData data[30];
-    char stringdata0[487];
+    QByteArrayData data[32];
+    char stringdata0[530];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -54,13 +54,15 @@ QT_MOC_LITERAL(19, 243, 17), // "xReleaseOperation"
 QT_MOC_LITERAL(20, 261, 26), // "xInitializeWidgetStatement"
 QT_MOC_LITERAL(21, 288, 31), // "xOnGeometrySelectionOfPointMass"
 QT_MOC_LITERAL(22, 320, 21), // "xStopSimulationThread"
-QT_MOC_LITERAL(23, 342, 19), // "xContextMenuProcess"
-QT_MOC_LITERAL(24, 362, 2), // "nm"
-QT_MOC_LITERAL(25, 365, 15), // "contextMenuType"
-QT_MOC_LITERAL(26, 381, 3), // "vot"
-QT_MOC_LITERAL(27, 385, 40), // "xSetupResultNavigatorByChange..."
-QT_MOC_LITERAL(28, 426, 22), // "xUploadResultThisModel"
-QT_MOC_LITERAL(29, 449, 37) // "xSetupParticleBufferColorDist..."
+QT_MOC_LITERAL(23, 342, 24), // "xReleaseResultCallThread"
+QT_MOC_LITERAL(24, 367, 19), // "xContextMenuProcess"
+QT_MOC_LITERAL(25, 387, 2), // "nm"
+QT_MOC_LITERAL(26, 390, 15), // "contextMenuType"
+QT_MOC_LITERAL(27, 406, 3), // "vot"
+QT_MOC_LITERAL(28, 410, 40), // "xSetupResultNavigatorByChange..."
+QT_MOC_LITERAL(29, 451, 22), // "xUploadResultThisModel"
+QT_MOC_LITERAL(30, 474, 37), // "xSetupParticleBufferColorDist..."
+QT_MOC_LITERAL(31, 512, 17) // "xSelectStartPoint"
 
     },
     "xdynamics_gui\0xNew\0\0xSave\0xOpen\0"
@@ -72,11 +74,12 @@ QT_MOC_LITERAL(29, 449, 37) // "xSetupParticleBufferColorDist..."
     "xGeometrySelection\0xReleaseOperation\0"
     "xInitializeWidgetStatement\0"
     "xOnGeometrySelectionOfPointMass\0"
-    "xStopSimulationThread\0xContextMenuProcess\0"
-    "nm\0contextMenuType\0vot\0"
-    "xSetupResultNavigatorByChangeTargetCombo\0"
+    "xStopSimulationThread\0xReleaseResultCallThread\0"
+    "xContextMenuProcess\0nm\0contextMenuType\0"
+    "vot\0xSetupResultNavigatorByChangeTargetCombo\0"
     "xUploadResultThisModel\0"
-    "xSetupParticleBufferColorDistribution"
+    "xSetupParticleBufferColorDistribution\0"
+    "xSelectStartPoint"
 };
 #undef QT_MOC_LITERAL
 
@@ -86,7 +89,7 @@ static const uint qt_meta_data_xdynamics_gui[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-      22,   14, // methods
+      24,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -94,28 +97,30 @@ static const uint qt_meta_data_xdynamics_gui[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,  124,    2, 0x08 /* Private */,
-       3,    0,  125,    2, 0x08 /* Private */,
-       4,    0,  126,    2, 0x08 /* Private */,
-       5,    0,  127,    2, 0x08 /* Private */,
-       6,    0,  128,    2, 0x08 /* Private */,
-       7,    0,  129,    2, 0x08 /* Private */,
-       8,    1,  130,    2, 0x08 /* Private */,
-      10,    1,  133,    2, 0x08 /* Private */,
-      12,    1,  136,    2, 0x08 /* Private */,
-      14,    3,  139,    2, 0x08 /* Private */,
-      15,    0,  146,    2, 0x08 /* Private */,
-      16,    2,  147,    2, 0x08 /* Private */,
-      17,    0,  152,    2, 0x08 /* Private */,
-      18,    1,  153,    2, 0x08 /* Private */,
-      19,    0,  156,    2, 0x08 /* Private */,
-      20,    0,  157,    2, 0x08 /* Private */,
-      21,    0,  158,    2, 0x08 /* Private */,
-      22,    0,  159,    2, 0x08 /* Private */,
-      23,    2,  160,    2, 0x08 /* Private */,
-      27,    1,  165,    2, 0x08 /* Private */,
-      28,    0,  168,    2, 0x08 /* Private */,
-      29,    1,  169,    2, 0x08 /* Private */,
+       1,    0,  134,    2, 0x08 /* Private */,
+       3,    0,  135,    2, 0x08 /* Private */,
+       4,    0,  136,    2, 0x08 /* Private */,
+       5,    0,  137,    2, 0x08 /* Private */,
+       6,    0,  138,    2, 0x08 /* Private */,
+       7,    0,  139,    2, 0x08 /* Private */,
+       8,    1,  140,    2, 0x08 /* Private */,
+      10,    1,  143,    2, 0x08 /* Private */,
+      12,    1,  146,    2, 0x08 /* Private */,
+      14,    3,  149,    2, 0x08 /* Private */,
+      15,    0,  156,    2, 0x08 /* Private */,
+      16,    2,  157,    2, 0x08 /* Private */,
+      17,    0,  162,    2, 0x08 /* Private */,
+      18,    1,  163,    2, 0x08 /* Private */,
+      19,    0,  166,    2, 0x08 /* Private */,
+      20,    0,  167,    2, 0x08 /* Private */,
+      21,    0,  168,    2, 0x08 /* Private */,
+      22,    0,  169,    2, 0x08 /* Private */,
+      23,    0,  170,    2, 0x08 /* Private */,
+      24,    2,  171,    2, 0x08 /* Private */,
+      28,    1,  176,    2, 0x08 /* Private */,
+      29,    0,  179,    2, 0x08 /* Private */,
+      30,    1,  180,    2, 0x08 /* Private */,
+      31,    0,  183,    2, 0x08 /* Private */,
 
  // slots: parameters
     QMetaType::Void,
@@ -136,10 +141,12 @@ static const uint qt_meta_data_xdynamics_gui[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::QString, 0x80000000 | 25,   24,   26,
+    QMetaType::Void,
+    QMetaType::Void, QMetaType::QString, 0x80000000 | 26,   25,   27,
     QMetaType::Void, QMetaType::Int,    2,
     QMetaType::Void,
     QMetaType::Void, QMetaType::Int,    2,
+    QMetaType::Void,
 
        0        // eod
 };
@@ -168,10 +175,12 @@ void xdynamics_gui::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _i
         case 15: _t->xInitializeWidgetStatement(); break;
         case 16: _t->xOnGeometrySelectionOfPointMass(); break;
         case 17: _t->xStopSimulationThread(); break;
-        case 18: _t->xContextMenuProcess((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< contextMenuType(*)>(_a[2]))); break;
-        case 19: _t->xSetupResultNavigatorByChangeTargetCombo((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 20: _t->xUploadResultThisModel(); break;
-        case 21: _t->xSetupParticleBufferColorDistribution((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 18: _t->xReleaseResultCallThread(); break;
+        case 19: _t->xContextMenuProcess((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< contextMenuType(*)>(_a[2]))); break;
+        case 20: _t->xSetupResultNavigatorByChangeTargetCombo((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 21: _t->xUploadResultThisModel(); break;
+        case 22: _t->xSetupParticleBufferColorDistribution((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 23: _t->xSelectStartPoint(); break;
         default: ;
         }
     }
@@ -206,13 +215,13 @@ int xdynamics_gui::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 22)
+        if (_id < 24)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 22;
+        _id -= 24;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 22)
+        if (_id < 24)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 22;
+        _id -= 24;
     }
     return _id;
 }

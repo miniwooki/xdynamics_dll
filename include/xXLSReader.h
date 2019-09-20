@@ -2,12 +2,14 @@
 #define XXLSREADER_H
 
 #include "xdynamics_decl.h"
-#include "libxl.h"
+//#include "libxl.h"
+#include "ExcelFormat.h"
 #include "xstring.h"
 //#include "xString."
 //#include <QtCore/QString>
 
-using namespace libxl;
+//using namespace libxl;.using namespace ExcelFormat;
+using namespace ExcelFormat;
 
 class xMultiBodyModel;
 class xDiscreteElementMethodModel;
@@ -24,6 +26,7 @@ public:
 	~xXLSReader();
 
 	bool Load(const char* n);
+	void Release();
 	void ReadMass(xMultiBodyModel* xmbd, vector2i rc);
 	void ReadJoint(xMultiBodyModel* xmbd, vector2i rc);
 	void ReadForce(xMultiBodyModel* xmbd, xDiscreteElementMethodModel* xdem, vector2i rc);
@@ -59,9 +62,11 @@ private:
 	xTSDAData ReadTSDAData(std::string& _name, int r, int& c);
 	xRotationalAxialForceData ReadxRotationalAxialForceData(std::string& _name, int r, int& c);
 	//xSPHPlaneObjectData ReadSPHPlaneParticleData(std::string& _name, int r, int& c);
+	//B xls;
+	BasicExcel *xls;
 
-	Book* book;
-	Sheet* sheet;
+	//Book* book;
+	//Sheet* sheet;
 	xViewExporter* xve;
 	xstring connect_file;
 };

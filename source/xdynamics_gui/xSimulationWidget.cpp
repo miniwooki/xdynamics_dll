@@ -4,17 +4,52 @@
 
 wsimulation::wsimulation(QWidget* parent /* = NULL */)
 	: QWidget(parent)
+	, is_check_starting_point(false)
+	, starting_part(0)
 {
 	setupUi(this);
 	connect(PBSolve, SIGNAL(clicked()), this, SLOT(SolveButton()));
 	connect(LETimeStep, SIGNAL(editingFinished()), this, SLOT(UpdateInformation()));
 	connect(LESaveStep, SIGNAL(editingFinished()), this, SLOT(UpdateInformation()));
 	connect(LEEndTime, SIGNAL(editingFinished()), this, SLOT(UpdateInformation()));
+	connect(PB_Select_SP, SIGNAL(clicked()), this, SLOT(StartingPointButton()));
+	connect(GB_StartingPoint, SIGNAL(clicked(bool)), this, SLOT(CheckStartingPoint(bool)));
 }
 
 wsimulation::~wsimulation()
 {
 
+}
+
+void wsimulation::set_starting_point(QString item, unsigned int sp)
+{
+	LE_StartingPoint->setText(item);
+	starting_part = sp;
+}
+
+bool wsimulation::get_enable_starting_point()
+{
+	return is_check_starting_point;
+}
+
+unsigned int wsimulation::get_starting_part()
+{
+	return starting_part;
+}
+
+QString wsimulation::get_starting_point_path()
+{
+	return LE_StartingPoint->text();
+}
+
+void wsimulation::StartingPointButton()
+{
+	emit clickedStartPointButton();
+}
+
+void wsimulation::CheckStartingPoint(bool b)
+{
+	is_check_starting_point = b;
 }
 
 void wsimulation::SolveButton()

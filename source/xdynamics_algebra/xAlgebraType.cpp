@@ -210,6 +210,11 @@ void xVectorD::zeros()
 	memset(data, 0, sizeof(double) * size);
 }
 
+void xVectorD::set(double * d)
+{
+	memcpy(data, d, sizeof(double) * size);
+}
+
 unsigned int xVectorD::Size() const
 {
 	return size;

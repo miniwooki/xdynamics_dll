@@ -18,7 +18,8 @@ public:
 	xSimulationThread();
 	~xSimulationThread();
 
-	bool xInitialize(xDynamicsManager* _xdm, double dt, unsigned int st, double et);
+	bool xInitialize(xDynamicsManager* _xdm, double dt, unsigned int st, double et, unsigned int npt = 0);
+	void set_from_part_result(QString path);
 	void setupByLastSimulationFile(QString lmr, QString ldr);
 	//bool xInitialize(QString xmlFile);
 
@@ -33,7 +34,7 @@ private:
 
 	//bool savePart(double ct, unsigned int pt);
 	//bool saveFinalResult(double ct);
-
+	double current_simulation_time;
 	bool isStop;
 	QMutex m_mutex;
 	xDynamicsSimulator* xds;

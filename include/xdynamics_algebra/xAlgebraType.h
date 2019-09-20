@@ -65,6 +65,7 @@ public:
 	void    operator+=(const xVectorD& v) const;
 	void alloc(unsigned int _size);
 	void zeros();
+	void set(double* d);
 	unsigned int Size() const;
 	double norm();
 	double* Data() const;

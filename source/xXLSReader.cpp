@@ -19,7 +19,7 @@ xXLSReader::xXLSReader()
 
 xXLSReader::~xXLSReader()
 {
-	if (book) book->release();
+	Release();
 }
 
 bool xXLSReader::_IsEmptyCell(int cid)
@@ -313,6 +313,13 @@ bool xXLSReader::Load(const char* n)
 		return book->load(n);
 	}
 	return false;
+}
+
+void xXLSReader::Release()
+{
+	if (book) book->release();
+//	book->
+//	book = NULL;
 }
 
 void xXLSReader::ReadMass(xMultiBodyModel* xmbd, vector2i rc)

@@ -23,6 +23,10 @@ xResultManager::xResultManager()
 	, c_generalized_coord_qd(NULL)
 	, c_generalized_coord_q_1(NULL)
 	, c_generalized_coord_rhs(NULL)
+	, nparticles(0)
+	, nclusters(0)
+	, ngeneralized_coordinates(0)
+	, nconstraints(0)
 {
 
 }
@@ -79,6 +83,26 @@ void xResultManager::set_num_parts(unsigned int npt)
 unsigned int xResultManager::get_num_parts()
 {
 	return nparts;
+}
+
+unsigned int xResultManager::get_num_particles()
+{
+	return nparticles;
+}
+
+unsigned int xResultManager::get_num_clusters()
+{
+	return nclusters;
+}
+
+unsigned int xResultManager::get_num_generalized_coordinates()
+{
+	return ngeneralized_coordinates;
+}
+
+unsigned int xResultManager::get_num_constraint_equations()
+{
+	return nconstraints;
 }
 
 double * xResultManager::get_times()
@@ -144,66 +168,183 @@ void xResultManager::setup_particle_buffer_color_distribution(xColorControl* xcc
 	}
 }
 
-bool xResultManager::upload_model_results(std::string path)
+bool xResultManager::initialize_from_exist_results(std::string path)
 {
 	std::string file_path;
 	stringstream ss(file_path);
-	unsigned int _npart = 0;
+	ss << path << xModel::getModelName() << ".cdn";
+	std::fstream fs;
+	fs.open(ss.str(), std::ios::in | std::ios::binary);
+	//unsigned int _npart = 0;
+	
 	//ss << path << "/part" << setw(4) << setfill('0') << _npart++ << ".bin";
 	//std::fstream fs;
 	//fs.open(ss.str(), std::ios::in | std::ios::binary);
 	/*double ct = 0.0;
 	char id = '0';*/
+	//fs.read((char*)&_nstep, sizeof(unsigned int));
+	fs.read((char*)&nparts, sizeof(unsigned int));
+	alloc_time_momory(nparts);
+	while (!fs.eof())
+	{
+		char id = '0';
+		fs.read(&id, sizeof(char));
+		switch (id)
+		{
+		case 'm':
+			fs.read((char*)&ngeneralized_coordinates, sizeof(unsigned int));
+			fs.read((char*)&nconstraints, sizeof(unsigned int));
+			break;
+		case 'd':
+			fs.read((char*)&nparticles, sizeof(unsigned int));
+			fs.read((char*)&nclusters, sizeof(unsigned int));
+			alloc_dem_result_memory(nparticles, nclusters);
+			break;
+		}
+	}
+	
+	//char id = '0';
+	//fs.open(&id, sizeof(char));
+	//
+	//	_npart++;
+	//	fs.read((char*)&ct, sizeof(double));
+	//	fs.read(&id, sizeof(char));
+	//	if (id == 'd')
+	//	{
+	//		unsigned int _np = 0;
+	//		unsigned int _nc = 0;
+	//		fs.read((char*)&_np, sizeof(unsigned int));
+	//		fs.read((char*)&_nc, sizeof(unsigned int));
+	//		
+	//	}
+	//	if (nparticles)
+	//	{
+	//		char id = 'd';
+	//		qf.write(&id, sizeof(char));
+	//		qf.write((char*)&nparticles, sizeof(unsigned int));
+	//		qf.write((char*)&nclusters, sizeof(unsigned int));
+	//		qf.write((char*)c_particle_pos, sizeof(double) * nparticles * 4);
+	//		qf.write((char*)c_particle_vel, sizeof(double) * nclusters * 3);
+	//		qf.write((char*)c_particle_acc, sizeof(double) * nclusters * 3);
+	//		qf.write((char*)c_particle_ep, sizeof(double) * nclusters * 4);
+	//		qf.write((char*)c_particle_ev, sizeof(double) * nclusters * 4);
+	//		qf.write((char*)c_particle_ea, sizeof(double) * nclusters * 4);
+	//		//qf.write((char*)avel, sizeof(double) * ns * 4);
+	//		if ((nparticles != nclusters) && c_cluster_pos)
+	//			qf.write((char*)c_cluster_pos, sizeof(double) * nclusters * 4);
+	//	}
+	//	if (ngeneralized_coordinates)
+	//	{
+	//		char id = 'm';
+	//		unsigned int mdim = ngeneralized_coordinates + xModel::OneDOF();
+	//		unsigned int tdim = ngeneralized_coordinates + nconstraints;
+	//		qf.write(&id, sizeof(char));
+	//		qf.write((char*)c_generalized_coord_q, sizeof(double) * mdim);
+	//		qf.write((char*)c_generalized_coord_qd, sizeof(double) * mdim);
+	//		qf.write((char*)c_generalized_coord_q_1, sizeof(double) * mdim);
+	//		qf.write((char*)c_generalized_coord_rhs, sizeof(double) * tdim);
+	//	}
+	//}
+	return true;
+}
+
+bool xResultManager::upload_exist_results(std::string path)
+{
+	std::string file_path;
+	stringstream ss(file_path);
+	unsigned int _nparts = 0;
+//	ss << path << "/part" << setw(4) << setfill('0') << _npart++ << ".bin";
+	//list<std::string> file_list;
 	while (1)
 	{
-		ss.clear();
-		ss << path << "/part" << setw(4) << setfill('0') << _npart << ".bin";
+		ss.str("");
+		ss << path << "part" << setw(4) << setfill('0') << _nparts << ".bin";
+		
 		filesystem::path p(ss.str());
 		if (filesystem::exists(p))
-			_npart++;
+		{
+			flist.push_back(ss.str());
+			_nparts++;
+		}			
 		else
 			break;
 	}
-	nparts = _npart;
-		_npart++;
+	if (nparts != _nparts)
+	{
+
+	}
+	std::fstream fs;
+	
+	unsigned int cnt = 0;
+	double ct = 0;
+	double* _cpos = NULL, *_pos = NULL, *_vel = NULL, *_acc = NULL, *_ep = NULL, *_ev = NULL, *_ea = NULL;
+	if (nparticles)
+	{
+		 _pos = new double[nparticles * 4];
+		 _vel = new double[nclusters * 3];
+		 _acc = new double[nclusters * 3];
+		 _ep = new double[nclusters * 4];
+		 _ev = new double[nclusters * 4];
+		 _ea = new double[nclusters * 4];
+		 if (nclusters != nparticles)
+			 _cpos = new double[nclusters * 4];
+	}
+	for (xlist<xstring>::iterator it = flist.begin(); it != flist.end(); it.next())
+	{
+		fs.open(it.value().toStdString(), std::ios::in | std::ios::binary);
 		fs.read((char*)&ct, sizeof(double));
-		fs.read(&id, sizeof(char));
-		if (id == 'd')
-		{
-			unsigned int _np = 0;
-			unsigned int _nc = 0;
-			fs.read((char*)&_np, sizeof(unsigned int));
-			fs.read((char*)&_nc, sizeof(unsigned int));
-			
-		}
+		time[cnt] = ct;
 		if (nparticles)
 		{
-			char id = 'd';
-			qf.write(&id, sizeof(char));
-			qf.write((char*)&nparticles, sizeof(unsigned int));
-			qf.write((char*)&nclusters, sizeof(unsigned int));
-			qf.write((char*)c_particle_pos, sizeof(double) * nparticles * 4);
-			qf.write((char*)c_particle_vel, sizeof(double) * nclusters * 3);
-			qf.write((char*)c_particle_acc, sizeof(double) * nclusters * 3);
-			qf.write((char*)c_particle_ep, sizeof(double) * nclusters * 4);
-			qf.write((char*)c_particle_ev, sizeof(double) * nclusters * 4);
-			qf.write((char*)c_particle_ea, sizeof(double) * nclusters * 4);
-			//qf.write((char*)avel, sizeof(double) * ns * 4);
-			if ((nparticles != nclusters) && c_cluster_pos)
-				qf.write((char*)c_cluster_pos, sizeof(double) * nclusters * 4);
+			fs.read((char*)_pos, sizeof(double) * nparticles * 4);
+			fs.read((char*)_vel, sizeof(double) * nclusters * 3);			
+			fs.read((char*)_acc, sizeof(double) * nclusters * 3);
+			fs.read((char*)_ep, sizeof(double) * nclusters * 4);
+			fs.read((char*)_ev, sizeof(double) * nclusters * 4);
+			fs.read((char*)_ea, sizeof(double) * nclusters * 4);
+			if(nclusters != nparticles)
+				fs.read((char*)_cpos, sizeof(double) * nclusters * 4);
+			this->save_dem_result(cnt, _cpos, _pos, _vel, _acc, _ep, _ev, _ea, nparticles, nclusters);
 		}
 		if (ngeneralized_coordinates)
 		{
-			char id = 'm';
-			unsigned int mdim = ngeneralized_coordinates + xModel::OneDOF();
-			unsigned int tdim = ngeneralized_coordinates + nconstraints;
-			qf.write(&id, sizeof(char));
-			qf.write((char*)c_generalized_coord_q, sizeof(double) * mdim);
-			qf.write((char*)c_generalized_coord_qd, sizeof(double) * mdim);
-			qf.write((char*)c_generalized_coord_q_1, sizeof(double) * mdim);
-			qf.write((char*)c_generalized_coord_rhs, sizeof(double) * tdim);
+			unsigned int m_size = 0;
+			unsigned int j_size = 0;
+			fs.read((char*)&m_size, sizeof(unsigned int));
+			fs.read((char*)&j_size, sizeof(unsigned int));
+			if (pmrs.size() != m_size)
+			{
+
+			}
+			if (kcrs.size() != j_size)
+			{
+
+			}
+			for (xmap<xstring, struct_pmr*>::iterator it = pmrs.begin(); it != pmrs.end(); it.next())
+			{
+				struct_pmr pr = { 0, };
+				struct_pmr* _pmr = it.value();
+				fs.read((char*)&pr, sizeof(struct_pmr));
+				_pmr[cnt] = pr;
+			}
+			for (xmap<xstring, struct_kcr*>::iterator it = kcrs.begin(); it != kcrs.end(); it.next())
+			{
+				struct_kcr kr = { 0, };
+				struct_kcr* _kcr = it.value();
+				fs.read((char*)&kr, sizeof(struct_kcr));
+				_kcr[cnt] = kr;
+			}
+			cnt++;
 		}
+		fs.close();
 	}
+	if (_cpos) delete[] _cpos;
+	if (_pos) delete[] _pos;
+	if (_vel) delete[] _vel;
+	if (_acc) delete[] _acc;
+	if (_ep) delete[] _ep;
+	if (_ev) delete[] _ev;
+	if (_ea) delete[] _ea;
 	return true;
 }
 
@@ -245,6 +386,14 @@ struct_pmr * xResultManager::get_mass_result_ptr(std::string n)
 {
 	xmap<xstring, struct_pmr*>::iterator it = pmrs.find(n);
 	if (it != pmrs.end())
+		return it.value();
+	return NULL;
+}
+
+struct_kcr * xResultManager::get_joint_result_ptr(std::string n)
+{
+	xmap<xstring, struct_kcr*>::iterator it = kcrs.find(n);
+	if (it != kcrs.end())
 		return it.value();
 	return NULL;
 }
@@ -302,6 +451,9 @@ bool xResultManager::alloc_mass_result_memory(std::string name)
 {
 	if (!nparts)
 		return false;
+	xmap<xstring, struct_pmr*>::iterator it = pmrs.find(name);
+	if (it != pmrs.end())
+		return false;
 	struct_pmr* spmrs = new struct_pmr[nparts];
 	pmrs.insert(name, spmrs);
 	return true;
@@ -310,6 +462,9 @@ bool xResultManager::alloc_mass_result_memory(std::string name)
 bool xResultManager::alloc_joint_result_memory(std::string name)
 {
 	if (!nparts)
+		return false;
+	xmap<xstring, struct_kcr*>::iterator it = kcrs.find(name);
+	if (it != kcrs.end())
 		return false;
 	struct_kcr* skcrs = new struct_kcr[nparts];
 	kcrs.insert(name, skcrs);
@@ -407,6 +562,7 @@ bool xResultManager::save_mass_result(unsigned int i, xPointMass * pm)
 	{
 		struct_pmr* _pmr = it.value();
 		_pmr[i] = pr;
+		c_struct_pmr = pr;
 	}
 	else
 		return false;
@@ -420,6 +576,7 @@ bool xResultManager::save_joint_result(unsigned int i, std::string nm, struct_kc
 	{
 		struct_kcr* __kcr = it.value();
 		__kcr[i] = _kcr;
+		c_struct_kcr = _kcr;
 	}
 	else
 		return false;
@@ -441,6 +598,7 @@ bool xResultManager::export_step_data_to_file(unsigned int pt, double ct)
 	std::string file_name;
 	stringstream ss(file_name);
 	ss << (xModel::path + xModel::name).toStdString() << "/part" << setw(4) << setfill('0') << pt << ".bin";
+	flist.push_back(ss.str());
 	std::fstream qf;
 	qf.open(ss.str(), std::ios::binary | std::ios::out);
 	if (qf.is_open())
@@ -448,26 +606,34 @@ bool xResultManager::export_step_data_to_file(unsigned int pt, double ct)
 		qf.write((char*)&ct, sizeof(double));
 		if (nparticles)
 		{
-			char id = 'd';
-			qf.write(&id, sizeof(char));
-			qf.write((char*)&nparticles, sizeof(unsigned int));
-			qf.write((char*)&nclusters, sizeof(unsigned int));
 			qf.write((char*)c_particle_pos, sizeof(double) * nparticles * 4);
 			qf.write((char*)c_particle_vel, sizeof(double) * nclusters * 3);
 			qf.write((char*)c_particle_acc, sizeof(double) * nclusters * 3);
 			qf.write((char*)c_particle_ep, sizeof(double) * nclusters * 4);
 			qf.write((char*)c_particle_ev, sizeof(double) * nclusters * 4);
 			qf.write((char*)c_particle_ea, sizeof(double) * nclusters * 4);
-			//qf.write((char*)avel, sizeof(double) * ns * 4);
 			if ((nparticles != nclusters) && c_cluster_pos)
 				qf.write((char*)c_cluster_pos, sizeof(double) * nclusters * 4);
 		}
 		if (ngeneralized_coordinates)
 		{
-			char id = 'm';
+			unsigned int m_size = pmrs.size();
+			unsigned int j_size = kcrs.size();
+			qf.write((char*)&m_size, sizeof(unsigned int));
+			qf.write((char*)&j_size, sizeof(unsigned int));
+			for (xmap<xstring, struct_pmr*>::iterator it = pmrs.begin(); it != pmrs.end(); it.next())
+			{
+				struct_pmr* _pmr = it.value();
+				qf.write((char*)&_pmr[pt], sizeof(struct_pmr));
+			}
+			for (xmap<xstring, struct_kcr*>::iterator it = kcrs.begin(); it != kcrs.end(); it.next())
+			{
+				struct_kcr* _kcr = it.value();
+				qf.write((char*)&_kcr[pt], sizeof(struct_kcr));
+			}
 			unsigned int mdim = ngeneralized_coordinates + xModel::OneDOF();
 			unsigned int tdim = ngeneralized_coordinates + nconstraints;
-			qf.write(&id, sizeof(char));
+			//qf.write(&id, sizeof(char));
 			qf.write((char*)c_generalized_coord_q, sizeof(double) * mdim);
 			qf.write((char*)c_generalized_coord_qd, sizeof(double) * mdim);
 			qf.write((char*)c_generalized_coord_q_1, sizeof(double) * mdim);

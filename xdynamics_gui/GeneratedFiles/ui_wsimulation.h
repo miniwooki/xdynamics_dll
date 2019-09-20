@@ -1,13 +1,13 @@
 /********************************************************************************
-** Form generated from reading UI file 'wsimulation.ui'
+** Form generated from reading UI file 'wsimulationxiDtZh.ui'
 **
 ** Created by: Qt User Interface Compiler version 5.12.3
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef UI_WSIMULATION_H
-#define UI_WSIMULATION_H
+#ifndef WSIMULATIONXIDTZH_H
+#define WSIMULATIONXIDTZH_H
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
@@ -47,19 +47,23 @@ public:
     QLabel *LNunParts;
     QLineEdit *LENumParts;
     QPushButton *PBSetting;
+    QGroupBox *GB_StartingPoint;
+    QGridLayout *gridLayout_7;
+    QPushButton *PB_Select_SP;
+    QLineEdit *LE_StartingPoint;
 
     void setupUi(QWidget *wsimulation)
     {
         if (wsimulation->objectName().isEmpty())
             wsimulation->setObjectName(QString::fromUtf8("wsimulation"));
-        wsimulation->resize(264, 190);
+        wsimulation->resize(264, 262);
         QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(wsimulation->sizePolicy().hasHeightForWidth());
         wsimulation->setSizePolicy(sizePolicy);
-        wsimulation->setMinimumSize(QSize(0, 190));
-        wsimulation->setMaximumSize(QSize(16777215, 192));
+        wsimulation->setMinimumSize(QSize(0, 262));
+        wsimulation->setMaximumSize(QSize(16777215, 263));
         gridLayout = new QGridLayout(wsimulation);
         gridLayout->setSpacing(0);
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
@@ -73,6 +77,7 @@ public:
         gridLayout_4->setObjectName(QString::fromUtf8("gridLayout_4"));
         gridLayout_4->setContentsMargins(0, 0, 0, 0);
         verticalLayout = new QVBoxLayout();
+        verticalLayout->setSpacing(10);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         GBSimulationCondition = new QGroupBox(frame);
         GBSimulationCondition->setObjectName(QString::fromUtf8("GBSimulationCondition"));
@@ -183,6 +188,27 @@ public:
 
         verticalLayout->addWidget(GBSimulationInformation);
 
+        GB_StartingPoint = new QGroupBox(frame);
+        GB_StartingPoint->setObjectName(QString::fromUtf8("GB_StartingPoint"));
+        GB_StartingPoint->setCheckable(true);
+        GB_StartingPoint->setChecked(false);
+        gridLayout_7 = new QGridLayout(GB_StartingPoint);
+        gridLayout_7->setSpacing(0);
+        gridLayout_7->setObjectName(QString::fromUtf8("gridLayout_7"));
+        gridLayout_7->setContentsMargins(0, 0, 0, 0);
+        PB_Select_SP = new QPushButton(GB_StartingPoint);
+        PB_Select_SP->setObjectName(QString::fromUtf8("PB_Select_SP"));
+
+        gridLayout_7->addWidget(PB_Select_SP, 0, 0, 1, 1);
+
+        LE_StartingPoint = new QLineEdit(GB_StartingPoint);
+        LE_StartingPoint->setObjectName(QString::fromUtf8("LE_StartingPoint"));
+
+        gridLayout_7->addWidget(LE_StartingPoint, 1, 0, 1, 1);
+
+
+        verticalLayout->addWidget(GB_StartingPoint);
+
 
         gridLayout_4->addLayout(verticalLayout, 0, 0, 1, 1);
 
@@ -207,6 +233,8 @@ public:
         LNumSteps->setText(QApplication::translate("wsimulation", "Num. steps", nullptr));
         LNunParts->setText(QApplication::translate("wsimulation", "Num. parts", nullptr));
         PBSetting->setText(QApplication::translate("wsimulation", "Setting", nullptr));
+        GB_StartingPoint->setTitle(QApplication::translate("wsimulation", "Starting point", nullptr));
+        PB_Select_SP->setText(QApplication::translate("wsimulation", "Select starting point", nullptr));
     } // retranslateUi
 
 };
@@ -217,4 +245,4 @@ namespace Ui {
 
 QT_END_NAMESPACE
 
-#endif // UI_WSIMULATION_H
+#endif // WSIMULATIONXIDTZH_H

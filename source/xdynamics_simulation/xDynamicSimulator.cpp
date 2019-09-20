@@ -59,14 +59,14 @@ xMultiBodySimulation* xDynamicsSimulator::setupMBDSimulation(xSimulation::MBDSol
 }
 
 bool xDynamicsSimulator::xInitialize(
-	bool exefromgui, double _dt, unsigned int _st, double _et, 
+	bool exefromgui, double _dt, unsigned int _st, double _et, unsigned int _sp,
 	xMultiBodySimulation* _xmbd, 
 	xDiscreteElementMethodSimulation* _xdem,
 	xSmoothedParticleHydrodynamicsSimulation* _xsph)
 {
 	std::string c_path = xModel::makeFilePath(xModel::getModelName() + ".cdn");
 	std::fstream fs;
-	fs.open(c_path, std::ios::out || std::ios::binary);
+	fs.open(c_path, std::ios::out | std::ios::binary);
 	if (!fs.is_open())
 	{
 		return false;
@@ -76,9 +76,10 @@ bool xDynamicsSimulator::xInitialize(
  	if(_et) xSimulation::et = _et;
 	xSimulation::nstep = static_cast<unsigned int>((xSimulation::et / xSimulation::dt));
 	xSimulation::npart = static_cast<unsigned int>((nstep / xSimulation::st)) + 1;
-	fs.write((char*)&xSimulation::nstep, sizeof(unsigned int));
+	//fs.write((char*)&xSimulation::nstep, sizeof(unsigned int));
 	fs.write((char*)&xSimulation::npart, sizeof(unsigned int));                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
-	xdm->initialize_result_manager(xSimulation::npart);
+	if(!_sp)
+		xdm->initialize_result_manager(xSimulation::npart);
 	if (_xmbd)
 	{
 		xmbd = _xmbd;
@@ -119,6 +120,12 @@ bool xDynamicsSimulator::xInitialize(
 			//int ret = xmbd->Initialize(xdm->XMBDModel());
 			if (!checkXerror(xmbd->Initialize(xdm->XMBDModel())))
 			{
+				char id_mbd = 'm';
+				unsigned int mdim = xmbd->num_generalized_coordinate();
+				unsigned int sdim = xmbd->num_constraint_equations();
+				fs.write(&id_mbd, sizeof(char));
+				fs.write((char*)&mdim, sizeof(unsigned int));
+				fs.write((char*)&sdim, sizeof(unsigned int));
 				xLog::log("The initialization of multibody model was succeeded.");
 			}				
 		}
@@ -131,6 +138,12 @@ bool xDynamicsSimulator::xInitialize(
 			//int ret = xdem->Initialize(xdm->XDEMModel(), xdm->XContact());
 			if (!checkXerror(xdem->Initialize(xdm->XDEMModel(), xdm->XContact())))
 			{
+				char id_dem = 'd';
+				unsigned int nparticle = xdem->num_particles();
+				unsigned int ncluster = xdem->num_clusters();
+				fs.write(&id_dem, sizeof(char));
+				fs.write((char*)&nparticle, sizeof(unsigned int));
+				fs.write((char*)&ncluster, sizeof(unsigned int));
 				xLog::log("The initialization of discrete element method model was succeeded.");
 			}
 				
@@ -150,10 +163,116 @@ bool xDynamicsSimulator::xInitialize(
 				xLog::log("The initialization of smoothed particle hydrodynamics mode was succeeded.");
 		}
 	}
-	
-	savePartData(0, 0);
+	if(!_sp)
+		savePartData(0, 0);
+	fs.close();
 	return true;
 }
+
+//bool xDynamicsSimulator::xInitialize_from_part_result(bool exefromgui, double _dt, unsigned int _st, double _et, xMultiBodySimulation * _xmbd, xDiscreteElementMethodSimulation * _xdem, xSmoothedParticleHydrodynamicsSimulation * _xsph)
+//{
+//	std::string c_path = xModel::makeFilePath(xModel::getModelName() + ".cdn");
+//	std::fstream fs;
+//	fs.open(c_path, std::ios::out | std::ios::binary);
+//	if (!fs.is_open())
+//	{
+//		return false;
+//	}
+//	if (_dt) xSimulation::dt = _dt;
+//	if (_st) xSimulation::st = _st;
+//	if (_et) xSimulation::et = _et;
+//	xSimulation::nstep = static_cast<unsigned int>((xSimulation::et / xSimulation::dt));
+//	xSimulation::npart = static_cast<unsigned int>((nstep / xSimulation::st)) + 1;
+//	//fs.write((char*)&xSimulation::nstep, sizeof(unsigned int));
+//	fs.write((char*)&xSimulation::npart, sizeof(unsigned int));
+//	xdm->initialize_result_manager(xSimulation::npart);
+//	if (_xmbd)
+//	{
+//		xmbd = _xmbd;
+//	}
+//	else
+//	{
+//		switch (xSimulation::mbd_solver_type)
+//		{
+//		case xSimulation::EXPLICIT_RK4: xmbd = new xIntegratorRK4(); break;
+//		case xSimulation::IMPLICIT_HHT: xmbd = new xIntegratorHHT(); break;
+//		case xSimulation::KINEMATIC: xmbd = new xKinematicAnalysis(); break;
+//		}
+//	}
+//	if (_xdem) xdem = _xdem;
+//	else
+//	{
+//		switch (xSimulation::dem_solver_type)
+//		{
+//		case xSimulation::EXPLICIT_VV: xdem = new xIntegratorVV(); break;
+//		}
+//	}
+//	if (_xsph) xsph = _xsph;
+//	else
+//	{
+//		switch (xSimulation::sph_solver_type)
+//		{
+//		case xSimulation::INCOMPRESSIBLESPH: xsph = new xIncompressibleSPH(); break;
+//		case xSimulation::WEAKELYSPH: break;
+//		}
+//	}
+//	if (xmbd)
+//	{
+//
+//		//std::cout << xmbd->Initialized() << " " << xdm->XMBDModel() << std::endl;
+//		if (xdm->XMBDModel() && !xmbd->Initialized())
+//		{
+//			xLog::log("An uninitialized multibody model has been detected.");
+//			//int ret = xmbd->Initialize(xdm->XMBDModel());
+//			if (!checkXerror(xmbd->Initialize(xdm->XMBDModel())))
+//			{
+//				char id_mbd = 'm';
+//				unsigned int mdim = xmbd->num_generalized_coordinate();
+//				unsigned int sdim = xmbd->num_constraint_equations();
+//				fs.write(&id_mbd, sizeof(char));
+//				fs.write((char*)&mdim, sizeof(unsigned int));
+//				fs.write((char*)&sdim, sizeof(unsigned int));
+//				xLog::log("The initialization of multibody model was succeeded.");
+//			}
+//		}
+//	}
+//	if (xdem)
+//	{
+//		if (xdm->XDEMModel() && !xdem->Initialized())
+//		{
+//			xLog::log("An uninitialized discrete element method model has been detected.");
+//			//int ret = xdem->Initialize(xdm->XDEMModel(), xdm->XContact());
+//			if (!checkXerror(xdem->Initialize(xdm->XDEMModel(), xdm->XContact())))
+//			{
+//				char id_dem = 'd';
+//				unsigned int nparticle = xdem->num_particles();
+//				unsigned int ncluster = xdem->num_clusters();
+//				fs.write(&id_dem, sizeof(char));
+//				fs.write((char*)&nparticle, sizeof(unsigned int));
+//				fs.write((char*)&ncluster, sizeof(unsigned int));
+//				xLog::log("The initialization of discrete element method model was succeeded.");
+//			}
+//
+//		}
+//		if (xmbd)
+//		{
+//			xdem->updateObjectFromMBD();
+//		}
+//		//xdem->EnableSaveResultToMemory(exefromgui);
+//	}
+//	if (xsph)
+//	{
+//		if (xdm->XSPHModel() && !xsph->Initialized())
+//		{
+//			xLog::log("An uninitialized smoothed particle hydrodynamics model has been detected.");
+//			if (!checkXerror(xsph->Initialize(xdm->XSPHModel())))
+//				xLog::log("The initialization of smoothed particle hydrodynamics mode was succeeded.");
+//		}
+//	}
+//	savePartData(0, 0);
+//	fs.close();
+//	return true;
+//}
 
 bool xDynamicsSimulator::savePartData(double ct, unsigned int pt)
 {
@@ -261,6 +380,92 @@ bool xDynamicsSimulator::xRunSimulationThread(double ct, unsigned int cstep)
 		xSimulation::triggerStopSimulation();
 //	return xDynamicsError::xdynamicsErrorDiscreteElementMethodModelInitialization;
 	return true;
+}
+
+double xDynamicsSimulator::set_from_part_result(std::string path)
+{
+	std::fstream fs;
+	fs.open(path, std::ios::in | std::ios::binary);
+	unsigned int cnt = 0;
+	unsigned int np = 0;
+	unsigned int ns = 0;
+	double ct = 0;
+	
+	fs.read((char*)&ct, sizeof(double));
+	if (xdem)
+	{
+		//double* _cpos = NULL, *_pos = NULL, *_vel = NULL, *_acc = NULL, *_ep = NULL, *_ev = NULL, *_ea = NULL;
+		np = xdem->num_particles();
+		ns = xdem->num_clusters();
+		double* _pos = new double[np * 4];
+		double* _vel = new double[ns * 3];
+		double* _acc = new double[ns * 3];
+		double* _ep = new double[ns * 4];
+		double* _ev = new double[ns * 4];
+		double* _ea = new double[ns * 4];
+		double* _cpos = NULL;
+		if (ns != np)
+			_cpos = new double[ns * 4];
+		
+	//	xrm->get_times()[cnt] = ct;
+		//time[cnt] = ct;
+		if (np)
+		{
+			fs.read((char*)_pos, sizeof(double) * np * 4);
+			fs.read((char*)_vel, sizeof(double) * ns * 3);
+			fs.read((char*)_acc, sizeof(double) * ns * 3);
+			fs.read((char*)_ep, sizeof(double) * ns * 4);
+			fs.read((char*)_ev, sizeof(double) * ns * 4);
+			fs.read((char*)_ea, sizeof(double) * ns * 4);
+			if (ns != np)
+				fs.read((char*)_cpos, sizeof(double) * ns * 4);
+			xdem->set_dem_data(_cpos, _pos, _vel, _acc, _ep, _ev, _ea);
+		}
+		delete[] _pos;
+		delete[] _vel;
+		delete[] _acc;
+		delete[] _ep;
+		delete[] _ev;
+		delete[] _ea;
+		if(_cpos) 
+			delete[] _cpos;
+	}
+	if (xmbd)
+	{
+		unsigned int m_size = 0;
+		unsigned int j_size = 0;
+		fs.read((char*)&m_size, sizeof(unsigned int));
+		fs.read((char*)&j_size, sizeof(unsigned int));
+		//xMultiBodyModel* xmbd = xdm->XMBDModel();
+		for (unsigned int i = 0; i < m_size; i++)
+		{
+			xPointMass::pointmass_result pr = { 0, };
+			fs.read((char*)&pr, sizeof(xPointMass::pointmass_result));
+		}
+		for (unsigned int i = 0; i < j_size; i++)
+		{
+			xKinematicConstraint::kinematicConstraint_result kr = { 0, };
+			fs.read((char*)&kr, sizeof(xKinematicConstraint::kinematicConstraint_result));
+		}
+		unsigned int ng = xmbd->num_generalized_coordinate() + xModel::OneDOF();
+		unsigned int nt = xmbd->num_generalized_coordinate() + xmbd->num_constraint_equations();
+		double *q = new double[ng];
+		double *dq = new double[ng];
+		double *q_1 = new double[ng];
+		double *rhs = new double[nt];
+
+		fs.read((char*)q, sizeof(double) * ng);
+		fs.read((char*)dq, sizeof(double) * ng);
+		fs.read((char*)q_1, sizeof(double) * ng);
+		fs.read((char*)rhs, sizeof(double) * nt);
+		xmbd->set_mbd_data(q, dq, q_1, rhs);
+		delete[] q;
+		delete[] dq;
+		delete[] q_1;
+		delete[] rhs;
+	}
+	fs.close();
+	return ct;
 }
 
 bool xDynamicsSimulator::xRunSimulation()

@@ -16,7 +16,9 @@ public:
 	virtual ~xDynamicsSimulator();
 
 	xMultiBodySimulation* setupMBDSimulation(xSimulation::MBDSolverType mst);
-	bool xInitialize(bool exefromgui = false, double _dt = 0, unsigned int _st = 0, double _et = 0, xMultiBodySimulation* _xmbd = NULL, xDiscreteElementMethodSimulation* _xdem = NULL, xSmoothedParticleHydrodynamicsSimulation* _xsph = NULL);
+	bool xInitialize(bool exefromgui = false, double _dt = 0, unsigned int _st = 0, double _et = 0, unsigned int _sp = 0, xMultiBodySimulation* _xmbd = NULL, xDiscreteElementMethodSimulation* _xdem = NULL, xSmoothedParticleHydrodynamicsSimulation* _xsph = NULL);
+	//bool xInitialize_from_part_result(bool exefromgui = false, double _dt = 0, unsigned int _st = 0, double _et = 0, xMultiBodySimulation* _xmbd = NULL, xDiscreteElementMethodSimulation* _xdem = NULL, xSmoothedParticleHydrodynamicsSimulation* _xsph = NULL);
+	double set_from_part_result(std::string path);
 	bool xRunSimulation();
 	bool xRunSimulationThread(double ct, unsigned int pt);
 	bool savePartData(double ct, unsigned int pt);

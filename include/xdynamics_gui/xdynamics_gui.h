@@ -39,6 +39,7 @@ public:
 	void ReadSTLFile(QString path);
 	bool ReadModelResults(QString path);
 	void OpenFile(QString path);
+	QSize FullWindowSize();
 	//void xInitializeGUI(int _argc, char** _argv);
 	void Clear();
 
@@ -61,10 +62,12 @@ private slots:
 	void xInitializeWidgetStatement();
 	void xOnGeometrySelectionOfPointMass();
 	void xStopSimulationThread();
+	void xReleaseResultCallThread();
 	void xContextMenuProcess(QString nm, contextMenuType vot);
 	void xSetupResultNavigatorByChangeTargetCombo(int);
 	void xUploadResultThisModel();
 	void xSetupParticleBufferColorDistribution(int);
+	void xSelectStartPoint();
 	
 private:
 	void setupMeshSphere();
@@ -97,7 +100,6 @@ private:
 	xCommandLine* xcl;
 	xChartWindow* xchart;
 	xColorControl* xcc;
-
-	QString mbd_last_result;
-	QString dem_last_result;
+	QSize desktop_size;
+	QStringList result_file_list;
 };

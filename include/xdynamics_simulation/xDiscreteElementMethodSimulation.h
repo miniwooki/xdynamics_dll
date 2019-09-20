@@ -30,7 +30,9 @@ public:
 	double* Velocity();
 	void SpringDamperForce();
 	unsigned int num_particles();
+	unsigned int num_clusters();
 	unsigned int setupByLastSimulationFile(std::string ldr);
+	unsigned int set_dem_data(double* cpos, double* pos, double* vel, double* acc, double* ep, double* ev, double* ea);
 
 protected:
 	void clearMemory();

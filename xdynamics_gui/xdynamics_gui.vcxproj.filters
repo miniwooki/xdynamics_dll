@@ -132,6 +132,12 @@
     <ClCompile Include="..\source\xColorControl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xResultCallThread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xListWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="..\include\xdynamics_gui\xGLWidget.h">
@@ -177,6 +183,12 @@
       <Filter>Header Files\widget</Filter>
     </QtMoc>
     <QtMoc Include="..\include\xdynamics_gui\xdynamics_gui.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="..\include\xdynamics_gui\xResultCallThread.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="..\include\xdynamics_gui\xListWidget.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

@@ -27,7 +27,9 @@ public:
 	void ExportResults(std::fstream& of);
 	void SetZeroBodyForce();
 	unsigned int setupByLastSimulationFile(std::string lmr);
-	
+	unsigned int num_generalized_coordinate();
+	unsigned int num_constraint_equations();
+	unsigned int set_mbd_data(double *_q, double *_dq, double *_q_1, double* _rhs);
 	virtual int Initialize(xMultiBodyModel* xmbd);
 	virtual int OneStepSimulation(double ct, unsigned int cstep) = 0;
 

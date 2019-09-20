@@ -3,11 +3,13 @@
 #include "xdynamics_manager/xDynamicsManager.h"
 #include <QTime>
 #include <QDebug>
+#include <QFile>
 
 xSimulationThread::xSimulationThread()
 	: isStop(false)
 	, last_pt(0)
 	, xds(NULL)
+	, current_simulation_time(0)
 {
 
 }
@@ -19,15 +21,25 @@ xSimulationThread::~xSimulationThread()
 // 	if (mbd) delete mbd; mbd = NULL;
 }
 
-bool xSimulationThread::xInitialize(xDynamicsManager* dm, double dt, unsigned int st, double et)
+bool xSimulationThread::xInitialize(xDynamicsManager* dm, double dt, unsigned int st, double et, unsigned int npt)
 {
+	last_pt = npt;
 	if (!xds)
 		xds = new xDynamicsSimulator(dm);
-	if (!xds->xInitialize(false, dt, st, et))
+	if (!xds->xInitialize(false, dt, st, et, npt))
 	{
 		return false;
 	}
 	return true;
+}
+
+void xSimulationThread::set_from_part_result(QString path)
+{
+	/*QFile qf(path);
+	qf.open(QIODevice::ReadOnly);*/
+	
+	//last_pt = path.mid(begin + 1, end - begin + 5).toUInt();
+	current_simulation_time = xds->set_from_part_result(path.toStdString());
 }
 
 void xSimulationThread::setupByLastSimulationFile(QString lmr, QString ldr)
@@ -112,8 +124,6 @@ void xSimulationThread::run()
 		}
 		sendProgress(cstep, "");
 	}
-	if (isStop || xSimulation::ConfirmStopSimulation())
-		xds->savePartData(ct, 9999);
 	elapsed_time = tme.elapsed() * 0.001;
 	total_time += elapsed_time;
 	sendProgress(-1, QString("=========  =======    ==========    ======   ========   =============  ====================\n"));

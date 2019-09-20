@@ -63,6 +63,7 @@ public:
 			tail = NULL;
 			head = new xListNode(v, tail);			
 			tail = head;
+			sz++;
 		}
 		else
 		{

@@ -147,6 +147,25 @@ unsigned int xMultiBodySimulation::setupByLastSimulationFile(std::string lmr)
 	return pt;
 }
 
+unsigned int xMultiBodySimulation::num_generalized_coordinate()
+{
+	return mdim;
+}
+
+unsigned int xMultiBodySimulation::num_constraint_equations()
+{
+	return sdim;
+}
+
+unsigned int xMultiBodySimulation::set_mbd_data(double * _q, double * _dq, double * _q_1, double * _rhs)
+{
+	q.set(_q);
+	qd.set(_dq);
+	q_1.set(_q_1);
+	rhs.set(_rhs);
+	return 0;
+}
+
 int xMultiBodySimulation::Initialize(xMultiBodyModel* _xmbd)
 {
 	//of = new std::fstream;

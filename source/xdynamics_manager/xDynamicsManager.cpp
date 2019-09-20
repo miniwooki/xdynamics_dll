@@ -198,10 +198,12 @@ int xDynamicsManager::OpenModelXLS(const char* n)
 
 		xve.Open(full_path + ".vmd");
 		xls.setViewExporter(&xve);
+		xls.Release();
 		try
 		{
 			for (; bt != et; bt++)
 			{
+				xls.Load(n);
 				switch (bt->first)
 				{
 				case XLS_SHAPE: xls.ReadShapeObject(xom, bt->second); break;
@@ -244,6 +246,7 @@ int xDynamicsManager::OpenModelXLS(const char* n)
 				case XLS_SIMULATION: xls.ReadSimulationCondition(bt->second); break;
 				case XLS_GRAVITY: xls.ReadInputGravity(bt->second); break;
 				}
+				xls.Release();
 			}
 		}
 		catch (exception &e)
@@ -282,7 +285,26 @@ bool xDynamicsManager::upload_model_results(std::string path)
 	if (xrm)
 		delete xrm;
 	xrm = new xResultManager;
-	xrm->upload_model_results(path);
+	xrm->initialize_from_exist_results(path);
+	if (xmbd)
+	{
+		for (xmap<xstring, xPointMass*>::iterator it = xmbd->Masses().begin(); it != xmbd->Masses().end(); it.next())
+		{
+			xstring name = it.key();
+			xrm->alloc_mass_result_memory(name.toStdString());
+		}
+		for (xmap<xstring, xKinematicConstraint*>::iterator it = xmbd->Joints().begin(); it != xmbd->Joints().end(); it.next())
+		{
+			xstring name = it.key();
+			xrm->alloc_joint_result_memory(name.toStdString());
+		}
+		for (xmap<xstring, xDrivingConstraint*>::iterator it = xmbd->Drivings().begin(); it != xmbd->Drivings().end(); it.next())
+		{
+			xstring name = it.key();
+			xrm->alloc_joint_result_memory(name.toStdString());
+		}
+	}
+//	xrm->upload_exist_results(path);
 	return true;
 }
 
@@ -309,6 +331,15 @@ void xDynamicsManager::initialize_result_manager(unsigned int npt)
 	xrm = new xResultManager();
 	xrm->set_num_parts(npt);
 	xrm->alloc_time_momory(npt);
+}
+
+void xDynamicsManager::release_result_manager()
+{
+	if (xrm)
+	{
+		delete xrm;
+		xrm = NULL;
+	}
 }
 
 void xDynamicsManager::setOnAirModel(modelType t, std::string n)

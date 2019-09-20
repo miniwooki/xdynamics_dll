@@ -5,6 +5,7 @@
 #include "xColorControl.h"
 #include "xdynamics_object/xPointMass.h"
 #include "xmap.hpp"
+#include "xlist.hpp"
 #include "xdynamics_object/xKinematicConstraint.h"
 
 typedef xPointMass::pointmass_result struct_pmr;
@@ -21,6 +22,11 @@ public:
 	void xRun(const std::string _cpath, const std::string _cname);
 	void set_num_parts(unsigned int npt);
 	unsigned int get_num_parts();
+	unsigned int get_num_particles();
+	unsigned int get_num_clusters();
+	unsigned int get_num_generalized_coordinates();
+	unsigned int get_num_constraint_equations();
+	
 	double* get_times();
 	//void set_num_particles(unsigned int np);
 	//void set_num_masses_and_joint(unsigned int nm, unsigned int nj);
@@ -28,6 +34,7 @@ public:
 	float get_min_result_value(xColorControl::ColorMapType cmt);
 	float get_max_result_value(xColorControl::ColorMapType cmt);
 	struct_pmr* get_mass_result_ptr(std::string n);
+	struct_kcr* get_joint_result_ptr(std::string n);
 	float* get_particle_position_result_ptr();
 	float* get_particle_velocity_result_ptr();
 	float* get_particle_color_result_ptr();
@@ -45,7 +52,8 @@ public:
 	void ExportPointMassResult2TXT(std::string n);
 	void setup_particle_buffer_color_distribution(xColorControl* xcc, int sframe, int cframe);
 
-	bool upload_model_results(std::string path);
+	bool initialize_from_exist_results(std::string path);
+	bool upload_exist_results(std::string path);
 
 private:
 	void setCurrentPath(std::string new_path);
@@ -70,6 +78,7 @@ private:
 	
 	xmap<xstring, struct_pmr*> pmrs;
 	xmap<xstring, struct_kcr*> kcrs;
+	xlist<xstring> flist;
 	double* time;
 	float* ptrs;
 	float* vtrs;
@@ -96,6 +105,9 @@ private:
 	double *c_generalized_coord_qd;
 	double *c_generalized_coord_q_1;
 	double *c_generalized_coord_rhs;
+
+	struct_pmr c_struct_pmr;
+	struct_kcr c_struct_kcr;
 };
 
 #endif

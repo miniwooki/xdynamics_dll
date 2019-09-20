@@ -54,7 +54,7 @@ proguard/
 captures/
 
 # Folder
-extern/
+extern/libxl-3.8.4.0
 
 # IntelliJ
 *.iml
