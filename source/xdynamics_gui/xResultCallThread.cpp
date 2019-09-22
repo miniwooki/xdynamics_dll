@@ -154,10 +154,9 @@ void xResultCallThread::run()
 					fs.read((char*)&kr, sizeof(struct_kcr));
 					_kcr[cnt] = kr;
 				}
-				cnt++;
-				fs.close();
 			}
-
+			cnt++;
+			fs.close();
 			emit result_call_send_progress(10 + cnt, "");
 		}
 
@@ -165,7 +164,14 @@ void xResultCallThread::run()
 		double* _time = xrm->get_times();
 		for (unsigned int i = 0; i < xrm->get_num_parts(); i++)
 			xvAnimationController::addTime(i, static_cast<float>(_time[i]));
-		xvAnimationController::setTotalFrame(xrm->get_num_parts());
+		xvAnimationController::setTotalFrame(xrm->get_num_parts()-1);
+		if (_cpos) delete[] _cpos;
+		if (_pos) delete[] _pos;
+		if (_vel) delete[] _vel;
+		if (_acc) delete[] _acc;
+		if (_ep) delete[] _ep;
+		if (_ev) delete[] _ev;
+		if (_ea) delete[] _ea;
 	}
 	emit result_call_finish();
 }

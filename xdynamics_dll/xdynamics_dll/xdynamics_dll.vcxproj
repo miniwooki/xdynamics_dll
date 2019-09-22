@@ -152,6 +152,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>C:\xdynamics\include;$(LAPACK_64)\inc;C:\xDynamics\extern\libxl-3.8.4.0\include_cpp;$(USING_CUDA_SAMPLE_VERSION)\common\inc;C:\xdynamics\extern\ExcelFormat;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4819</DisableSpecificWarnings>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -170,6 +171,8 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\extern\ExcelFormat\BasicExcel.cpp" />
+    <ClCompile Include="..\..\extern\ExcelFormat\ExcelFormat.cpp" />
     <ClCompile Include="..\..\source\xColorControl.cpp" />
     <ClCompile Include="..\..\source\xDynamicsError.cpp" />
     <ClCompile Include="..\..\source\xdynamics_algebra\xAlgebraMath.cpp" />
@@ -215,6 +218,7 @@
     <ClCompile Include="..\..\source\xdynamics_object\xQuadraticKernel.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xQuinticKernel.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xRevoluteConstraint.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xRotationSpringDamperForce.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xSphericalConstraint.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xSpringDamperForce.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xTranslationConstraint.cpp" />
@@ -252,6 +256,8 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\extern\ExcelFormat\BasicExcel.hpp" />
+    <ClInclude Include="..\..\extern\ExcelFormat\ExcelFormat.h" />
     <ClInclude Include="..\..\include\xColorControl.h" />
     <ClInclude Include="..\..\include\xdynamics.h" />
     <ClInclude Include="..\..\include\xDynamicsError.h" />
@@ -302,6 +308,7 @@
     <ClInclude Include="..\..\include\xdynamics_object\xQuinticKernel.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xRevoluteConstraint.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xRotationalAxialForce.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xRotationSpringDamperForce.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xSphericalConstraint.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xSpringDamperForce.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xTranslationConstraint.h" />

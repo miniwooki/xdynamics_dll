@@ -22,7 +22,7 @@ QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_xChartWindow_t {
     QByteArrayData data[6];
-    char stringdata0[82];
+    char stringdata0[92];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -34,14 +34,14 @@ static const qt_meta_stringdata_xChartWindow_t qt_meta_stringdata_xChartWindow =
 QT_MOC_LITERAL(0, 0, 12), // "xChartWindow"
 QT_MOC_LITERAL(1, 13, 16), // "updateTargetItem"
 QT_MOC_LITERAL(2, 30, 0), // ""
-QT_MOC_LITERAL(3, 31, 16), // "click_waveHeight"
-QT_MOC_LITERAL(4, 48, 18), // "changeComboBoxItem"
-QT_MOC_LITERAL(5, 67, 14) // "editingCommand"
+QT_MOC_LITERAL(3, 31, 26), // "click_passing_distribution"
+QT_MOC_LITERAL(4, 58, 18), // "changeComboBoxItem"
+QT_MOC_LITERAL(5, 77, 14) // "editingCommand"
 
     },
     "xChartWindow\0updateTargetItem\0\0"
-    "click_waveHeight\0changeComboBoxItem\0"
-    "editingCommand"
+    "click_passing_distribution\0"
+    "changeComboBoxItem\0editingCommand"
 };
 #undef QT_MOC_LITERAL
 
@@ -80,7 +80,7 @@ void xChartWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->updateTargetItem((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2]))); break;
-        case 1: _t->click_waveHeight(); break;
+        case 1: _t->click_passing_distribution(); break;
         case 2: _t->changeComboBoxItem((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 3: _t->editingCommand(); break;
         default: ;

@@ -1,13 +1,13 @@
 /********************************************************************************
-** Form generated from reading UI file 'wsimulationxiDtZh.ui'
+** Form generated from reading UI file 'wsimulation.ui'
 **
 ** Created by: Qt User Interface Compiler version 5.12.3
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef WSIMULATIONXIDTZH_H
-#define WSIMULATIONXIDTZH_H
+#ifndef UI_WSIMULATION_H
+#define UI_WSIMULATION_H
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
@@ -245,4 +245,4 @@ namespace Ui {
 
 QT_END_NAMESPACE
 
-#endif // WSIMULATIONXIDTZH_H
+#endif // UI_WSIMULATION_H

@@ -209,6 +209,26 @@ QComboBox* xChartDatabase::plotItemComboBox()
 void xChartDatabase::setResultManager(xResultManager * _xrm)
 {
 	xrm = _xrm;
+	xmap<xstring, struct_pmr*>* pmrs = xrm->get_mass_result_xmap();
+	xmap<xstring, struct_kcr*>* kcrs = xrm->get_joint_result_xmap();
+	if (pmrs->size())
+	{
+		for (xmap<xstring, struct_pmr*>::iterator it = pmrs->begin(); it != pmrs->end(); it.next())
+		{
+			QString _nm = it.key().text();
+			mass_results[_nm] = it.value();
+			addChild(MASS_ROOT, _nm);
+		}
+	}
+	if (kcrs->size())
+	{
+		for (xmap<xstring, struct_kcr*>::iterator it = kcrs->begin(); it != kcrs->end(); it.next())
+		{
+			QString _nm = it.key().text();
+			constraint_results[_nm] = it.value();
+			addChild(KCONSTRAINT_ROOT, _nm);
+		}
+	}
 }
 
 QString xChartDatabase::plotTarget()
@@ -237,4 +257,20 @@ void xChartDatabase::upload_mbd_results(xMultiBodyModel* _xmbd)
 		constraint_results[xkc->Name()] = xkc->XKinematicConstraintResultPointer();
 		addChild(KCONSTRAINT_ROOT, xkc->Name());
 	}*/
+}
+
+xPointMass::pointmass_result* xChartDatabase::MassResults(QString name)
+{
+	QMap<QString, xPointMass::pointmass_result*>::iterator it = mass_results.find(name);
+	if (it != mass_results.end())
+		return it.value();
+	return NULL;
+}
+
+xKinematicConstraint::kinematicConstraint_result * xChartDatabase::JointResults(QString name)
+{
+	QMap<QString, xKinematicConstraint::kinematicConstraint_result*>::iterator it = constraint_results.find(name);
+	if (it != constraint_results.end())
+		return it.value();
+	return NULL;
 }

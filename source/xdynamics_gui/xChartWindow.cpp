@@ -3,7 +3,7 @@
 //#include "waveHeightSensor.h"
 #include "xCallOut.h"
 //#include "cmdWindow.h"
-#include "xdynamics_manager/xDynamicsManager.h"
+#include "xdynamics_manager/xResultManager.h"
 #include <QtCharts/QLineSeries>
 #include <QtWidgets>
 #include <QtCharts>
@@ -60,13 +60,13 @@ xChartWindow::xChartWindow(QWidget* parent /* = NULL */)
 	mainToolBar = new QToolBar(this);
 	addToolBar(mainToolBar);
 
-	actions[WAVE_HEIGHT] = new QAction(QIcon(":/Resources/waveHeight.png"), tr("&Wave height"), this);
-	actions[WAVE_HEIGHT]->setStatusTip(tr("Wave height"));
-	connect(actions[WAVE_HEIGHT], SIGNAL(triggered()), this, SLOT(click_waveHeight()));
+	/*actions[PASSING_DISTRIBUTION] = new QAction(QIcon(":/Resources/chart_passing.png"), tr("&Passing distribution"), this);
+	actions[PASSING_DISTRIBUTION]->setStatusTip(tr("Distribution of particles passing area"));
+	connect(actions[PASSING_DISTRIBUTION], SIGNAL(triggered()), this, SLOT(click_passing_distribution()));
 	connect(comm, SIGNAL(editingFinished()), this, SLOT(editingCommand()));
 	connect(tree, SIGNAL(ClickedItem(int, QString)), this, SLOT(updateTargetItem(int, QString)));
 	connect(tree->plotItemComboBox(), SIGNAL(currentIndexChanged(int)), this, SLOT(changeComboBoxItem(int)));
-	mainToolBar->addAction(actions[WAVE_HEIGHT]);
+	mainToolBar->addAction(actions[PASSING_DISTRIBUTION]);*/
 	isActivate = true;
 }
 
@@ -84,14 +84,14 @@ xChartWindow::~xChartWindow()
 	isActivate = false;
 }
 
-void xChartWindow::setChartData(xDynamicsManager* xdm)
+bool xChartWindow::setChartData(xResultManager* xrm)
 {
-	if (xdm)
+	if (xrm)
 	{
-		tree->setResultManager(xdm->XResult());
-		if(xdm->XMBDModel())
-			tree->upload_mbd_results(xdm->XMBDModel());
-	}	
+		tree->setResultManager(xrm);
+		return false;
+	}		
+	return true;
 }
 
 void xChartWindow::closeEvent(QCloseEvent *event)
@@ -122,7 +122,7 @@ void xChartWindow::editingCommand()
 		waveHeightInputData.end = ss.at(1).toInt();
 		commandStatus = 2;
 		comm->setText("");
-		click_waveHeight();
+	//	click_waveHeight();
 
 	}
 	else if (commandStatus == 3)
@@ -130,7 +130,7 @@ void xChartWindow::editingCommand()
 		waveHeightInputData.location = comm->text().toDouble();
 		commandStatus = 4;
 		comm->setText("");
-		click_waveHeight();
+		//click_waveHeight();
 		return;
 	}
 	comm->setText("");
@@ -187,7 +187,7 @@ void xChartWindow::joint_plot()
 	double max_v = -FLT_MAX;
 	double min_v = FLT_MAX;
 	QString ytitle;
-	xKinematicConstraint::kinematicConstraint_result* pmr = tree->JointResults()[select_item_name];
+	xKinematicConstraint::kinematicConstraint_result* pmr = tree->JointResults(select_item_name);
 	double *time = tree->result_manager_ptr()->get_times();
 	for(unsigned int i = 0 ; i < tree->result_manager_ptr()->get_num_parts(); i++)
 	/*foreach(xKinematicConstraint::kinematicConstraint_result r, *pmr)*/
@@ -268,7 +268,7 @@ void xChartWindow::body_plot()
  	double max_v = -FLT_MAX;
  	double min_v = FLT_MAX;
  	QString ytitle;
-	xPointMass::pointmass_result* pmr = tree->MassResults()[select_item_name];
+	xPointMass::pointmass_result* pmr = tree->MassResults(select_item_name);
 	double *time = tree->result_manager_ptr()->get_times();
 	for (unsigned int i = 0; i < tree->result_manager_ptr()->get_num_parts(); i++)
 	{
@@ -352,7 +352,7 @@ void xChartWindow::updateTargetItem(int id, QString n)
 	select_item_name = n;
 }
 
-void xChartWindow::click_waveHeight()
+void xChartWindow::click_passing_distribution()
 {
 // 	whs = new waveHeightSensor;
 // 		if (commandStatus == 0)

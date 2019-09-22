@@ -27,6 +27,7 @@ public:
 	//irtual void updateCollisionPair(unsigned int id, xContactPairList& xcpl, double r, vector3d pos, double rj = 0, vector3d posj = new_vector3d(0.0, 0.0, 0.0));
 	virtual void collision(double r, double m, vector3d& pos, vector3d& vel, vector3d& omega, vector3d& F, vector3d& M);
 	virtual void cudaMemoryAlloc(unsigned int np);
+	static bool detect_contact(vector4f& p, xPlaneObject& pl);
 
 private:
 	double particle_plane_contact_detection(xPlaneObject* _pe, vector3d& u, vector3d& xp, vector3d& wp, double r);

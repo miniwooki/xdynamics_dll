@@ -8,7 +8,7 @@
 
 class XDYNAMICS_API xDrivingConstraint
 {
-	enum { UP_RIGHT = 0, UP_LEFT, DOWN_LEFT, DOWN_RIGHT };
+	
 public:
 	enum { ROTATION_DRIVING = 0, TRANSLATION_DRIVING };
 	xDrivingConstraint();
@@ -37,8 +37,9 @@ public:
 	void DerivateEquation(xVectorD& v, xVectorD& q, xVectorD& qd, int sr, double ct, double mul);
 
 private:
-	double RelativeAngle(double ct, vector3d& gi, vector3d& fi, vector3d& fj);
+//	double RelativeAngle(double ct, vector3d& gi, vector3d& fi, vector3d& fj);
 	int udrl;
+	int d_udrl;
 	xstring name;
 	int type;
 	double plus_time;
@@ -54,6 +55,7 @@ private:
 
 	unsigned int n;
 	unsigned int n_rev;
+	unsigned int dn_rev;
 	unsigned int srow;
 	unsigned int nr_part;
 	xKinematicConstraint* kconst;

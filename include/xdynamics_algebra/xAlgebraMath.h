@@ -113,6 +113,9 @@ XDYNAMICS_API matrix33d operator* (const vector3d& v3, const vector3d& v3t);
 XDYNAMICS_API matrix33d operator/ (const matrix33d& m3x3, const double v);
 XDYNAMICS_API matrix43d operator* (const matrix34d& m4x3, const matrix33d& m3x3);
 XDYNAMICS_API matrix44d operator* (const matrix43d& m4x3, const matrix34d& m3x4);
+XDYNAMICS_API vector3d operator* (const euler_parameters& e, const matrix34d& m4x3);
+XDYNAMICS_API vector4d operator* (const euler_parameters& e, const matrix44d& m4x4);
+XDYNAMICS_API matrix34d operator* (const vector3d& v3, const vector4d& v4);
 
 // Declaration new vectors
 XDYNAMICS_API vector2i new_vector2i(int x, int y);

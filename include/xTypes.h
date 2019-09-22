@@ -198,7 +198,7 @@ enum xBoundaryTreatmentType
 	DUMMY_PARTICLE_METHOD = 0,
 	GHOST_PARTICLE_METHOD
 };
-
+enum { UP_RIGHT = 0, UP_LEFT, DOWN_LEFT, DOWN_RIGHT };
 enum xUnitType{ MKS = 0, MMKS };
 enum xGravityDirection{ PLUS_X = 0, PLUS_Y, PLUS_Z, MINUS_X, MINUS_Y, MINUS_Z };
 enum xSimulationStopType{ FORCE_MAGNITUDE = 0 };
@@ -220,6 +220,7 @@ typedef struct{ double Ei, Ej, Pri, Prj, Gi, Gj; }xMaterialPair;
 typedef struct{ double eq_e, eq_r, eq_m, eq_s, coh_r, coh_e, coh_s, kn, vn, ks, vs, fric, rfric, amp; }xContactParameters;
 typedef struct { double restitution, friction, rolling_friction, cohesion, stiffness_ratio, stiffness_multiplyer; }xContactMaterialParameters;
 typedef struct{ double spix, spiy, spiz, spjx, spjy, spjz, k, c, init_l; }xTSDAData;
+typedef struct { double lx, ly, lz, fix, fiy, fiz, gix, giy, giz, fjx, fjy, fjz, gjx, gjy, gjz, k, c, init_l; }xRSDAData;
 typedef struct{ int correction, dim, type; double factor; }xKernelFunctionData;
 typedef struct{ double p0x, p0y, p0z, p1x, p1y, p1z, nx, ny, nz; }xLineObjectData;
 typedef struct{ double xx, xy, xz, yy, yz, zz; }symatrix;

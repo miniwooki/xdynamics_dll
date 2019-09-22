@@ -156,18 +156,18 @@ void xUtilityFunctions::DirectoryFileList(const char* _path)
 //	return cstr;
 //}
 //
-// std::string xUtilityFunctions::WideChar2String(const wchar_t* wc)
-// {
-// 	int wLen;
-// 	char* cArr;
-// 
-// 	wLen = (int)wcslen(wc);
-// 	cArr = (char*)calloc(1, wLen * 2 + 1);
-// 	WideCharToMultiByte(CP_ACP, 0, wc, wLen, cArr, wLen * 2, 0, 0);
-// 	string cstr = cArr;
-// 	delete cArr;
-// 	return cstr;
-// }
+ std::string xUtilityFunctions::WideChar2String(const wchar_t* wc)
+ {
+ 	int wlen;
+ 	char* carr;
+ 
+ 	wlen = (int)wcslen(wc);
+ 	carr = (char*)calloc(1, wlen * 2 + 1);
+ 	WideCharToMultiByte(CP_ACP, 0, wc, wlen, carr, wlen * 2, 0, 0);
+ 	string cstr = carr;
+ 	delete carr;
+ 	return cstr;
+ }
 
 std::string xUtilityFunctions::GetDateTimeFormat(const char* format, int nseg)
 {
@@ -532,3 +532,56 @@ void xUtilityFunctions::DeleteFileByEXT(std::string path, std::string ext)
 	//	QFile::remove(deleteFilePath);
 	//}
 }
+
+double xUtilityFunctions::RelativeAngle(int udrl, double theta, unsigned int& n_rev, vector3d& gi, vector3d& fi, vector3d& fj)
+{
+	double df = dot(fi, fj);
+	double dg = dot(gi, fj);
+	double a = acos(dot(fi, fj));
+	double b = asin(dg);
+	double a_deg = a * 180 / M_PI;
+	double b_deg = b * 180 / M_PI;
+	double stheta = 0.0;
+	double p_theta = theta;
+	if ((df <= 0.2 && df > -0.8) && dg > 0) { udrl = UP_RIGHT;  stheta = acos(df); }
+	else if ((df < -0.8 && df >= -1.1 && dg > 0) || (df > -1.1 && df <= -0.2 && dg < 0)) { udrl = UP_LEFT; stheta = M_PI - asin(dg); }
+	else if ((df > -0.2 && df <= 0.8) && dg < 0) { udrl = DOWN_LEFT; stheta = 2.0 * M_PI - acos(df); }
+	else if ((df > 0.8 && df < 1.1 && dg < 0) || (df <= 1.1 && df > 0.2 && dg > 0)) { udrl = DOWN_RIGHT; stheta = 2.0 * M_PI + asin(dg); }
+	if (p_theta >= 2.0 * M_PI && stheta < 2.0 * M_PI)
+		n_rev--;
+	if (p_theta > M_PI && p_theta < 2.0 * M_PI && stheta >= 2.0 * M_PI)
+		n_rev++;
+
+	if (stheta >= 2.0 * M_PI)
+		stheta -= 2.0 * M_PI;
+	//std::cout << "stheta : " << stheta << std::endl;
+	return stheta;// xUtilityFunctions::AngleCorrection(prad, stheta);
+}
+
+//double xUtilityFunctions::DerivativeRelativeAngle(
+//	int udrl, double theta, unsigned int& n_rev, 
+//	vector3d& gi, vector3d& fi, vector3d& fj, 
+//	vector3d& dgi, vector3d& dfi, vector3d& dfj)
+//{
+//	double df = dot(fj, dfi) + dot(fi, dfj);
+//	double dg = dot(fj, dgi) + dot(gi, dfj);// dot(gi, fj);
+//	double a = -asin(df);
+//	double b = acos(dg);
+//	double a_deg = a * 180 / M_PI;
+//	double b_deg = b * 180 / M_PI;
+//	double stheta = 0.0;
+//	double p_theta = theta;
+//	if ((df <= 0.2 && df > -0.8) && dg > 0) { udrl = UP_RIGHT;  stheta = acos(df); }
+//	else if ((df < -0.8 && df >= -1.1 && dg > 0) || (df > -1.1 && df <= -0.2 && dg < 0)) { udrl = UP_LEFT; stheta = M_PI - asin(dg); }
+//	else if ((df > -0.2 && df <= 0.8) && dg < 0) { udrl = DOWN_LEFT; stheta = 2.0 * M_PI - acos(df); }
+//	else if ((df > 0.8 && df < 1.1 && dg < 0) || (df <= 1.1 && df > 0.2 && dg > 0)) { udrl = DOWN_RIGHT; stheta = 2.0 * M_PI + asin(dg); }
+//	if (p_theta >= 2.0 * M_PI && stheta < 2.0 * M_PI)
+//		n_rev--;
+//	if (p_theta > M_PI && p_theta < 2.0 * M_PI && stheta >= 2.0 * M_PI)
+//		n_rev++;
+//
+//	if (stheta >= 2.0 * M_PI)
+//		stheta -= 2.0 * M_PI;
+//	//std::cout << "stheta : " << stheta << std::endl;
+//	return stheta;// xUtilityFunctions::AngleCorrection(prad, stheta);
+//}

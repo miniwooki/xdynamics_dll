@@ -7,6 +7,7 @@
 #include "xNewDialog.h"
 #include "xLineEditWidget.h"
 #include "xListWidget.h"
+#include "xpass_distribution_dlg.h"
 #include "xCommandLine.h"
 #include "xChartWindow.h"
 #include "xColorControl.h"
@@ -450,8 +451,14 @@ void xdynamics_gui::xChart()
 	caction = CHART;
 	if (!xchart)
 	{
+		xResultManager* _xrm = xdm->XResult();
+		if (!_xrm)
+		{
+			xcw->write(xCommandWindow::CMD_INFO, "The analysis result does not exist.");
+			return;
+		}			
 		xchart = new xChartWindow(this);
-		xchart->setChartData(xdm);
+		xchart->setChartData(xdm->XResult());
 		xchart->show();
 		return;
 	}
@@ -634,6 +641,10 @@ void xdynamics_gui::setupObjectOperations()
 	connect(a, SIGNAL(triggered()), this, SLOT(xUploadResultThisModel()));
 	myObjectActions.insert(UPLOAD_RESULT, a);
 
+	a = new QAction(QIcon(":/Resources/icon/chart_passing.png"), tr("&Passing distribution"), this);
+	a->setStatusTip(tr("Distribution of particles passing area"));
+	connect(a, SIGNAL(triggered()), this, SLOT(xPassFiyribution()));
+	myObjectActions.insert(PASSING_DISTRIBUTION, a);
 // 	a = new QAction(QIcon(":/Resources/icon/save.png"), tr("&Save"), this);
 // 	a->setStatusTip(tr("Save project"));
 // 	connect(a, SIGNAL(triggered()), this, SLOT(xSave()));
@@ -832,6 +843,21 @@ void xdynamics_gui::xSelectStartPoint()
 	}
 }
 
+void xdynamics_gui::xPassDistribution()
+{
+	if (xdm->XResult())
+	{
+		xpass_distribution_dlg d(this);
+		d.setup(xdm->XResult());
+		int ret = d.exec();
+		if (ret)
+		{
+			xdm->XResult()->set_distribution_result(d.get_distribution_result().toStdList());
+		}
+	}
+	
+}
+
 void xdynamics_gui::xEditCommandLine()
 {
 	QLineEdit* e = (QLineEdit*)sender();
@@ -961,6 +987,7 @@ void xdynamics_gui::xReleaseResultCallThread()
 {
 	result_file_list = rThread->get_file_list();
 	xcw->write(xCommandWindow::CMD_INFO, "The loading process of analysis results has been terminated.");
+	myAnimationBar->update(xdm->XResult()->get_num_parts() - 1);
 	rThread->quit();
 	rThread->wait();
 	rThread->disconnect();
@@ -970,6 +997,7 @@ void xdynamics_gui::xReleaseResultCallThread()
 		delete pbar;
 		pbar = NULL;
 	}
+	
 }
 
 void xdynamics_gui::xContextMenuProcess(QString nm, contextMenuType vot)

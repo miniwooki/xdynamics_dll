@@ -3,13 +3,29 @@
 
 #include "xdynamics_decl.h"
 //#include "libxl.h"
-#include "ExcelFormat.h"
 #include "xstring.h"
+
+//#include <shellapi.h>
 //#include "xString."
 //#include <QtCore/QString>
 
 //using namespace libxl;.using namespace ExcelFormat;
-using namespace ExcelFormat;
+//using namespace ExcelFormat;
+namespace ExcelFormat
+{
+	struct XLSFormatManager;
+	
+}
+namespace YExcel
+{
+	class BasicExcel;
+	class BasicExcelWorksheet;
+}
+////namespace VExcel
+////{
+////	
+////}
+
 
 class xMultiBodyModel;
 class xDiscreteElementMethodModel;
@@ -41,7 +57,8 @@ public:
 	bool IsEmptyCell(int r, int c);
 
 	xstring SetupSheet(int idx);
-	xstring ReadStr(int r, int c);
+	std::string ReadStr(int r, int c);
+	double ReadNum(int r, int c);
 
 	void setViewExporter(xViewExporter* _xve);
 
@@ -63,8 +80,9 @@ private:
 	xRotationalAxialForceData ReadxRotationalAxialForceData(std::string& _name, int r, int& c);
 	//xSPHPlaneObjectData ReadSPHPlaneParticleData(std::string& _name, int r, int& c);
 	//B xls;
-	BasicExcel *xls;
-
+	ExcelFormat::XLSFormatManager* fmgr;
+	YExcel::BasicExcel* xls;
+	YExcel::BasicExcelWorksheet* sheet;
 	//Book* book;
 	//Sheet* sheet;
 	xViewExporter* xve;

@@ -516,6 +516,37 @@ matrix44d operator* (const matrix43d& m4x3, const matrix34d& m3x4)
 	};
 }
 
+vector3d operator* (const euler_parameters& e, const matrix34d& m4x3)
+{
+	return
+	{
+		e.e0 * m4x3.a00 + e.e1 * m4x3.a01 + e.e2 * m4x3.a02 + e.e3 * m4x3.a03,
+		e.e0 * m4x3.a10 + e.e1 * m4x3.a11 + e.e2 * m4x3.a12 + e.e3 * m4x3.a13,
+		e.e0 * m4x3.a20 + e.e1 * m4x3.a21 + e.e2 * m4x3.a22 + e.e3 * m4x3.a23
+	};
+}
+
+vector4d operator* (const euler_parameters& e, const matrix44d& m4x4)
+{
+	return
+	{
+		e.e0 * m4x4.a00 + e.e1 * m4x4.a01 + e.e2 * m4x4.a02 + e.e3 * m4x4.a03,
+		e.e0 * m4x4.a10 + e.e1 * m4x4.a11 + e.e2 * m4x4.a12 + e.e3 * m4x4.a13,
+		e.e0 * m4x4.a20 + e.e1 * m4x4.a21 + e.e2 * m4x4.a22 + e.e3 * m4x4.a23,
+		e.e0 * m4x4.a30 + e.e1 * m4x4.a31 + e.e2 * m4x4.a32 + e.e3 * m4x4.a33
+	};
+}
+
+matrix34d operator* (const vector3d& v3, const vector4d& v4)
+{
+	return
+	{
+		v3.x * v4.x, v3.x * v4.y, v3.x * v4.z, v3.x * v4.w,
+		v3.y * v4.x, v3.y * v4.y, v3.y * v4.z, v3.y * v4.w,
+		v3.z * v4.x, v3.z * v4.y, v3.z * v4.z, v3.z * v4.w
+	};
+}
+
 // Define dot product
 int dot(const vector3i &v1, const vector3i &v2) { return v1.x*v2.x + v1.y*v2.y + v1.z*v2.z; }
 unsigned int dot(const vector3ui &v1, const vector3ui &v2) { return v1.x*v2.x + v1.y*v2.y + v1.z*v2.z; }

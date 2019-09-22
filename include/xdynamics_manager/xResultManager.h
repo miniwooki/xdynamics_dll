@@ -7,6 +7,7 @@
 #include "xmap.hpp"
 #include "xlist.hpp"
 #include "xdynamics_object/xKinematicConstraint.h"
+#include <list>
 
 typedef xPointMass::pointmass_result struct_pmr;
 typedef xKinematicConstraint::kinematicConstraint_result struct_kcr;
@@ -33,13 +34,18 @@ public:
 	//bool initialize();
 	float get_min_result_value(xColorControl::ColorMapType cmt);
 	float get_max_result_value(xColorControl::ColorMapType cmt);
+	xlist<xstring>* get_part_file_list();
 	struct_pmr* get_mass_result_ptr(std::string n);
 	struct_kcr* get_joint_result_ptr(std::string n);
+	xmap<xstring, struct_pmr*>* get_mass_result_xmap();
+	xmap<xstring, struct_kcr*>* get_joint_result_xmap();
+	xlist<unsigned int>* get_distribution_id_list();
 	float* get_particle_position_result_ptr();
 	float* get_particle_velocity_result_ptr();
 	float* get_particle_color_result_ptr();
 	void set_num_generailzed_coordinates(unsigned int ng);
 	void set_num_constraints_equations(unsigned int nc);
+	void set_distribution_result(std::list<unsigned int> dl);
 	bool alloc_time_momory(unsigned int npart);
 	bool alloc_dem_result_memory(unsigned int np, unsigned int ns);
 	bool alloc_mass_result_memory(std::string name);
@@ -50,6 +56,7 @@ public:
 	bool save_generalized_coordinate_result(double *q, double *qd, double *q_1, double *rhs);
 	bool export_step_data_to_file(unsigned int pt, double ct);
 	void ExportPointMassResult2TXT(std::string n);
+	void export_joint_result_to_text(std::string n);
 	void setup_particle_buffer_color_distribution(xColorControl* xcc, int sframe, int cframe);
 
 	bool initialize_from_exist_results(std::string path);
@@ -79,6 +86,7 @@ private:
 	xmap<xstring, struct_pmr*> pmrs;
 	xmap<xstring, struct_kcr*> kcrs;
 	xlist<xstring> flist;
+	xlist<unsigned int> dist_id;
 	double* time;
 	float* ptrs;
 	float* vtrs;

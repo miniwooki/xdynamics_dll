@@ -80,7 +80,7 @@ void xAnimationTool::setup(xGLWidget* gl)
 	}
 	HSlider = new QSlider(Qt::Orientation::Horizontal, this);
 	HSlider->setFixedWidth(100);
-	connect(HSlider, SIGNAL(valueChanged(int)), this, SLOT(xChangeAnimationFrame()));
+	connect(HSlider, SIGNAL(valueChanged(int)), this, SLOT(xChangeAnimationSlider()));
  	connect(xgl, SIGNAL(changedAnimationFrame()), this, SLOT(xChangeAnimationFrame()));
 // 	connect(gl, SIGNAL(propertySignal(QString, context_object_type)), this, SLOT(propertySlot(QString, context_object_type)));
 // 	connect(db, SIGNAL(propertySignal(QString, context_object_type)), this, SLOT(propertySlot(QString, context_object_type)));
@@ -190,6 +190,8 @@ void xAnimationTool::xChangeAnimationSlider()
 		return;
 	//OnAnimationPause(xvAnimationController);
 	int value = HSlider->value();
+	xvAnimationController::setFrame(value);
+	xChangeAnimationFrame();
 }
 
 void xAnimationTool::OnAnimationPlay(int tp)

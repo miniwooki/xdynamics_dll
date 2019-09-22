@@ -14,14 +14,14 @@ class QStandardItemModel;
 class xCallOut;
 class QToolBar;
 class QLineEdit;
-class xDynamicsManager;
+class xResultManager;
 //class waveHeightSensor;
 
 class xChartWindow : public QMainWindow
 {
 	Q_OBJECT
 
-	enum ACTION_ID { WAVE_HEIGHT = 0 };
+	enum ACTION_ID { PASSING_DISTRIBUTION = 0 };
 
 	struct
 	{
@@ -30,12 +30,18 @@ class xChartWindow : public QMainWindow
 		double location;
 	}waveHeightInputData;
 
+	//struct
+	//{
+	//	double 
+	//	double area_y;
+	//}passing_distribution_data;
+
 public:
 	xChartWindow(QWidget* parent = NULL);
 	virtual ~xChartWindow();
 
 	//void setResultStorage(resultStorage* _rs);
-	void setChartData(xDynamicsManager* xdm);
+	bool setChartData(xResultManager* xdm);
 	void uploadingResults();
 	void joint_plot();
 	void body_plot();
@@ -48,7 +54,7 @@ public:
 	void updateTargetItem(int, QString);
 
 	private slots:
-	void click_waveHeight();
+	void click_passing_distribution();
 	void changeComboBoxItem(int);
 	void editingCommand();
 
@@ -85,7 +91,7 @@ private:
 	QDockWidget *commDock;
 	QLineEdit *comm;
 	//waveHeightSensor *whs;
-
+	//xResultManager* xrm;
 
 
 };

@@ -60,8 +60,8 @@ public:
 	QString plotTarget();
 	xResultManager* result_manager_ptr();
 	void upload_mbd_results(xMultiBodyModel* _xmbd);
-	QMap<QString, xPointMass::pointmass_result*>& MassResults() { return mass_results; }
-	QMap<QString, xKinematicConstraint::kinematicConstraint_result*>& JointResults() { return constraint_results; }
+	xPointMass::pointmass_result* MassResults(QString name);
+	xKinematicConstraint::kinematicConstraint_result* JointResults(QString name);// { return constraint_results; }
 
 	private slots:
 	void contextMenu(const QPoint&);

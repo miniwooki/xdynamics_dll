@@ -21,6 +21,13 @@ public:
 	xlist() : head(0), sz(0) {}
 	~xlist()
 	{
+		remove_all();
+	}
+
+	unsigned int size() { return sz; }
+
+	void remove_all()
+	{
 		xListNode *n = tail;
 		while (n != head)
 		{
@@ -34,6 +41,7 @@ public:
 			delete head;
 			head = NULL;
 		}
+		sz = 0;
 	}
 
 	void delete_all()

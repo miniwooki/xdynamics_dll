@@ -40,6 +40,12 @@
     <Filter Include="Source Files\widget">
       <UniqueIdentifier>{f94dedf1-79a3-4360-962e-c4a9a26b503b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\dialog">
+      <UniqueIdentifier>{27bdcfdf-ef66-48be-80f8-49c9ad1dd8cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\dialog">
+      <UniqueIdentifier>{43a14d48-4402-462e-a57f-b40ebf6d6489}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -138,6 +144,9 @@
     <ClCompile Include="..\source\xdynamics_gui\xListWidget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xpass_distribution_dlg.cpp">
+      <Filter>Source Files\dialog</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="..\include\xdynamics_gui\xGLWidget.h">
@@ -191,6 +200,9 @@
     <QtMoc Include="..\include\xdynamics_gui\xListWidget.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="..\include\xdynamics_gui\xpass_distribution_dlg.h">
+      <Filter>Header Files\dialog</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="xdynamics_gui.ui">
@@ -215,6 +227,9 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="wresult.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="xpass_distribution.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
@@ -295,6 +310,9 @@
     </ClInclude>
     <ClInclude Include="..\include\xColorControl.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_xpass_distribution.h">
+      <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

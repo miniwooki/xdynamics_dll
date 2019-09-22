@@ -1,5 +1,6 @@
 ﻿#include "xdynamics_object/xDrivingConstraint.h"
 #include "xdynamics_object/xKinematicConstraint.h"
+#include "xdynamics_algebra/xUtilityFunctions.h"
 #include <sstream>
 
 xDrivingConstraint::xDrivingConstraint()
@@ -12,8 +13,10 @@ xDrivingConstraint::xDrivingConstraint()
 	, kconst(NULL)
 	, n(0)
 	, n_rev(0)
+	, dn_rev(0)
 	, srow(0)
 	, udrl(0)
+	, d_udrl(0)
 {
 
 }
@@ -28,8 +31,10 @@ xDrivingConstraint::xDrivingConstraint(std::string _name, xKinematicConstraint* 
 	, kconst(_kc)
 	, n(0)
 	, n_rev(0)
+	, dn_rev(0)
 	, srow(0)
 	, udrl(0)
+	, d_udrl(0)
 {
 	if (kconst->Type() == xKinematicConstraint::REVOLUTE)
 		type = ROTATION_DRIVING;
@@ -232,7 +237,7 @@ void xDrivingConstraint::ConstraintJacobian(xSparseD& lhs, xVectorD& q, xVectorD
  		vector3d fi = Ai * kconst->Fi();
  		vector3d fj = Aj * kconst->Fj();
  		vector3d gi = Ai * kconst->Gi();
-		theta = RelativeAngle(ct, gi, fi, fj);
+		theta = xUtilityFunctions::RelativeAngle(udrl, theta, n_rev, gi, fi, fj);
 	//	std::cout << "driving angle : " << theta << std::endl;
 		vector4d D1 = kconst->relative_rotation_constraintJacobian_e_i(theta, ei, ej, fj);
 		vector4d D2 = kconst->relative_rotation_constraintJacobian_e_j(theta, ei, ej, fi, gi);
@@ -280,7 +285,7 @@ void xDrivingConstraint::DerivateJacobian(xMatrixD& lhs, xVectorD& q, xVectorD& 
 			Fi = Ai * kconst->Fi();
 			Fj = Aj * kconst->Fj();
 			Gi = Ai * kconst->Gi();
-			double th = RelativeAngle(ct, Gi, Fi, Fj);
+			double th = xUtilityFunctions::RelativeAngle(d_udrl, theta, dn_rev, Gi, Fi, Fj);
 			eqi[i] = kconst->relative_rotation_constraintJacobian_e_i(th, e[0], e[1], Fj);
 			eqj[i] = kconst->relative_rotation_constraintJacobian_e_j(th, e[0], e[1], Fi, Gi);
 		}
@@ -380,7 +385,7 @@ xKinematicConstraint::kinematicConstraint_result xDrivingConstraint::GetStepResu
 		vector3d fi = Ai * kconst->Fi();
 		vector3d fj = Aj * kconst->Fj();
 		vector3d gi = Ai * kconst->Gi();
-		theta = RelativeAngle(ct, gi, fi, fj);
+		//theta = xUtilityFunctions::RelativeAngle(ct, udrl, theta, n_rev, gi, fi, fj);
 		//	std::cout << "driving angle : " << theta << std::endl;
 		vector4d D1 = kconst->relative_rotation_constraintJacobian_e_i(theta, ei, ej, fj);
 		vector4d D2 = kconst->relative_rotation_constraintJacobian_e_j(theta, ei, ej, fi, gi);
@@ -436,43 +441,29 @@ void xDrivingConstraint::DerivateEquation(xVectorD& v, xVectorD& q, xVectorD& qd
 	}
 }
 
-double xDrivingConstraint::RelativeAngle(double ct, vector3d& gi, vector3d& fi, vector3d& fj)
-{
-	double df = dot(fi, fj);
-	double dg = dot(gi, fj);
-	double a = acos(dot(fi, fj));
-	double b = asin(dg);
-	double a_deg = a * 180 / M_PI;
-	double b_deg = b * 180 / M_PI;
-	double stheta = 0.0;
-	int p_udrl = udrl;
-	double p_theta = theta;
-	if ((df <= 0.2 && df > -0.8) && dg > 0) { udrl = UP_RIGHT;  stheta = acos(df); }
-	else if ((df < -0.8 && df >= -1.1 && dg > 0) || (df > -1.1 && df <= -0.2 && dg < 0)) { udrl = UP_LEFT; stheta = M_PI - asin(dg); }
-	else if ((df > -0.2 && df <= 0.8) && dg < 0) { udrl = DOWN_LEFT; stheta = 2.0 * M_PI - acos(df); }
-	else if ((df > 0.8 && df < 1.1 && dg < 0) || (df <= 1.1 && df > 0.2 && dg > 0)) { udrl = DOWN_RIGHT; stheta = 2.0 * M_PI + asin(dg); }
-//	else if (a < 0 && b < 0) stheta = M_PI + b;
-	//else if (a >= 0 && b < 0) stheta = 2.0 * M_PI - a;
-
-	/*double prad = 0.0;
-	if (start_time > ct)
-		prad = init_v + 0.0 * ct;
-	else
-		prad = init_v + cons_v * (ct - start_time + plus_time);
-	double ctr = 0.8 * M_PI + 0.5 * n * M_PI;
-	if (prad > ctr)
-		n++;*/
-	//d/*ouble s = M_PI_2 - asin(dot(gi, fj));
-	//double c = n * M_PI - acos(dot(fi, fj));
-	//double stheta = n * M_PI_2 + (n % 2  ? s : c);*/
-	if (p_theta >= 2.0 * M_PI && stheta < 2.0 * M_PI)
-		n_rev--;
-	if (p_theta > M_PI && p_theta < 2.0 * M_PI && stheta >= 2.0 * M_PI)
-		n_rev++;
-
-	if(stheta >= 2.0 * M_PI)
-		stheta -= 2.0 * M_PI;
-	//std::cout << "stheta : " << stheta << std::endl;
-	return stheta;// xUtilityFunctions::AngleCorrection(prad, stheta);
-}
+//double xDrivingConstraint::RelativeAngle(double ct, vector3d& gi, vector3d& fi, vector3d& fj)
+//{
+//	double df = dot(fi, fj);
+//	double dg = dot(gi, fj);
+//	double a = acos(dot(fi, fj));
+//	double b = asin(dg);
+//	double a_deg = a * 180 / M_PI;
+//	double b_deg = b * 180 / M_PI;
+//	double stheta = 0.0;
+//	int p_udrl = udrl;
+//	double p_theta = theta;
+//	if ((df <= 0.2 && df > -0.8) && dg > 0) { udrl = UP_RIGHT;  stheta = acos(df); }
+//	else if ((df < -0.8 && df >= -1.1 && dg > 0) || (df > -1.1 && df <= -0.2 && dg < 0)) { udrl = UP_LEFT; stheta = M_PI - asin(dg); }
+//	else if ((df > -0.2 && df <= 0.8) && dg < 0) { udrl = DOWN_LEFT; stheta = 2.0 * M_PI - acos(df); }
+//	else if ((df > 0.8 && df < 1.1 && dg < 0) || (df <= 1.1 && df > 0.2 && dg > 0)) { udrl = DOWN_RIGHT; stheta = 2.0 * M_PI + asin(dg); }
+//	if (p_theta >= 2.0 * M_PI && stheta < 2.0 * M_PI)
+//		n_rev--;
+//	if (p_theta > M_PI && p_theta < 2.0 * M_PI && stheta >= 2.0 * M_PI)
+//		n_rev++;
+//
+//	if(stheta >= 2.0 * M_PI)
+//		stheta -= 2.0 * M_PI;
+//	//std::cout << "stheta : " << stheta << std::endl;
+//	return stheta;// xUtilityFunctions::AngleCorrection(prad, stheta);
+//}
 

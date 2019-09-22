@@ -17,5 +17,6 @@
         <file>Resources/icon/cylinder.png</file>
         <file>Resources/icon/plot.png</file>
         <file>Resources/icon/upload_result.png</file>
+        <file>Resources/icon/chart_passing.png</file>
     </qresource>
 </RCC>

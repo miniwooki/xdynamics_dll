@@ -168,7 +168,7 @@ int xDynamicsManager::OpenModelXLS(const char* n)
 		{
 			vector2i d;
 			xstring tn = xls.ReadStr(0, c++);
-			xstring t = xls.ReadStr(0, c++).toStdString();
+			xstring t = xls.ReadStr(0, c++);
 			t.split(",", 2, &d.x);
 			d.x -= 1; d.y -= 1;
 			if (tn == "SHAPE") xx[XLS_SHAPE] = d;
@@ -198,12 +198,12 @@ int xDynamicsManager::OpenModelXLS(const char* n)
 
 		xve.Open(full_path + ".vmd");
 		xls.setViewExporter(&xve);
-		xls.Release();
+		//xls.Release();
 		try
 		{
 			for (; bt != et; bt++)
 			{
-				xls.Load(n);
+				//xls.Load(n);
 				switch (bt->first)
 				{
 				case XLS_SHAPE: xls.ReadShapeObject(xom, bt->second); break;
@@ -246,7 +246,7 @@ int xDynamicsManager::OpenModelXLS(const char* n)
 				case XLS_SIMULATION: xls.ReadSimulationCondition(bt->second); break;
 				case XLS_GRAVITY: xls.ReadInputGravity(bt->second); break;
 				}
-				xls.Release();
+			//	xls.Release();
 			}
 		}
 		catch (exception &e)

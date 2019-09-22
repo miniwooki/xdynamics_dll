@@ -46,10 +46,24 @@ QString xListWidget::get_selected_item()
 	return selected_item;
 }
 
+QStringList xListWidget::get_selected_items()
+{
+	return selected_items;
+}
+
 void xListWidget::click_ok()
 {
-	QListWidgetItem *citem = wlist->currentItem();
-	selected_item = citem->text();
+	QList<QListWidgetItem*> items = wlist->selectedItems();
+	if (items.size() == 1)
+	{
+		QListWidgetItem *citem = wlist->currentItem();
+		selected_item = citem->text();
+	}
+	foreach(QListWidgetItem* it, items)
+	{
+		selected_items.push_back(it->text());
+	}
+
 	this->close();
 	this->setResult(QDialog::Accepted);
 }

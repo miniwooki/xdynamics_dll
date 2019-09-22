@@ -7,6 +7,7 @@
 #include <iomanip>
 #include <filesystem>
 
+
 xResultManager::xResultManager()
 	: time(NULL)
 	, ptrs(NULL)
@@ -128,27 +129,44 @@ void xResultManager::ExportPointMassResult2TXT(std::string name)
 	struct_pmr* _pmr = it.value();
 	for(unsigned int i = 0 ; i < nparts; i++)//foreach(xPointMass::pointmass_result pr, *rst)
 	{
-		ifs << time[i] << std::endl;
+		ifs << time[i];
 		for (unsigned int j = 0; j < 49; j++)
 		{
-			double v = *(&(_pmr->pos.x) + j);
+			double v = *(&(_pmr[i].pos.x) + j);
 			ifs << v << " ";
 		}
 		ifs << std::endl;
 	}
 	ifs.close();
-	/*std::string rt_string;
-	stringstream ss(rt_string);
-	ss << name << " was exported to (" << new_file_name << ").";*/
+}
+
+void xResultManager::export_joint_result_to_text(std::string n)
+{
+	xmap<xstring, struct_kcr*>::iterator it = kcrs.find(n);
+	std::fstream ifs;
+	std::string new_file_name = xModel::makeFilePath(n + ".txt");
+	ifs.open(new_file_name, ios::out);
+	ifs << "time " << "locx " << "locy " << "locz "
+		<< "iafx " << "iafy " << "iafz " << "irfx " << "irfy " << "irfz "
+		<< "jafx " << "jafy " << "jafz " << "jrfx " << "jrfy " << "jrfz ";
+	struct_kcr* _kcr = it.value();
+	for (unsigned int i = 0; i < nparts; i++)
+	{
+		ifs << time[i];
+		for (unsigned int j = 0; j < 15; j++)
+		{
+			double v = *(&(_kcr[i].location.x) + j);
+			ifs << v << " ";
+		}
+		ifs << std::endl;
+	}
+	ifs.close();
 }
 
 void xResultManager::setup_particle_buffer_color_distribution(xColorControl* xcc, int sframe, int cframe)
 {
 	if (ctrs)
 	{
-		//int sframe = n < 0 ? 0 : xvAnimationController::getTotalBuffers();
-		//int cframe = xvAnimationController::getTotalBuffers();
-
 		xColorControl::ColorMapType cmt = xcc->Target();
 		if (!xcc->isUserLimitInput())
 			xcc->setMinMax(get_min_result_value(cmt), get_max_result_value(cmt));
@@ -382,6 +400,11 @@ float xResultManager::get_max_result_value(xColorControl::ColorMapType cmt)
 	return v;
 }
 
+xlist<xstring>* xResultManager::get_part_file_list()
+{
+	return &flist;
+}
+
 struct_pmr * xResultManager::get_mass_result_ptr(std::string n)
 {
 	xmap<xstring, struct_pmr*>::iterator it = pmrs.find(n);
@@ -396,6 +419,21 @@ struct_kcr * xResultManager::get_joint_result_ptr(std::string n)
 	if (it != kcrs.end())
 		return it.value();
 	return NULL;
+}
+
+xmap<xstring, struct_pmr*>* xResultManager::get_mass_result_xmap()
+{
+	return &pmrs;
+}
+
+xmap<xstring, struct_kcr*>* xResultManager::get_joint_result_xmap()
+{
+	return &kcrs;
+}
+
+xlist<unsigned int>* xResultManager::get_distribution_id_list()
+{
+	return &dist_id;
 }
 
 float * xResultManager::get_particle_position_result_ptr()
@@ -421,6 +459,18 @@ void xResultManager::set_num_generailzed_coordinates(unsigned int ng)
 void xResultManager::set_num_constraints_equations(unsigned int nc)
 {
 	nconstraints = nc;
+}
+
+void xResultManager::set_distribution_result(std::list<unsigned int> dl)
+{
+	if (dist_id.size())
+	{
+		dist_id.remove_all();
+	}
+	for (std::list<unsigned int>::iterator it = dl.begin(); it != dl.end(); it++)
+	{
+		dist_id.push_back(*it);
+	}
 }
 
 bool xResultManager::alloc_time_momory(unsigned int npart)
