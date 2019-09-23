@@ -16,7 +16,7 @@ public:
 	//~xDiscreteElementMethoSimulation();
 	virtual ~xDiscreteElementMethodSimulation();
 
-	virtual int Initialize(xDiscreteElementMethodModel* _xdem, xContactManager* _cm);
+	virtual int Initialize(xDiscreteElementMethodModel* _xdem, xContactManager* _cm, bool is_set_result_memory = false);
 	bool Initialized();
 	/*bool initialize_f(contactManager* _cm);*/
 	virtual int OneStepSimulation(double ct, unsigned int cstep) = 0;

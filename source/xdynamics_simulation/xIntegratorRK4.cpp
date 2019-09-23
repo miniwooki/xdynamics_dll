@@ -15,9 +15,9 @@ xIntegratorRK4::~xIntegratorRK4()
 	if (ccd) delete[] ccd; ccd = NULL;
 }
 
-int xIntegratorRK4::Initialize(xMultiBodyModel* xmbd)
+int xIntegratorRK4::Initialize(xMultiBodyModel* xmbd, bool is_set_result_memory)
 {
-	if (xMultiBodySimulation::Initialize(xmbd))
+	if (xMultiBodySimulation::Initialize(xmbd, is_set_result_memory))
 	{
 		return xDynamicsError::xdynamicsErrorMultiBodyModelInitialization;
 	}

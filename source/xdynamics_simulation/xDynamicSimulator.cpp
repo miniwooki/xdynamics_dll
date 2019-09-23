@@ -33,8 +33,8 @@ xDynamicsSimulator::xDynamicsSimulator(xDynamicsManager* _xdm)
 // 		xmbd = new xMultiBodySimulation;
 // 		xmbd->initialize(xdm->XMBDModel());
 // 	}
-	SET_GLOBAL_XDYNAMICS_MANAGER(_xdm);
-	SET_GLOBAL_XDYNAMICS_SIMULATOR(this);
+	//SET_GLOBAL_XDYNAMICS_MANAGER(_xdm);
+	//SET_GLOBAL_XDYNAMICS_SIMULATOR(this);
 }
 
 xDynamicsSimulator::~xDynamicsSimulator()
@@ -118,7 +118,7 @@ bool xDynamicsSimulator::xInitialize(
 		{
 			xLog::log("An uninitialized multibody model has been detected.");
 			//int ret = xmbd->Initialize(xdm->XMBDModel());
-			if (!checkXerror(xmbd->Initialize(xdm->XMBDModel())))
+			if (!checkXerror(xmbd->Initialize(xdm->XMBDModel(), !_sp)))
 			{
 				char id_mbd = 'm';
 				unsigned int mdim = xmbd->num_generalized_coordinate();
@@ -136,7 +136,7 @@ bool xDynamicsSimulator::xInitialize(
 		{
 			xLog::log("An uninitialized discrete element method model has been detected.");
 			//int ret = xdem->Initialize(xdm->XDEMModel(), xdm->XContact());
-			if (!checkXerror(xdem->Initialize(xdm->XDEMModel(), xdm->XContact())))
+			if (!checkXerror(xdem->Initialize(xdm->XDEMModel(), xdm->XContact(), !_sp)))
 			{
 				char id_dem = 'd';
 				unsigned int nparticle = xdem->num_particles();
@@ -279,6 +279,7 @@ bool xDynamicsSimulator::savePartData(double ct, unsigned int pt)
 	if (xdem)
 	{
 		xdem->SaveStepResult(pt);
+		//xdm->XContact()->SaveStepResult(pt);
 	}
 	if (xmbd)
 	{
@@ -411,6 +412,10 @@ double xDynamicsSimulator::set_from_part_result(std::string path)
 		//time[cnt] = ct;
 		if (np)
 		{
+			unsigned int _np = 0;
+			unsigned int _ns = 0;
+			fs.read((char*)&_np, sizeof(unsigned int));
+			fs.read((char*)&_ns, sizeof(unsigned int));
 			fs.read((char*)_pos, sizeof(double) * np * 4);
 			fs.read((char*)_vel, sizeof(double) * ns * 3);
 			fs.read((char*)_acc, sizeof(double) * ns * 3);

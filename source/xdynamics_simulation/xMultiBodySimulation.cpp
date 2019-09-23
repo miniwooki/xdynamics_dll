@@ -166,7 +166,7 @@ unsigned int xMultiBodySimulation::set_mbd_data(double * _q, double * _dq, doubl
 	return 0;
 }
 
-int xMultiBodySimulation::Initialize(xMultiBodyModel* _xmbd)
+int xMultiBodySimulation::Initialize(xMultiBodyModel* _xmbd, bool is_set_result_memory)
 {
 	//of = new std::fstream;
 	xmbd = _xmbd;
@@ -174,7 +174,8 @@ int xMultiBodySimulation::Initialize(xMultiBodyModel* _xmbd)
 	int nr = 0;
 	mdim = nm * xModel::OneDOF();
 	sdim = nm;
-	xDynamicsManager::This()->XResult()->set_num_generailzed_coordinates(mdim);
+	if (is_set_result_memory)
+		xDynamicsManager::This()->XResult()->set_num_generailzed_coordinates(mdim);
 	q.alloc(mdim + xModel::OneDOF());// = new double[mdim];
 	q_1.alloc(mdim + xModel::OneDOF());
 	qd.alloc(mdim + xModel::OneDOF());// = new double[mdim];
@@ -205,7 +206,8 @@ int xMultiBodySimulation::Initialize(xMultiBodyModel* _xmbd)
 		xpm->setupInertiaMatrix();
 		xpm->setupTransformationMatrix();
 	//	xpm->AllocResultMomory(xSimulation::npart);
-		xDynamicsManager::This()->XResult()->alloc_mass_result_memory(xpm->Name());
+		if(is_set_result_memory)
+			xDynamicsManager::This()->XResult()->alloc_mass_result_memory(xpm->Name());
 		it.next();
 	}
 	for (xmap<xstring, xKinematicConstraint*>::iterator it = xmbd->Joints().begin(); it != xmbd->Joints().end(); it.next())
@@ -219,13 +221,15 @@ int xMultiBodySimulation::Initialize(xMultiBodyModel* _xmbd)
 		xkc->setBaseBodyIndex(base_idx);
 		xkc->setActionBodyIndex(action_idx);
 		xkc->AllocResultMemory(xSimulation::npart);
-		xDynamicsManager::This()->XResult()->alloc_joint_result_memory(xkc->Name());
+		if (is_set_result_memory)
+			xDynamicsManager::This()->XResult()->alloc_joint_result_memory(xkc->Name());
 		//xkc->set
 	}
 	for (xmap<xstring, xDrivingConstraint*>::iterator it = xmbd->Drivings().begin(); it != xmbd->Drivings().end(); it.next())
 	{
 		it.value()->define(q);
-		xDynamicsManager::This()->XResult()->alloc_joint_result_memory(it.value()->Name());
+		if (is_set_result_memory)
+			xDynamicsManager::This()->XResult()->alloc_joint_result_memory(it.value()->Name());
 		sdim++;
 	}
 	for(xmap<xstring, xForce*>::iterator it = xmbd->Forces().begin(); it != xmbd->Forces().end(); it.next())
@@ -239,7 +243,8 @@ int xMultiBodySimulation::Initialize(xMultiBodyModel* _xmbd)
 		xf->setActionBodyIndex(action_idx);
 		//xf->setBaseLocalCoordinate();
 	}
-	xDynamicsManager::This()->XResult()->set_num_constraints_equations(sdim);
+	if (is_set_result_memory)
+		xDynamicsManager::This()->XResult()->set_num_constraints_equations(sdim);
 	dof = mdim - sdim;
 	std::stringstream wss;
 	wss << dof;

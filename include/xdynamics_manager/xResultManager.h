@@ -27,6 +27,7 @@ public:
 	unsigned int get_num_clusters();
 	unsigned int get_num_generalized_coordinates();
 	unsigned int get_num_constraint_equations();
+	unsigned int get_terminated_num_parts();
 	
 	double* get_times();
 	//void set_num_particles(unsigned int np);
@@ -46,6 +47,7 @@ public:
 	void set_num_generailzed_coordinates(unsigned int ng);
 	void set_num_constraints_equations(unsigned int nc);
 	void set_distribution_result(std::list<unsigned int> dl);
+	void set_terminated_num_parts(unsigned int _npt);
 	bool alloc_time_momory(unsigned int npart);
 	bool alloc_dem_result_memory(unsigned int np, unsigned int ns);
 	bool alloc_mass_result_memory(std::string name);
@@ -80,6 +82,7 @@ private:
 	unsigned int nparticles;
 	unsigned int nclusters;
 	unsigned int nparts;
+	unsigned int terminated_num_parts;
 	unsigned int ngeneralized_coordinates;
 	unsigned int nconstraints;
 	

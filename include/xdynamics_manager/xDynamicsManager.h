@@ -26,6 +26,7 @@ public:
 	bool getSimulatorFromCommand(int argc, char* argv[]);
 	void CreateModel(std::string str, modelType t, bool isOnAir = true);
 	void initialize_result_manager(unsigned int npt);
+	//void allocation_simulation_result_memory();
 	void release_result_manager();
 
 	xMultiBodyModel* XMBDModel();

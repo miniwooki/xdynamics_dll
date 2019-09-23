@@ -28,6 +28,7 @@ xResultManager::xResultManager()
 	, nclusters(0)
 	, ngeneralized_coordinates(0)
 	, nconstraints(0)
+	, terminated_num_parts(0)
 {
 
 }
@@ -104,6 +105,11 @@ unsigned int xResultManager::get_num_generalized_coordinates()
 unsigned int xResultManager::get_num_constraint_equations()
 {
 	return nconstraints;
+}
+
+unsigned int xResultManager::get_terminated_num_parts()
+{
+	return terminated_num_parts;
 }
 
 double * xResultManager::get_times()
@@ -314,6 +320,10 @@ bool xResultManager::upload_exist_results(std::string path)
 		time[cnt] = ct;
 		if (nparticles)
 		{
+			unsigned int _npt = 0;
+			unsigned int _nct = 0;
+			fs.read((char*)&_npt, sizeof(unsigned int));
+			fs.read((char*)&_nct, sizeof(unsigned int));
 			fs.read((char*)_pos, sizeof(double) * nparticles * 4);
 			fs.read((char*)_vel, sizeof(double) * nclusters * 3);			
 			fs.read((char*)_acc, sizeof(double) * nclusters * 3);
@@ -471,6 +481,11 @@ void xResultManager::set_distribution_result(std::list<unsigned int> dl)
 	{
 		dist_id.push_back(*it);
 	}
+}
+
+void xResultManager::set_terminated_num_parts(unsigned int _npt)
+{
+	terminated_num_parts = _npt;
 }
 
 bool xResultManager::alloc_time_momory(unsigned int npart)
@@ -656,6 +671,8 @@ bool xResultManager::export_step_data_to_file(unsigned int pt, double ct)
 		qf.write((char*)&ct, sizeof(double));
 		if (nparticles)
 		{
+			qf.write((char*)&nparticles, sizeof(unsigned int));
+			qf.write((char*)&nclusters, sizeof(unsigned int));
 			qf.write((char*)c_particle_pos, sizeof(double) * nparticles * 4);
 			qf.write((char*)c_particle_vel, sizeof(double) * nclusters * 3);
 			qf.write((char*)c_particle_acc, sizeof(double) * nclusters * 3);

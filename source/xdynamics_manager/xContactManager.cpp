@@ -332,6 +332,10 @@ void xContactManager::allocPairList(unsigned int np)
 	}
 }
 
+void xContactManager::SaveStepResult(unsigned int pt)
+{
+}
+
 void xContactManager::updateCollisionPair(
 	vector4d* pos, 
 	unsigned int* sorted_id,

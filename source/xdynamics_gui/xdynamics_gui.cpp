@@ -987,7 +987,10 @@ void xdynamics_gui::xReleaseResultCallThread()
 {
 	result_file_list = rThread->get_file_list();
 	xcw->write(xCommandWindow::CMD_INFO, "The loading process of analysis results has been terminated.");
-	myAnimationBar->update(xdm->XResult()->get_num_parts() - 1);
+	if(xdm->XResult()->get_terminated_num_parts())
+		myAnimationBar->update(xdm->XResult()->get_terminated_num_parts() - 1);
+	else
+		myAnimationBar->update(xdm->XResult()->get_num_parts() - 1);
 	rThread->quit();
 	rThread->wait();
 	rThread->disconnect();
@@ -1048,7 +1051,11 @@ void xdynamics_gui::xRunSimulationThread(double dt, unsigned int st, double et)
 		}
 	}
 	else
+	{
+		//xdm->allocation_simulation_result_memory();
 		setupBindingPointer();
+	}
+		
 	setupAnimationTool();
 	
 	if (xgl->vParticles())

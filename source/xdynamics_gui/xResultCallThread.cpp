@@ -34,6 +34,7 @@ void xResultCallThread::run()
 {
 	if (xdm && is_success_loading_model)
 	{
+		bool is_terminated = false;
 		xResultManager* xrm = xdm->XResult();
 		QString file_path;
 		QTextStream ss(&file_path);
@@ -56,8 +57,12 @@ void xResultCallThread::run()
 		}
 		emit result_call_send_progress(5, "");
 		if (xrm->get_num_parts() != _nparts)
+		{
 			emit result_call_send_progress(-1,
 				QString("!_This result of this analysis is not enough[%1 / %2]. This may mean that the interpretation was interrupted.").arg(_nparts).arg(xrm->get_num_parts()));
+			xrm->set_terminated_num_parts(_nparts);
+			is_terminated = true;
+		}			
 		else
 			emit result_call_send_progress(-1, QString("Detected part results are %1.").arg(_nparts));
 	//	std::fstream fs;
@@ -89,6 +94,10 @@ void xResultCallThread::run()
 			//time[cnt] = ct;
 			if (np)
 			{
+				unsigned int _npt = 0;
+				unsigned int _nct = 0;
+				fs.read((char*)&_npt, sizeof(unsigned int));
+				fs.read((char*)&_nct, sizeof(unsigned int));
 				fs.read((char*)_pos, sizeof(double) * np * 4);
 				fs.read((char*)_vel, sizeof(double) * ns * 3);
 				fs.read((char*)_acc, sizeof(double) * ns * 3);
@@ -164,7 +173,7 @@ void xResultCallThread::run()
 		double* _time = xrm->get_times();
 		for (unsigned int i = 0; i < xrm->get_num_parts(); i++)
 			xvAnimationController::addTime(i, static_cast<float>(_time[i]));
-		xvAnimationController::setTotalFrame(xrm->get_num_parts()-1);
+		xvAnimationController::setTotalFrame(is_terminated ? xrm->get_terminated_num_parts() - 1 : xrm->get_num_parts() - 1);
 		if (_cpos) delete[] _cpos;
 		if (_pos) delete[] _pos;
 		if (_vel) delete[] _vel;

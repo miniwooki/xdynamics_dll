@@ -333,6 +333,10 @@ void xDynamicsManager::initialize_result_manager(unsigned int npt)
 	xrm->alloc_time_momory(npt);
 }
 
+//void xDynamicsManager::allocation_simulation_result_memory()
+//{
+//}
+
 void xDynamicsManager::release_result_manager()
 {
 	if (xrm)

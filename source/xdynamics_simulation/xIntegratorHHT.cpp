@@ -48,9 +48,9 @@ double xIntegratorHHT::Tolerance()
 	return eps;
 }
 
-int xIntegratorHHT::Initialize(xMultiBodyModel* _xmbd)
+int xIntegratorHHT::Initialize(xMultiBodyModel* _xmbd, bool is_set_result_memory)
 {
-	if (xMultiBodySimulation::Initialize(_xmbd))
+	if (xMultiBodySimulation::Initialize(_xmbd, is_set_result_memory))
 	{
 		return xDynamicsError::xdynamicsErrorMultiBodyModelInitialization;
 	}

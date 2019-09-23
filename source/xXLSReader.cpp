@@ -538,37 +538,42 @@ void xXLSReader::ReadDEMParticle(xDiscreteElementMethodModel* xdem, xObjectManag
 			
 			if (!IsEmptyCell(rc.x, rc.y))
 			{
-				unsigned int np = 0;
-				unsigned int neach = 0;
-				unsigned int nstep = 0;
-				vector2i _rc = new_vector2i(0, 0);
 				xstring x = ReadStr(rc.x, rc.y);
-				if (x.size())// xUtilityFunctions::xsplit(ReadStr(rc.x, rc.y), ",", 2, &_rc.x))
+				std::string ext = xUtilityFunctions::FileExtension(x.text());
+				if(ext == ".bin")
 				{
-					x.split(",", 2, &_rc.x);
-					unsigned int _neach = 0;
-					_rc.x -= 1; _rc.y -= 1;
-					if (!IsEmptyCell(_rc.x, _rc.y))
+					std::string p_path = ReadStr(rc.x, rc.y);
+					xdem->XParticleManager()->SetCurrentParticlesFromPartResult(p_path);
+				}
+				else
+				{
+					unsigned int np = 0;
+					unsigned int neach = 0;
+					unsigned int nstep = 0;
+					vector2i _rc = new_vector2i(0, 0);
+
+					if (x.size())// xUtilityFunctions::xsplit(ReadStr(rc.x, rc.y), ",", 2, &_rc.x))
 					{
-						np = static_cast<unsigned int>(ReadNum(_rc.x, _rc.y++));
-						neach = static_cast<unsigned int>(ReadNum(_rc.x, _rc.y++));
-						nstep = static_cast<unsigned int>(ReadNum(_rc.x, _rc.y));
+						x.split(",", 2, &_rc.x);
+						unsigned int _neach = 0;
+						_rc.x -= 1; _rc.y -= 1;
+						if (!IsEmptyCell(_rc.x, _rc.y))
+						{
+							np = static_cast<unsigned int>(ReadNum(_rc.x, _rc.y++));
+							neach = static_cast<unsigned int>(ReadNum(_rc.x, _rc.y++));
+							nstep = static_cast<unsigned int>(ReadNum(_rc.x, _rc.y));
+						}
+						/*		if (!neach)
+									neach = npcircle;*/
+						if (neach && nstep)
+						{
+							xpo->setEachCount(xpo->NumParticle());
+							xParticleCreateCondition xpcc = { xpo->StartIndex(), np, neach, nstep };
+							xdem->XParticleManager()->AddParticleCreatingCondition(xpo, xpcc);
+						}
+						rc.y++;
 					}
-					/*		if (!neach)
-								neach = npcircle;*/
-					if (neach && nstep)
-					{
-						xpo->setEachCount(xpo->NumParticle());
-						xParticleCreateCondition xpcc = { xpo->StartIndex(), np, neach, nstep };
-						xdem->XParticleManager()->AddParticleCreatingCondition(xpo, xpcc);
-					}
-					rc.y++;
 				}				
-			}
-			if (!IsEmptyCell(rc.x, rc.y))
-			{
-				std::string p_path = ReadStr(rc.x, rc.y);
-				xdem->XParticleManager()->SetCurrentParticlesFromPartResult(p_path);
 			}
 			rc.x++;
 			rc.y = init_col;

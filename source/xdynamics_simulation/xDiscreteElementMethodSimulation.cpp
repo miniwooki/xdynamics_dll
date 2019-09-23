@@ -33,7 +33,8 @@ xDiscreteElementMethodSimulation::~xDiscreteElementMethodSimulation()
 	clearMemory();
 }
 
-int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _xdem, xContactManager* _xcm)
+int xDiscreteElementMethodSimulation::Initialize(
+	xDiscreteElementMethodModel* _xdem, xContactManager* _xcm, bool is_set_result_memory)
 {
 	xdem = _xdem;
 	double maxRadius = 0;
@@ -243,7 +244,8 @@ int xDiscreteElementMethodSimulation::Initialize(xDiscreteElementMethodModel* _x
 	}
 	if (isSaveMemory)
 		xdem->XParticleManager()->AllocParticleResultMemory(xSimulation::npart, np);
-	xDynamicsManager::This()->XResult()->alloc_dem_result_memory(np, ns);
+	if (is_set_result_memory)
+		xDynamicsManager::This()->XResult()->alloc_dem_result_memory(np, ns);
 	//dynamic_cast<neighborhood_cell*>(dtor)->reorderElements(pos, (double*)cm->HostSphereData(), np, nPolySphere);
 	return xDynamicsError::xdynamicsSuccess;
 }

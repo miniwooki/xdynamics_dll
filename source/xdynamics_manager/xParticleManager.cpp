@@ -385,15 +385,19 @@ void xParticleManager::SetCurrentParticlesFromPartResult(std::string path)
 		}
 		vector4d* m_pos = new vector4d[m_np];
 		vector3d* m_vel = new vector3d[m_ns];
+		vector3d* m_acc = new vector3d[m_ns];
 		vector4d* m_ep = new vector4d[m_ns];
 		vector4d* m_avel = new vector4d[m_ns];
+		vector4d* m_aavel = new vector4d[m_ns];
 		vector4d* m_cpos = NULL;
 		if (m_np != m_ns)
 			m_cpos = new vector4d[m_ns];
 		qf.read((char*)m_pos, sizeof(vector4d) * m_np);
 		qf.read((char*)m_vel, sizeof(vector3d) * m_ns);
+		qf.read((char*)m_acc, sizeof(vector3d) * m_ns);
 		qf.read((char*)m_ep, sizeof(vector4d) * m_ns);
 		qf.read((char*)m_avel, sizeof(vector4d) * m_ns);
+		qf.read((char*)m_aavel, sizeof(vector4d) * m_ns);
 		if(m_cpos)
 			qf.read((char*)m_cpos, sizeof(vector4d) * m_ns);
 		for(xmap<xstring, xParticleObject*>::iterator it = xpcos.begin(); it != xpcos.end(); it.next())//foreach(xParticleObject* xpo, xpcos)
@@ -416,8 +420,10 @@ void xParticleManager::SetCurrentParticlesFromPartResult(std::string path)
 		}
 		delete[] m_pos;
 		delete[] m_vel;
+		delete[] m_acc;
 		delete[] m_ep;
 		delete[] m_avel;
+		delete[] m_aavel;
 		if (m_cpos) delete[] m_cpos;
 		
 	}

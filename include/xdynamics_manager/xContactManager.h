@@ -57,6 +57,7 @@ public:
 
 	void update();
 	void allocPairList(unsigned int np);
+	void SaveStepResult(unsigned int pt);
 
 private:
 	void updateCollisionPair(

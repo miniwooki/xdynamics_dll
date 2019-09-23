@@ -18,7 +18,7 @@ public:
 	double AlphaValue();
 	double Tolerance();
 
-	virtual int Initialize(xMultiBodyModel* xmbd);
+	virtual int Initialize(xMultiBodyModel* xmbd, bool is_set_result_memory = false);
 	virtual int OneStepSimulation(double ct, unsigned int cstep);
 
 private:

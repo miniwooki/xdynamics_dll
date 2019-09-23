@@ -12,9 +12,9 @@ xKinematicAnalysis::~xKinematicAnalysis()
 
 }
 
-int xKinematicAnalysis::Initialize(xMultiBodyModel* xmbd)
+int xKinematicAnalysis::Initialize(xMultiBodyModel* xmbd, bool is_set_result_memory)
 {
-	if (xMultiBodySimulation::Initialize(xmbd))
+	if (xMultiBodySimulation::Initialize(xmbd, is_set_result_memory))
 	{
 		return xDynamicsError::xdynamicsErrorMultiBodyModelInitialization;
 	}
