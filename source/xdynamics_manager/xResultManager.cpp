@@ -24,6 +24,18 @@ xResultManager::xResultManager()
 	, c_generalized_coord_qd(NULL)
 	, c_generalized_coord_q_1(NULL)
 	, c_generalized_coord_rhs(NULL)
+	, p2p_contact_count(NULL)
+	, p2p_contact_id(NULL)
+	, p2p_contact_tsd(NULL)
+	, p2pl_contact_count(NULL)
+	, p2pl_contact_id(NULL)
+	, p2pl_contact_tsd(NULL)
+	, p2cyl_contact_count(NULL)
+	, p2cyl_contact_id(NULL)
+	, p2cyl_contact_tsd(NULL)
+	, p2tri_contact_count(NULL)
+	, p2tri_contact_id(NULL)
+	, p2tri_contact_tsd(NULL)
 	, nparticles(0)
 	, nclusters(0)
 	, ngeneralized_coordinates(0)
@@ -461,6 +473,11 @@ float * xResultManager::get_particle_color_result_ptr()
 	return ctrs;
 }
 
+void xResultManager::set_gpu_process_device(bool b)
+{
+	is_gpu_process = b;
+}
+
 void xResultManager::set_num_generailzed_coordinates(unsigned int ng)
 {
 	ngeneralized_coordinates = ng;
@@ -486,6 +503,26 @@ void xResultManager::set_distribution_result(std::list<unsigned int> dl)
 void xResultManager::set_terminated_num_parts(unsigned int _npt)
 {
 	terminated_num_parts = _npt;
+}
+
+void xResultManager::set_p2p_contact_data(int n)
+{
+	p2p_contact = n;
+}
+
+void xResultManager::set_p2pl_contact_data(int n)
+{
+	p2pl_contact = n;
+}
+
+void xResultManager::set_p2cyl_contact_data(int n)
+{
+	p2cyl_contact = n;
+}
+
+void xResultManager::set_p2tri_contact_data(int n)
+{
+	p2tri_contact = n;
 }
 
 bool xResultManager::alloc_time_momory(unsigned int npart)
@@ -657,6 +694,38 @@ bool xResultManager::save_generalized_coordinate_result(double * q, double * qd,
 	return true;
 }
 
+bool xResultManager::save_p2p_contact_data(unsigned int * count, unsigned int * id, double * tsd)
+{
+	p2p_contact_count = count;
+	p2p_contact_id = id;
+	p2p_contact_tsd = tsd;
+	return true;
+}
+
+bool xResultManager::save_p2pl_contact_data(unsigned int * count, unsigned int * id, double * tsd)
+{
+	p2pl_contact_count = count;
+	p2pl_contact_id = id;
+	p2pl_contact_tsd = tsd;
+	return true;
+}
+
+bool xResultManager::save_p2cyl_contact_data(unsigned int * count, unsigned int * id, double * tsd)
+{
+	p2cyl_contact_count = count;
+	p2cyl_contact_id = id;
+	p2cyl_contact_tsd = tsd;
+	return true;
+}
+
+bool xResultManager::save_p2tri_contact_data(unsigned int * count, unsigned int * id, double * tsd)
+{
+	p2tri_contact_count = count;
+	p2tri_contact_id = id;
+	p2tri_contact_tsd = tsd;
+	return true;
+}
+
 bool xResultManager::export_step_data_to_file(unsigned int pt, double ct)
 {
 	time[pt] = ct;
@@ -705,9 +774,33 @@ bool xResultManager::export_step_data_to_file(unsigned int pt, double ct)
 			qf.write((char*)c_generalized_coord_qd, sizeof(double) * mdim);
 			qf.write((char*)c_generalized_coord_q_1, sizeof(double) * mdim);
 			qf.write((char*)c_generalized_coord_rhs, sizeof(double) * tdim);
+		}	
+		if (p2p_contact)
+		{
+			qf.write((char*)p2p_contact_count, sizeof(unsigned int) * nparticles);
+			qf.write((char*)p2p_contact_id, sizeof(unsigned int) * nparticles * p2p_contact);
+			qf.write((char*)p2p_contact_tsd, sizeof(double) * 2 * nparticles * p2p_contact);
 		}
-		
+		if (p2pl_contact)
+		{
+			qf.write((char*)p2pl_contact_count, sizeof(unsigned int) * nparticles);
+			qf.write((char*)p2pl_contact_id, sizeof(unsigned int) * nparticles * p2pl_contact);
+			qf.write((char*)p2pl_contact_tsd, sizeof(double) * 2 * nparticles * p2pl_contact);
+		}
+		if (p2cyl_contact)
+		{
+			qf.write((char*)p2cyl_contact_count, sizeof(unsigned int) * nparticles);
+			qf.write((char*)p2cyl_contact_id, sizeof(unsigned int) * nparticles * p2cyl_contact);
+			qf.write((char*)p2cyl_contact_tsd, sizeof(double) * 2 * nparticles * p2cyl_contact);
+		}
+		if (p2tri_contact)
+		{
+			qf.write((char*)p2tri_contact_count, sizeof(unsigned int) * nparticles);
+			qf.write((char*)p2tri_contact_id, sizeof(unsigned int) * nparticles * p2tri_contact);
+			qf.write((char*)p2tri_contact_tsd, sizeof(double) * 2 * nparticles * p2tri_contact);
+		}
 	}
+	qf.close();
 	c_cluster_pos = NULL;
 	c_particle_pos = NULL;
 	c_particle_vel = NULL;

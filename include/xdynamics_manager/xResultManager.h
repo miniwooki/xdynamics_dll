@@ -44,10 +44,15 @@ public:
 	float* get_particle_position_result_ptr();
 	float* get_particle_velocity_result_ptr();
 	float* get_particle_color_result_ptr();
+	void set_gpu_process_device(bool b);
 	void set_num_generailzed_coordinates(unsigned int ng);
 	void set_num_constraints_equations(unsigned int nc);
 	void set_distribution_result(std::list<unsigned int> dl);
 	void set_terminated_num_parts(unsigned int _npt);
+	void set_p2p_contact_data(int n);
+	void set_p2pl_contact_data(int n);
+	void set_p2cyl_contact_data(int n);
+	void set_p2tri_contact_data(int n);
 	bool alloc_time_momory(unsigned int npart);
 	bool alloc_dem_result_memory(unsigned int np, unsigned int ns);
 	bool alloc_mass_result_memory(std::string name);
@@ -56,6 +61,10 @@ public:
 	bool save_mass_result(unsigned int i, xPointMass* pm);
 	bool save_joint_result(unsigned int i, std::string nm, struct_kcr _kcr);
 	bool save_generalized_coordinate_result(double *q, double *qd, double *q_1, double *rhs);
+	bool save_p2p_contact_data(unsigned int* count, unsigned int *id, double* tsd);
+	bool save_p2pl_contact_data(unsigned int* count, unsigned int *id, double* tsd);
+	bool save_p2cyl_contact_data(unsigned int* count, unsigned int *id, double* tsd);
+	bool save_p2tri_contact_data(unsigned int* count, unsigned int *id, double* tsd);
 	bool export_step_data_to_file(unsigned int pt, double ct);
 	void ExportPointMassResult2TXT(std::string n);
 	void export_joint_result_to_text(std::string n);
@@ -77,7 +86,7 @@ private:
 
 	xstring cur_path;// char cur_path[PATH_BUFFER_SIZE];
 	xstring cur_name;// char cur_name[NAME_BUFFER_SIZE];
-
+	bool is_gpu_process;
 	unsigned int allocated_size;
 	unsigned int nparticles;
 	unsigned int nclusters;
@@ -85,6 +94,10 @@ private:
 	unsigned int terminated_num_parts;
 	unsigned int ngeneralized_coordinates;
 	unsigned int nconstraints;
+	int p2p_contact;
+	int p2pl_contact;
+	int p2cyl_contact;
+	int p2tri_contact;
 	
 	xmap<xstring, struct_pmr*> pmrs;
 	xmap<xstring, struct_kcr*> kcrs;
@@ -116,6 +129,22 @@ private:
 	double *c_generalized_coord_qd;
 	double *c_generalized_coord_q_1;
 	double *c_generalized_coord_rhs;
+
+	unsigned int *p2p_contact_count;
+	unsigned int *p2p_contact_id;
+	double *p2p_contact_tsd;
+
+	unsigned int *p2pl_contact_count;
+	unsigned int *p2pl_contact_id;
+	double *p2pl_contact_tsd;
+
+	unsigned int *p2cyl_contact_count;
+	unsigned int *p2cyl_contact_id;
+	double *p2cyl_contact_tsd;
+
+	unsigned int *p2tri_contact_count;
+	unsigned int *p2tri_contact_id;
+	double *p2tri_contact_tsd;
 
 	struct_pmr c_struct_pmr;
 	struct_kcr c_struct_kcr;

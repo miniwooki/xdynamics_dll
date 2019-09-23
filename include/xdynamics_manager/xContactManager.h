@@ -57,7 +57,8 @@ public:
 
 	void update();
 	void allocPairList(unsigned int np);
-	void SaveStepResult(unsigned int pt);
+	void SaveStepResult(unsigned int pt, unsigned int np);
+	void set_from_part_result(std::fstream& fs);
 
 private:
 	void updateCollisionPair(
@@ -114,6 +115,20 @@ private:
 	double *d_tsd_ppl;
 	double *d_tsd_ptri;
 	double *d_tsd_pcyl;
+
+	unsigned int* pair_count_pp;
+	unsigned int* pair_count_ppl;
+	unsigned int* pair_count_ptri;
+	unsigned int* pair_count_pcyl;
+	unsigned int* pair_id_pp;
+	unsigned int* pair_id_ppl;
+	unsigned int* pair_id_ptri;
+	unsigned int* pair_id_pcyl;
+
+	double* tsd_pp;
+	double* tsd_ppl;
+	double* tsd_ptri;
+	double* tsd_pcyl;
 // 	unsigned int *d_old_pair_start;
 // 	unsigned int *d_pair_start;
 //	pair_data* d_pppd;

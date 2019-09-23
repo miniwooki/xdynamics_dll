@@ -166,6 +166,7 @@ bool xDynamicsSimulator::xInitialize(
 	if(!_sp)
 		savePartData(0, 0);
 	fs.close();
+	xdm->XResult()->set_gpu_process_device(xSimulation::Gpu());
 	return true;
 }
 
@@ -279,7 +280,7 @@ bool xDynamicsSimulator::savePartData(double ct, unsigned int pt)
 	if (xdem)
 	{
 		xdem->SaveStepResult(pt);
-		//xdm->XContact()->SaveStepResult(pt);
+		xdm->XContact()->SaveStepResult(pt, xdem->num_particles());
 	}
 	if (xmbd)
 	{
@@ -468,6 +469,10 @@ double xDynamicsSimulator::set_from_part_result(std::string path)
 		delete[] dq;
 		delete[] q_1;
 		delete[] rhs;
+	}
+	if (xdm->XContact())
+	{
+		xdm->XContact()->set_from_part_result(fs);
 	}
 	fs.close();
 	return ct;

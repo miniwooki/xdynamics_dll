@@ -5,6 +5,7 @@
 #include <thrust/reduce.h>
 #include <thrust/execution_policy.h>
 #include <list>
+#include "xdynamics_manager/xDynamicsManager.h"
 //#include <QtCore/QDebug>
 
 xContactManager::xContactManager()
@@ -25,6 +26,18 @@ xContactManager::xContactManager()
 	, d_tsd_ppl(NULL)
 	, d_tsd_ptri(NULL)
 	, d_tsd_pcyl(NULL)
+	, pair_count_pp(NULL)
+	, pair_count_ppl(NULL)
+	, pair_count_ptri(NULL)
+	, pair_count_pcyl(NULL)
+	, pair_id_pp(NULL)
+	, pair_id_ppl(NULL)
+	, pair_id_ptri(NULL)
+	, pair_id_pcyl(NULL)
+	, tsd_pp(NULL)
+	, tsd_ppl(NULL)
+	, tsd_ptri(NULL)
+	, tsd_pcyl(NULL)
 	, d_Tmax(NULL)
 	, d_RRes(NULL)
 	, xcpl(NULL)
@@ -64,6 +77,21 @@ xContactManager::~xContactManager()
 	if (d_tsd_pcyl) checkCudaErrors(cudaFree(d_tsd_pcyl)); d_tsd_pcyl = NULL;
 	if (d_Tmax) checkCudaErrors(cudaFree(d_Tmax)); d_Tmax = NULL;
 	if (d_RRes) checkCudaErrors(cudaFree(d_RRes)); d_RRes = NULL;
+
+	if (pair_count_pp) delete[] pair_count_pp; pair_count_pp = NULL;
+	if (pair_count_ppl) delete[] pair_count_ppl; pair_count_ppl = NULL;
+	if (pair_count_ptri) delete[] pair_count_ptri; pair_count_ptri = NULL;
+	if (pair_count_pcyl) delete[] pair_count_pcyl; pair_count_pcyl = NULL;
+	if (pair_id_pp) delete[] pair_id_pp; pair_id_pp = NULL;
+	if (pair_id_ppl) delete[] pair_id_ppl; pair_id_ppl = NULL;
+	if (pair_id_ptri) delete[] pair_id_ptri; pair_id_ptri = NULL;
+	if (pair_id_pcyl) delete[] pair_id_pcyl; pair_id_pcyl = NULL;
+	if (tsd_pp) delete[] tsd_pp; tsd_pp = NULL;
+	if (tsd_ppl) delete[] tsd_ppl; tsd_ppl = NULL;
+	if (tsd_ptri) delete[] tsd_ptri; tsd_ptri = NULL;
+	if (tsd_pcyl) delete[] tsd_pcyl; tsd_pcyl = NULL;
+	if (Tmax) delete[] Tmax; Tmax = NULL;
+	if (RRes) delete[] RRes; RRes = NULL;
 }
 
 
@@ -291,39 +319,55 @@ void xContactManager::allocPairList(unsigned int np)
 	{
 		if (cpp)
 		{
+			pair_count_pp = new unsigned int[np];
+			pair_id_pp = new unsigned int[np * MAX_P2P_COUNT];
+			tsd_pp = new double[2 * np * MAX_P2P_COUNT];
 			checkCudaErrors(cudaMalloc((void**)&d_pair_count_pp, sizeof(unsigned int) * np));
 			checkCudaErrors(cudaMalloc((void**)&d_pair_id_pp, sizeof(unsigned int) * np * MAX_P2P_COUNT));
 			checkCudaErrors(cudaMalloc((void**)&d_tsd_pp, sizeof(double2) * np * MAX_P2P_COUNT));
 			checkCudaErrors(cudaMemset(d_pair_count_pp, 0, sizeof(unsigned int) * np));
 			checkCudaErrors(cudaMemset(d_pair_id_pp, 0, sizeof(unsigned int) * np * MAX_P2P_COUNT));
 			checkCudaErrors(cudaMemset(d_tsd_pp, 0, sizeof(double2) * np * MAX_P2P_COUNT));
+			xDynamicsManager::This()->XResult()->set_p2p_contact_data((int)MAX_P2P_COUNT);
 		}
 		if (cpplane)
 		{
+			pair_count_ppl = new unsigned int[np];
+			pair_id_ppl = new unsigned int[np * MAX_P2PL_COUNT];
+			tsd_ppl = new double[2 * np * MAX_P2PL_COUNT];
 			checkCudaErrors(cudaMalloc((void**)&d_pair_count_ppl, sizeof(unsigned int) * np));
 			checkCudaErrors(cudaMalloc((void**)&d_pair_id_ppl, sizeof(unsigned int) * np * MAX_P2PL_COUNT));
 			checkCudaErrors(cudaMalloc((void**)&d_tsd_ppl, sizeof(double2) * np * MAX_P2PL_COUNT));
 			checkCudaErrors(cudaMemset(d_pair_count_ppl, 0, sizeof(unsigned int) * np));
 			checkCudaErrors(cudaMemset(d_pair_id_ppl, 0, sizeof(unsigned int) * np * MAX_P2PL_COUNT));
 			checkCudaErrors(cudaMemset(d_tsd_ppl, 0, sizeof(double2) * np * MAX_P2PL_COUNT));
+			xDynamicsManager::This()->XResult()->set_p2pl_contact_data((int)MAX_P2PL_COUNT);
 		}
 		if (cpcylinders)
 		{
+			pair_count_pcyl = new unsigned int[np];
+			pair_id_pcyl = new unsigned int[np * MAX_P2CY_COUNT];
+			tsd_pcyl = new double[2 * np * MAX_P2CY_COUNT];
 			checkCudaErrors(cudaMalloc((void**)&d_pair_count_pcyl, sizeof(unsigned int) * np));
 			checkCudaErrors(cudaMalloc((void**)&d_pair_id_pcyl, sizeof(unsigned int) * np * MAX_P2CY_COUNT));
 			checkCudaErrors(cudaMalloc((void**)&d_tsd_pcyl, sizeof(double2) * np * MAX_P2CY_COUNT));
 			checkCudaErrors(cudaMemset(d_pair_count_pcyl, 0, sizeof(unsigned int) * np));
 			checkCudaErrors(cudaMemset(d_pair_id_pcyl, 0, sizeof(unsigned int) * np * MAX_P2CY_COUNT));
 			checkCudaErrors(cudaMemset(d_tsd_pcyl, 0, sizeof(double2) * np * MAX_P2CY_COUNT));
+			xDynamicsManager::This()->XResult()->set_p2cyl_contact_data((int)MAX_P2CY_COUNT);
 		}
 		if (cpmeshes)
 		{
+			pair_count_ptri = new unsigned int[np];
+			pair_id_ptri = new unsigned int[np * MAX_P2MS_COUNT];
+			tsd_ptri = new double[2 * np * MAX_P2MS_COUNT];
 			checkCudaErrors(cudaMalloc((void**)&d_pair_count_ptri, sizeof(unsigned int) * np));
 			checkCudaErrors(cudaMalloc((void**)&d_pair_id_ptri, sizeof(unsigned int) * np * MAX_P2MS_COUNT));
 			checkCudaErrors(cudaMalloc((void**)&d_tsd_ptri, sizeof(double2) * np * MAX_P2MS_COUNT));
 			checkCudaErrors(cudaMemset(d_pair_count_ptri, 0, sizeof(unsigned int) * np));
 			checkCudaErrors(cudaMemset(d_pair_id_ptri, 0, sizeof(unsigned int) * np * MAX_P2MS_COUNT));
 			checkCudaErrors(cudaMemset(d_tsd_ptri, 0, sizeof(double2) * np * MAX_P2MS_COUNT));
+			xDynamicsManager::This()->XResult()->set_p2tri_contact_data((int)MAX_P2MS_COUNT);
 		}
 		checkCudaErrors(cudaMalloc((void**)&d_Tmax, sizeof(double3) * np));
 		checkCudaErrors(cudaMalloc((void**)&d_RRes, sizeof(double) * np));
@@ -332,8 +376,49 @@ void xContactManager::allocPairList(unsigned int np)
 	}
 }
 
-void xContactManager::SaveStepResult(unsigned int pt)
+void xContactManager::SaveStepResult(unsigned int pt, unsigned int np)
 {
+	/*unsigned int *count = NULL, *id = NULL;
+	double2 *tsd = NULL;*/
+	if (xSimulation::Gpu())
+	{
+		if (cpp)
+		{
+			checkCudaErrors(cudaMemcpy(pair_count_pp, d_pair_count_pp, sizeof(unsigned int) * np, cudaMemcpyDeviceToHost));
+			checkCudaErrors(cudaMemcpy(pair_id_pp, d_pair_id_pp, sizeof(unsigned int) * np * MAX_P2P_COUNT, cudaMemcpyDeviceToHost));
+			checkCudaErrors(cudaMemcpy(tsd_pp, d_tsd_pp, sizeof(double2) * np * MAX_P2P_COUNT, cudaMemcpyDeviceToHost));
+			xDynamicsManager::This()->XResult()->save_p2p_contact_data(pair_count_pp, pair_id_pp, tsd_pp);
+		}			
+		if (cpplane)
+		{
+			checkCudaErrors(cudaMemcpy(pair_count_ppl, d_pair_count_ppl, sizeof(unsigned int) * np, cudaMemcpyDeviceToHost));
+			checkCudaErrors(cudaMemcpy(pair_id_ppl, d_pair_id_ppl, sizeof(unsigned int) * np * MAX_P2PL_COUNT, cudaMemcpyDeviceToHost));
+			checkCudaErrors(cudaMemcpy(tsd_ppl, d_tsd_ppl, sizeof(double2) * np * MAX_P2PL_COUNT, cudaMemcpyDeviceToHost));
+			xDynamicsManager::This()->XResult()->save_p2pl_contact_data(pair_count_ppl, pair_id_ppl, tsd_ppl);
+		}			
+		if (cpcylinders)
+		{
+			checkCudaErrors(cudaMemcpy(pair_count_pcyl, d_pair_count_pcyl, sizeof(unsigned int) * np, cudaMemcpyDeviceToHost));
+			checkCudaErrors(cudaMemcpy(pair_id_pcyl, d_pair_id_pcyl, sizeof(unsigned int) * np * MAX_P2CY_COUNT, cudaMemcpyDeviceToHost));
+			checkCudaErrors(cudaMemcpy(tsd_pcyl, d_tsd_pcyl, sizeof(double2) * np * MAX_P2CY_COUNT, cudaMemcpyDeviceToHost));
+			xDynamicsManager::This()->XResult()->save_p2cyl_contact_data(pair_count_pcyl, pair_id_pcyl, tsd_pcyl);
+		}			
+		if (cpmeshes)
+		{
+			checkCudaErrors(cudaMemcpy(pair_count_ptri, d_pair_count_ptri, sizeof(unsigned int) * np, cudaMemcpyDeviceToHost));
+			checkCudaErrors(cudaMemcpy(pair_id_ptri, d_pair_id_ptri, sizeof(unsigned int) * np * MAX_P2MS_COUNT, cudaMemcpyDeviceToHost));
+			checkCudaErrors(cudaMemcpy(tsd_ptri, d_tsd_ptri, sizeof(double2) * np * MAX_P2MS_COUNT, cudaMemcpyDeviceToHost));
+			xDynamicsManager::This()->XResult()->save_p2tri_contact_data(pair_count_ptri, pair_id_ptri, tsd_ptri);
+		}			
+	}
+}
+
+void xContactManager::set_from_part_result(std::fstream & fs)
+{
+	if (cpp)
+	{
+
+	}
 }
 
 void xContactManager::updateCollisionPair(
