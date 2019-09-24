@@ -118,31 +118,31 @@ int xDiscreteElementMethodSimulation::Initialize(
 		xdem->XSpringDamperForce()->initializeFreeLength(pos, ep);
 	if (xSimulation::Gpu())
 	{
-		checkCudaErrors(cudaMemcpy(dpos, pos, sizeof(double) * np * 4, cudaMemcpyHostToDevice));
+		checkXerror(cudaMemcpy(dpos, pos, sizeof(double) * np * 4, cudaMemcpyHostToDevice));
 
-		checkCudaErrors(cudaMemcpy(dep, ep, sizeof(double) * ns * 4, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(dvel, vel, sizeof(double) * ns * 3, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(dacc, acc, sizeof(double) * ns * 3, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(davel, avel, sizeof(double) * ns * 4, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(daacc, aacc, sizeof(double) * ns * 4, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(dforce, force, sizeof(double) * np * 3, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(dmoment, moment, sizeof(double) * np * 3, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(dmass, mass, sizeof(double) * ns, cudaMemcpyHostToDevice));
+		checkXerror(cudaMemcpy(dep, ep, sizeof(double) * ns * 4, cudaMemcpyHostToDevice));
+		checkXerror(cudaMemcpy(dvel, vel, sizeof(double) * ns * 3, cudaMemcpyHostToDevice));
+		checkXerror(cudaMemcpy(dacc, acc, sizeof(double) * ns * 3, cudaMemcpyHostToDevice));
+		checkXerror(cudaMemcpy(davel, avel, sizeof(double) * ns * 4, cudaMemcpyHostToDevice));
+		checkXerror(cudaMemcpy(daacc, aacc, sizeof(double) * ns * 4, cudaMemcpyHostToDevice));
+		checkXerror(cudaMemcpy(dforce, force, sizeof(double) * np * 3, cudaMemcpyHostToDevice));
+		checkXerror(cudaMemcpy(dmoment, moment, sizeof(double) * np * 3, cudaMemcpyHostToDevice));
+		checkXerror(cudaMemcpy(dmass, mass, sizeof(double) * ns, cudaMemcpyHostToDevice));
 		//if(ns < np)
-		checkCudaErrors(cudaMemcpy(diner, inertia, sizeof(double) * ns * 3, cudaMemcpyHostToDevice));
+		checkXerror(cudaMemcpy(diner, inertia, sizeof(double) * ns * 3, cudaMemcpyHostToDevice));
 		/*else
 			checkCudaErrors(cudaMemcpy(diner, inertia, sizeof(double) * ((np - nMassParticle) + nMassParticle * 3), cudaMemcpyHostToDevice));*/
 		if (xci)
 		{
-			checkCudaErrors(cudaMemcpy(dcpos, cpos, sizeof(double) * ns * 4, cudaMemcpyHostToDevice));
-			checkCudaErrors(cudaMemcpy(dxci, xci, sizeof(xClusterInformation) * xpm->nClusterObject(), cudaMemcpyHostToDevice));
-			checkCudaErrors(cudaMemcpy(drcloc, rcloc, sizeof(double) * xpm->nClusterEach() * 3, cudaMemcpyHostToDevice));
+			checkXerror(cudaMemcpy(dcpos, cpos, sizeof(double) * ns * 4, cudaMemcpyHostToDevice));
+			checkXerror(cudaMemcpy(dxci, xci, sizeof(xClusterInformation) * xpm->nClusterObject(), cudaMemcpyHostToDevice));
+			checkXerror(cudaMemcpy(drcloc, rcloc, sizeof(double) * xpm->nClusterEach() * 3, cudaMemcpyHostToDevice));
 		}
 		if (nTsdaConnection && xdem->XSpringDamperForce()->xSpringDamperConnection())
 		{
-			checkCudaErrors(cudaMemcpy(dxsdci, xdem->XSpringDamperForce()->xSpringDamperConnection(), sizeof(xSpringDamperConnectionInformation) * nTsdaConnection, cudaMemcpyHostToDevice));
-			checkCudaErrors(cudaMemcpy(dxsdc_data, xdem->XSpringDamperForce()->xSpringDamperConnectionList(), sizeof(xSpringDamperConnectionData) * nTsdaConnectionList, cudaMemcpyHostToDevice));
-			checkCudaErrors(cudaMemcpy(dxsdc_kc, xdem->XSpringDamperForce()->xSpringDamperCoefficientValue(), sizeof(xSpringDamperCoefficient) * nTsdaConnectionValue, cudaMemcpyHostToDevice));
+			checkXerror(cudaMemcpy(dxsdci, xdem->XSpringDamperForce()->xSpringDamperConnection(), sizeof(xSpringDamperConnectionInformation) * nTsdaConnection, cudaMemcpyHostToDevice));
+			checkXerror(cudaMemcpy(dxsdc_data, xdem->XSpringDamperForce()->xSpringDamperConnectionList(), sizeof(xSpringDamperConnectionData) * nTsdaConnectionList, cudaMemcpyHostToDevice));
+			checkXerror(cudaMemcpy(dxsdc_kc, xdem->XSpringDamperForce()->xSpringDamperCoefficientValue(), sizeof(xSpringDamperCoefficient) * nTsdaConnectionValue, cudaMemcpyHostToDevice));
 			if (nTsdaConnectionBodyData)
 			{
 				dxsdc_body = xdem->XSpringDamperForce()->xSpringDamperBodyConnectionInformation();
@@ -168,7 +168,7 @@ int xDiscreteElementMethodSimulation::Initialize(
 						};
 					}
 				}
-				checkCudaErrors(cudaMemcpy(dxsd_cbd, htcbd, sizeof(device_tsda_connection_body_data) * nTsdaConnectionBodyData, cudaMemcpyHostToDevice));
+				checkXerror(cudaMemcpy(dxsd_cbd, htcbd, sizeof(device_tsda_connection_body_data) * nTsdaConnectionBodyData, cudaMemcpyHostToDevice));
 				delete[] htcbd;
 			}
 		/*	checkCudaErrors(cudaMemcpy(dxsdc_body, xdem->XSpringDamperForce()->xSpringDamperBodyConnectionInformation(), sizeof(xSpringDamperBodyConnectionInfo) * nTsdaConnectionBody, cudaMemcpyHostToDevice));
@@ -276,14 +276,14 @@ bool xDiscreteElementMethodSimulation::SaveStepResult(unsigned int pt)
 	}*/
 	if (xSimulation::Gpu())
 	{
-		checkCudaErrors(cudaMemcpy(pos, dpos, sizeof(double) * np * 4, cudaMemcpyDeviceToHost));
-		checkCudaErrors(cudaMemcpy(vel, dvel, sizeof(double) * ns * 3, cudaMemcpyDeviceToHost));
-		checkCudaErrors(cudaMemcpy(ep, dep, sizeof(double) * ns * 4, cudaMemcpyDeviceToHost));
-		checkCudaErrors(cudaMemcpy(avel, davel, sizeof(double) * ns * 4, cudaMemcpyDeviceToHost));
-		checkCudaErrors(cudaMemcpy(acc, dacc, sizeof(double) * ns * 3, cudaMemcpyDeviceToHost));
-		checkCudaErrors(cudaMemcpy(aacc, daacc, sizeof(double) * ns * 4, cudaMemcpyDeviceToHost));
+		checkXerror(cudaMemcpy(pos, dpos, sizeof(double) * np * 4, cudaMemcpyDeviceToHost));
+		checkXerror(cudaMemcpy(vel, dvel, sizeof(double) * ns * 3, cudaMemcpyDeviceToHost));
+		checkXerror(cudaMemcpy(ep, dep, sizeof(double) * ns * 4, cudaMemcpyDeviceToHost));
+		checkXerror(cudaMemcpy(avel, davel, sizeof(double) * ns * 4, cudaMemcpyDeviceToHost));
+		checkXerror(cudaMemcpy(acc, dacc, sizeof(double) * ns * 3, cudaMemcpyDeviceToHost));
+		checkXerror(cudaMemcpy(aacc, daacc, sizeof(double) * ns * 4, cudaMemcpyDeviceToHost));
 		if (np != ns)
-			checkCudaErrors(cudaMemcpy(cpos, dcpos, sizeof(double) * ns * 4, cudaMemcpyDeviceToHost));
+			checkXerror(cudaMemcpy(cpos, dcpos, sizeof(double) * ns * 4, cudaMemcpyDeviceToHost));
 	}
 	return xDynamicsManager::This()->XResult()->save_dem_result(pt, cpos, pos, vel, acc, ep, avel, aacc, np, ns);
  	/*std::string fname;
@@ -435,14 +435,14 @@ unsigned int xDiscreteElementMethodSimulation::set_dem_data(
 		memcpy(cpos, _cpos, sizeof(double) * ns * 4);
 	if (xSimulation::Gpu())
 	{
-		checkCudaErrors(cudaMemcpy(dpos, pos, sizeof(double) * np * 4, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(dvel, vel, sizeof(double) * ns * 3, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(dacc, acc, sizeof(double) * ns * 3, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(dep, ep, sizeof(double) * ns * 4, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(davel, avel, sizeof(double) * ns * 4, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(daacc, aacc, sizeof(double) * ns * 4, cudaMemcpyHostToDevice));
+		checkXerror(cudaMemcpy(dpos, pos, sizeof(double) * np * 4, cudaMemcpyHostToDevice));
+		checkXerror(cudaMemcpy(dvel, vel, sizeof(double) * ns * 3, cudaMemcpyHostToDevice));
+		checkXerror(cudaMemcpy(dacc, acc, sizeof(double) * ns * 3, cudaMemcpyHostToDevice));
+		checkXerror(cudaMemcpy(dep, ep, sizeof(double) * ns * 4, cudaMemcpyHostToDevice));
+		checkXerror(cudaMemcpy(davel, avel, sizeof(double) * ns * 4, cudaMemcpyHostToDevice));
+		checkXerror(cudaMemcpy(daacc, aacc, sizeof(double) * ns * 4, cudaMemcpyHostToDevice));
 		if(np != ns)
-			checkCudaErrors(cudaMemcpy(dcpos, cpos, sizeof(double) * ns * 4, cudaMemcpyHostToDevice));
+			checkXerror(cudaMemcpy(dcpos, cpos, sizeof(double) * ns * 4, cudaMemcpyHostToDevice));
 	}
 	else
 	{
@@ -509,25 +509,25 @@ void xDiscreteElementMethodSimulation::clearMemory()
 
 	if (xSimulation::Gpu())
 	{
-		if (dmass) checkCudaErrors(cudaFree(dmass)); dmass = NULL;
-		if (diner) checkCudaErrors(cudaFree(diner)); diner = NULL;
-		if (dpos) checkCudaErrors(cudaFree(dpos)); dpos = NULL;
-		if (dcpos) checkCudaErrors(cudaFree(dcpos)); dcpos = NULL;
-		if (dep) checkCudaErrors(cudaFree(dep)); dep = NULL;
+		if (dmass) checkXerror(cudaFree(dmass)); dmass = NULL;
+		if (diner) checkXerror(cudaFree(diner)); diner = NULL;
+		if (dpos) checkXerror(cudaFree(dpos)); dpos = NULL;
+		if (dcpos) checkXerror(cudaFree(dcpos)); dcpos = NULL;
+		if (dep) checkXerror(cudaFree(dep)); dep = NULL;
 		//if (drot) checkCudaErrors(cudaFree(drot)); drot = NULL;
-		if (dvel) checkCudaErrors(cudaFree(dvel)); dvel = NULL;
-		if (dacc) checkCudaErrors(cudaFree(dacc)); dacc = NULL;
-		if (davel) checkCudaErrors(cudaFree(davel)); davel = NULL;
-		if (daacc) checkCudaErrors(cudaFree(daacc)); daacc = NULL;
-		if (dforce) checkCudaErrors(cudaFree(dforce)); dforce = NULL;
-		if (dmoment) checkCudaErrors(cudaFree(dmoment)); dmoment = NULL;
-		if (dxci) checkCudaErrors(cudaFree(dxci)); dxci = NULL;
-		if (drcloc) checkCudaErrors(cudaFree(drcloc)); drcloc = NULL;
-		if (dxsdci) checkCudaErrors(cudaFree(dxsdci)); dxsdci = NULL;
-		if (dxsdc_data) checkCudaErrors(cudaFree(dxsdc_data)); dxsdc_data = NULL;
-		if (dxsdc_kc) checkCudaErrors(cudaFree(dxsdc_kc)); dxsdc_kc = NULL;
+		if (dvel) checkXerror(cudaFree(dvel)); dvel = NULL;
+		if (dacc) checkXerror(cudaFree(dacc)); dacc = NULL;
+		if (davel) checkXerror(cudaFree(davel)); davel = NULL;
+		if (daacc) checkXerror(cudaFree(daacc)); daacc = NULL;
+		if (dforce) checkXerror(cudaFree(dforce)); dforce = NULL;
+		if (dmoment) checkXerror(cudaFree(dmoment)); dmoment = NULL;
+		if (dxci) checkXerror(cudaFree(dxci)); dxci = NULL;
+		if (drcloc) checkXerror(cudaFree(drcloc)); drcloc = NULL;
+		if (dxsdci) checkXerror(cudaFree(dxsdci)); dxsdci = NULL;
+		if (dxsdc_data) checkXerror(cudaFree(dxsdc_data)); dxsdc_data = NULL;
+		if (dxsdc_kc) checkXerror(cudaFree(dxsdc_kc)); dxsdc_kc = NULL;
 		//if (dxsdc_body) checkCudaErrors(cudaFree(dxsdc_body)); dxsdc_body = NULL;
-		if (dxsd_cbd) checkCudaErrors(cudaFree(dxsd_cbd)); dxsd_cbd = NULL;
+		if (dxsd_cbd) checkXerror(cudaFree(dxsd_cbd)); dxsd_cbd = NULL;
 		//if (dxsd_free_length) checkCudaErrors(cudaFree(dxsd_free_length)); dxsd_free_length = NULL;
 	}
 }
@@ -561,25 +561,22 @@ void xDiscreteElementMethodSimulation::allocationMemory(unsigned int np, unsigne
 
 	if (xSimulation::Gpu())
 	{
-		checkCudaErrors(cudaMalloc((void**)&dmass, sizeof(double) * np));
-		checkCudaErrors(cudaMalloc((void**)&diner, sizeof(double) * np * 3));
-		/*if(np < rnp)
-			
-		else
-			checkCudaErrors(cudaMalloc((void**)&diner, sizeof(double) * ((np - nMassParticle) + nMassParticle * 3)));*/
-		checkCudaErrors(cudaMalloc((void**)&dpos, sizeof(double) * rnp * 4));
-		checkCudaErrors(cudaMalloc((void**)&dep, sizeof(double) * np * 4));
-		checkCudaErrors(cudaMalloc((void**)&dvel, sizeof(double) * np * 3));
-		checkCudaErrors(cudaMalloc((void**)&dacc, sizeof(double) * np * 3));
-		checkCudaErrors(cudaMalloc((void**)&davel, sizeof(double) * np * 4));
-		checkCudaErrors(cudaMalloc((void**)&daacc, sizeof(double) * np * 4));
-		checkCudaErrors(cudaMalloc((void**)&dforce, sizeof(double) * rnp * 3));
-		checkCudaErrors(cudaMalloc((void**)&dmoment, sizeof(double) * rnp * 3));
+		//cudaError_t err;		
+		checkXerror(cudaMalloc((void**)&dmass, sizeof(double) * np));
+		checkXerror(cudaMalloc((void**)&diner, sizeof(double) * np * 3));
+		checkXerror(cudaMalloc((void**)&dpos, sizeof(double) * rnp * 4));
+		checkXerror(cudaMalloc((void**)&dep, sizeof(double) * np * 4));
+		checkXerror(cudaMalloc((void**)&dvel, sizeof(double) * np * 3));
+		checkXerror(cudaMalloc((void**)&dacc, sizeof(double) * np * 3));
+		checkXerror(cudaMalloc((void**)&davel, sizeof(double) * np * 4));
+		checkXerror(cudaMalloc((void**)&daacc, sizeof(double) * np * 4));
+		checkXerror(cudaMalloc((void**)&dforce, sizeof(double) * rnp * 3));
+		checkXerror(cudaMalloc((void**)&dmoment, sizeof(double) * rnp * 3));
 		if (xdem->XParticleManager()->nClusterObject())
 		{
-			checkCudaErrors(cudaMalloc((void**)&dcpos, sizeof(double) * np * 4));
-			checkCudaErrors(cudaMalloc((void**)&dxci, sizeof(xClusterInformation) * xdem->XParticleManager()->nClusterObject()));
-			checkCudaErrors(cudaMalloc((void**)&drcloc, sizeof(double) * xdem->XParticleManager()->nClusterEach() * 3));
+			checkXerror(cudaMalloc((void**)&dcpos, sizeof(double) * np * 4));
+			checkXerror(cudaMalloc((void**)&dxci, sizeof(xClusterInformation) * xdem->XParticleManager()->nClusterObject()));
+			checkXerror(cudaMalloc((void**)&drcloc, sizeof(double) * xdem->XParticleManager()->nClusterEach() * 3));
 		}
 		
 		if (xdem->XSpringDamperForce())
@@ -589,11 +586,11 @@ void xDiscreteElementMethodSimulation::allocationMemory(unsigned int np, unsigne
 			nTsdaConnectionValue = xdem->XSpringDamperForce()->NumSpringDamperConnectionValue();
 			nTsdaConnectionBody = xdem->XSpringDamperForce()->NumSpringDamperBodyConnection();
 			nTsdaConnectionBodyData = xdem->XSpringDamperForce()->NumSpringDamperBodyConnectionData();
-			checkCudaErrors(cudaMalloc((void**)&dxsdci, sizeof(xSpringDamperConnectionInformation)*nTsdaConnection));
-			checkCudaErrors(cudaMalloc((void**)&dxsdc_data, sizeof(xSpringDamperConnectionData)* nTsdaConnectionList));
-			checkCudaErrors(cudaMalloc((void**)&dxsdc_kc, sizeof(xSpringDamperCoefficient) * nTsdaConnectionValue));
+			checkXerror(cudaMalloc((void**)&dxsdci, sizeof(xSpringDamperConnectionInformation)*nTsdaConnection));
+			checkXerror(cudaMalloc((void**)&dxsdc_data, sizeof(xSpringDamperConnectionData)* nTsdaConnectionList));
+			checkXerror(cudaMalloc((void**)&dxsdc_kc, sizeof(xSpringDamperCoefficient) * nTsdaConnectionValue));
 			if(nTsdaConnectionBodyData)
-				checkCudaErrors(cudaMalloc((void**)&dxsd_cbd, sizeof(device_tsda_connection_body_data) * nTsdaConnectionBodyData));
+				checkXerror(cudaMalloc((void**)&dxsd_cbd, sizeof(device_tsda_connection_body_data) * nTsdaConnectionBodyData));
 			//checkCudaErrors(cudaMalloc((void**)&dxsd_free_length, sizeof(double) * nTsdaConnectionList));
 		}		
 	}

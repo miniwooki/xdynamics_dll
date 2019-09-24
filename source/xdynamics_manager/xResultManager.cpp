@@ -7,7 +7,6 @@
 #include <iomanip>
 #include <filesystem>
 
-
 xResultManager::xResultManager()
 	: time(NULL)
 	, ptrs(NULL)
@@ -541,9 +540,17 @@ bool xResultManager::alloc_dem_result_memory(unsigned int np, unsigned int ns)
 	if (ptrs) delete[] ptrs; ptrs = NULL;
 	if (vtrs) delete[] vtrs; vtrs = NULL;
 	if (ctrs) delete[] ctrs; ctrs = NULL;
-	ptrs = new float[nparts * nparticles * 4]; memset(ptrs, 0, sizeof(float) * nparts * nparticles * 4);
-	vtrs = new float[nparts * nclusters * 3]; memset(vtrs, 0, sizeof(float) * nparts * nclusters * 3);
-	ctrs = new float[nparts * nclusters * 4]; memset(ctrs, 0, sizeof(float) * nparts * nclusters * 4);
+
+	ptrs = new float[nparts * nparticles * 4]; 
+	for (unsigned int i = 0; i < nparts * nparticles * 4; i++) ptrs[i] = 0.f;
+		//memset(ptrs, 0, sizeof(float) * nparts * nparticles * 4);
+	vtrs = new float[nparts * nclusters * 3]; 
+	for (unsigned int i = 0; i < nparts * nclusters * 3; i++) vtrs[i] = 0.f;
+		//memset(vtrs, 0, sizeof(float) * nparts * nclusters * 3);
+	ctrs = new float[nparts * nclusters * 4]; 
+	for (unsigned int i = 0; i < nparts * nclusters * 4; i++) ctrs[i] = 0.f;
+		//memset(ctrs, 0, sizeof(float) * nparts * nclusters * 4);
+	//throw runtime_error("error");
 	allocated_size += nparts * (nparticles * 4 + nclusters * 3 + nclusters * 4) * sizeof(float);
 	//memset(ptrs, 0, allocated_size);
 	return true;
@@ -593,7 +600,7 @@ bool xResultManager::save_dem_result(
 	if (np != ns)
 		neach = np / ns;
 	sid = np * i * 4;
-	vid = np * i * 3;
+	vid = ns * i * 3;
 	for (unsigned int j = 0; j < np; j++)
 	{
 		unsigned int s = j * 4;

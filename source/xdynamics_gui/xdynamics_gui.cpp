@@ -1041,7 +1041,17 @@ void xdynamics_gui::xRunSimulationThread(double dt, unsigned int st, double et)
 		deleteFileByEXT("bin");		
 		xvAnimationController::allocTimeMemory(xSimulation::npart);
 	}
-	sThread->xInitialize(xdm, dt, st, et, wsim->get_starting_part());
+	try
+	{
+		sThread->xInitialize(xdm, dt, st, et, wsim->get_starting_part());
+	}
+	catch (std::exception &e)
+	{
+		QString what = e.what();
+		xcw->write(xCommandWindow::CMD_ERROR, QString("Exception : ") + what);
+		xExitSimulationThread();
+		return;
+	}
 	if (wsim && wsim->get_enable_starting_point())
 	{
 		QString spath = wsim->get_starting_point_path();
@@ -1051,13 +1061,8 @@ void xdynamics_gui::xRunSimulationThread(double dt, unsigned int st, double et)
 		}
 	}
 	else
-	{
-		//xdm->allocation_simulation_result_memory();
 		setupBindingPointer();
-	}
-		
 	setupAnimationTool();
-	
 	if (xgl->vParticles())
 		xnavi->addChild(xModelNavigator::RESULT_ROOT, "Particles");
 

@@ -17,6 +17,7 @@ xSimulationThread::xSimulationThread()
 xSimulationThread::~xSimulationThread()
 {
 	if (xds) delete xds; xds = NULL;
+	
 // 	if (dem) delete dem; dem = NULL;
 // 	if (mbd) delete mbd; mbd = NULL;
 }

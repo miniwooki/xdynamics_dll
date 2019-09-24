@@ -41,6 +41,7 @@ xDynamicsSimulator::~xDynamicsSimulator()
 {
 	if (xmbd) delete xmbd; xmbd = NULL;
 	if (xdem) delete xdem; xdem = NULL;
+	xdm->release_result_manager();
 	//if (stop_condition) delete stop_condition; stop_condition = NULL;
 }
 
@@ -286,14 +287,6 @@ bool xDynamicsSimulator::savePartData(double ct, unsigned int pt)
 	{
 		xmbd->SaveStepResult(pt);
 	}
-	/*if (xdem)
-	{
-		xdem->SaveStepResult(pt, ct);
-		if (!xmbd)
-		{
-			xdm->XObject()->SaveResultCompulsionMovingObjects(ct);
-		}
-	}		*/
 	if (xsph)
 		xsph->SaveStepResult(pt, ct);
 	xdm->XResult()->export_step_data_to_file(pt, ct);
@@ -352,31 +345,37 @@ bool xDynamicsSimulator::checkStopCondition()
 
 bool xDynamicsSimulator::xRunSimulationThread(double ct, unsigned int cstep)
 {
-	
-	if (xsph)
-		if (checkXerror(xsph->OneStepSimulation(ct, cstep)))
-			return false;
-	if (xdem)
+	try
 	{
-		if (!xmbd)
-		{
-			xdm->XObject()->UpdateMovingObjects(xSimulation::dt);
-			xdem->updateObjectFromMBD();
-		}
-		else
-		{
-			xmbd->SetZeroBodyForce();
-		}
-		if (checkXerror(xdem->OneStepSimulation(ct, cstep)))
-			return false;
-	}
-	if (xmbd)
-	{
-		if (checkXerror(xmbd->OneStepSimulation(ct, cstep)))
-			return false;
+		if (xsph)
+			if (checkXerror(xsph->OneStepSimulation(ct, cstep)))
+				return false;
 		if (xdem)
-			xdem->updateObjectFromMBD();
-		//xmbd->SetZeroBodyForce();
+		{
+			if (!xmbd)
+			{
+				xdm->XObject()->UpdateMovingObjects(xSimulation::dt);
+				xdem->updateObjectFromMBD();
+			}
+			else
+			{
+				xmbd->SetZeroBodyForce();
+			}
+			if (checkXerror(xdem->OneStepSimulation(ct, cstep)))
+				return false;
+		}
+		if (xmbd)
+		{
+			if (checkXerror(xmbd->OneStepSimulation(ct, cstep)))
+				return false;
+			if (xdem)
+				xdem->updateObjectFromMBD();
+			//xmbd->SetZeroBodyForce();
+		}
+	}
+	catch (std::bad_alloc &e)
+	{
+
 	}
 	if (checkStopCondition())
 		xSimulation::triggerStopSimulation();
