@@ -1049,12 +1049,16 @@ __device__ double particle_plane_contact_detection(
 		u = -h_star / h;
 		return r - h;
 	}
-	double3 dp = xp - pe.xw;
-	double3 uu = pe.uw / length(pe.uw);
-	int pp = -sign(dot(dp, pe.uw));// dp.dot(pe.UW()));
-	u = -uu;
-	double collid_dist = r - abs(dot(dp, u));// dp.dot(u));
-	return collid_dist;
+	else if ((wp.x > 0 && wp.x < pe.l1) && (wp.y > 0 && wp.y < pe.l2))
+	{
+		double3 dp = xp - pe.xw;
+		double3 uu = pe.uw / length(pe.uw);
+		int pp = -sign(dot(dp, pe.uw));// dp.dot(pe.UW()));
+		u = -uu;
+		double collid_dist = r - abs(dot(dp, u));// dp.dot(u));
+		return collid_dist;
+	}
+	return 0;
 }
 
 __global__ void cluster_plane_contact_kernel(
