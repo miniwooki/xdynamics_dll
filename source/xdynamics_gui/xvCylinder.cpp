@@ -29,8 +29,8 @@ void xvCylinder::draw(GLenum eMode)
 	if (display){
 		glPolygonMode(GL_FRONT_AND_BACK, drawingMode);
 		glPushMatrix();
-		glDisable(GL_LIGHTING);
-		glColor3f(clr.redF(), clr.greenF(), clr.blueF());
+		//glDisable(GL_LIGHTING);
+		glColor4f(clr.redF(), clr.greenF(), clr.blueF(), blend_alpha);
 		if (eMode == GL_SELECT)
 			glLoadName((GLuint)ID());
 		bool isplaymode = (xvAnimationController::Play() || xvAnimationController::getFrame()) && xvObject::pmrs;
@@ -59,7 +59,7 @@ void xvCylinder::draw(GLenum eMode)
 			glLineWidth(1.0);
 		glCallList(glList);
 		glPopMatrix();
-		glEnable(GL_LIGHTING);
+		//glEnable(GL_LIGHTING);
 	}
 }
 
@@ -86,26 +86,38 @@ bool xvCylinder::define()
 		data.length = length(to);
 		double h_len = data.length * 0.5;
 		vector3d u = to / length(to);
-		vector3d pu = new_vector3d(-u.y, u.x, u.z);
+		/*vector3d _e = sin(M_PI * 0.5) * u;
+		double e0 = 1 - dot(_e, _e);
+		euler_parameters e = { e0, _e.x, _e.y, _e.z };
+		matrix33d A = GlobalTransformationMatrix(e);*/
+		vector3d pu = new_vector3d(-u.y, u.z, u.x);
 		vector3d qu = cross(u, pu);
 
 		matrix33d A = { u.x, pu.x, qu.x, u.y, pu.y, qu.y, u.z, pu.z, qu.z };
 		double radius = data.r_top + t;
-		glBegin(GL_LINE_STRIP);
+
+		glBegin(GL_TRIANGLE_FAN);
 		{
+			vector3d c = A * new_vector3d(h_len + t, 0, 0);
+			xVertex(c.x, c.y, c.z);
+			if(i) glNormal3f(u.x, u.y, u.z);
 			for (int i = 0; i < iter + 1; i++) {
 				double rad = angle * i;
 				vector3d q = A * new_vector3d(h_len + top_t, sin(rad) * radius, cos(rad) * radius);
+				
 				xVertex(q.x, q.y, q.z);
 			}
 		}
 		glEnd();
-		glBegin(GL_LINE_STRIP);
+		glBegin(GL_TRIANGLE_FAN);
 		{
-
+			vector3d c = A * new_vector3d(-h_len - t, 0, 0);
+			xVertex(c.x, c.y, c.z);
+			if (i) glNormal3f(-u.x, -u.y, -u.z);
 			for (int i = 0; i < iter + 1; i++) {
 				double rad = angle * i;
 				vector3d q = A * new_vector3d(-h_len - bottom_t, sin(-rad) * radius, cos(-rad) * radius);
+				
 				xVertex(q.x, q.y, q.z);
 			}
 		}
@@ -116,6 +128,9 @@ bool xvCylinder::define()
 				double rad = angle * i;
 				vector3d q1 = A * new_vector3d(h_len + top_t, sin(rad) * radius, cos(rad) * radius);
 				vector3d q2 = A * new_vector3d(-h_len - bottom_t, sin(rad) * radius, cos(rad) * radius);
+				vector3d us = 0.5 * (q1 - (A * new_vector3d(h_len + top_t, 0, 0)));
+				us = us / length(us);
+				if (i) glNormal3f(us.x, us.y, us.z);
 				xVertex(q2.x, q2.y, q2.z);
 				xVertex(q1.x, q1.y, q1.z);
 			}

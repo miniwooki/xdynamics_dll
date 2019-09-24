@@ -14,9 +14,10 @@ public:
 	static void releaseLogSystem();
 	static void launchLogSystem(std::string d);
 	static void log(std::string txt);
-
+	static const char* getLogText();
 private:
 	static std::ofstream *qf;
+	static char logtext[255];
 };
 
 #endif

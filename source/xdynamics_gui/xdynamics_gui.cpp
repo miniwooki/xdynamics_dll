@@ -531,12 +531,16 @@ QString xdynamics_gui::ReadXLSFile(QString xls_path)
 	{
 		xdm = new xDynamicsManager;
 		//xnavi->setDynamicManager(xdm);
-	}		
-	if (checkXerror(xdm->OpenModelXLS(xls_path.toStdString().c_str())))
+	}
+	try
+	{
+		checkXerror(xdm->OpenModelXLS(xls_path.toStdString().c_str()));
+	}
+	catch (std::exception &e)
 	{
 		delete xdm;
 		xdm = NULL;
-		xcw->write(xCommandWindow::CMD_ERROR, "Error in xls file\nCheck log file.");
+		xcw->write(xCommandWindow::CMD_ERROR, xLog::getLogText());
 		return "";
 	}
 	int begin = xls_path.lastIndexOf("/");

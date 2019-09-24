@@ -8,6 +8,8 @@
 #include "xdynamics_simulation/xSimulation.h"
 #include "ExcelFormat.h"
 
+#include <sstream>
+
 //using namespace ExcelFormat;
 //static BasicExcel *xls;
 //static XLSFormatManager *fmgr;
@@ -238,6 +240,14 @@ xCylinderObjectData xXLSReader::ReadCylinderObjectData(std::string& _name, int m
 	if (x == "top") d.empty = xCylinderObject::TOP_CIRCLE;
 	else if (x == "bottom") d.empty = xCylinderObject::BOTTOM_CIRCLE;
 	else if (x == "radial") d.empty = xCylinderObject::RADIAL_WALL;
+	else if (x == "noempty") d.empty = xCylinderObject::NO_EMPTY_PART;
+	else
+	{
+		std::string s;
+		stringstream ss(s);
+		ss << "Unsupported cylinder[" << _name << "] empty information.";
+		throw runtime_error(ss.str().c_str());
+	}
 	if (xve)
 	{
 		int t = VCYLINDER;
@@ -614,14 +624,18 @@ void xXLSReader::ReadContact(xContactManager* xcm, vector2i rc)
 			std::string obj0 = ReadStr(rc.x, rc.y++);
 			std::string obj1 = ReadStr(rc.x, rc.y++);
 			xContactParameterData d = ReadContactData(name, rc.x, rc.y);
+			xObject* obj0_ptr = xObjectManager::XOM()->XObject(obj0);
+			xObject* obj1_ptr = xObjectManager::XOM()->XObject(obj1);
+			if (obj0_ptr == NULL)
+				throw runtime_error(std::string("You have defined a contact[") + name + "] for an object[" + obj0 + "] that does not exist.");
+			if (obj1_ptr == NULL)
+				throw runtime_error(std::string("You have defined a contact[") + name + "] for an object[" + obj1 + "] that does not exist.");
 			xContact* xc = xcm->CreateContactPair(
 				name,
 				method,
-				xObjectManager::XOM()->XObject(obj0),
-				xObjectManager::XOM()->XObject(obj1),
+				obj0_ptr,
+				obj1_ptr,
 				d);
-			if (!xc)
-				throw runtime_error("Runtime error in xXLSReader::ReadContact");
 			rc.x++;
 			rc.y = 0;
 		}
@@ -698,6 +712,13 @@ void xXLSReader::ReadShapeObject(xObjectManager* xom, vector2i rc)
 				xve->Write((char*)file.c_str(), sizeof(char)*ns);
 				xmo->exportMeshData(file);
 				//xmo->splitTriangles(fsz);
+			}
+			else
+			{
+				std::string s;
+				stringstream ss(s);
+				ss << "Unsupported shape[" << name << "] type.";
+				throw runtime_error(ss.str().c_str());
 			}
 			if (!IsEmptyCell(rc.x, rc.y))
 			{
@@ -810,7 +831,15 @@ xstring xXLSReader::SetupSheet(int idx)
 std::string xXLSReader::ReadStr(int r, int c)
 {
 	YExcel::BasicExcelCell* cell = sheet->Cell(r, c);
-	std::string s = cell->GetString();
+	const char* s = cell->GetString();
+	if (s == NULL)
+	{
+		std::string out;
+		stringstream ss(out);
+		ss << "Cell[" << r << ", " << c << "] is not string type.";
+		throw runtime_error(ss.str().c_str());
+	}
+		
 	//CellFormat fmt(*fmgr, cell);
 
 	////			cout << " - xf_idx=" << cell->GetXFormatIdx();
@@ -826,13 +855,20 @@ std::string xXLSReader::ReadStr(int r, int c)
 	//std::string s = xUtilityFunctions::WideChar2String(fmt_string.c_str());
 	/*if (sheet)
 		s = ReadStr(r, c);*/
-	return s;
+	return std::string(s);
 }
 
 double xXLSReader::ReadNum(int r, int c)
 {
 	YExcel::BasicExcelCell* cell = sheet->Cell(r, c);
 	double s = cell->GetDouble();
+	if (s == FLT_MAX)
+	{
+		std::string out;
+		stringstream ss(out);
+		ss << "Cell[" << r << ", " << c << "] is not number type.";
+		throw runtime_error(ss.str().c_str());
+	}
 	return  s;
 }
 

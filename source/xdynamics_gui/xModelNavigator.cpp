@@ -370,6 +370,7 @@ void wview::setupColor()
 void wview::changeTransparency(int c)
 {
 	xo->setBlendAlpha((100 - c) * 0.01);
+	LETransparency->setText(QString("%1").arg(c));
 }
 
 void wview::colorPalette()

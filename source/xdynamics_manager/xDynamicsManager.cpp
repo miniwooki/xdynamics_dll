@@ -10,6 +10,7 @@
 #include <map>
 #include <typeinfo>
 #include <stdexcept>
+#include <sstream>
 
 static xDynamicsManager* xdmanager;
 
@@ -184,26 +185,31 @@ int xDynamicsManager::OpenModelXLS(const char* n)
 		}
 		std::map<xXlsInputDataType, vector2i>::iterator bt = xx.begin();
 		std::map<xXlsInputDataType, vector2i>::iterator et = xx.end();
+		for (; bt != et; bt++)
+		{
+			bool is_empty_cell = xls.IsEmptyCell(bt->second.x, bt->second.y);
+			if (is_empty_cell)
+			{
+				std::string s;
+				stringstream ss(s);
+				ss << "Exception in excel reader : Information cell[" << bt->second.x << ", " << bt->second.y << "] of " << NameOfXLSPart(bt->first) << " is empty.";
+				xLog::log(ss.str().c_str());
+				return xDynamicsError::xdynamicsErrorExcelModelingData;
+			}
+		}
+		bt = xx.begin();
  		std::string model_name = xModel::name.toStdString();
  		std::string full_path = xModel::path.toStdString() + model_name + "/" + model_name;
 		std::string dDir = full_path;
-		/*QDir dir = QDir(dDir);
-		QStringList delFileList;
-		delFileList = dir.entryList(QStringList("*.*"), QDir::Files | QDir::NoSymLinks);
-		for (int i = 0; i < delFileList.length(); i++){
-			QString deleteFilePath = dDir + delFileList[i];
-			QFile::remove(deleteFilePath);
-		}*/
 		xViewExporter xve;
 
 		xve.Open(full_path + ".vmd");
+		
 		xls.setViewExporter(&xve);
-		//xls.Release();
 		try
 		{
 			for (; bt != et; bt++)
 			{
-				//xls.Load(n);
 				switch (bt->first)
 				{
 				case XLS_SHAPE: xls.ReadShapeObject(xom, bt->second); break;
@@ -228,7 +234,6 @@ int xDynamicsManager::OpenModelXLS(const char* n)
 						{
 							xls.ReadSPHParticle(xsph, bt->second);
 							xsph->CreateParticles(xom);
-							//xsph->CreateParticles(xom);
 						}
 						else
 						{
@@ -246,7 +251,6 @@ int xDynamicsManager::OpenModelXLS(const char* n)
 				case XLS_SIMULATION: xls.ReadSimulationCondition(bt->second); break;
 				case XLS_GRAVITY: xls.ReadInputGravity(bt->second); break;
 				}
-			//	xls.Release();
 			}
 		}
 		catch (exception &e)

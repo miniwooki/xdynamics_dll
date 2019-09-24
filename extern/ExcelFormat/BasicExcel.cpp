@@ -6673,7 +6673,7 @@ namespace YExcel
 		if (Get(val))
 			return val;
 		else
-			return 0;
+			return INT_MAX;
 	}
 
 	// Get a double value.
@@ -6685,7 +6685,7 @@ namespace YExcel
 		if (Get(val))
 			return val;
 		else
-			return 0.0;
+			return FLT_MAX;
 	}
 
 	// Get an ANSI string.

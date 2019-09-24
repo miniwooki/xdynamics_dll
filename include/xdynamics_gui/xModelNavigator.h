@@ -51,6 +51,10 @@ public:
 	wview(QWidget* parent = NULL) : QWidget(parent) 
 	{ 
 		setupUi(this);
+		HSRed->setMaximum(255);
+		HSGreen->setMaximum(255);
+		HSBlue->setMaximum(255);
+		LETransparency->setText("0");
 		connect(HSTransparency, SIGNAL(valueChanged(int)), this, SLOT(changeTransparency(int)));
 		connect(PBPalette, SIGNAL(clicked()), this, SLOT(colorPalette()));
 		connect(HSRed, SIGNAL(valueChanged(int)), this, SLOT(changeRedColor(int)));

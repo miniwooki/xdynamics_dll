@@ -68,6 +68,20 @@ enum xMaterialType
 	USER_INPUT 
 };
 
+enum xXlsInputDataType
+{
+	XLS_KERNEL = 0,
+	XLS_SHAPE,
+	XLS_MASS,
+	XLS_JOINT,
+	XLS_PARTICLE,
+	XLS_FORCE,
+	XLS_CONTACT,
+	XLS_INTEGRATOR,
+	XLS_SIMULATION,
+	XLS_GRAVITY
+};
+
 inline std::string NameOfMaterial(int i)
 {
 	xMaterialType xmt = (xMaterialType)(i);
@@ -83,6 +97,26 @@ inline std::string NameOfMaterial(int i)
 	case ALUMINUM: n = "Aluminum"; break;
 	case SAND: n = "Sand"; break;
 	case USER_INPUT: n = "User input"; break;
+	}
+	return n;
+}
+
+inline std::string NameOfXLSPart(int i)
+{
+	xXlsInputDataType xt = (xXlsInputDataType)(i);
+	std::string n;
+	switch (xt)
+	{
+	case XLS_SHAPE: n = "SHAPE"; break;
+	case XLS_MASS: n = "MASS"; break;
+	case XLS_JOINT: n = "JOINT"; break;
+	case XLS_FORCE: n = "FORCE"; break;
+	case XLS_PARTICLE: n = "PARTICLE"; break;
+	case XLS_CONTACT: n = "CONTACT"; break;
+	case XLS_KERNEL: n = "KERNE"; break;
+	case XLS_INTEGRATOR: n = "INTEGRATOR"; break;
+	case XLS_SIMULATION: n = "SIMULATION"; break;
+	case XLS_GRAVITY: n = "GRAVITY"; break;
 	}
 	return n;
 }
@@ -131,20 +165,6 @@ inline std::string ForceModelString(xContactForceModelType ct)
 	}
 	return s;
 }
-
-enum xXlsInputDataType 
-{ 
-	XLS_KERNEL = 0,
-	XLS_SHAPE,
-	XLS_MASS, 
-	XLS_JOINT,
-	XLS_PARTICLE,
-	XLS_FORCE,		
-	XLS_CONTACT,	
-	XLS_INTEGRATOR,
-	XLS_SIMULATION,
-	XLS_GRAVITY
-};
 
 enum xImportShapeType
 { 
