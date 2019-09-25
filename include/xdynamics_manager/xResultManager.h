@@ -57,6 +57,7 @@ public:
 	bool alloc_dem_result_memory(unsigned int np, unsigned int ns);
 	bool alloc_mass_result_memory(std::string name);
 	bool alloc_joint_result_memory(std::string name);
+	bool alloc_driving_rotation_result_memory(std::string name);
 	bool save_dem_result(unsigned int i, double* cpos, double* pos, double* vel, double* acc, double* ep, double* ev, double* ea, unsigned int np, unsigned int ns);
 	bool save_mass_result(unsigned int i, xPointMass* pm);
 	bool save_joint_result(unsigned int i, std::string nm, struct_kcr _kcr);
@@ -65,6 +66,7 @@ public:
 	bool save_p2pl_contact_data(unsigned int* count, unsigned int *id, double* tsd);
 	bool save_p2cyl_contact_data(unsigned int* count, unsigned int *id, double* tsd);
 	bool save_p2tri_contact_data(unsigned int* count, unsigned int *id, double* tsd);
+	void save_driving_rotation_result(unsigned int i, std::string nm, unsigned int n_rev, unsigned int dn_rev, double theta);
 	bool export_step_data_to_file(unsigned int pt, double ct);
 	void ExportPointMassResult2TXT(std::string n);
 	void export_joint_result_to_text(std::string n);
@@ -101,6 +103,7 @@ private:
 	
 	xmap<xstring, struct_pmr*> pmrs;
 	xmap<xstring, struct_kcr*> kcrs;
+	xmap<xstring, xDrivingRotationResultData> xdrr;
 	xlist<xstring> flist;
 	xlist<unsigned int> dist_id;
 	double* time;

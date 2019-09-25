@@ -1,5 +1,6 @@
 #include "xdynamics_manager/xMultiBodyModel.h"
 #include "xdynamics_manager/xObjectManager.h"
+#include <map>
 
 
 xMultiBodyModel::xMultiBodyModel()
@@ -197,6 +198,17 @@ xDrivingConstraint* xMultiBodyModel::CreateDrivingConstraint(std::string _name, 
 	xLog::log("Create Driving : " + _name);
 	//std::cout << "Create driving constraint - " << _name.c_str() << ", Num. driving constraint - " << dconstraints.size() << std::endl;
 	return xdc;
+}
+
+void xMultiBodyModel::set_driving_rotation_data(unsigned int i, xDrivingRotationResultData xdrr)
+{
+	xmap<xstring, xDrivingConstraint*>::iterator it = dconstraints.begin();
+	for (unsigned int k = 0; k < i; k++)
+		it.next();
+	xDrivingConstraint* xdc = it.value();
+	xdc->setRevolutionCount(xdrr.rev_count);
+	xdc->setRotationAngle(xdrr.theta);
+	xdc->setDerivativeRevolutionCount(xdrr.drev_count);
 }
 
 // void xMultiBodyModel::InsertPointMassFromShape(xPointMass* pm)

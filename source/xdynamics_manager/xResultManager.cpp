@@ -577,6 +577,16 @@ bool xResultManager::alloc_joint_result_memory(std::string name)
 		return false;
 	struct_kcr* skcrs = new struct_kcr[nparts];
 	kcrs.insert(name, skcrs);
+	//xdrr.insert(name, { 0,0 });
+	return true;
+}
+
+bool xResultManager::alloc_driving_rotation_result_memory(std::string name)
+{
+	xmap<xstring, xDrivingRotationResultData>::iterator it = xdrr.find(name);
+	if (it != xdrr.end())
+		return false;
+	xdrr.insert(name, { 0, });
 	return true;
 }
 
@@ -733,6 +743,12 @@ bool xResultManager::save_p2tri_contact_data(unsigned int * count, unsigned int 
 	return true;
 }
 
+void xResultManager::save_driving_rotation_result(unsigned int i, std::string nm, unsigned int n_rev, unsigned int dn_rev, double theta)
+{
+	xmap<xstring, xDrivingRotationResultData>::iterator it = xdrr.find(nm);
+	it.setValue({ n_rev, dn_rev, theta });
+}
+
 bool xResultManager::export_step_data_to_file(unsigned int pt, double ct)
 {
 	time[pt] = ct;
@@ -762,8 +778,10 @@ bool xResultManager::export_step_data_to_file(unsigned int pt, double ct)
 		{
 			unsigned int m_size = pmrs.size();
 			unsigned int j_size = kcrs.size();
+			unsigned int d_size = xdrr.size();
 			qf.write((char*)&m_size, sizeof(unsigned int));
 			qf.write((char*)&j_size, sizeof(unsigned int));
+			qf.write((char*)&d_size, sizeof(unsigned int));
 			for (xmap<xstring, struct_pmr*>::iterator it = pmrs.begin(); it != pmrs.end(); it.next())
 			{
 				struct_pmr* _pmr = it.value();
@@ -773,6 +791,10 @@ bool xResultManager::export_step_data_to_file(unsigned int pt, double ct)
 			{
 				struct_kcr* _kcr = it.value();
 				qf.write((char*)&_kcr[pt], sizeof(struct_kcr));
+			}
+			for (xmap<xstring, xDrivingRotationResultData>::iterator it = xdrr.begin(); it != xdrr.end(); it.next())
+			{
+				qf.write((char*)&it.value(), sizeof(xDrivingRotationResultData));
 			}
 			unsigned int mdim = ngeneralized_coordinates + xModel::OneDOF();
 			unsigned int tdim = ngeneralized_coordinates + nconstraints;

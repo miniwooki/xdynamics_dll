@@ -60,8 +60,8 @@ vector3d xUtilityFunctions::QuaternionRotation(vector4d & q, vector3d & v)
 std::string xUtilityFunctions::GetFileName(const char* pn)
 {
 	std::string path = pn;// QString::fromStdString(pn);
-	int begin = path.find_last_of('/') + 1;// finlastIndexOf('/');
-	int end = path.find_last_of('.');// lastIndexOf('.');
+	size_t begin = path.find_last_of('/') + 1;// finlastIndexOf('/');
+	size_t end = path.find_last_of('.');// lastIndexOf('.');
 	return path.substr(begin, end - begin);// path.mid(begin + 1, end - begin - 1);
 // 	QString b;
 // 	try
@@ -435,17 +435,17 @@ vector4d xUtilityFunctions::FitSphereToTriangle(vector3d& P, vector3d& Q, vector
 
 double xUtilityFunctions::FitClusterRadius(vector4d * cpos, unsigned int n)
 {
-	int cnt = 0;
+	unsigned int cnt = 0;
 	double maximum = -FLT_MAX;
-	int m_i = 0;
-	int m_j = 0;
+	unsigned int m_i = 0;
+	unsigned int m_j = 0;
 	vector4d cpi, cpj;
 	vector3d ci, cj;
 	while (cnt + 1 < n)
 	{
 		cpi = cpos[cnt];
 		ci = new_vector3d(cpi.x, cpi.y, cpi.z);
-		for (int i = cnt + 1; i < n; i++)
+		for (unsigned int i = cnt + 1; i < n; i++)
 		{
 			cpj = cpos[i];
 			cj = new_vector3d(cpj.x, cpj.y, cpj.z);
@@ -469,7 +469,7 @@ double xUtilityFunctions::FitClusterRadius(vector4d * cpos, unsigned int n)
 	vector3d Ca = 0.5 * (Pi + Pj);
 	double Ra = 0.5 * length(Pi - Pj);
 	vector3d Cb = new_vector3d(0, 0, 0);
-	for (int i = 0; i < n; i++)
+	for (unsigned int i = 0; i < n; i++)
 	{
 		if (i == m_i || i == m_j)
 			continue;

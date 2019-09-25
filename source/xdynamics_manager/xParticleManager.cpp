@@ -177,7 +177,7 @@ unsigned int xParticleManager::GetNumLineParticles(double sx, double sy, double 
 	unsigned int n = 0;
 	vector3d dp = new_vector3d(ex - sx, ey - sy, ez - sz);
 	double len = length(dp);
-	n = floor(len / (2.0 * max_radius));
+	n = static_cast<unsigned int>(floor(len / (2.0 * max_radius)));
 	return n;
 }
 
@@ -555,7 +555,7 @@ xParticleObject* xParticleManager::CreatePlaneParticle(
 	}
 	if (plist.size())
 	{
-		unsigned int _np = plist.size();
+		unsigned int _np = static_cast<unsigned int>(plist.size());
 		vector4d* pos = xpo->AllocMemory(_np);
 		np += _np;
 		unsigned int cnt = 0;
@@ -904,8 +904,8 @@ void xParticleManager::ExportParticleDataForView(std::string path)
 		unsigned int _cnp = po->NumCluster();
 		double d[2] = { po->MinRadius(), po->MaxRadius() };
 		double* _pos = (double *)po->Position();
-		int mat = po->Material();
-		int ns = po->Name().size();
+		unsigned int mat = po->Material();
+		unsigned int ns = static_cast<unsigned int>(po->Name().size());
 		of.write((char*)&ns, sizeof(int));
 		of.write((char*)po->Name().c_str(), sizeof(char) * ns);
 		of.write((char*)&mat, sizeof(int));
@@ -932,44 +932,6 @@ void xParticleManager::AllocParticleResultMemory(unsigned int npart, unsigned in
 	memset(r_pos, 0, sizeof(double) * n * 4);
 	memset(r_vel, 0, sizeof(double) * n * 3);
 }
-
-//void xParticleManager::SetClusterInformation()
-//{
-////	isCluster = new bool[]
-//	//unsigned int ncs = np - n_single_sphere;
-//	//if (n_cluster_object)
-//	//{
-//	//	cluster_index = new unsigned int[ncs * 2];
-//	//	cluster_count = new unsigned int[n_cluster_object];
-//	//	cluster_begin = new unsigned int[n_cluster_object * 2];
-//	//	cluster_set_location = new vector3d[n_cluster_each];
-//	//}
-//	//unsigned int idx = 0;
-//	//unsigned int cnt = 0;
-//	//unsigned int sum_each = 0;
-//	//foreach(xParticleObject* po, xpcos)
-//	//{
-//	//	if (po->ShapeForm() == CLUSTER_SHAPE)
-//	//	{
-//	//		/*cluster_count[idx] = po->EachCount();
-//	//		cluster_begin[idx*2 + 0] = po->StartIndex();
-//	//		cluster_begin[idx*2 + 1] = sum_each;*/
-//	//		memcpy(cluster_set_location + sum_each, po->RelativeLocation(), sizeof(vector3d) * po->EachCount());
-//	//		unsigned int t = po->NumParticle() / po->EachCount();
-//	//		for (unsigned int i = po->StartIndex(); i < t; i++)
-//	//		{
-//	//			for (unsigned int j = 0; j < po->EachCount(); j++)
-//	//			{
-//	//				cluster_index[cnt * 2 + 0] = idx;
-//	//				cluster_index[cnt * 2 + 1] = i;
-//	//				cnt++;
-//	//			}
-//	//		}
-//	//		sum_each += po->EachCount();
-//	//	}
-//	//	idx++;
-//	//}
-//}
 
 void xParticleManager::AddParticleCreatingCondition(xParticleObject* xpo, xParticleCreateCondition& xpcc)
 {
@@ -1015,10 +977,7 @@ void xParticleManager::AddParticleCreatingCondition(xParticleObject* xpo, xParti
 		vector4d* pos = xpo->Position() + k * xpo->EachCount();
 		double* mass = xpo->Mass() + k * xpo->EachCount();
 		vector3d* inertia = xpo->Inertia() + k * xpo->EachCount();
-		/*for (unsigned int i = 0; i < it; i++)
-		{
-			pList.push_back(pos[i]);
-		}*/
+
 		unsigned int over = 0;
 		for(unsigned int i = 0; i < iList.size(); i++)
 		//foreach(vector4d v, pList)

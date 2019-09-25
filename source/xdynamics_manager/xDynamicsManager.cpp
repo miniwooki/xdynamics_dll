@@ -306,6 +306,7 @@ bool xDynamicsManager::upload_model_results(std::string path)
 		{
 			xstring name = it.key();
 			xrm->alloc_joint_result_memory(name.toStdString());
+			xrm->alloc_driving_rotation_result_memory(name.toStdString());
 		}
 	}
 //	xrm->upload_exist_results(path);

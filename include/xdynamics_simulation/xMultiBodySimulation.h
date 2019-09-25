@@ -18,6 +18,7 @@ public:
 
 	//integratorType IntegrationType();
 	//void setIntegrationType(integratorType _type);
+	xMultiBodyModel* Model();
 	bool Initialized();
 	void SetDEMSpringDamper(xSpringDamperForce* dem_t);
 	//bool initialize(xMultiBodyModel* xmbd);
@@ -30,8 +31,10 @@ public:
 	unsigned int num_generalized_coordinate();
 	unsigned int num_constraint_equations();
 	unsigned int set_mbd_data(double *_q, double *_dq, double *_q_1, double* _rhs);
+	
 	virtual int Initialize(xMultiBodyModel* xmbd, bool is_set_result_memory = false);
 	virtual int OneStepSimulation(double ct, unsigned int cstep) = 0;
+
 
 protected:
 // 	bool initialize_implicit_hht(xMultiBodyModel* xmbd);

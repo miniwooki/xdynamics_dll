@@ -41,7 +41,7 @@ xDynamicsSimulator::~xDynamicsSimulator()
 {
 	if (xmbd) delete xmbd; xmbd = NULL;
 	if (xdem) delete xdem; xdem = NULL;
-	xdm->release_result_manager();
+	//xdm->release_result_manager();
 	//if (stop_condition) delete stop_condition; stop_condition = NULL;
 }
 
@@ -439,8 +439,10 @@ double xDynamicsSimulator::set_from_part_result(std::string path)
 	{
 		unsigned int m_size = 0;
 		unsigned int j_size = 0;
+		unsigned int d_size = 0;
 		fs.read((char*)&m_size, sizeof(unsigned int));
 		fs.read((char*)&j_size, sizeof(unsigned int));
+		fs.read((char*)&d_size, sizeof(unsigned int));
 		//xMultiBodyModel* xmbd = xdm->XMBDModel();
 		for (unsigned int i = 0; i < m_size; i++)
 		{
@@ -451,6 +453,12 @@ double xDynamicsSimulator::set_from_part_result(std::string path)
 		{
 			xKinematicConstraint::kinematicConstraint_result kr = { 0, };
 			fs.read((char*)&kr, sizeof(xKinematicConstraint::kinematicConstraint_result));
+		}
+		for (unsigned int i = 0; i < d_size; i++)
+		{
+			xDrivingRotationResultData xdr = { 0, };
+			fs.read((char*)&xdr, sizeof(xDrivingRotationResultData));
+			xmbd->Model()->set_driving_rotation_data(i, xdr);
 		}
 		unsigned int ng = xmbd->num_generalized_coordinate() + xModel::OneDOF();
 		unsigned int nt = xmbd->num_generalized_coordinate() + xmbd->num_constraint_equations();

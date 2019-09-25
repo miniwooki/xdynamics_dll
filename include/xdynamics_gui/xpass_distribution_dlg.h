@@ -11,7 +11,7 @@ public:
 	xpass_distribution_dlg(QWidget* parent = NULL);
 	~xpass_distribution_dlg();
 
-	void setup(xResultManager* _xrm);
+	void setup(xResultManager* _xrm, QStringList qls);
 	QList<unsigned int>& get_distribution_result();
 
 private slots:
@@ -21,6 +21,7 @@ private slots:
 
 private:
 	xResultManager* xrm;
+	QStringList frlist;
 	QStringList qslist;
 	QList<unsigned int> cid;
 };

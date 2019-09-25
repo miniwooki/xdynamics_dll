@@ -11,7 +11,6 @@ xDrivingConstraint::xDrivingConstraint()
 	, cons_v(0.0)
 	, theta(0.0)
 	, kconst(NULL)
-	, n(0)
 	, n_rev(0)
 	, dn_rev(0)
 	, srow(0)
@@ -29,7 +28,6 @@ xDrivingConstraint::xDrivingConstraint(std::string _name, xKinematicConstraint* 
 	, cons_v(0.0)
 	, theta(0.0)
 	, kconst(_kc)
-	, n(0)
 	, n_rev(0)
 	, dn_rev(0)
 	, srow(0)
@@ -47,6 +45,36 @@ xDrivingConstraint::xDrivingConstraint(std::string _name, xKinematicConstraint* 
 xDrivingConstraint::~xDrivingConstraint()
 {
 
+}
+
+unsigned int xDrivingConstraint::RevolutionCount()
+{
+	return n_rev;
+}
+
+unsigned int xDrivingConstraint::DerivativeRevolutionCount()
+{
+	return dn_rev;
+}
+
+double xDrivingConstraint::RotationAngle()
+{
+	return theta;
+}
+
+void xDrivingConstraint::setRevolutionCount(unsigned int _n_rev)
+{
+	n_rev = _n_rev;
+}
+
+void xDrivingConstraint::setDerivativeRevolutionCount(unsigned int _dn_rev)
+{
+	dn_rev = _dn_rev;
+}
+
+void xDrivingConstraint::setRotationAngle(double _theta)
+{
+	theta = _theta;
 }
 
 void xDrivingConstraint::define(xVectorD& q)
@@ -166,14 +194,14 @@ void xDrivingConstraint::ConstraintGamma(xVectorD& rhs, xVectorD& q, xVectorD& q
 void xDrivingConstraint::ConstraintEquation(xVectorD& rhs, xVectorD& q, xVectorD& qd, unsigned int sr, double ct, double mul)
 {
 	double v = 0.0;
-// 	unsigned int i = kconst->IndexBaseBody() * xModel::OneDOF();
-// 	unsigned int j = kconst->IndexActionBody() * xModel::OneDOF();
-	vector3d ri = kconst->BaseBody()->Position();// q(i + 0), q(i + 1), q(i + 2));
-	vector3d rj = kconst->ActionBody()->Position();//new_vector3d(q(j + 0), q(j + 1), q(j + 2));
-	euler_parameters ei = kconst->BaseBody()->EulerParameters();// new_euler_parameters(q(i + 3), q(i + 4), q(i + 5), q(i + 6));
-	euler_parameters ej = kconst->ActionBody()->EulerParameters();//new_euler_parameters(q(j + 3), q(j + 4), q(j + 5), q(j + 6));
-	matrix33d Ai = kconst->BaseBody()->TransformationMatrix();//GlobalTransformationMatrix(ei);
-	matrix33d Aj = kconst->ActionBody()->TransformationMatrix();//GlobalTransformationMatrix(ej);
+ 	unsigned int i = kconst->IndexBaseBody() * xModel::OneDOF();
+ 	unsigned int j = kconst->IndexActionBody() * xModel::OneDOF();
+	vector3d ri = new_vector3d(q(i + 0), q(i + 1), q(i + 2));
+	vector3d rj = new_vector3d(q(j + 0), q(j + 1), q(j + 2));
+	euler_parameters ei = new_euler_parameters(q(i + 3), q(i + 4), q(i + 5), q(i + 6));
+	euler_parameters ej = new_euler_parameters(q(j + 3), q(j + 4), q(j + 5), q(j + 6));
+	matrix33d Ai = GlobalTransformationMatrix(ei);
+	matrix33d Aj = GlobalTransformationMatrix(ej);
 	if (type == TRANSLATION_DRIVING)
 	{
 		vector3d dist = (rj + Aj * kconst->Spj()) - (ri + Ai * kconst->Spi());// kconst->CurrentDistance();
@@ -207,14 +235,14 @@ void xDrivingConstraint::ConstraintDerivative(xVectorD& rhs, xVectorD& q, xVecto
 
 void xDrivingConstraint::ConstraintJacobian(xSparseD& lhs, xVectorD& q, xVectorD& qd, unsigned int sr, double ct)
 {
- 	unsigned int i = kconst->IndexBaseBody() * xModel::OneDOF();
+	unsigned int i = kconst->IndexBaseBody() * xModel::OneDOF();
 	unsigned int j = kconst->IndexActionBody() * xModel::OneDOF();
-	vector3d ri = kconst->BaseBody()->Position();// q(i + 0), q(i + 1), q(i + 2));
-	vector3d rj = kconst->ActionBody()->Position();//new_vector3d(q(j + 0), q(j + 1), q(j + 2));
-	euler_parameters ei = kconst->BaseBody()->EulerParameters();// new_euler_parameters(q(i + 3), q(i + 4), q(i + 5), q(i + 6));
-	euler_parameters ej = kconst->ActionBody()->EulerParameters();//new_euler_parameters(q(j + 3), q(j + 4), q(j + 5), q(j + 6));
-	matrix33d Ai = kconst->BaseBody()->TransformationMatrix();//GlobalTransformationMatrix(ei);
-	matrix33d Aj = kconst->ActionBody()->TransformationMatrix();//GlobalTransformationMatrix(ej);
+	vector3d ri = new_vector3d(q(i + 0), q(i + 1), q(i + 2));
+	vector3d rj = new_vector3d(q(j + 0), q(j + 1), q(j + 2));
+	euler_parameters ei = new_euler_parameters(q(i + 3), q(i + 4), q(i + 5), q(i + 6));
+	euler_parameters ej = new_euler_parameters(q(j + 3), q(j + 4), q(j + 5), q(j + 6));
+	matrix33d Ai = GlobalTransformationMatrix(ei);
+	matrix33d Aj = GlobalTransformationMatrix(ej);
 	int ic = (kconst->IndexBaseBody() - 1) * xModel::OneDOF();
 	int jc = (kconst->IndexActionBody() - 1) * xModel::OneDOF();
 	if (type == TRANSLATION_DRIVING)
@@ -335,12 +363,12 @@ void xDrivingConstraint::DerivateJacobian(xMatrixD& lhs, xVectorD& q, xVectorD& 
 	}
 	else if (type == TRANSLATION_DRIVING)
 	{
-		vector3d ri = kconst->BaseBody()->Position();// q(i + 0), q(i + 1), q(i + 2));
-		vector3d rj = kconst->ActionBody()->Position();//new_vector3d(q(j + 0), q(j + 1), q(j + 2));
-		euler_parameters ei = kconst->BaseBody()->EulerParameters();// new_euler_parameters(q(i + 3), q(i + 4), q(i + 5), q(i + 6));
-		euler_parameters ej = kconst->ActionBody()->EulerParameters();//new_euler_parameters(q(j + 3), q(j + 4), q(j + 5), q(j + 6));
-		matrix33d Ai = kconst->BaseBody()->TransformationMatrix();//GlobalTransformationMatrix(ei);
-		matrix33d Aj = kconst->ActionBody()->TransformationMatrix();//GlobalTrans
+		vector3d ri = new_vector3d(q(idx + 0), q(idx + 1), q(idx + 2));
+		vector3d rj = new_vector3d(q(jdx + 0), q(jdx + 1), q(jdx + 2));
+		euler_parameters ei = new_euler_parameters(q(idx + 3), q(idx + 4), q(idx + 5), q(idx + 6));
+		euler_parameters ej = new_euler_parameters(q(jdx + 3), q(jdx + 4), q(jdx + 5), q(jdx + 6));
+		matrix33d Ai = GlobalTransformationMatrix(ei);
+		matrix33d Aj = GlobalTransformationMatrix(ej);
 		vector3d dij = (rj + Aj * kconst->Spj()) - (ri + Ai * kconst->Spi());
 		kconst->dot_2_differentialJacobian(lhs, kconst->Hi(), kconst->Spi(), kconst->Spj(), dij, ei, ej, mul * lm[0]);
 	}
@@ -351,12 +379,12 @@ xKinematicConstraint::kinematicConstraint_result xDrivingConstraint::GetStepResu
 {
 	unsigned int i = kconst->IndexBaseBody() * xModel::OneDOF();
 	unsigned int j = kconst->IndexActionBody() * xModel::OneDOF();
-	vector3d ri = kconst->BaseBody()->Position();// q(i + 0), q(i + 1), q(i + 2));
-	vector3d rj = kconst->ActionBody()->Position();//new_vector3d(q(j + 0), q(j + 1), q(j + 2));
-	euler_parameters ei = kconst->BaseBody()->EulerParameters();// new_euler_parameters(q(i + 3), q(i + 4), q(i + 5), q(i + 6));
-	euler_parameters ej = kconst->ActionBody()->EulerParameters();//new_euler_parameters(q(j + 3), q(j + 4), q(j + 5), q(j + 6));
-	matrix33d Ai = kconst->BaseBody()->TransformationMatrix();//GlobalTransformationMatrix(ei);
-	matrix33d Aj = kconst->ActionBody()->TransformationMatrix();//GlobalTransformationMatrix(ej);
+	vector3d ri = new_vector3d(q(i + 0), q(i + 1), q(i + 2));
+	vector3d rj = new_vector3d(q(j + 0), q(j + 1), q(j + 2));
+	euler_parameters ei = new_euler_parameters(q(i + 3), q(i + 4), q(i + 5), q(i + 6));
+	euler_parameters ej = new_euler_parameters(q(j + 3), q(j + 4), q(j + 5), q(j + 6));
+	matrix33d Ai = GlobalTransformationMatrix(ei);
+	matrix33d Aj = GlobalTransformationMatrix(ej);
 	int ic = (kconst->IndexBaseBody() - 1) * xModel::OneDOF();
 	int jc = (kconst->IndexActionBody() - 1) * xModel::OneDOF();
 	xKinematicConstraint::kinematicConstraint_result kcr = { 0, };
@@ -405,7 +433,7 @@ xKinematicConstraint::kinematicConstraint_result xDrivingConstraint::GetStepResu
 	}
 	kcr.location = ri + Ai * kconst->Spi();
 	//kcrs.push_back(kcr);
-	nr_part++;
+	//nr_part++;
 	return kcr;
 }
 
@@ -413,8 +441,16 @@ void xDrivingConstraint::DerivateEquation(xVectorD& v, xVectorD& q, xVectorD& qd
 {
 	if (ct < start_time)
 		return;
+	unsigned int i = kconst->IndexBaseBody() * xModel::OneDOF();
+	unsigned int j = kconst->IndexActionBody() * xModel::OneDOF();
+	vector3d ri = new_vector3d(q(i + 0), q(i + 1), q(i + 2));
+	vector3d rj = new_vector3d(q(j + 0), q(j + 1), q(j + 2));
+	euler_parameters ei = new_euler_parameters(q(i + 3), q(i + 4), q(i + 5), q(i + 6));
+	euler_parameters ej = new_euler_parameters(q(j + 3), q(j + 4), q(j + 5), q(j + 6));
+	matrix33d Ai = Transpose(GlobalTransformationMatrix(ei));
+	matrix33d Aj = GlobalTransformationMatrix(ej);
 	matrix33d TAi = Transpose(kconst->BaseBody()->TransformationMatrix());
-	matrix33d Aj = kconst->ActionBody()->TransformationMatrix();
+	//matrix33d Aj = kconst->ActionBody()->TransformationMatrix();
 	vector3d fi = kconst->Fi();
 	vector3d fj = kconst->Fj();
 	vector3d gi = kconst->Gi();

@@ -38,6 +38,8 @@ public:
 	xForce* CreateForceElement(std::string _name, xForce::fType _type, std::string bn, std::string an);
 	xDrivingConstraint* CreateDrivingConstraint(std::string _name, xKinematicConstraint* _kc);
 
+	void set_driving_rotation_data(unsigned int i, xDrivingRotationResultData xdrr);
+
 	//void InsertPointMassFromShape(xPointMass* pm);
 
 private:

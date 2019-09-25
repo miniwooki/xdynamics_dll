@@ -15,6 +15,12 @@ public:
 	xDrivingConstraint(std::string _name, xKinematicConstraint* _kc);
 	~xDrivingConstraint();
 
+	unsigned int RevolutionCount();
+	unsigned int DerivativeRevolutionCount();
+	double RotationAngle();
+	void setRevolutionCount(unsigned int _n_rev);
+	void setDerivativeRevolutionCount(unsigned int _dn_rev);
+	void setRotationAngle(double _theta);
 	void define(xVectorD& q);
 	std::string Name();
 	void setStartTime(double st);
@@ -36,6 +42,7 @@ public:
 	xKinematicConstraint::kinematicConstraint_result GetStepResult(unsigned int part,double ct, xVectorD& q, xVectorD& q_1, double* L, unsigned int sr);
 	void DerivateEquation(xVectorD& v, xVectorD& q, xVectorD& qd, int sr, double ct, double mul);
 
+
 private:
 //	double RelativeAngle(double ct, vector3d& gi, vector3d& fi, vector3d& fj);
 	int udrl;
@@ -53,11 +60,11 @@ private:
 	//unsigned int scol;
 	//QString name;
 
-	unsigned int n;
+	//unsigned int n;
 	unsigned int n_rev;
 	unsigned int dn_rev;
 	unsigned int srow;
-	unsigned int nr_part;
+	//unsigned int nr_part;
 	xKinematicConstraint* kconst;
 	//Type type;
 };

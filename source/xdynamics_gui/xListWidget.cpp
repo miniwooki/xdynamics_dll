@@ -39,6 +39,7 @@ void xListWidget::setup_widget(QStringList& qsl)
 	const QSize g_size = xdynamics_gui::XGUI()->FullWindowSize();
 	//const QSize availableSize = QApplication::desktop()->availableGeometry(wlist).size();
 	this->resize(g_size / 2.0);
+	wlist->setSelectionMode(QAbstractItemView::ExtendedSelection);
 }
 
 QString xListWidget::get_selected_item()

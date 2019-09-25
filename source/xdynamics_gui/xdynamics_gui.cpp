@@ -647,7 +647,7 @@ void xdynamics_gui::setupObjectOperations()
 
 	a = new QAction(QIcon(":/Resources/icon/chart_passing.png"), tr("&Passing distribution"), this);
 	a->setStatusTip(tr("Distribution of particles passing area"));
-	connect(a, SIGNAL(triggered()), this, SLOT(xPassFiyribution()));
+	connect(a, SIGNAL(triggered()), this, SLOT(xPassDistribution()));
 	myObjectActions.insert(PASSING_DISTRIBUTION, a);
 // 	a = new QAction(QIcon(":/Resources/icon/save.png"), tr("&Save"), this);
 // 	a->setStatusTip(tr("Save project"));
@@ -852,7 +852,7 @@ void xdynamics_gui::xPassDistribution()
 	if (xdm->XResult())
 	{
 		xpass_distribution_dlg d(this);
-		d.setup(xdm->XResult());
+		d.setup(xdm->XResult(), result_file_list);
 		int ret = d.exec();
 		if (ret)
 		{

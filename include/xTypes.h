@@ -266,6 +266,13 @@ typedef struct
 	int empty;
 }xCylinderObjectData;
 
+typedef struct
+{
+	unsigned int rev_count;
+	unsigned int drev_count;
+	double theta;
+}xDrivingRotationResultData;
+
 typedef struct 
 {
 	double lx, ly, lz;

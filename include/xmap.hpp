@@ -163,6 +163,10 @@ public:
 		{
 			return current->value;
 		}
+		void setValue(T v)
+		{
+			current->value = v;
+		}
 		bool has_next()
 		{
 			return current;

@@ -112,8 +112,10 @@ void xResultCallThread::run()
 			{
 				unsigned int m_size = 0;
 				unsigned int j_size = 0;
+				unsigned int d_size = 0;
 				fs.read((char*)&m_size, sizeof(unsigned int));
 				fs.read((char*)&j_size, sizeof(unsigned int));
+				fs.read((char*)&d_size, sizeof(unsigned int));
 				/*if (pmrs.size() != m_size)
 				{
 
@@ -162,6 +164,10 @@ void xResultCallThread::run()
 					}
 					fs.read((char*)&kr, sizeof(struct_kcr));
 					_kcr[cnt] = kr;
+					xDrivingRotationResultData xdr = { 0, };
+					fs.read((char*)&xdr, sizeof(xDrivingRotationResultData));
+
+					xrm->save_driving_rotation_result(cnt, it.value()->Name(), xdr.rev_count, xdr.drev_count, xdr.theta);
 				}
 			}
 			cnt++;
