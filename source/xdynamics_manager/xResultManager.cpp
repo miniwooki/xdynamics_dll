@@ -188,15 +188,18 @@ void xResultManager::setup_particle_buffer_color_distribution(xColorControl* xcc
 		if (!xcc->isUserLimitInput())
 			xcc->setMinMax(get_min_result_value(cmt), get_max_result_value(cmt));
 		xcc->setLimitArray();
+		unsigned int neach = static_cast<unsigned int>(nparticles / nclusters);
 		for (int i = sframe; i <= cframe; i++)
 		{
 			unsigned int idx = nparticles * i;
+			unsigned int sidx = nclusters * i;
 			float *pbuf = ptrs + idx * 4;
-			float *vbuf = vtrs + idx * 3;
+			float *vbuf = vtrs + sidx * 3;
 			float *cbuf = ctrs + idx * 4;
 			for (unsigned int j = 0; j < nparticles; j++)
 			{
-				xcc->getColorRamp(pbuf + j * 4, vbuf + j * 3, cbuf + j * 4);
+				unsigned int sj = (j / neach);
+				xcc->getColorRamp(pbuf + j * 4, vbuf + sj * 3, cbuf + j * 4);
 				cbuf[j * 4 + 3] = 1.0;
 			}
 		}
@@ -542,16 +545,19 @@ bool xResultManager::alloc_dem_result_memory(unsigned int np, unsigned int ns)
 	if (ctrs) delete[] ctrs; ctrs = NULL;
 
 	ptrs = new float[nparts * nparticles * 4]; 
-	for (unsigned int i = 0; i < nparts * nparticles * 4; i++) ptrs[i] = 0.f;
+	for (unsigned int i = 0; i < nparts * nparticles * 4; i++) 
+		ptrs[i] = 0.f;
 		//memset(ptrs, 0, sizeof(float) * nparts * nparticles * 4);
 	vtrs = new float[nparts * nclusters * 3]; 
-	for (unsigned int i = 0; i < nparts * nclusters * 3; i++) vtrs[i] = 0.f;
+	for (unsigned int i = 0; i < nparts * nclusters * 3; i++) 
+		vtrs[i] = 0.f;
 		//memset(vtrs, 0, sizeof(float) * nparts * nclusters * 3);
-	ctrs = new float[nparts * nclusters * 4]; 
-	for (unsigned int i = 0; i < nparts * nclusters * 4; i++) ctrs[i] = 0.f;
+	ctrs = new float[nparts * nparticles * 4]; 
+	for (unsigned int i = 0; i < nparts * nparticles * 4; i++)
+		ctrs[i] = 0.f;
 		//memset(ctrs, 0, sizeof(float) * nparts * nclusters * 4);
 	//throw runtime_error("error");
-	allocated_size += nparts * (nparticles * 4 + nclusters * 3 + nclusters * 4) * sizeof(float);
+	allocated_size += nparts * (nparticles * 4 + nclusters * 3 + nparticles * 4) * sizeof(float);
 	//memset(ptrs, 0, allocated_size);
 	return true;
 }
@@ -600,6 +606,7 @@ bool xResultManager::save_dem_result(
 	c_particle_ep = ep;
 	c_particle_ev = ev;
 	c_particle_ea = ea;
+	c_cluster_pos = cpos;
 	unsigned int neach = 1;
 	unsigned int sid = 0;
 	unsigned int vid = 0;
@@ -645,7 +652,7 @@ bool xResultManager::save_dem_result(
 			static_cast<float>(vel[v + 1]),
 			static_cast<float>(vel[v + 2]));
 
-		v = j * 3 + vid;
+		v += vid;
 
 		vtrs[v + 0] = vv.x;// static_cast<float>(_vel[v + 0]);
 		vtrs[v + 1] = vv.y;// static_cast<float>(_vel[v + 1]);

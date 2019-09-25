@@ -1043,7 +1043,6 @@ void xdynamics_gui::xRunSimulationThread(double dt, unsigned int st, double et)
 	{
 		deleteFileByEXT("txt");
 		deleteFileByEXT("bin");		
-		xvAnimationController::allocTimeMemory(xSimulation::npart);
 	}
 	try
 	{
@@ -1056,6 +1055,8 @@ void xdynamics_gui::xRunSimulationThread(double dt, unsigned int st, double et)
 		xExitSimulationThread();
 		return;
 	}
+	xvAnimationController::allocTimeMemory(xSimulation::npart);
+
 	if (wsim && wsim->get_enable_starting_point())
 	{
 		QString spath = wsim->get_starting_point_path();
