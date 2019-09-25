@@ -111,7 +111,7 @@ void xParticlePlaneContact::cudaMemoryAlloc(unsigned int np)
 	cudaMemoryAlloc_planeObject();
 }
 
-bool xParticlePlaneContact::detect_contact(vector4f& p, xPlaneObject& pe)
+bool xParticlePlaneContact::detect_contact(vector4f& p, xPlaneObject& pe, vector3f& cpoint)
 {
 	vector3d pos =
 	{
@@ -136,6 +136,13 @@ bool xParticlePlaneContact::detect_contact(vector4f& p, xPlaneObject& pe)
 	u = -uu;
 	double collid_dist = r - abs(dot(dp, u));
 	bool is_contact = collid_dist > 0;
+	vector3d _cp = pos + r * u;
+	cpoint = 
+	{
+	static_cast<float>(_cp.x),
+	static_cast<float>(_cp.y),
+	static_cast<float>(_cp.z)
+	};
 	return is_contact;
 }
 

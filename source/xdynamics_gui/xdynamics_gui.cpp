@@ -856,7 +856,7 @@ void xdynamics_gui::xPassDistribution()
 		int ret = d.exec();
 		if (ret)
 		{
-			xdm->XResult()->set_distribution_result(d.get_distribution_result().toStdList());
+			//xdm->XResult()->set_distribution_result(d.get_distribution_result().toStdList());
 		}
 	}
 	

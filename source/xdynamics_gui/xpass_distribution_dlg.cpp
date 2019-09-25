@@ -3,6 +3,9 @@
 #include "xdynamics_manager/xResultManager.h"
 #include "xdynamics_object/xParticlePlaneContact.h"
 #include "xListWidget.h"
+#include "xdynamics_manager/xModel.h"
+#include <QFile>
+#include <QTextStream>
 
 xpass_distribution_dlg::xpass_distribution_dlg(QWidget* parent)
 	: QDialog(parent)
@@ -55,16 +58,16 @@ void xpass_distribution_dlg::click_analysis()
 	vector3d p2 = new_vector3d(0, 0, 0);
 	vector3d p3 = new_vector3d(0, 0, 0);
 	if(point.size() == 3) 
-		vector3d p0 = { point.at(0).toDouble(), point.at(1).toDouble(), point.at(2).toDouble() };
+		p0 = { point.at(0).toDouble(), point.at(1).toDouble(), point.at(2).toDouble() };
 	point = LEP1->text().split(",");
 	if (point.size() == 3) 
-		vector3d p1 = { point.at(0).toDouble(), point.at(1).toDouble(), point.at(2).toDouble() };
+		p1 = { point.at(0).toDouble(), point.at(1).toDouble(), point.at(2).toDouble() };
 	point = LEP2->text().split(",");
 	if (point.size() == 3) 
-		vector3d p2 = { point.at(0).toDouble(), point.at(1).toDouble(), point.at(2).toDouble() };
+		p2 = { point.at(0).toDouble(), point.at(1).toDouble(), point.at(2).toDouble() };
 	point = LEP3->text().split(",");
 	if (point.size() == 3) 
-		vector3d p3 = { point.at(0).toDouble(), point.at(1).toDouble(), point.at(2).toDouble() };
+		p3 = { point.at(0).toDouble(), point.at(1).toDouble(), point.at(2).toDouble() };
 
 	xPlaneObject plane("area");
 	plane.define(p0, p1, p2, p3);
@@ -78,31 +81,53 @@ void xpass_distribution_dlg::click_analysis()
 	unsigned int np = xrm->get_num_particles();
 	/*bool* is_contact = new bool[np];
 	memset(is_contact, 0, sizeof(bool)*np);*/
-	QMap<unsigned int, unsigned int> id;
-	for (unsigned int i = 0; i < np; i++) id[i]=i;
-	PROB->setMaximum(qslist.size() * id.size());
+	//QMap<unsigned int, unsigned int> id;
+	//for (unsigned int i = 0; i < np; i++) id[i]=i;
+	PROB->setMaximum(qslist.size() * np);
 	unsigned int cnt = 1;
 	for (unsigned int i = 0; i < qslist.size(); i++)
 	{
-		unsigned int pnid = cid.size();
+		//unsigned int pnid = cid.size();
 		vector4f* ps = (vector4f*)(ptrs + ((sp + i) * np * 4));
-		foreach(unsigned int j, id)
+		for (unsigned int j = 0; j < np; j++)// foreach(unsigned int j, id)
 		{
-			bool b = c.detect_contact(ps[j], plane);
-			if(b)
-				cid.push_back(j);
+			vector3f cpoint = new_vector3f(0.f, 0.f, 0.f);
+			bool b = c.detect_contact(ps[j], plane, cpoint);
+			if (b)
+			{
+				if(cid.find(j) == cid.end())
+					cid[j] = { i, ps[j].x, ps[j].y, ps[j].z, cpoint.x, cpoint.y, cpoint.z };// .push_back(j);
+			}
+				
 			PROB->setValue(cnt++);
 		}
-		unsigned int anid = cid.size();
-		for (unsigned int k = pnid; k < anid; k++)
+		//unsigned int anid = cid.size();
+		//for (unsigned int k = pnid; k < anid; k++)
+		//{
+		//	unsigned int rid = cid[k].id;
+		//	id.remove(rid);
+		//}
+	}
+	if (CB_TXT->isChecked())
+	{
+		QString path = QString::fromStdString(xModel::makeFilePath("particle_distribution.txt"));
+		QFile qf(path);
+		qf.open(QIODevice::WriteOnly);
+		QTextStream qts(&qf);
+		qts <<  "particle_id " << "part_id " << "px " << "py " << "pz " << "cpx " << "cpy " << "cpz " << endl;
+		QMapIterator<unsigned int, distribution_data> it(cid);
+		while (it.hasNext())
 		{
-			unsigned int rid = cid.at(k);
-			id.remove(rid);
+			it.next();
+			unsigned int pid = it.key();
+			distribution_data d = it.value();
+			qts << pid << " " << d.id << " " << d.x << " " << d.y << " " << d.z << " " << d.cpx << " " << d.cpy << " " << d.cpz << endl;
 		}
+		qf.close();
 	}
 }
 
-QList<unsigned int>& xpass_distribution_dlg::get_distribution_result()
+QMap<unsigned int, distribution_data>& xpass_distribution_dlg::get_distribution_result()
 {
 	return cid;
 }

@@ -4,6 +4,13 @@
 
 class xResultManager;
 
+typedef struct
+{
+	unsigned int id;
+	float x, y, z;
+	float cpx, cpy, cpz;
+}distribution_data;
+
 class xpass_distribution_dlg : public QDialog, private Ui::XPASS_DISTRIBUTION
 {
 	Q_OBJECT
@@ -12,7 +19,7 @@ public:
 	~xpass_distribution_dlg();
 
 	void setup(xResultManager* _xrm, QStringList qls);
-	QList<unsigned int>& get_distribution_result();
+	QMap<unsigned int, distribution_data>& get_distribution_result();
 
 private slots:
 	void click_select();
@@ -23,5 +30,5 @@ private:
 	xResultManager* xrm;
 	QStringList frlist;
 	QStringList qslist;
-	QList<unsigned int> cid;
+	QMap<unsigned int, distribution_data> cid;
 };
