@@ -147,6 +147,9 @@
     <ClCompile Include="..\source\xdynamics_gui\xpass_distribution_dlg.cpp">
       <Filter>Source Files\dialog</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xLineSeries.cpp">
+      <Filter>Source Files\chart</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="..\include\xdynamics_gui\xGLWidget.h">
@@ -313,6 +316,9 @@
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_xpass_distribution.h">
       <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xdynamics_gui\xLineSeries.h">
+      <Filter>Header Files\plot</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

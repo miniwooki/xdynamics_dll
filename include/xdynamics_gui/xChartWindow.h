@@ -6,6 +6,7 @@
 //#include <QColumnView>
 #include "xChartDatabase.h"
 #include "xChartControl.h"
+#include "xLineSeries.h"
 //#include "resultStorage.h"
 
 //class model;
@@ -42,7 +43,6 @@ public:
 
 	//void setResultStorage(resultStorage* _rs);
 	bool setChartData(xResultManager* xdm);
-	void uploadingResults();
 	void joint_plot();
 	void body_plot();
 	void closeEvent(QCloseEvent *event);
@@ -55,15 +55,11 @@ public:
 
 	private slots:
 	void click_passing_distribution();
-	void changeComboBoxItem(int);
+	void changeComboBoxItem(int i = 0);
 	void editingCommand();
 
 private:
-	QLineSeries* createLineSeries(QString n);
-	//void columnViewAdjustSameSize(int ncol);
-	//void setBodyRoot(QStandardItem *p);
-	/*void setJointForceRoot(QStandardItem *p);*/
-	//void resizeEvent(QResizeEvent *event);
+	xLineSeries* createLineSeries(QString n);
 
 private:
 	bool isAutoUpdateProperties;
@@ -81,18 +77,12 @@ private:
 	xChartDatabase *tree;
 	xChartControl *prop;
 	QStandardItemModel *cmodel;
-	//resultStorage* rs;
 	xCallOut *m_tooltip;
 	QList<xCallOut *> m_callouts;
 	QToolBar *mainToolBar;
 	QMap<ACTION_ID, QAction*> actions;
-	//QComboBox* plot_item;
-	QMap<QString, QLineSeries*> seriesMap;
+	QMap<QString, xLineSeries*> seriesMap;
 	QDockWidget *commDock;
 	QLineEdit *comm;
-	//waveHeightSensor *whs;
-	//xResultManager* xrm;
-
-
 };
 #endif

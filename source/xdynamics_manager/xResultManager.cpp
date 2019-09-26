@@ -151,9 +151,9 @@ void xResultManager::export_mass_result_to_text(std::string name)
 		<< "ax " << "ay " << "az "
 		<< "ea0 " << "ea1 " << "ea2 " << "ea3" << std::endl;
 	struct_pmr* _pmr = it.value();
-	for(unsigned int i = 0 ; i < nparts; i++)//foreach(xPointMass::pointmass_result pr, *rst)
+	for(unsigned int i = 0 ; i < ncparts; i++)//foreach(xPointMass::pointmass_result pr, *rst)
 	{
-		ifs << time[i];
+		ifs << time[i] << " ";
 		for (unsigned int j = 0; j < 49; j++)
 		{
 			double v = *(&(_pmr[i].pos.x) + j);
@@ -174,9 +174,9 @@ void xResultManager::export_joint_result_to_text(std::string n)
 		<< "iafx " << "iafy " << "iafz " << "irfx " << "irfy " << "irfz "
 		<< "jafx " << "jafy " << "jafz " << "jrfx " << "jrfy " << "jrfz ";
 	struct_kcr* _kcr = it.value();
-	for (unsigned int i = 0; i < nparts; i++)
+	for (unsigned int i = 0; i < ncparts; i++)
 	{
-		ifs << time[i];
+		ifs << time[i] << " ";
 		for (unsigned int j = 0; j < 15; j++)
 		{
 			double v = *(&(_kcr[i].location.x) + j);

@@ -26,8 +26,8 @@ QRectF xCallOut::boundingRect() const
 void xCallOut::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
 	Q_UNUSED(option)
-		Q_UNUSED(widget)
-		QPainterPath path;
+	Q_UNUSED(widget)
+	QPainterPath path;
 	path.addRoundedRect(m_rect, 5, 5);
 
 	QPointF anchor = mapFromParent(m_chart->mapToPosition(m_anchor));

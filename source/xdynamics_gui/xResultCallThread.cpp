@@ -61,6 +61,7 @@ void xResultCallThread::run()
 			emit result_call_send_progress(-1,
 				QString("!_This result of this analysis is not enough[%1 / %2]. This may mean that the interpretation was interrupted.").arg(_nparts).arg(xrm->get_num_parts()));
 			xrm->set_terminated_num_parts(_nparts);
+			xrm->set_current_part_number(_nparts);
 			is_terminated = true;
 		}			
 		else
