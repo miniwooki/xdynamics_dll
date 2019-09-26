@@ -377,7 +377,7 @@ vector3d xUtilityFunctions::CenterOfTriangle(vector3d& P, vector3d& Q, vector3d&
 	vector3d M2 = (R + P) / 2;
 	vector3d D1 = cross(N, V);
 	vector3d D2 = cross(N, W);
-	double t;// = (D2.x*(M1.y - M2.y)) / (D1.x*D2.y - D1.y*D2.x) - (D2.y*(M1.x - M2.x)) / (D1.x*D2.y - D1.y*D2.x);
+	double t=0.0;// = (D2.x*(M1.y - M2.y)) / (D1.x*D2.y - D1.y*D2.x) - (D2.y*(M1.x - M2.x)) / (D1.x*D2.y - D1.y*D2.x);
 	if (abs(D1.x*D2.y - D1.y*D2.x) > 1E-13)
 	{
 		t = (D2.x*(M1.y - M2.y)) / (D1.x*D2.y - D1.y*D2.x) - (D2.y*(M1.x - M2.x)) / (D1.x*D2.y - D1.y*D2.x);
@@ -404,7 +404,7 @@ vector4d xUtilityFunctions::FitSphereToTriangle(vector3d& P, vector3d& Q, vector
 	vector3d M2 = (R + P) / 2;
 	vector3d D1 = cross(N, V);
 	vector3d D2 = cross(N, W);
-	double t;// = (D2.x*(M1.y - M2.y)) / (D1.x*D2.y - D1.y*D2.x) - (D2.y*(M1.x - M2.x)) / (D1.x*D2.y - D1.y*D2.x);
+	double t=0.0;// = (D2.x*(M1.y - M2.y)) / (D1.x*D2.y - D1.y*D2.x) - (D2.y*(M1.x - M2.x)) / (D1.x*D2.y - D1.y*D2.x);
 	if (abs(D1.x*D2.y - D1.y*D2.x) > 1E-13)
 	{
 		t = (D2.x*(M1.y - M2.y)) / (D1.x*D2.y - D1.y*D2.x) - (D2.y*(M1.x - M2.x)) / (D1.x*D2.y - D1.y*D2.x);

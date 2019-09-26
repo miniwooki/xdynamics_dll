@@ -21,12 +21,12 @@ bool xvPlane::makePlaneGeometry(xPlaneObjectData& d)
 // 	pos.x = 0.5f * (d.p1x + d.pox);
 // 	pos.y = 0.5f * (d.p1y + d.poy);
 // 	pos.z = 0.5f * (d.p1z + d.poz);
-
-	p0 = new_vector3f(d.p0x, d.p0y, d.p0z);
-	p1 = new_vector3f(d.p1x, d.p1y, d.p1z);
-	p2 = new_vector3f(d.p2x, d.p2y, d.p2z);
-	p3 = new_vector3f(d.p3x, d.p3y, d.p3z);
-	pos = 0.5f * (p0 + p2);
+	pos = 0.5f * new_vector3f(d.p0x + d.p2x, d.p0y + d.p2y, d.p0z+d.p2z);
+	p0 = new_vector3f(d.p0x, d.p0y, d.p0z) - pos;
+	p1 = new_vector3f(d.p1x, d.p1y, d.p1z) -pos;
+	p2 = new_vector3f(d.p2x, d.p2y, d.p2z) -pos;
+	p3 = new_vector3f(d.p3x, d.p3y, d.p3z)-pos;
+	
 	width = length(p1 - p0);
 	height = length(p3 - p0);
 // 	vector3f dr = new_vector3f(d.drx, d.dry, d.drz);
