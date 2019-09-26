@@ -60,13 +60,13 @@ xChartWindow::xChartWindow(QWidget* parent /* = NULL */)
 	mainToolBar = new QToolBar(this);
 	addToolBar(mainToolBar);
 
-	/*actions[PASSING_DISTRIBUTION] = new QAction(QIcon(":/Resources/chart_passing.png"), tr("&Passing distribution"), this);
-	actions[PASSING_DISTRIBUTION]->setStatusTip(tr("Distribution of particles passing area"));
-	connect(actions[PASSING_DISTRIBUTION], SIGNAL(triggered()), this, SLOT(click_passing_distribution()));
+	//actions[PASSING_DISTRIBUTION] = new QAction(QIcon(":/Resources/chart_passing.png"), tr("&Passing distribution"), this);
+	//actions[PASSING_DISTRIBUTION]->setStatusTip(tr("Distribution of particles passing area"));
+	//c/onnect(actions[PASSING_DISTRIBUTION], SIGNAL(triggered()), this, SLOT(click_passing_distribution()));
 	connect(comm, SIGNAL(editingFinished()), this, SLOT(editingCommand()));
 	connect(tree, SIGNAL(ClickedItem(int, QString)), this, SLOT(updateTargetItem(int, QString)));
 	connect(tree->plotItemComboBox(), SIGNAL(currentIndexChanged(int)), this, SLOT(changeComboBoxItem(int)));
-	mainToolBar->addAction(actions[PASSING_DISTRIBUTION]);*/
+	//mainToolBar->addAction(actions[PASSING_DISTRIBUTION]);
 	isActivate = true;
 }
 
@@ -270,7 +270,7 @@ void xChartWindow::body_plot()
  	QString ytitle;
 	xPointMass::pointmass_result* pmr = tree->MassResults(select_item_name);
 	double *time = tree->result_manager_ptr()->get_times();
-	for (unsigned int i = 0; i < tree->result_manager_ptr()->get_num_parts(); i++)
+	for (unsigned int i = 0; i < tree->result_manager_ptr()->get_current_part_number(); i++)
 	{
 		xPointMass::pointmass_result r = pmr[i];
 		double v = 0.0;

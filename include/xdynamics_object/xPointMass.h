@@ -113,6 +113,7 @@ public:
 	void setNewData(xVectorD& q, xVectorD& qd);
 	void setNewPositionData(xVectorD& q);
 	void setNewVelocityData(xVectorD& qd);
+	void setNewAccelerationData(xVectorD& qdd);
 	bool checkStopCondition();
 	void UpdateByCompulsion(double ct);
 	//virtual void translation(vector3d new_pos);

@@ -40,6 +40,8 @@ xResultManager::xResultManager()
 	, ngeneralized_coordinates(0)
 	, nconstraints(0)
 	, terminated_num_parts(0)
+	, nparts(0)
+	, ncparts(0)
 {
 
 }
@@ -123,12 +125,17 @@ unsigned int xResultManager::get_terminated_num_parts()
 	return terminated_num_parts;
 }
 
+unsigned int xResultManager::get_current_part_number()
+{
+	return ncparts;
+}
+
 double * xResultManager::get_times()
 {
 	return time;
 }
 
-void xResultManager::ExportPointMassResult2TXT(std::string name)
+void xResultManager::export_mass_result_to_text(std::string name)
 {
 	xmap<xstring, struct_pmr*>::iterator it = pmrs.find(name);
 	std::fstream ifs;
@@ -204,6 +211,11 @@ void xResultManager::setup_particle_buffer_color_distribution(xColorControl* xcc
 			}
 		}
 	}
+}
+
+void xResultManager::set_current_part_number(unsigned int cnpt)
+{
+	ncparts = cnpt;
 }
 
 bool xResultManager::initialize_from_exist_results(std::string path)

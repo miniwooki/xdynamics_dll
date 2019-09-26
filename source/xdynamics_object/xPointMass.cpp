@@ -453,6 +453,8 @@ void xPointMass::setNewData(xVectorD& q, xVectorD& qd)
 	ev.e0 = qd(idx + 3); ev.e1 = qd(idx + 4); ev.e2 = qd(idx + 5); ev.e3 = qd(idx + 6);
 	af = new_vector3d(0.0, 0.0, 0.0);
 	am = new_vector3d(0.0, 0.0, 0.0);
+	omega = ToAngularVelocity(ep, ev);
+	//alpha = ToAngularAcceleration(ep, ea);
 	setupTransformationMatrix();
 }
 
@@ -470,6 +472,15 @@ void xPointMass::setNewVelocityData(xVectorD& qd)
 	unsigned int idx = index * xModel::OneDOF();
 	vel.x = qd(idx + 0); vel.y = qd(idx + 1); vel.z = qd(idx + 2);
 	ev.e0 = qd(idx + 3); ev.e1 = qd(idx + 4); ev.e2 = qd(idx + 5); ev.e3 = qd(idx + 6);
+	omega = ToAngularVelocity(ep, ev);
+}
+
+void xPointMass::setNewAccelerationData(xVectorD & qdd)
+{
+	unsigned int idx = (index - 1) * xModel::OneDOF();
+	acc.x = qdd(idx + 0); acc.y = qdd(idx + 1); acc.z = qdd(idx + 2);
+	ea.e0 = qdd(idx + 3); ea.e1 = qdd(idx + 4); ea.e2 = qdd(idx + 5); ea.e3 = qdd(idx + 6);
+	alpha = ToAngularVelocity(ep, ea);
 }
 
 bool xPointMass::checkStopCondition()

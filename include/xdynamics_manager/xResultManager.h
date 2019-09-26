@@ -28,6 +28,7 @@ public:
 	unsigned int get_num_generalized_coordinates();
 	unsigned int get_num_constraint_equations();
 	unsigned int get_terminated_num_parts();
+	unsigned int get_current_part_number();
 	
 	double* get_times();
 	//void set_num_particles(unsigned int np);
@@ -68,10 +69,10 @@ public:
 	bool save_p2tri_contact_data(unsigned int* count, unsigned int *id, double* tsd);
 	void save_driving_rotation_result(unsigned int i, std::string nm, unsigned int n_rev, unsigned int dn_rev, double theta);
 	bool export_step_data_to_file(unsigned int pt, double ct);
-	void ExportPointMassResult2TXT(std::string n);
+	void export_mass_result_to_text(std::string n);
 	void export_joint_result_to_text(std::string n);
 	void setup_particle_buffer_color_distribution(xColorControl* xcc, int sframe, int cframe);
-
+	void set_current_part_number(unsigned int cnpt);
 	bool initialize_from_exist_results(std::string path);
 	bool upload_exist_results(std::string path);
 
@@ -93,6 +94,7 @@ private:
 	unsigned int nparticles;
 	unsigned int nclusters;
 	unsigned int nparts;
+	unsigned int ncparts;
 	unsigned int terminated_num_parts;
 	unsigned int ngeneralized_coordinates;
 	unsigned int nconstraints;

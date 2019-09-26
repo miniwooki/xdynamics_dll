@@ -801,6 +801,11 @@ vector3d ToAngularVelocity(const euler_parameters &e, const euler_parameters& ev
 	return 2.0 * LMatrix(e) * ev;
 }
 
+vector3d ToAngularAcceleration(const euler_parameters & e, const euler_parameters & ea)
+{
+	return 2.0 * LMatrix(e) * ea;// vector3d();
+}
+
 matrix33d Tilde(const vector3d & v)
 {
 	matrix33d m;

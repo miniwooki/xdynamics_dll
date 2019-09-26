@@ -161,7 +161,10 @@ void xChartDatabase::selectPlotItem(int id)
 void xChartDatabase::export_to_textfile(QTreeWidgetItem* citem)
 {
 	QString cname = citem->text(0);
-	xrm->ExportPointMassResult2TXT(cname.toStdString());
+	if (citem->parent()->text(0) == "Body")
+		xrm->export_mass_result_to_text(cname.toStdString());
+	else if (citem->parent()->text(0) == "Joint")
+		xrm->export_joint_result_to_text(cname.toStdString());
 }
 
 void xChartDatabase::process_context_menu(QString txt, QTreeWidgetItem* citem)
@@ -169,6 +172,7 @@ void xChartDatabase::process_context_menu(QString txt, QTreeWidgetItem* citem)
 	//.QString txt = a->text();
 	if (txt == "Export text file" && citem)
 	{
+		
 		export_to_textfile(citem);
 	}
 }

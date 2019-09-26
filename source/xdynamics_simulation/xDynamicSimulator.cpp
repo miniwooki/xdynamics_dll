@@ -290,6 +290,7 @@ bool xDynamicsSimulator::savePartData(double ct, unsigned int pt)
 	if (xsph)
 		xsph->SaveStepResult(pt, ct);
 	xdm->XResult()->export_step_data_to_file(pt, ct);
+	xdm->XResult()->set_current_part_number(pt);
 	return true;
 }
 

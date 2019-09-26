@@ -187,6 +187,7 @@ XDYNAMICS_API matrix44d DMatrix(const vector3d& s, const vector3d& d);
 XDYNAMICS_API matrix44d Inverse4X4(const matrix44d& A);
 XDYNAMICS_API matrix33d new_identity3(const double j);
 XDYNAMICS_API vector3d ToAngularVelocity(const euler_parameters& e, const euler_parameters& ev);
+XDYNAMICS_API vector3d ToAngularAcceleration(const euler_parameters& e, const euler_parameters& ea);
 XDYNAMICS_API vector3d ToGlobal(const euler_parameters& e, const vector3d& v3);
 XDYNAMICS_API vector3d ToLocal(const euler_parameters& e, const vector3d& v3);
 XDYNAMICS_API matrix33d Tilde(const vector3d& v);

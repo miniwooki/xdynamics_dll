@@ -60,6 +60,7 @@ bool xMultiBodySimulation::SaveStepResult(unsigned int part)
 	xmap<xstring, xPointMass*>::iterator it = xmbd->Masses().begin();
 	while (it.has_next())
 	{
+		it.value()->setNewAccelerationData(rhs);
 		xrm->save_mass_result(part, it.value());
 		it.next();
 	}
