@@ -205,13 +205,13 @@ void XDYNAMICS_API cu_cube_contact_force(
 
 // Function for contact between particle and polygonObject
 void XDYNAMICS_API cu_particle_polygonObject_collision(
-	device_triangle_info* dpi, device_body_info* dbi, device_body_force* dbf,
+	device_triangle_info* dpi, device_body_info* dbi,
 	double* pos, double* ep, double* vel, double* omega,
 	double* force, double* moment, double* mass,
 	double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd, double* dsph,
 	unsigned int* sidx, unsigned int* cstart, unsigned int* cend, device_contact_property *cp,
-	unsigned int np, unsigned int bindex, unsigned int eindex, unsigned int nmesh/*, double3* mpos, double3* mf, double3* mm, double3& _mf, double3& _mm*/);
+	unsigned int np, unsigned int bindex, unsigned int eindex/*, double3* mpos, double3* mf, double3* mm, double3& _mf, double3& _mm*/);
 
 // Function for contact between particle and cylinder
 void XDYNAMICS_API cu_cylinder_contact_force(

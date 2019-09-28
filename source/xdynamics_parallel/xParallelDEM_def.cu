@@ -240,13 +240,12 @@ void cu_cylinder_contact_force(
 
 void cu_particle_polygonObject_collision(
 	device_triangle_info* dpi, device_body_info* dbi,
-	device_body_force* dbfm,
 	double* pos, double* ep, double* vel, double* ev,
 	double* force, double* moment, double* mass,
 	double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd, double* dsph,
 	unsigned int* sorted_index, unsigned int* cstart, unsigned int* cend, device_contact_property *cp,
-	unsigned int np, unsigned int bindex, unsigned int eindex, unsigned int nmesh)
+	unsigned int np, unsigned int bindex, unsigned int eindex)
 {
 	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
 	

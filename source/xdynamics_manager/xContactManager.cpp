@@ -524,7 +524,7 @@ void xContactManager::deviceCollision(
 				unsigned int ePolySphere = 0;
 				unsigned int cnt = 0;
 				device_body_force *dbfm = cpmeshes->deviceBodyForceAndMoment();
-				memset(dbfm, 0, sizeof(device_body_force) * cpmeshes->NumContact());
+				memset(dbfm, 0, sizeof(device_body_force) * cpmeshes->NumContactObjects());
 				for (xmap<xstring, xParticleMeshObjectContact*>::iterator it = cpmesh.begin(); it != cpmesh.end(); it.next())// (xParticleMeshObjectContact* cpm, cpmesh)
 				{
 					xParticleMeshObjectContact* cpm = it.value();
@@ -611,15 +611,13 @@ void xContactManager::deviceCollision(
 					cu_particle_polygonObject_collision(
 						cpmeshes->deviceTrianglesInfo(),
 						cpmeshes->devicePolygonObjectMassInfo(), 
-						cpmeshes->deviceBodyForceAndMoment(),
 						pos, ep, vel, ev, force, moment, mass,
 						d_Tmax, d_RRes, d_pair_count_ptri, d_pair_id_ptri, d_tsd_ptri, 
 						cpmeshes->SphereData(),
 						sorted_id, cell_start, cell_end, 
 						cpmeshes->DeviceContactProperty(),
 						np,
-						bPolySphere, ePolySphere,
-						cpmeshes->NumContact());
+						bPolySphere, ePolySphere);
 					bPolySphere += cpm->MeshObject()->NumTriangle();
 					dbfm[cnt].force = reductionD3(xContact::deviceBodyForce(), np);
 					dbfm[cnt].moment = reductionD3(xContact::deviceBodyMoment(), np);

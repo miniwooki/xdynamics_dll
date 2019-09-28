@@ -365,10 +365,10 @@ void xParticleMeshObjectsContact::updateMeshObjectData(bool is_first_set_up)
 				pobj->Velocity().x, pobj->Velocity().y, pobj->Velocity().z,
 				ep.e0, ep.e1, ep.e2, ep.e3,
 				ed.e0, ed.e1, ed.e2, ed.e3
-			};
-			checkCudaErrors(cudaMemcpy(dbi, bi, sizeof(device_body_info) * nPobjs, cudaMemcpyHostToDevice));
+			};			
 			mcnt++;
 		}
+		checkCudaErrors(cudaMemcpy(dbi, bi, sizeof(device_body_info) * nPobjs, cudaMemcpyHostToDevice));
 		for (xmap<unsigned int, xMeshObject*>::iterator it = pair_ip.begin(); it != pair_ip.end(); it.next())
 		{
 			ePolySphere += it.value()->NumTriangle();

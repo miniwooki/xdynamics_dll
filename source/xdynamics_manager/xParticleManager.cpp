@@ -403,20 +403,25 @@ void xParticleManager::SetCurrentParticlesFromPartResult(std::string path)
 		for(xmap<xstring, xParticleObject*>::iterator it = xpcos.begin(); it != xpcos.end(); it.next())//foreach(xParticleObject* xpo, xpcos)
 		{
 			xParticleObject* xpo = it.value();
-			unsigned int sid = xpo->StartIndex();
+ 			unsigned int sid = xpo->StartIndex();
 			unsigned int xnp = xpo->NumParticle();
+			unsigned int xns = xpo->NumCluster();
 			vector4d* xpo_pos = xpo->Position();
 			vector4d* xpo_ep = xpo->EulerParameters();
 			memcpy(xpo_pos, m_pos + sid, sizeof(vector4d) * xnp);
-			if (m_cpos)
+			if (xns && m_cpos)
 			{
 				vector4d* xpo_cpos = xpo->ClusterPosition();
-				unsigned int xns = xpo->NumCluster();
-				memcpy(xpo_cpos, m_cpos, sizeof(vector4d) * xns);
-				memcpy(xpo_ep, m_ep, sizeof(vector4d) * xns);
+				unsigned int c_sid = xpo->StartClusterIndex();
+				memcpy(xpo_cpos, m_cpos + c_sid, sizeof(vector4d) * xns);
+				memcpy(xpo_ep, m_ep + c_sid, sizeof(vector4d) * xns);
 			}
+		/*	else
+			{
+				memcpy(xpo_ep, m_ep + sid, sizeof(vector4d) * xnp);
+			}*/
 		//	qf.read((char*)m_pos, sizeof()
-			xpccs.erase(xpo->Name());
+		//	xpccs.erase(xpo->Name());
 		}
 		delete[] m_pos;
 		delete[] m_vel;

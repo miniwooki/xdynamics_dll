@@ -145,7 +145,7 @@ void xRotationSpringDamperForce::SetupDataFromListData(xRSDAData&d, std::string 
 			else if (ch == "mass_particle_connection_list")
 			{
 				std::string ch;
-				unsigned int cnt = 0;
+				size_t cnt = 0;
 				fs >> nBodyConnection;
 				connection_body_info = new xSpringDamperBodyConnectionInfo[nBodyConnection];
 				list<xSpringDamperBodyConnectionData> bc_list;
