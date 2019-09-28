@@ -33,17 +33,20 @@ xParticleMeshObjectsContact::~xParticleMeshObjectsContact()
 	if (hpi) delete[] hpi; hpi = NULL;
 	if (hcp) delete[] hcp; hcp = NULL;
 	if (xmps) delete[] xmps; xmps = NULL;
+	if (dbf) delete[] dbf; dbf = NULL;
 	//if (hpmi) delete[] hpmi; hpmi = NULL;
 	//qDeleteAll(pair_ip);
 	if (xSimulation::Gpu())
 	{
+//		if (dbf) checkCudaErrors(cudaFree(dbf)); dbf = NULL;
 		if (dsphere) checkCudaErrors(cudaFree(dsphere)); dsphere = NULL;
 		if (dlocal) checkCudaErrors(cudaFree(dlocal)); dlocal = NULL;
+		if (dbi) checkXerror(cudaFree(dbi)); dbi = NULL;
 		if (dpi) checkCudaErrors(cudaFree(dpi)); dpi = NULL;
 		if (dvList) checkCudaErrors(cudaFree(dvList)); dvList = NULL;
 		if (diList) checkCudaErrors(cudaFree(diList)); diList = NULL;
-		if (dbi) checkCudaErrors(cudaFree(dbi)); dbi = NULL;
-		if (dbf) checkCudaErrors(cudaFree(dbf)); dbf = NULL;
+		//if (dbi) checkCudaErrors(cudaFree(dbi)); dbi = NULL;
+		
 	}
 	
 }
@@ -372,6 +375,7 @@ void xParticleMeshObjectsContact::updateMeshObjectData(bool is_first_set_up)
 			cu_update_meshObjectData(dvList, dsphere, dlocal, dpi, dbi, ePolySphere - bPolySphere);
 			bPolySphere += it.value()->NumTriangle();// ePolySphere;
 		}
+		if(bi) delete [] bi;
 	}
 	else
 	{

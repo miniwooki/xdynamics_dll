@@ -23,6 +23,7 @@ public:
 	void setRotationAngle(double _theta);
 	void define(xVectorD& q);
 	std::string Name();
+	int get_driving_type();
 	void setStartTime(double st);
 	void setConstantVelocity(double cv);
 	void ImportResults(std::string f);

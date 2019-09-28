@@ -467,6 +467,11 @@ xmap<xstring, struct_kcr*>* xResultManager::get_joint_result_xmap()
 	return &kcrs;
 }
 
+xmap<xstring, xDrivingRotationResultData>* xResultManager::get_rotation_driving_result_xmap()
+{
+	return &xdrr;
+}
+
 xlist<unsigned int>* xResultManager::get_distribution_id_list()
 {
 	return &dist_id;

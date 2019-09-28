@@ -77,7 +77,8 @@ bool xMultiBodySimulation::SaveStepResult(unsigned int part)
 	{
 		xKinematicConstraint::kinematicConstraint_result kcr = it.value()->GetStepResult(part, xSimulation::ctime, q, qd, lagMul, sr);
 		xrm->save_joint_result(part, it.value()->Name(), kcr);
-		xrm->save_driving_rotation_result(part, it.value()->Name(), it.value()->RevolutionCount(), it.value()->DerivativeRevolutionCount(), it.value()->RotationAngle());
+		if(it.value()->get_driving_type() == xDrivingConstraint::ROTATION_DRIVING)
+			xrm->save_driving_rotation_result(part, it.value()->Name(), it.value()->RevolutionCount(), it.value()->DerivativeRevolutionCount(), it.value()->RotationAngle());
 		sr++;
 	}
 	return xrm->save_generalized_coordinate_result(q.Data(), qd.Data(), q_1.Data(), rhs.Data());
@@ -238,7 +239,8 @@ int xMultiBodySimulation::Initialize(xMultiBodyModel* _xmbd, bool is_set_result_
 		if (is_set_result_memory)
 		{
 			xDynamicsManager::This()->XResult()->alloc_joint_result_memory(it.value()->Name());
-			xDynamicsManager::This()->XResult()->alloc_driving_rotation_result_memory(it.value()->Name());
+			if(it.value()->get_driving_type() == xDrivingConstraint::ROTATION_DRIVING)
+				xDynamicsManager::This()->XResult()->alloc_driving_rotation_result_memory(it.value()->Name());
 		}
 			
 		sdim++;

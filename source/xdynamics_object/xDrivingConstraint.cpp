@@ -106,6 +106,11 @@ std::string xDrivingConstraint::Name()
 	return name.toStdString();
 }
 
+int xDrivingConstraint::get_driving_type()
+{
+	return type;
+}
+
 void xDrivingConstraint::setStartTime(double st)
 {
 	start_time = st;

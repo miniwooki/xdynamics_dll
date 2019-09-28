@@ -51,11 +51,11 @@ public:
 	static bool isActivate;
 
 	public slots:
-	void updateTargetItem(int, QString);
+	void updateTargetItem(int, QString, QStringList);
 
 	private slots:
 	void click_passing_distribution();
-	void changeComboBoxItem(int i = 0);
+	void PlotFromComboBoxItem(int i = 0);
 	void editingCommand();
 
 private:
@@ -84,5 +84,6 @@ private:
 	QMap<QString, xLineSeries*> seriesMap;
 	QDockWidget *commDock;
 	QLineEdit *comm;
+	QComboBox* plot_item;
 };
 #endif

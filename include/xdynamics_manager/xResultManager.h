@@ -41,6 +41,7 @@ public:
 	struct_kcr* get_joint_result_ptr(std::string n);
 	xmap<xstring, struct_pmr*>* get_mass_result_xmap();
 	xmap<xstring, struct_kcr*>* get_joint_result_xmap();
+	xmap<xstring, xDrivingRotationResultData>* get_rotation_driving_result_xmap();
 	xlist<unsigned int>* get_distribution_id_list();
 	float* get_particle_position_result_ptr();
 	float* get_particle_velocity_result_ptr();
@@ -141,6 +142,8 @@ private:
 
 	unsigned int *p2pl_contact_count;
 	unsigned int *p2pl_contact_id;
+
+
 	double *p2pl_contact_tsd;
 
 	unsigned int *p2cyl_contact_count;

@@ -3,6 +3,7 @@
 #include "xvAnimationController.h"
 #include <QTextStream>
 #include <QFile>
+#include <QDebug>
 #include <QDir>
 //#include <sstream>
 //#include <iostream>
@@ -55,12 +56,13 @@ void xResultCallThread::run()
 			else
 				break;
 		}
-		emit result_call_send_progress(5, "");
+		//emit result_call_send_progress(5, "");
 		if (xrm->get_num_parts() != _nparts)
 		{
 			emit result_call_send_progress(-1,
 				QString("!_This result of this analysis is not enough[%1 / %2]. This may mean that the interpretation was interrupted.").arg(_nparts).arg(xrm->get_num_parts()));
 			xrm->set_terminated_num_parts(_nparts);
+			//qDebug() << "_nparticles : " << _nparts;
 			xrm->set_current_part_number(_nparts);
 			is_terminated = true;
 		}			
@@ -84,7 +86,7 @@ void xResultCallThread::run()
 			if (ns != np)
 				_cpos = new double[ns * 4];
 		}
-		emit result_call_send_progress(10, "");
+	//	emit result_call_send_progress(10, "");
 		foreach(QString it, flist)
 		{
 			QFile fs(it);
@@ -98,7 +100,11 @@ void xResultCallThread::run()
 				unsigned int _npt = 0;
 				unsigned int _nct = 0;
 				fs.read((char*)&_npt, sizeof(unsigned int));
+				//qDebug() << "_npt : " << _npt;
 				fs.read((char*)&_nct, sizeof(unsigned int));
+				//qDebug() << "_nct : " << _nct;
+				//qDebug() << "np : " << np;
+				//qDebug() << "ns : " << ns;
 				fs.read((char*)_pos, sizeof(double) * np * 4);
 				fs.read((char*)_vel, sizeof(double) * ns * 3);
 				fs.read((char*)_acc, sizeof(double) * ns * 3);
@@ -117,6 +123,9 @@ void xResultCallThread::run()
 				fs.read((char*)&m_size, sizeof(unsigned int));
 				fs.read((char*)&j_size, sizeof(unsigned int));
 				fs.read((char*)&d_size, sizeof(unsigned int));
+				//qDebug() << "m_size : " << m_size;
+				//qDebug() << "j_size : " << j_size;
+				//qDebug() << "d_size : " << d_size;
 				/*if (pmrs.size() != m_size)
 				{
 
@@ -127,53 +136,54 @@ void xResultCallThread::run()
 				}*/
 				xMultiBodyModel* xmbd = xdm->XMBDModel();
 				
-				for (xmap<xstring, xPointMass*>::iterator it = xmbd->Masses().begin(); it != xmbd->Masses().end(); it.next())
+				for (xmap<xstring, xPointMass::pointmass_result*>::iterator it = xrm->get_mass_result_xmap()->begin(); it != xrm->get_mass_result_xmap()->end(); it.next())
 				{
 					struct_pmr pr = { 0, };
-					struct_pmr* _pmr = xrm->get_mass_result_ptr(it.key().toStdString());
-					if (_pmr == NULL)
+					struct_pmr* _pmr = it.value();// xrm->get_mass_result_ptr(it.key().toStdString());
+					/*if (_pmr == NULL)
 					{
 						emit result_call_send_progress(-1, "!_Body that exists in the current model does not exist in the results.");
 						xdm->release_result_manager();
 						break;
-					}						
+					}	*/					
 					fs.read((char*)&pr, sizeof(struct_pmr));
 					_pmr[cnt] = pr;
 				}
-				for (xmap<xstring, xKinematicConstraint*>::iterator it = xmbd->Joints().begin(); it != xmbd->Joints().end(); it.next())
+				for (xmap<xstring, xKinematicConstraint::kinematicConstraint_result*>::iterator it = xrm->get_joint_result_xmap()->begin(); it != xrm->get_joint_result_xmap()->end(); it.next())
 				{
 					struct_kcr kr = { 0, };
-					struct_kcr* _kcr = xrm->get_joint_result_ptr(it.key().toStdString());
-					if (_kcr == NULL)
+					struct_kcr* _kcr = it.value();// ->get_joint_result_ptr(it.key().toStdString());
+				/*	if (_kcr == NULL)
 					{
 						emit result_call_send_progress(-1, "!_Joint that exists in the current model does not exist in the results.");
 						xdm->release_result_manager();
 						break;
-					}
+					}*/
 					fs.read((char*)&kr, sizeof(struct_kcr));
 					_kcr[cnt] = kr;
 				}
-				for (xmap<xstring, xDrivingConstraint*>::iterator it = xmbd->Drivings().begin(); it != xmbd->Drivings().end(); it.next())
+				for (xmap<xstring, xDrivingRotationResultData>::iterator it = xrm->get_rotation_driving_result_xmap()->begin(); it != xrm->get_rotation_driving_result_xmap()->end(); it.next())
 				{
-					struct_kcr kr = { 0, };
-					struct_kcr* _kcr = xrm->get_joint_result_ptr(it.key().toStdString());
-					if (_kcr == NULL)
+					//struct_kcr kr = { 0, };
+					//struct_kcr* _kcr = xrm->get_joint_result_ptr(it.key().toStdString());
+					/*if (_kcr == NULL)
 					{
 						emit result_call_send_progress(-1, "!_Driving that exists in the current model does not exist in the results.");
 						xdm->release_result_manager();
 						break;
-					}
-					fs.read((char*)&kr, sizeof(struct_kcr));
-					_kcr[cnt] = kr;
+					}*/
+					//fs.read((char*)&kr, sizeof(struct_kcr));
+					//_kcr[cnt] = kr;
 					xDrivingRotationResultData xdr = { 0, };
 					fs.read((char*)&xdr, sizeof(xDrivingRotationResultData));
-
-					xrm->save_driving_rotation_result(cnt, it.value()->Name(), xdr.rev_count, xdr.drev_count, xdr.theta);
+					xrm->save_driving_rotation_result(cnt, it.key().toStdString(), xdr.rev_count, xdr.drev_count, xdr.theta);
+					//qDebug() << "driving : " << cnt << " - " << it.value()->Name().c_str() << " - " << xdr.rev_count << " - " << xdr.drev_count << " - " << xdr.theta;
 				}
 			}
-			cnt++;
+			xrm->set_current_part_number(cnt);
 			fs.close();
-			emit result_call_send_progress(10 + cnt, "");
+			emit result_call_send_progress(cnt, "Uploaded : " + it);
+			cnt++;
 		}
 
 		xvAnimationController::allocTimeMemory(xdm->XResult()->get_num_parts());

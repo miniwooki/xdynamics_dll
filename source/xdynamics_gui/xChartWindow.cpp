@@ -30,6 +30,7 @@ xChartWindow::xChartWindow(QWidget* parent /* = NULL */)
 	, mainToolBar(NULL)
 	, comm(NULL)
 	, commDock(NULL)
+	, plot_item(NULL)
 {
 	QFrame *vb = new QFrame(this);
 	QVBoxLayout *layout = new QVBoxLayout(vb);
@@ -38,9 +39,10 @@ xChartWindow::xChartWindow(QWidget* parent /* = NULL */)
 	vcht = new xChartView(this);
 	tree = new xChartDatabase(this);
 	prop = new xChartControl(this);
+	plot_item = new QComboBox(this);
 	setMinimumSize(640, 580);
 	resize(xSize, ySize);
-	layout->addWidget(tree->plotItemComboBox());
+	layout->addWidget(plot_item);
 	layout->addWidget(vcht);
 	setCentralWidget(vb);
 
@@ -56,8 +58,9 @@ xChartWindow::xChartWindow(QWidget* parent /* = NULL */)
 	addToolBar(mainToolBar);
 
 	connect(comm, SIGNAL(editingFinished()), this, SLOT(editingCommand()));
-	connect(tree, SIGNAL(ClickedItem(int, QString)), this, SLOT(updateTargetItem(int, QString)));
-	connect(tree->plotItemComboBox(), SIGNAL(currentIndexChanged(int)), this, SLOT(changeComboBoxItem(int)));
+	connect(tree, SIGNAL(ClickedItem(int, QString, QStringList)), this, SLOT(updateTargetItem(int, QString, QStringList)));
+	//connect(tree, &QTreeWidget::itemClicked, this, &xChartDatabase::clickItem);
+	connect(plot_item, SIGNAL(currentIndexChanged(int)), this, SLOT(PlotFromComboBoxItem(int)));
 	QShortcut *a = new QShortcut(QKeySequence("Shift+R"), this);
 	connect(a, SIGNAL(activated()), this, SLOT(changeComboBoxItem()));
 	isActivate = true;
@@ -127,8 +130,8 @@ void xChartWindow::editingCommand()
 
 void xChartWindow::joint_plot()
 {
-	int it = tree->plotItemComboBox()->currentIndex();
-	QString plotName = select_item_name + "_" + tree->plotItemComboBox()->currentText();
+	int it = plot_item->currentIndex();
+	QString plotName = select_item_name + "_" + plot_item->currentText();
 	if (!curPlotName.isEmpty())
 		seriesMap[curPlotName]->hide();
 	curPlotName = plotName;
@@ -186,9 +189,9 @@ void xChartWindow::joint_plot()
 
 void xChartWindow::body_plot()
 {
- 	int it = tree->plotItemComboBox()->currentIndex();
+ 	int it = plot_item->currentIndex();
 // 	QString target = tree->plotTarget();
- 	QString plotName = select_item_name + "_" + tree->plotItemComboBox()->currentText();
+ 	QString plotName = select_item_name + "_" + plot_item->currentText();
  	if (!curPlotName.isEmpty())
  		seriesMap[curPlotName]->hide();
  	curPlotName = plotName;
@@ -246,10 +249,12 @@ void xChartWindow::body_plot()
 // 	//	else if (plotItem == )
 }
 
-void xChartWindow::updateTargetItem(int id, QString n)
+void xChartWindow::updateTargetItem(int id, QString n, QStringList plist)
 {
 	select_item_index = id;
 	select_item_name = n;
+	plot_item->clear();
+	plot_item->addItems(plist);
 }
 
 void xChartWindow::click_passing_distribution()
@@ -257,7 +262,7 @@ void xChartWindow::click_passing_distribution()
 
 }
 
-void xChartWindow::changeComboBoxItem(int idx)
+void xChartWindow::PlotFromComboBoxItem(int idx)
 {
 	switch (select_item_index)
 	{

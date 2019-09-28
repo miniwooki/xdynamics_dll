@@ -4,6 +4,7 @@
 #include <QDockWidget>
 #include <QTreeWidget>
 #include <QComboBox>
+#include <QDebug>
 #include "xdynamics_object/xPointMass.h"
 #include "xdynamics_object/xKinematicConstraint.h"
 
@@ -18,6 +19,7 @@ inline QStringList get_point_mass_chart_list()
 	stList.push_back("RVX"); stList.push_back("RVY"); stList.push_back("RVZ");
 	stList.push_back("AX"); stList.push_back("AY"); stList.push_back("AZ");
 	stList.push_back("RAX"); stList.push_back("RAY"); stList.push_back("RAZ");
+	qDebug() << "end get_point_mass_chart_list";
 	return stList;
 }
 
@@ -55,7 +57,6 @@ public:
 	void bindItemComboBox(QComboBox* t);
 	QStringList selectedLists();
 	tRoot selectedType();
-	QComboBox* plotItemComboBox();
 	void setResultManager(xResultManager* _xrm);
 	QString plotTarget();
 	xResultManager* result_manager_ptr();
@@ -79,12 +80,13 @@ private:
 	QMap<QString, xKinematicConstraint::kinematicConstraint_result*> constraint_results;
 	QStringList sLists;
 	tRoot tSelected;
-	QComboBox *plot_item;
+	//QComboBox plot_item;
 	QString target;
 	xResultManager* xrm;
 
 signals:
-	void ClickedItem(int, QString);
+	void ClickedItem(int, QString, QStringList);
+	void ChangeComboBoxItem(int);
 };
 
 #endif

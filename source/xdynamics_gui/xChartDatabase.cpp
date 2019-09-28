@@ -47,10 +47,10 @@ xChartDatabase::xChartDatabase(QWidget* parent)
 	roots[CYLINDER_ROOT]->setIcon(0, QIcon(":/Resources/cylinder.png"));
 	roots[POLYGON_ROOT]->setIcon(0, QIcon(":/Resources/icPolygon.png"));
 	roots[MASS_ROOT]->setIcon(0, QIcon(":/Resources/mass.png"));*/
-	plot_item = new QComboBox(this);
+	//plot_item = new QComboBox;
 	connect(tree, &QTreeWidget::customContextMenuRequested, this, &xChartDatabase::contextMenu);
 	connect(tree, &QTreeWidget::itemClicked, this, &xChartDatabase::clickItem);
-	connect(plot_item, SIGNAL(currentIndexChanged(int)), this, SLOT(selectPlotItem(int)));
+	//connect(&plot_item, SIGNAL(currentIndexChanged(int)), this, SLOT(selectPlotItem(int)));
 
 	tree->setSelectionMode(QAbstractItemView::SelectionMode::ContiguousSelection);
 	setWidget(tree);
@@ -88,7 +88,8 @@ void xChartDatabase::clickItem(QTreeWidgetItem* item, int col)
 {
 	if (!item)
 		return;
-	plot_item->clear();
+
+	//plot_item.clear();
 	//QList<QTreeWidgetItem*> items = tree->selectedItems();
 	//cmdWindow::write(CMD_INFO, "The number of selected items : " + QString("%1").arg(items.size()));
 // 	if (items.size() > 1)
@@ -98,6 +99,7 @@ void xChartDatabase::clickItem(QTreeWidgetItem* item, int col)
 // 		return;
 // 	}
 	QString tg = item->text(col);
+	//qDebug() << "target_name : " << tg;
 // 	if (target == tg)
 // 		return;
 // 	target = tg;
@@ -107,24 +109,29 @@ void xChartDatabase::clickItem(QTreeWidgetItem* item, int col)
 		return;
 	}
 	QString sp = parent->text(0);
+	//qDebug() << "parent_name : " << sp;
 	int idx = -1;
+	QStringList plist;
 	if (sp == "Body")
 	{
 		idx = (int)MASS_ROOT;
-		plot_item->addItems(get_point_mass_chart_list());
+		//qDebug() << "before add items";
+		plist = get_point_mass_chart_list();
+		//qDebug() << "after add items";
+	//	qDebug() << "fdljksdfkljsdfkljsdf";
 	}
 	else if (sp == "Joint")
 	{
 		idx = (int)KCONSTRAINT_ROOT;
-		plot_item->addItems(get_joint_chart_list());
+		plist = get_joint_chart_list();
 	}
 	else if (sp == "Particle")
 	{
 		idx = (int)PARTICLE_ROOT;
-		plot_item->addItems(get_particle_chart_list());
+		plist = get_particle_chart_list();
 	}
-	emit ClickedItem(idx, tg);
-	plot_item->setCurrentIndex(0);
+	emit ClickedItem(idx, tg, plist);
+	//plot_item.setCurrentIndex(0);
 // 	{
 // // 		tSelected = SENSOR_ROOT;
 // // 		sLists.push_back(target);
@@ -155,7 +162,7 @@ void xChartDatabase::clickItem(QTreeWidgetItem* item, int col)
 
 void xChartDatabase::selectPlotItem(int id)
 {
-
+	emit ChangeComboBoxItem(id);
 }
 
 void xChartDatabase::export_to_textfile(QTreeWidgetItem* citem)
@@ -192,7 +199,7 @@ void xChartDatabase::addChild(tRoot tr, QString& _nm)
 
 void xChartDatabase::bindItemComboBox(QComboBox* t)
 {
-	plot_item = t;
+//plot_item = t;
 }
 
 QStringList xChartDatabase::selectedLists()
@@ -203,11 +210,6 @@ QStringList xChartDatabase::selectedLists()
 xChartDatabase::tRoot xChartDatabase::selectedType()
 {
 	return tSelected;
-}
-
-QComboBox* xChartDatabase::plotItemComboBox()
-{
-	return plot_item;
 }
 
 void xChartDatabase::setResultManager(xResultManager * _xrm)

@@ -22,7 +22,7 @@ QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_xChartWindow_t {
     QByteArrayData data[7];
-    char stringdata0[94];
+    char stringdata0[96];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -35,14 +35,14 @@ QT_MOC_LITERAL(0, 0, 12), // "xChartWindow"
 QT_MOC_LITERAL(1, 13, 16), // "updateTargetItem"
 QT_MOC_LITERAL(2, 30, 0), // ""
 QT_MOC_LITERAL(3, 31, 26), // "click_passing_distribution"
-QT_MOC_LITERAL(4, 58, 18), // "changeComboBoxItem"
-QT_MOC_LITERAL(5, 77, 1), // "i"
-QT_MOC_LITERAL(6, 79, 14) // "editingCommand"
+QT_MOC_LITERAL(4, 58, 20), // "PlotFromComboBoxItem"
+QT_MOC_LITERAL(5, 79, 1), // "i"
+QT_MOC_LITERAL(6, 81, 14) // "editingCommand"
 
     },
     "xChartWindow\0updateTargetItem\0\0"
     "click_passing_distribution\0"
-    "changeComboBoxItem\0i\0editingCommand"
+    "PlotFromComboBoxItem\0i\0editingCommand"
 };
 #undef QT_MOC_LITERAL
 
@@ -60,14 +60,14 @@ static const uint qt_meta_data_xChartWindow[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    2,   39,    2, 0x0a /* Public */,
-       3,    0,   44,    2, 0x08 /* Private */,
-       4,    1,   45,    2, 0x08 /* Private */,
-       4,    0,   48,    2, 0x28 /* Private | MethodCloned */,
-       6,    0,   49,    2, 0x08 /* Private */,
+       1,    3,   39,    2, 0x0a /* Public */,
+       3,    0,   46,    2, 0x08 /* Private */,
+       4,    1,   47,    2, 0x08 /* Private */,
+       4,    0,   50,    2, 0x28 /* Private | MethodCloned */,
+       6,    0,   51,    2, 0x08 /* Private */,
 
  // slots: parameters
-    QMetaType::Void, QMetaType::Int, QMetaType::QString,    2,    2,
+    QMetaType::Void, QMetaType::Int, QMetaType::QString, QMetaType::QStringList,    2,    2,    2,
     QMetaType::Void,
     QMetaType::Void, QMetaType::Int,    5,
     QMetaType::Void,
@@ -82,10 +82,10 @@ void xChartWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
         auto *_t = static_cast<xChartWindow *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
-        case 0: _t->updateTargetItem((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2]))); break;
+        case 0: _t->updateTargetItem((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2])),(*reinterpret_cast< QStringList(*)>(_a[3]))); break;
         case 1: _t->click_passing_distribution(); break;
-        case 2: _t->changeComboBoxItem((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 3: _t->changeComboBoxItem(); break;
+        case 2: _t->PlotFromComboBoxItem((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 3: _t->PlotFromComboBoxItem(); break;
         case 4: _t->editingCommand(); break;
         default: ;
         }
