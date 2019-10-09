@@ -300,7 +300,7 @@ bool xParticlePlanesContact::cpplCollision(
 		ci = i / neach;
 		cp = new_vector3d(cpos[ci].x, cpos[ci].y, cpos[ci].z);
 	}
-	for (xmap<unsigned int, xPairData*>::iterator it = pairs->ParticlePair().begin(); it != pairs->ParticlePair().end(); it.next())
+	for (xmap<unsigned int, xPairData*>::iterator it = pairs->PlanePair().begin(); it != pairs->PlanePair().end(); it.next())
 	{
 		xPairData* d = it.value();
 		xPlaneObject* pl = pair_ip[d->id];

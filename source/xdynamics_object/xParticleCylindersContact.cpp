@@ -52,6 +52,8 @@ void xParticleCylindersContact::define(unsigned int i, xParticleCylinderContact 
 		c_ptr->bottom_position(), 
 		c_ptr->top_position() };
 	//cpcylinders.push_back(d);
+	nContactObject++;
+	pair_contact.insert(i, d);
 }
 
 void xParticleCylindersContact::allocHostMemory(unsigned int n)
@@ -69,14 +71,21 @@ unsigned int xParticleCylindersContact::NumContact()
 
 void xParticleCylindersContact::updateCylinderObjectData(bool is_first_set_up)
 {
-	if ((xSimulation::Gpu() && nmoving) || is_first_set_up)
+	device_body_info *bi = NULL;
+	if (nContactObject || is_first_set_up)
+		bi = new device_body_info[nContactObject];
+
+
+	if (xSimulation::Gpu())
 	{
-		device_body_info *bi = new device_body_info[ncylinders];
-		for (unsigned int i = 0; i < ncylinders; i++)
+		unsigned int mcnt = 0;
+		for(xmap<unsigned int, xContact*>::iterator it = pair_contact.begin(); it != pair_contact.end(); it.next())
 		{
-			xCylinderObject *c = pair_ip[i];
+			xPointMass* pm = NULL;
+			xContact* xc = it.value();
+			xCylinderObject *c = dynamic_cast<xParticleCylinderContact*>(xc)->CylinderObject();
 			euler_parameters ep = c->EulerParameters(), ed = c->DEulerParameters();
-			bi[i] = {
+			bi[it.key()] = {
 				c->Mass(),
 				c->Position().x, c->Position().y, c->Position().z,
 				c->Velocity().x, c->Velocity().y, c->Velocity().z,
@@ -86,8 +95,10 @@ void xParticleCylindersContact::updateCylinderObjectData(bool is_first_set_up)
 		}
 		//checkCudaErrors(cudaMemset(db_force, 0, sizeof(double3) * ncylinders));
 		//checkCudaErrors(cudaMemset(db_moment, 0, sizeof(double3) * ncylinders));
-		checkCudaErrors(cudaMemcpy(dbi, bi, sizeof(device_body_info) * ncylinders, cudaMemcpyHostToDevice));
+		checkCudaErrors(cudaMemcpy(dbi, bi, sizeof(device_body_info) * nContactObject, cudaMemcpyHostToDevice));
 	}
+	if (bi)
+		delete[] bi;
 }
 
 void xParticleCylindersContact::getCylinderContactForce()
@@ -257,7 +268,7 @@ void xParticleCylindersContact::updateCollisionPair(
 		//foreach(xCylinderObject* c_ptr, pair_ip)
 	{
 		xCylinderObject* c_ptr = it.value();
-		host_cylinder_info cinfo = hci[cnt++];
+		host_cylinder_info cinfo = hci[it.key()];
 		//xCylinderObject* c_ptr = pcyl->CylinderObject();
 		//int id = c_ptr->ObjectID();
 		unsigned int id = cinfo.id;

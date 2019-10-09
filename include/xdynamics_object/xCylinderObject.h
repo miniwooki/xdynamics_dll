@@ -11,7 +11,7 @@ class XDYNAMICS_API xCylinderObject : public xPointMass
 {
 	
 public:
-	enum empty_part { NO_EMPTY_PART = 0, TOP_CIRCLE, BOTTOM_CIRCLE, RADIAL_WALL };
+	enum empty_part { NO_EMPTY_PART = 0, TOP_CIRCLE, BOTTOM_CIRCLE, BOTH_CIRCLE, RADIAL_WALL };
 	xCylinderObject();
 	xCylinderObject(std::string _name);
 	xCylinderObject(const xCylinderObject& _cube);

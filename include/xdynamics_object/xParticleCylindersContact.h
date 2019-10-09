@@ -47,7 +47,8 @@ private:
 		host_cylinder_info& cinfo, xCylinderObject* c_ptr, vector3d& pt, vector3d& u, vector3d& cp, double r, bool& isInnerContact);
 	double particle_cylinder_inner_base_or_top_contact_detection(
 		host_cylinder_info& cinfo, xCylinderObject* c_ptr, vector3d& pt, vector3d& u, vector3d& cp, double r);
-	xmap<unsigned int, xCylinderObject*> pair_ip;
+	
+	unsigned int nContactObject;
 	unsigned int ncylinders;
 	unsigned int nmoving;
 	xContactMaterialParameters* hcmp;
@@ -56,6 +57,8 @@ private:
 	device_cylinder_info* dci;
 	device_body_info* dbi;
 	device_body_force* dbf;
+	xmap<unsigned int, xCylinderObject*> pair_ip;
+	xmap<unsigned int, xContact*> pair_contact;
 };
 
 #endif

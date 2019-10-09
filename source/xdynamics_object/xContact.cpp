@@ -130,15 +130,15 @@ xContactParameters xContact::getContactParameters(
 	cp.coh_e = 1.0 / (((1.0 - ip * ip) / iE) + ((1.0 - jp * jp) / jE));
 	double lne = log(rest);
 	double beta = 0.0;
-	beta = -lne / sqrt(lne*lne + M_PI * M_PI);
+	beta = -lne * sqrt(1.0 / (lne*lne + M_PI * M_PI));
 	cp.eq_e = Eeq;
 	cp.eq_m = Meq;
 	cp.eq_r = Req;
 	cp.eq_s = Seq;
 	cp.kn = (4.0 / 3.0) * Eeq * sqrt(Req);
-	cp.vn = -2.0 * sqrt(5.0 / 6.0) * beta; //(//sqrt((4.0 * Meq * cp.kn) / (1.0 + beta * beta));
-	cp.ks = 8.0 * Seq;// cp.kn * ratio;
-	cp.vs = -2.0 * sqrt(5.0 / 6.0) * beta;//c//p.vn * ratio;
+	cp.vn = beta; //(//sqrt((4.0 * Meq * cp.kn) / (1.0 + beta * beta));
+	cp.ks = force_model == HERTZ_MINDLIN_NO_SLIP ? 8.0 * Seq : cp.kn * ratio;
+	cp.vs = force_model == HERTZ_MINDLIN_NO_SLIP ? 2.0 * sqrt(5.0 / 6.0) * beta : cp.vn * ratio;
 	cp.fric = fric;
 	cp.rfric = rfric;
 	cp.coh_r = Req;
@@ -221,7 +221,7 @@ void xContact::Hertz_Mindlin(
 {
 	//vector3d Fn, Ft;
 	double fsn = (-c.kn * pow(cdist, 1.5));
-	double fsd = c.vn * (2.0 * c.eq_e * sqrt(c.eq_r * cdist)) * dot(dv, unit);
+	double fsd = c.vn * (2.0 * sqrt(c.eq_m * c.kn)) * dot(dv, unit);
 	double fco = -cohesionForce(coh, cdist, c.coh_r, c.coh_e, c.coh_s, fsn + fsd);
 
 	Fn = (fsn + fsd + fco) * unit;

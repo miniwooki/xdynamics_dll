@@ -2083,6 +2083,7 @@ __device__ void cluster_triangle_contact_force(
 		if (p_pair_id[i] == dtci.id) { sd = p_tsd[i]; break; }
 	//double3 rc = r * unit;
 	double3 jomega = toAngularVelocity(db.ep, db.ed);
+	//printf("jomega : [%e, %e, %e]\n", jomega.x, jomega.y, jomega.z);
 	double3 dv = db.vel + cross(jomega, po2cp) - (ivel + cross(iomega, dcpr));
 	device_force_constant c = getConstant(1, r, 0, m, db.mass, cmp.Ei, cmp.Ej, cmp.pri, cmp.prj, cmp.Gi, cmp.Gj, cmp.rest, cmp.fric, cmp.rfric, cmp.sratio);
 	DHSModel(c, r, 0, cmp.Ei, cmp.Ej, cmp.pri, cmp.prj, cmp.coh, cdist, iomega, sd.x, sd.y, dv, unit, Ft, Fn);
@@ -2382,7 +2383,8 @@ __global__ void cluster_meshes_contact_kernel(
 	if (!nct && !ncl)
 		for (unsigned int k = 0; k < ncp; k++)
 			cluster_triangle_contact_force(cpoint[k], 2, id, dpi, cp, dbi, dbf, dbm, ipos, icpos, ivel, iomega, old_count, p_pair_id, p_tsd, pair_id, tsd, ir, im, sum_force, sum_moment, res, tma, new_count);
-
+	for (unsigned int i = 0; i < 5; i++)
+		tsd[sid + i] = make_double2(0, 0);
 	force[id] += sum_force;
 	moment[id] += sum_moment;
 	///*if (new_count - sid > MAX_P2MS_COUNT)
