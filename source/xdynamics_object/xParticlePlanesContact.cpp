@@ -26,8 +26,8 @@ xParticlePlanesContact::~xParticlePlanesContact()
 	if (dbf) delete[] dbf; dbf = NULL;
 	if (dpi) checkCudaErrors(cudaFree(dpi)); dpi = NULL;
 	if (dbi) checkCudaErrors(cudaFree(dbi)); dbi = NULL;
-	if (db_force) checkCudaErrors(cudaFree(db_force)); db_force = NULL;
-	if (db_moment) checkCudaErrors(cudaFree(db_moment)); db_moment = NULL;
+//	if (db_force) checkCudaErrors(cudaFree(db_force)); db_force = NULL;
+	//if (db_moment) checkCudaErrors(cudaFree(db_moment)); db_moment = NULL;
 }
 
 void xParticlePlanesContact::define(unsigned int id, xParticlePlaneContact* d)
@@ -40,6 +40,7 @@ void xParticlePlanesContact::define(unsigned int id, xParticlePlaneContact* d)
 	cp.restitution = d->Restitution();
 	cp.stiffness_ratio = d->StiffnessRatio();
 	cp.friction = d->Friction();
+	cp.s_friction = d->StaticFriction();
 	cp.rolling_friction = d->RollingFactor();
 	cp.cohesion = d->Cohesion();
 	cp.stiffness_multiplyer = d->StiffMultiplyer();
@@ -72,6 +73,7 @@ void xParticlePlanesContact::define(unsigned int id, xParticleCubeContact* d)
 		xPlaneObject *p = &ps[i];
 		cp.restitution = d->Restitution();
 		cp.stiffness_ratio = d->StiffnessRatio();
+		cp.s_friction = d->StaticFriction();
 		cp.friction = d->Friction();
 		cp.cohesion = d->Cohesion();
 		cp.rolling_friction = d->RollingFactor();
@@ -323,7 +325,7 @@ bool xParticlePlanesContact::cpplCollision(
 			xmps[d->id].Ei, xmps[d->id].Ej,
 			xmps[d->id].Pri, xmps[d->id].Prj,
 			xmps[d->id].Gi, xmps[d->id].Gj, 
-			cmp.restitution, cmp.stiffness_ratio,
+			cmp.restitution, cmp.stiffness_ratio, cmp.s_friction,
 			cmp.friction, cmp.rolling_friction, cmp.cohesion);
 		if (d->gab < 0 && abs(d->gab) < abs(c.coh_s))
 		{

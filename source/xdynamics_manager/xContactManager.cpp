@@ -133,6 +133,7 @@ xContact* xContactManager::CreateContactPair(
 	c->setMaterialPair(mpp);
 	c->setRestitution(d.rest);
 	c->setStiffnessRatio(d.rto);
+	c->setStaticFriction(d.mu_s);
 	c->setFriction(d.mu);
 	c->setCohesion(d.coh);
 	c->setRollingFactor(d.rf);
@@ -536,8 +537,14 @@ void xContactManager::deviceCollision(
 						d_Tmax, d_RRes, d_pair_count_ptri, d_pair_id_ptri, d_tsd_ptri,
 						sorted_id, cell_start, cell_end, xci, bPolySphere, ePolySphere, np);
 					bPolySphere += cpm->MeshObject()->NumTriangle();
-					dbfm[cnt].force = reductionD3(xContact::deviceBodyForce(), np);
-					dbfm[cnt].moment = reductionD3(xContact::deviceBodyMoment(), np);
+					dbfm[cnt].force.x += reduction(xContact::deviceBodyForceX(), np);
+					dbfm[cnt].force.y += reduction(xContact::deviceBodyForceY(), np);
+					dbfm[cnt].force.z += reduction(xContact::deviceBodyForceZ(), np);
+					dbfm[cnt].moment.x += reduction(xContact::deviceBodyMomentX(), np);
+					dbfm[cnt].moment.y += reduction(xContact::deviceBodyMomentY(), np);
+					dbfm[cnt].moment.z += reduction(xContact::deviceBodyMomentZ(), np);
+					//dbfm[cnt].force = reductionD3(xContact::deviceBodyForce(), np);
+					//dbfm[cnt].moment = reductionD3(xContact::deviceBodyMoment(), np);
 					cnt++;
 				}
 
@@ -583,12 +590,26 @@ void xContactManager::deviceCollision(
 		{
 			if (cpcylinders->NumContact())
 			{
-				cu_cylinder_contact_force(1, cpcylinders->deviceCylinderInfo(), 
-					cpcylinders->deviceCylinderBodyInfo(),
-					cpcylinders->deviceCylinderBodyForceAndMoment(), 
-					cpcylinders->DeviceContactProperty(),
-					pos, ep, vel, ev, force, moment, mass,
-					d_Tmax, d_RRes, d_pair_count_pcyl, d_pair_id_pcyl, d_tsd_pcyl, np, cpcylinders->NumContact());
+
+				device_body_force* dbfm = cpcylinders->deviceCylinderBodyForceAndMoment();
+				memset(dbfm, 0, sizeof(device_body_force) * cpcylinders->NumContact());
+				for (unsigned int i = 0 ; i < cpcylinders->NumContact(); i++)
+				{
+					cu_cylinder_contact_force(i, cpcylinders->deviceCylinderInfo(),
+						cpcylinders->deviceCylinderBodyInfo(),
+						cpcylinders->DeviceContactProperty(),
+						pos, ep, vel, ev, force, moment, mass,
+						d_Tmax, d_RRes, d_pair_count_pcyl, d_pair_id_pcyl, d_tsd_pcyl, np, cpcylinders->NumContact());
+					dbfm[i].force.x += reduction(xContact::deviceBodyForceX(), np);
+					dbfm[i].force.y += reduction(xContact::deviceBodyForceY(), np);
+					dbfm[i].force.z += reduction(xContact::deviceBodyForceZ(), np);
+					dbfm[i].moment.x += reduction(xContact::deviceBodyMomentX(), np);
+					dbfm[i].moment.y += reduction(xContact::deviceBodyMomentY(), np);
+					dbfm[i].moment.z += reduction(xContact::deviceBodyMomentZ(), np);
+					/*dbfm[i].force = dbfm[i].force + reductionD3(xContact::deviceBodyForce(), np);
+					dbfm[i].moment = dbfm[i].moment + reductionD3(xContact::deviceBodyMoment(), n*///p);
+				}
+				
 				cpcylinders->getCylinderContactForce();
 			}			
 		}
@@ -619,8 +640,14 @@ void xContactManager::deviceCollision(
 						np,
 						bPolySphere, ePolySphere);
 					bPolySphere += cpm->MeshObject()->NumTriangle();
-					dbfm[cnt].force = reductionD3(xContact::deviceBodyForce(), np);
-					dbfm[cnt].moment = reductionD3(xContact::deviceBodyMoment(), np);
+					dbfm[cnt].force.x += reduction(xContact::deviceBodyForceX(), np);
+					dbfm[cnt].force.y += reduction(xContact::deviceBodyForceY(), np);
+					dbfm[cnt].force.z += reduction(xContact::deviceBodyForceZ(), np);
+					dbfm[cnt].moment.x += reduction(xContact::deviceBodyMomentX(), np);
+					dbfm[cnt].moment.y += reduction(xContact::deviceBodyMomentY(), np);
+					dbfm[cnt].moment.z += reduction(xContact::deviceBodyMomentZ(), np);
+					/*dbfm[cnt].force = reductionD3(xContact::deviceBodyForce(), np);
+					dbfm[cnt].moment = reductionD3(xContact::deviceBodyMoment(), np);*/
 					cnt++;
 				}
 				cpmeshes->getMeshContactForce();

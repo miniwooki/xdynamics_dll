@@ -131,7 +131,7 @@ void xParticleParticleContact::cppCollision(
 			mpp.Ei, mpp.Ej,
 			mpp.Pri, mpp.Prj,
 			mpp.Gi, mpp.Gj,
-			restitution, stiffnessRatio,
+			restitution, stiffnessRatio, s_friction,
 			friction, rolling_factor, cohesion);
 		if (d->gab < 0 && abs(d->gab) < abs(c.coh_s))
 		{

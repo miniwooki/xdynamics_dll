@@ -150,6 +150,9 @@
     <ClCompile Include="..\source\xdynamics_gui\xLineSeries.cpp">
       <Filter>Source Files\chart</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xparticle_result_dlg.cpp">
+      <Filter>Source Files\dialog</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="..\include\xdynamics_gui\xGLWidget.h">
@@ -206,6 +209,9 @@
     <QtMoc Include="..\include\xdynamics_gui\xpass_distribution_dlg.h">
       <Filter>Header Files\dialog</Filter>
     </QtMoc>
+    <QtMoc Include="..\include\xdynamics_gui\xparticle_result_dlg.h">
+      <Filter>Header Files\dialog</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="xdynamics_gui.ui">
@@ -233,6 +239,9 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="xpass_distribution.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="wparticle_result.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
@@ -319,6 +328,9 @@
     </ClInclude>
     <ClInclude Include="..\include\xdynamics_gui\xLineSeries.h">
       <Filter>Header Files\plot</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_wparticle_result.h">
+      <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

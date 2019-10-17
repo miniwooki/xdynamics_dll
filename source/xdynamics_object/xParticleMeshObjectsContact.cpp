@@ -110,6 +110,7 @@ unsigned int xParticleMeshObjectsContact::define(xmap<xstring, xParticleMeshObje
 		cp.restitution = cpm->Restitution();
 		cp.stiffness_ratio = cpm->StiffnessRatio();
 		cp.friction = cpm->Friction();
+		cp.s_friction = cpm->StaticFriction();
 		cp.rolling_friction = cpm->RollingFactor();
 		cp.stiffness_multiplyer = cpm->StiffMultiplyer();
 		xmp = cpm->MaterialPropertyPair();
@@ -194,7 +195,7 @@ void xParticleMeshObjectsContact::particle_triangle_contact_force(
 		xmps[j].Ei, xmps[j].Ej,
 		xmps[j].Pri, xmps[j].Prj,
 		xmps[j].Gi, xmps[j].Gj,
-		cmp.restitution, cmp.stiffness_ratio,
+		cmp.restitution, cmp.stiffness_ratio, cmp.s_friction,
 		cmp.friction, cmp.rolling_friction, cmp.cohesion);
 	switch (xContact::ContactForceModel())
 	{

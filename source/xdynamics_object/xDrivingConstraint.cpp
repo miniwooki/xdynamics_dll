@@ -258,7 +258,7 @@ void xDrivingConstraint::ConstraintJacobian(xSparseD& lhs, xVectorD& q, xVectorD
 		{
 			vector4d v = dist * BMatrix(ei, kconst->Hi()) - hi * BMatrix(ei, kconst->Spi());
 			lhs.insert(sr, ic, -hi, v);
-		}
+		} 
 		if (j)
 		{
 			vector4d v = hi * BMatrix(ej, kconst->Spj());

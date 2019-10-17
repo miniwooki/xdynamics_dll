@@ -987,7 +987,8 @@ void xParticleManager::AddParticleCreatingCondition(xParticleObject* xpo, xParti
 		for(unsigned int i = 0; i < iList.size(); i++)
 		//foreach(vector4d v, pList)
 		{
-			if (over > it) break;
+			if (over >= it) 
+				break;
 			while (*iter >= it) { iter++; }
 			pos[*iter] = pList.at(i) + sign * xpo->MaxRadius() * frand() * new_vector4d(0.1, 0.1, 0.1, 0.0);
 			mass[*iter] = mList.at(i);

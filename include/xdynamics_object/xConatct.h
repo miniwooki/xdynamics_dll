@@ -31,6 +31,7 @@ public:
 	double Cohesion() const;
 	double Restitution() const;
 	double Friction() const;
+	double StaticFriction() const;
 	double StiffnessRatio() const;
 	double RollingFactor() const;
 	double StiffMultiplyer() const;
@@ -38,11 +39,16 @@ public:
 	void setCohesion(double d);
 	void setRestitution(double d);
 	void setFriction(double d);
+	void setStaticFriction(double d);
 	void setStiffnessRatio(double d);
 	void setRollingFactor(double d);
 	void setStiffMultiplyer(double d);
-	static double3* deviceBodyForce();
-	static double3* deviceBodyMoment();
+	static double* deviceBodyForceX();
+	static double* deviceBodyForceY();
+	static double* deviceBodyForceZ();
+	static double* deviceBodyMomentX();
+	static double* deviceBodyMomentY();
+	static double* deviceBodyMomentZ();
 	//contactForce_type ForceMethod() const { return f_type; }
 	xMaterialPair MaterialPropertyPair() const;
 	static xContactForceModelType ContactForceModel();
@@ -55,7 +61,7 @@ public:
 		double iE, double jE,
 		double ip, double jp,
 		double is, double js,
-		double rest, double ratio,
+		double rest, double ratio, double s_fric,
 		double fric, double rfric, double coh);
 	// 		contactForce_type cft, double rest, double ratio, double fric);
 	void setMaterialPair(xMaterialPair _mpp);// { mpp = _mpp; }
@@ -95,12 +101,18 @@ protected:
 // 	device_contact_property_f* dcp_f;
 	xObject* iobj;
 	xObject* jobj;
-	static double3* db_force;
-	static double3* db_moment;
+	static double* dbfx;
+	static double* dbfy;
+	static double* dbfz;
+	static double* dbmx;
+	static double* dbmy;
+	static double* dbmz;
+
 
 	double cohesion;
 	double restitution;
 	double stiffnessRatio;
+	double s_friction;
 	double friction;
 	double rolling_factor;
 	double stiff_multiplyer;

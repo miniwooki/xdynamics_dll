@@ -18,6 +18,100 @@ typedef unsigned int uint;
 //__constant__ device_parameters cte;
 //double3 toDouble3(VEC3D& v3) { return double3(v3.x, v3.y, v3.z); }
 //inline double3 change_cuda_double3(VEC3D& v3) { return make_double3(v3.x, v3.y, v3.z); }
+inline __host__ __device__ int sign(double L)
+{
+	return L < 0 ? -1 : 1;
+}
+
+inline __host__ __device__ double dot(double3 v1, double3 v2)
+{
+	return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+}
+
+inline __host__ __device__ double dot(double4 v1, double4 v2)
+{
+	return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w;
+}
+
+inline __host__ __device__ double3 operator-(double3& v1, double3& v2)
+{
+	return make_double3(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
+}
+
+inline __host__ __device__ double4 operator-(double4& v1, double4& v2)
+{
+	return make_double4(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z, v1.w - v2.w);
+}
+
+inline __host__ __device__ double4 operator+(double4& v1, double4& v2)
+{
+	return make_double4(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z, v1.w + v2.w);
+}
+
+inline __host__ __device__ double3 operator-(double3& v1)
+{
+	return make_double3(-v1.x, -v1.y, -v1.z);
+}
+
+inline __host__ __device__ double3 operator*(double v1, double3& v2)
+{
+	return make_double3(v1 * v2.x, v1 * v2.y, v1 * v2.z);
+}
+
+inline __host__ __device__ double4 operator*(double v1, double4& v2)
+{
+	return make_double4(v1 * v2.x, v1 * v2.y, v1 * v2.z, v1 * v2.w);
+}
+
+inline __host__ __device__ double3 operator+(double3& v1, double3& v2)
+{
+	return make_double3(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
+}
+
+inline __host__ __device__ void operator+=(double3& a, double3 b)
+{
+	a.x += b.x;
+	a.y += b.y;
+	a.z += b.z;
+}
+
+inline __host__ __device__ void operator-=(double3& a, double3 b)
+{
+	a.x -= b.x;
+	a.y -= b.y;
+	a.z -= b.z;
+}
+
+inline __host__ __device__ double3 operator/(double3& v1, double v2)
+{
+	return make_double3(v1.x / v2, v1.y / v2, v1.z / v2);
+}
+
+inline __host__ __device__ double4 operator/(double4& v1, double v2)
+{
+	return make_double4(v1.x / v2, v1.y / v2, v1.z / v2, v1.w / v2);
+}
+
+inline __host__ __device__ double length(double3 v1)
+{
+	return sqrt(dot(v1, v1));
+}
+
+inline __host__ __device__ double length(double4 v1)
+{
+	return sqrt(dot(v1, v1));
+}
+
+inline __host__ __device__ double3 cross(double3 a, double3 b)
+{
+	return make_double3(a.y*b.z - a.z*b.y, a.z*b.x - a.x*b.z, a.x*b.y - a.y*b.x);
+}
+
+inline __host__ __device__ double4 normalize(double4 v)
+{
+	return v / length(v);
+}
+
 struct device_wave_damping
 {
 
@@ -216,7 +310,7 @@ void XDYNAMICS_API cu_particle_polygonObject_collision(
 // Function for contact between particle and cylinder
 void XDYNAMICS_API cu_cylinder_contact_force(
 	const int tcm, device_cylinder_info* cyl, device_body_info* bi, 
-	device_body_force* dbfm, device_contact_property *cp,
+	device_contact_property *cp,
 	double* pos, double* ep, double* vel, double* omega,
 	double* force, double* moment, double* mass,
 	double* tmax, double* rres,
@@ -232,7 +326,7 @@ void XDYNAMICS_API cu_decide_rolling_friction_moment(
 	double* moment,
 	unsigned int np);
 
-double3 XDYNAMICS_API reductionD3(double3* in, unsigned int np);
+double XDYNAMICS_API reduction(double* in, unsigned int np);
 void XDYNAMICS_API cu_update_meshObjectData(
 	double *vList, double* sph, double* dlocal, device_triangle_info* poly,
 	device_body_info* dbi, unsigned int np);

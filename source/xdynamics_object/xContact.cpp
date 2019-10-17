@@ -1,8 +1,12 @@
 #include "xdynamics_object/xConatct.h"
 #include "xdynamics_simulation//xSimulation.h"
 
-double3* xContact::db_force = NULL;
-double3* xContact::db_moment = NULL;
+double* xContact::dbfx = NULL;
+double* xContact::dbfy = NULL;
+double* xContact::dbfz = NULL;
+double* xContact::dbmx = NULL;
+double* xContact::dbmy = NULL;
+double* xContact::dbmz = NULL;
 xContactForceModelType xContact::force_model = NO_DEFINE_CONTACT_MODEL;
 
 xContact::xContact()
@@ -57,8 +61,12 @@ xContact::xContact(const xContact& xc)
 
 xContact::~xContact()
 {
-	if (db_force) checkCudaErrors(cudaFree(db_force)); db_force = NULL;
-	if (db_moment) checkCudaErrors(cudaFree(db_moment)); db_moment = NULL;
+	if (dbfx) checkCudaErrors(cudaFree(dbfx)); dbfx = NULL;
+	if (dbfy) checkCudaErrors(cudaFree(dbfy)); dbfy = NULL;
+	if (dbfz) checkCudaErrors(cudaFree(dbfz)); dbfz = NULL;
+	if (dbmx) checkCudaErrors(cudaFree(dbmx)); dbmx = NULL;
+	if (dbmy) checkCudaErrors(cudaFree(dbmy)); dbmy = NULL;
+	if (dbmz) checkCudaErrors(cudaFree(dbmz)); dbmz = NULL;
 }
 
 xContactForceModelType xContact::ContactForceModel()
@@ -92,6 +100,11 @@ void xContact::setFriction(double d)
 	friction = d;
 }
 
+void xContact::setStaticFriction(double d)
+{
+	s_friction = d;
+}
+
 void xContact::setStiffnessRatio(double d)
 {
 	stiffnessRatio = d;
@@ -118,7 +131,7 @@ xContactParameters xContact::getContactParameters(
 	double iE, double jE, 
 	double ip, double jp, 
 	double is, double js,
-	double rest, double ratio,
+	double rest, double ratio, double s_fric,
 	double fric, double rfric, double coh)
 {
 	xContactParameters cp;
@@ -139,6 +152,7 @@ xContactParameters xContact::getContactParameters(
 	cp.vn = beta; //(//sqrt((4.0 * Meq * cp.kn) / (1.0 + beta * beta));
 	cp.ks = force_model == HERTZ_MINDLIN_NO_SLIP ? 8.0 * Seq : cp.kn * ratio;
 	cp.vs = force_model == HERTZ_MINDLIN_NO_SLIP ? 2.0 * sqrt(5.0 / 6.0) * beta : cp.vn * ratio;
+	cp.s_fric = s_fric;
 	cp.fric = fric;
 	cp.rfric = rfric;
 	cp.coh_r = Req;
@@ -236,7 +250,8 @@ void xContact::Hertz_Mindlin(
 		double S_t = c.ks * sqrt(c.eq_r * cdist);
 		double ft1 = S_t * ds + c.vs * sqrt(S_t * c.eq_m) * dot(dv, s_hat);
 		double ft2 = c.fric * length(Fn);
-		Ft = min(ft1, ft2) * s_hat;
+		double ft3 = c.s_fric * length(Fn);
+		Ft = (ft1 < ft3 ? 0.0 : ft2)/*min(ft1, ft2)*/ * s_hat;
 		//M = cross(cp, Ft);
 	}
 	//F = Fn + Ft;
@@ -259,6 +274,10 @@ xObject* xContact::SecondObject() const { return jobj; }
 double xContact::Cohesion() const { return cohesion; }
 double xContact::Restitution() const { return restitution; }
 double xContact::Friction() const { return friction; }
+double xContact::StaticFriction() const
+{
+	return s_friction;
+}
 double xContact::StiffnessRatio() const { return stiffnessRatio; }
 //contactForce_type ForceMethod() const { return f_type; }
 xMaterialPair xContact::MaterialPropertyPair() const { return mpp; }
@@ -275,10 +294,12 @@ void xContact::cudaMemoryAlloc(unsigned int np)
 	};
 	checkCudaErrors(cudaMalloc((void**)&dcp, sizeof(device_contact_property)));
 	checkCudaErrors(cudaMemcpy(dcp, &hcp, sizeof(device_contact_property), cudaMemcpyHostToDevice));
-	if (!db_force)
-		checkCudaErrors(cudaMalloc((void**)&db_force, sizeof(double3) * np));
-	if (!db_moment)
-		checkCudaErrors(cudaMalloc((void**)&db_moment, sizeof(double3) * np));
+	if (!dbfx) checkCudaErrors(cudaMalloc((void**)&dbfx, sizeof(double) * np));
+	if (!dbfy) checkCudaErrors(cudaMalloc((void**)&dbfy, sizeof(double) * np));
+	if (!dbfz) checkCudaErrors(cudaMalloc((void**)&dbfz, sizeof(double) * np));
+	if (!dbmx) checkCudaErrors(cudaMalloc((void**)&dbmx, sizeof(double) * np));
+	if (!dbmy) checkCudaErrors(cudaMalloc((void**)&dbmy, sizeof(double) * np));
+	if (!dbmz) checkCudaErrors(cudaMalloc((void**)&dbmz, sizeof(double) * np));
 }
 
 double xContact::StiffMultiplyer() const
@@ -291,12 +312,10 @@ void xContact::setStiffMultiplyer(double d)
 	stiff_multiplyer = d;
 }
 
-double3 * xContact::deviceBodyForce()
-{
-	return db_force;
-}
+double* xContact::deviceBodyForceX() { return dbfx; }
+double* xContact::deviceBodyForceY() { return dbfy; }
+double* xContact::deviceBodyForceZ() { return dbfz; }
 
-double3 * xContact::deviceBodyMoment()
-{
-	return db_moment;
-}
+double * xContact::deviceBodyMomentX() { return dbmx; }
+double * xContact::deviceBodyMomentY() { return dbmy; }
+double * xContact::deviceBodyMomentZ() { return dbmz; }

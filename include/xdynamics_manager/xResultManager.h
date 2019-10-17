@@ -45,6 +45,7 @@ public:
 	xlist<unsigned int>* get_distribution_id_list();
 	float* get_particle_position_result_ptr();
 	float* get_particle_velocity_result_ptr();
+	float* get_cluster_position_result_ptr();
 	float* get_particle_color_result_ptr();
 	void set_gpu_process_device(bool b);
 	void set_num_generailzed_coordinates(unsigned int ng);

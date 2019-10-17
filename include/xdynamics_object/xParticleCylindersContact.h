@@ -35,6 +35,7 @@ public:
 	device_cylinder_info* deviceCylinderInfo();
 	device_body_info* deviceCylinderBodyInfo();
 	device_body_force* deviceCylinderBodyForceAndMoment();
+	xmap<unsigned int, xContact*>* PairContacts();
 	void updateCollisionPair(xContactPairList& xcpl, double r, vector3d pos);
 	virtual void cudaMemoryAlloc(unsigned int np);
 	virtual void cuda_collision(

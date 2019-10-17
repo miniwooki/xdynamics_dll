@@ -5,10 +5,12 @@
 #include <helper_math.h>
 #include <helper_functions.h>
 #include <thrust/device_ptr.h>
+#include <thrust/device_vector.h>
 #include <thrust/reduce.h>
 #include <thrust/for_each.h>
 #include <thrust/iterator/zip_iterator.h>
 #include <thrust/sort.h>
+#include <thrust/reduce.h>
 //#include <helper_cuda.h>
 
 void setDEMSymbolicParameter(device_dem_parameters *h_paras)
@@ -165,21 +167,30 @@ void cu_plane_contact_force(
 	memset(dbfm, 0, sizeof(device_body_force) * nplane);
 
 	
-	double3* dbf = xContact::deviceBodyForce();
-	double3* dbm = xContact::deviceBodyMoment();
+	double* fx = xContact::deviceBodyForceX();
+	double* fy = xContact::deviceBodyForceY();
+	double* fz = xContact::deviceBodyForceZ();
+
+	double* mx = xContact::deviceBodyMomentX();
+	double* my = xContact::deviceBodyMomentY();
+	double* mz = xContact::deviceBodyMomentZ();
 	/*checkCudaErrors(cudaMalloc((void**)&dbf, sizeof(double3) * np));
 	checkCudaErrors(cudaMalloc((void**)&dbm, sizeof(double3) * np));*/
 	for (unsigned int i = 0; i < nplane; i++)
 	{
 		plane_contact_force_kernel << < numBlocks, numThreads >> > (
-			plan, i, dbi, cp+i, dbf, dbm,
+			plan, i, dbi, cp+i, fx, fy, fz, mx, my, mz,
 			(double4 *)pos, (double4 *)ep, (double3 *)vel, (double4 *)ev,
 			(double3 *)force, (double3 *)moment, mass,
 			(double3 *)tmax, rres,
 			pair_count, pair_id, (double2 *)tsd, np);
 
-		dbfm[i].force += reductionD3(dbf, np);
-		dbfm[i].moment += reductionD3(dbm, np);
+		dbfm[i].force.x += reduction(fx, np);
+		dbfm[i].force.y += reduction(fy, np);
+		dbfm[i].force.z += reduction(fz, np);
+		dbfm[i].moment.x += reduction(mx, np);
+		dbfm[i].moment.y += reduction(my, np);
+		dbfm[i].moment.z += reduction(mz, np);
 	}
 	/*checkCudaErrors(cudaFree(dbf));
 	checkCudaErrors(cudaFree(dbm));*/
@@ -209,8 +220,8 @@ void cu_cube_contact_force(
 }
 
 void cu_cylinder_contact_force(
-	const int tcm, device_cylinder_info* cyl, 
-	device_body_info* bi, device_body_force* dbfm, device_contact_property *cp,
+	const int i, device_cylinder_info* cyl, 
+	device_body_info* bi, device_contact_property *cp,
 	double* pos, double* ep, double* vel, double* ev,
 	double* force, double* moment,
 	double* mass, double* tmax, double* rres,
@@ -218,22 +229,21 @@ void cu_cylinder_contact_force(
 	unsigned int np, unsigned int ncylinder)
 {
 	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
-	memset(dbfm, 0, sizeof(device_body_force) * ncylinder);
-	double3* dbf = xContact::deviceBodyForce();
-	double3* dbm = xContact::deviceBodyMoment();
-	//checkCudaErrors(cudaMalloc((void**)&dbf, sizeof(double3) * np));
-	//checkCudaErrors(cudaMalloc((void**)&dbm, sizeof(double3) * np));
-	/*double3* dbf = xContact::deviceBodyForce();
-	double3* dbm = xContact::deviceBodyMoment();*/
-	for (unsigned int i = 0; i < ncylinder; i++)
-	{
-		cylinder_contact_force_kernel << < numBlocks, numThreads >> > (
-			cyl, i, bi, dbf, dbm, (double4 *)pos, (double4 *)ep, (double3 *)vel, (double4 *)ev,
-			(double3 *)force, (double3 *)moment, cp, mass,
-			(double3*)tmax, rres, pair_count, pair_id, (double2 *)tsd, np);
-		dbfm[i].force += reductionD3(dbf, np);
-		dbfm[i].moment += reductionD3(dbm, np);
-	}
+	//memset(dbfm, 0, sizeof(device_body_force) * ncylinder);
+	double* fx = xContact::deviceBodyForceX();
+	double* fy = xContact::deviceBodyForceY();
+	double* fz = xContact::deviceBodyForceZ();
+
+	double* mx = xContact::deviceBodyMomentX();
+	double* my = xContact::deviceBodyMomentY();
+	double* mz = xContact::deviceBodyMomentZ();
+
+	cylinder_contact_force_kernel << < numBlocks, numThreads >> > (
+		cyl, i, bi, fx, fy, fz, mx, my, mz, 
+		(double4 *)pos, (double4 *)ep, (double3 *)vel, (double4 *)ev,
+		(double3 *)force, (double3 *)moment, cp, mass,
+		(double3*)tmax, rres, pair_count, pair_id, (double2 *)tsd, np);
+//	}
 	/*checkCudaErrors(cudaFree(dbf));
 	checkCudaErrors(cudaFree(dbm));*/
 }
@@ -249,10 +259,15 @@ void cu_particle_polygonObject_collision(
 {
 	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
 	
-	double3* dbf = xContact::deviceBodyForce();
-	double3* dbm = xContact::deviceBodyMoment();
+	double* fx = xContact::deviceBodyForceX();
+	double* fy = xContact::deviceBodyForceY();
+	double* fz = xContact::deviceBodyForceZ();
+
+	double* mx = xContact::deviceBodyMomentX();
+	double* my = xContact::deviceBodyMomentY();
+	double* mz = xContact::deviceBodyMomentZ();
 	particle_polygonObject_collision_kernel<< < numBlocks, numThreads >> > (
-		dpi, dbi, dbf, dbm,
+		dpi, dbi, fx, fy, fz, mx, my, mz,
 		(double4 *)pos, (double4 *)ep, (double3 *)vel, (double4 *)ev,
 		(double3 *)force, (double3 *)moment, mass,
 		(double3 *)tmax, rres,
@@ -280,24 +295,37 @@ void cu_decide_rolling_friction_moment(
 		np);
 }
 
-double3 reductionD3(double3* in, unsigned int np)
+double reduction(double* in, unsigned int np)
 {
+	//double3 init = make_double3(0, 0, 0);
+	
+	//double3 out = thrust::reduce(a.begin(),	b.end(), init);
+	double rt = thrust::reduce(thrust::device, thrust::device_ptr<double>(in),
+		thrust::device_ptr<double>(in + np));
+	/*double3* h_in = new double3[np];
+	checkCudaErrors(cudaMemcpy(h_in, in, sizeof(double3) * np, cudaMemcpyDeviceToHost));
 	double3 rt = make_double3(0.0, 0.0, 0.0);
-	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
-	double3* d_out;
-	double3* h_out = new double3[numBlocks];
-	checkCudaErrors(cudaMalloc((void**)&d_out, sizeof(double3) * numBlocks));
-	checkCudaErrors(cudaMemset(d_out, 0, sizeof(double3) * numBlocks));
-	unsigned smemSize = sizeof(double3)*(CUDA_THREADS_PER_BLOCK);
-	reduce6<double3, CUDA_THREADS_PER_BLOCK> << < numBlocks, numThreads, smemSize >> > (in, d_out, np);
-	checkCudaErrors(cudaMemcpy(h_out, d_out, sizeof(double3) * numBlocks, cudaMemcpyDeviceToHost));
-	for (unsigned int i = 0; i < numBlocks; i++) {
-		rt.x += h_out[i].x;
-		rt.y += h_out[i].y;
-		rt.z += h_out[i].z;
-	}
-	delete[] h_out;
-	checkCudaErrors(cudaFree(d_out));
+	for (unsigned int i = 0; i < np; i++)
+	{
+		rt += h_in[i];
+	}*/
+	//computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
+	//double3* d_out;
+	//double3* h_out = new double3[numBlocks];
+	//checkCudaErrors(cudaMalloc((void**)&d_out, sizeof(double3) * numBlocks));
+	//checkCudaErrors(cudaMemset(d_out, 0, sizeof(double3) * numBlocks));
+	//unsigned smemSize = sizeof(double3)*(CUDA_THREADS_PER_BLOCK);
+	//reduce6<CUDA_THREADS_PER_BLOCK> << < numBlocks, numThreads, smemSize >> > (in, d_out, np);
+	//checkCudaErrors(cudaMemcpy(h_out, d_out, sizeof(double3) * numBlocks, cudaMemcpyDeviceToHost));
+	//for (unsigned int i = 0; i < numBlocks; i++) {
+	//	rt.x += h_out[i].x;
+	//	rt.y += h_out[i].y;
+	//	rt.z += h_out[i].z;
+	//}
+	//delete[] h_out;
+	//printf("body_force = [%e, %e, %e]\n", rt.x, rt.y, rt.z);
+	////checkCudaErrors(cudaFree(d_out));
+	//delete[] h_in;
 	return rt;
 }
 
@@ -344,13 +372,19 @@ void cu_cluster_plane_contact(
 {
 	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
 	memset(dbfm, 0, sizeof(device_body_force) * nplanes);
-	double3* dbf = xContact::deviceBodyForce();
-	double3* dbm = xContact::deviceBodyMoment();
+	double* fx = xContact::deviceBodyForceX();
+	double* fy = xContact::deviceBodyForceY();
+	double* fz = xContact::deviceBodyForceZ();
+
+	double* mx = xContact::deviceBodyMomentX();
+	double* my = xContact::deviceBodyMomentY();
+	double* mz = xContact::deviceBodyMomentZ();
 	//double3* h_dbf = new double3[np];
 	for (unsigned int i = 0; i < nplanes; i++)
 	{
 		cluster_plane_contact_kernel << < numBlocks, numThreads >> > (
-			plan, i, dbi, dbf, dbm,
+			plan, i, dbi, 
+			fx, fy, fz, mx, my, mz,
 			(double4 *)pos, 
 			(double4*)cpos, 
 			(double4 *)ep, 
@@ -363,8 +397,12 @@ void cu_cluster_plane_contact(
 			pair_count, pair_id, 
 			(double2 *)tsd, xci, np);
 		//cudaMemcpy(h_dbf, dbf, sizeof(double3) * np, cudaMemcpyDeviceToHost);
-		dbfm[i].force += reductionD3(dbf, np);
-		dbfm[i].moment += reductionD3(dbm, np);
+		dbfm[i].force.x += reduction(fx, np);
+		dbfm[i].force.y += reduction(fy, np);
+		dbfm[i].force.z += reduction(fz, np);
+		dbfm[i].moment.x += reduction(mx, np);
+		dbfm[i].moment.y += reduction(my, np);
+		dbfm[i].moment.z += reduction(mz, np);
 	}
 }
 
@@ -380,17 +418,27 @@ void cu_cluster_cylinder_contact(
 {
 	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
 	memset(dbfm, 0, sizeof(device_body_force) * ncylinder);
-	double3* dbf = xContact::deviceBodyForce();
-	double3* dbm = xContact::deviceBodyMoment();
+	double* fx = xContact::deviceBodyForceX();
+	double* fy = xContact::deviceBodyForceY();
+	double* fz = xContact::deviceBodyForceZ();
+
+	double* mx = xContact::deviceBodyMomentX();
+	double* my = xContact::deviceBodyMomentY();
+	double* mz = xContact::deviceBodyMomentZ();
 	for (unsigned int i = 0; i < ncylinder; i++)
 	{
 		cluster_cylinder_contact_force_kernel << < numBlocks, numThreads >> > (
-			cyl, i, bi, dbf, dbm, (double4 *)pos, (double4 *)cpos,
+			cyl, i, bi, fx, fy, fz, mx, my, mz,
+			(double4 *)pos, (double4 *)cpos,
 			(double4 *)ep, (double3 *)vel, (double4 *)ev,
 			(double3 *)force, (double3 *)moment, xci, cp, mass,
 			(double3*)tmax, rres, pair_count, pair_id, (double2 *)tsd, np);
-		dbfm[i].force += reductionD3(dbf, np);
-		dbfm[i].moment += reductionD3(dbm, np);
+		dbfm[i].force.x += reduction(fx, np);
+		dbfm[i].force.y += reduction(fy, np);
+		dbfm[i].force.z += reduction(fz, np);
+		dbfm[i].moment.x += reduction(mx, np);
+		dbfm[i].moment.y += reduction(my, np);
+		dbfm[i].moment.z += reduction(mz, np);
 	}
 }
 
@@ -420,10 +468,16 @@ void cu_cluster_meshes_contact(
 	unsigned int np)
 {
 	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
-	double3* dbf = xContact::deviceBodyForce();
-	double3* dbm = xContact::deviceBodyMoment();
+	double* fx = xContact::deviceBodyForceX();
+	double* fy = xContact::deviceBodyForceY();
+	double* fz = xContact::deviceBodyForceZ();
+
+	double* mx = xContact::deviceBodyMomentX();
+	double* my = xContact::deviceBodyMomentY();
+	double* mz = xContact::deviceBodyMomentZ();
 	cluster_meshes_contact_kernel << <numBlocks, numThreads >> > (
-		dpi, dbi, dbf, dbm,
+		dpi, dbi, 
+		fx, fy, fz, mx, my, mz,//dbf, dbm,
 		(double4*)pos,
 		(double4*)cpos,
 		(double4*)ep,

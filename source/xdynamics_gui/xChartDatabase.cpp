@@ -1,6 +1,7 @@
 #include "xChartDatabase.h"
 #include "xdynamics_manager/xMultiBodyModel.h"
 #include "xdynamics_manager/xResultManager.h"
+#include "xparticle_result_dlg.h"
 ///#include "cmdWindow.h"
 #include "xmap.hpp"
 #include <QAction>
@@ -29,7 +30,7 @@ xChartDatabase::xChartDatabase(QWidget* parent)
 // 
 	roots[MASS_ROOT]->setText(0, "Body");
 	roots[KCONSTRAINT_ROOT]->setText(0, "Joint");
-	roots[PARTICLE_ROOT]->setText(0, "Particle");
+	roots[PARTICLE_ROOT]->setText(0, "Particles");
 // 	roots[PART_ROOT]->setText(0, "Part");
 // 	roots[SENSOR_ROOT]->setText(0, "Sensor");
 // 	roots[PMASS_ROOT]->setText(0, "Mass");
@@ -172,6 +173,16 @@ void xChartDatabase::export_to_textfile(QTreeWidgetItem* citem)
 		xrm->export_mass_result_to_text(cname.toStdString());
 	else if (citem->parent()->text(0) == "Joint")
 		xrm->export_joint_result_to_text(cname.toStdString());
+	else if (citem->parent()->text(0) == "Particles")
+	{
+		xparticle_result_dlg xrd;
+		xrd.setup(xrm);
+		int ret = xrd.exec();
+		if (ret)
+		{
+
+		}
+	}
 }
 
 void xChartDatabase::process_context_menu(QString txt, QTreeWidgetItem* citem)

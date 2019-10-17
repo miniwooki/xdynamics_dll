@@ -33,6 +33,7 @@ void xParticleCylindersContact::define(unsigned int i, xParticleCylinderContact 
 	cp.restitution = d->Restitution();
 	cp.stiffness_ratio = d->StiffnessRatio();
 	cp.friction = d->Friction();
+	cp.s_friction = d->StaticFriction();
 	cp.rolling_friction = d->RollingFactor();
 	cp.cohesion = d->Cohesion();
 	cp.stiffness_multiplyer = d->StiffMultiplyer();
@@ -117,6 +118,7 @@ void xParticleCylindersContact::getCylinderContactForce()
 			xCylinderObject* o = it.value();
 			if (o->MovingObject())
 			{
+				//std::cout << "dbf[" << id << "] - " << dbf[id].force.x << ", " << dbf[id].force.y << ", " << dbf[id].force.z << std::endl;
 				o->addContactForce(dbf[id].force.x, dbf[id].force.y, dbf[id].force.z);
 				o->addContactMoment(dbf[id].moment.x, dbf[id].moment.y, dbf[id].moment.z);
 			}
@@ -138,6 +140,11 @@ device_body_info * xParticleCylindersContact::deviceCylinderBodyInfo()
 device_body_force * xParticleCylindersContact::deviceCylinderBodyForceAndMoment()
 {
 	return dbf;
+}
+
+xmap<unsigned int, xContact*>* xParticleCylindersContact::PairContacts()
+{
+	return &pair_contact;
 }
 
 double xParticleCylindersContact::particle_cylinder_contact_detection(
@@ -445,7 +452,7 @@ bool xParticleCylindersContact::pcylCollision(
 			mpp.Ei, mpp.Ej,
 			mpp.Pri, mpp.Prj,
 			mpp.Gi, mpp.Gj,
-			cpp.restitution, cpp.stiffness_ratio,
+			cpp.restitution, cpp.stiffness_ratio, cpp.s_friction,
 			cpp.friction, cpp.rolling_friction, cpp.cohesion);
 		if (d->gab < 0 && abs(d->gab) < abs(c.coh_s))
 		{
