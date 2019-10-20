@@ -1,13 +1,13 @@
 /********************************************************************************
-** Form generated from reading UI file 'wparticle_result.ui'
+** Form generated from reading UI file 'wparticle_resultfGUhAd.ui'
 **
 ** Created by: Qt User Interface Compiler version 5.12.3
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef UI_WPARTICLE_RESULT_H
-#define UI_WPARTICLE_RESULT_H
+#ifndef WPARTICLE_RESULTFGUHAD_H
+#define WPARTICLE_RESULTFGUHAD_H
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
@@ -171,7 +171,7 @@ public:
         ParticleResultDialog->setWindowTitle(QApplication::translate("ParticleResultDialog", "Dialog", nullptr));
         RB_Part->setText(QApplication::translate("ParticleResultDialog", "From part", nullptr));
         L_Part->setText(QApplication::translate("ParticleResultDialog", "TextLabel", nullptr));
-        RB_Time->setText(QApplication::translate("ParticleResultDialog", "From time", nullptr));
+        RB_Time->setText(QApplication::translate("ParticleResultDialog", "From particle", nullptr));
         L_Time->setText(QApplication::translate("ParticleResultDialog", "TextLabel", nullptr));
         CBPX->setText(QApplication::translate("ParticleResultDialog", "PX", nullptr));
         CBPY->setText(QApplication::translate("ParticleResultDialog", "PY", nullptr));
@@ -192,4 +192,4 @@ namespace Ui {
 
 QT_END_NAMESPACE
 
-#endif // UI_WPARTICLE_RESULT_H
+#endif // WPARTICLE_RESULTFGUHAD_H

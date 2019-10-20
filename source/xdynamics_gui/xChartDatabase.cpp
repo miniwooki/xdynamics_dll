@@ -1,6 +1,7 @@
 #include "xChartDatabase.h"
 #include "xdynamics_manager/xMultiBodyModel.h"
 #include "xdynamics_manager/xResultManager.h"
+#include "xdynamics_object/xParticleObject.h"
 #include "xparticle_result_dlg.h"
 ///#include "cmdWindow.h"
 #include "xmap.hpp"
@@ -65,6 +66,8 @@ xChartDatabase::xChartDatabase(QWidget* parent)
 void xChartDatabase::contextMenu(const QPoint& pos)
 {
 	QTreeWidgetItem* item = tree->itemAt(pos);
+	if (!item)
+		return;
 	if (!item->parent())
 		return;
 	current_item = item;
@@ -246,6 +249,17 @@ void xChartDatabase::setResultManager(xResultManager * _xrm)
 			addChild(KCONSTRAINT_ROOT, _nm);
 		}
 	}
+	if (xrm->get_num_particles())
+	{
+
+	}
+}
+
+void xChartDatabase::addParticleObject(xParticleObject * _xpo)
+{
+	QString name = QString::fromStdString(_xpo->Name());
+	particle_objects[name] = _xpo;
+	addChild(PARTICLE_ROOT, name);
 }
 
 QString xChartDatabase::plotTarget()

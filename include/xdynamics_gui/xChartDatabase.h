@@ -10,6 +10,7 @@
 
 class xMultiBodyModel;
 class xResultManager;
+class xParticleObject;
 
 inline QStringList get_point_mass_chart_list()
 {
@@ -58,6 +59,7 @@ public:
 	QStringList selectedLists();
 	tRoot selectedType();
 	void setResultManager(xResultManager* _xrm);
+	void addParticleObject(xParticleObject* _xpo);
 	QString plotTarget();
 	xResultManager* result_manager_ptr();
 	void upload_mbd_results(xMultiBodyModel* _xmbd);
@@ -78,6 +80,7 @@ private:
 	QMap<tRoot, QTreeWidgetItem*> roots;
 	QMap<QString, xPointMass::pointmass_result*> mass_results;
 	QMap<QString, xKinematicConstraint::kinematicConstraint_result*> constraint_results;
+	QMap<QString, xParticleObject*> particle_objects;
 	QStringList sLists;
 	tRoot tSelected;
 	//QComboBox plot_item;

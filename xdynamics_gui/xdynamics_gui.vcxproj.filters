@@ -153,6 +153,12 @@
     <ClCompile Include="..\source\xdynamics_gui\xparticle_result_dlg.cpp">
       <Filter>Source Files\dialog</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xMessageBox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xProgressDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="..\include\xdynamics_gui\xGLWidget.h">
@@ -211,6 +217,9 @@
     </QtMoc>
     <QtMoc Include="..\include\xdynamics_gui\xparticle_result_dlg.h">
       <Filter>Header Files\dialog</Filter>
+    </QtMoc>
+    <QtMoc Include="..\include\xdynamics_gui\xProgressDialog.h">
+      <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
@@ -331,6 +340,9 @@
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_wparticle_result.h">
       <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xdynamics_gui\xMessageBox.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

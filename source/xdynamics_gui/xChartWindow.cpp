@@ -4,6 +4,7 @@
 #include "xCallOut.h"
 //#include "cmdWindow.h"
 #include "xdynamics_manager/xResultManager.h"
+#include "xdynamics_manager/xParticleMananger.h"
 #include <QtCharts/QLineSeries>
 #include <QtWidgets>
 #include <QtCharts>
@@ -85,6 +86,16 @@ bool xChartWindow::setChartData(xResultManager* xrm)
 		tree->setResultManager(xrm);
 		return false;
 	}		
+	return true;
+}
+
+bool xChartWindow::setParticleData(xParticleManager * xpm)
+{
+
+	for (xmap<xstring, xParticleObject*>::iterator it = xpm->XParticleObjects().begin(); it != xpm->XParticleObjects().end(); it.next())
+	{
+		tree->addParticleObject(it.value());
+	}
 	return true;
 }
 

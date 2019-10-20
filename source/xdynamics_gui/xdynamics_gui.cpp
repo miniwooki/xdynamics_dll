@@ -459,6 +459,8 @@ void xdynamics_gui::xChart()
 		}			
 		xchart = new xChartWindow(this);
 		xchart->setChartData(xdm->XResult());
+		if (xdm->XDEMModel())
+			xchart->setParticleData(xdm->XDEMModel()->XParticleManager());
 		xchart->show();
 		return;
 	}

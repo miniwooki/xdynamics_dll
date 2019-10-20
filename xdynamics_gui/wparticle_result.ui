@@ -55,7 +55,7 @@
      <item alignment="Qt::AlignRight">
       <widget class="QRadioButton" name="RB_Time">
        <property name="text">
-        <string>From time</string>
+        <string>From particle</string>
        </property>
       </widget>
      </item>

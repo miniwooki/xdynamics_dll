@@ -16,6 +16,7 @@ class xCallOut;
 class QToolBar;
 class QLineEdit;
 class xResultManager;
+class xParticleManager;
 //class waveHeightSensor;
 
 class xChartWindow : public QMainWindow
@@ -43,6 +44,7 @@ public:
 
 	//void setResultStorage(resultStorage* _rs);
 	bool setChartData(xResultManager* xdm);
+	bool setParticleData(xParticleManager* xpm);
 	void joint_plot();
 	void body_plot();
 	void closeEvent(QCloseEvent *event);

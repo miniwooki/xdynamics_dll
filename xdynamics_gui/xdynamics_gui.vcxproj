@@ -158,6 +158,7 @@
     <ClCompile Include="..\source\xdynamics_gui\xdynamics_gui.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xLineSeries.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xListWidget.cpp" />
+    <ClCompile Include="..\source\xdynamics_gui\xMessageBox.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xparticle_result_dlg.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xpass_distribution_dlg.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xPointMassWidget.cpp" />
@@ -168,6 +169,7 @@
     <ClCompile Include="..\source\xdynamics_gui\xLineEditWidget.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xModelNavigator.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xNewDialog.cpp" />
+    <ClCompile Include="..\source\xdynamics_gui\xProgressDialog.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xResultCallThread.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xResultWidget.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xSimulationThread.cpp" />
@@ -210,6 +212,13 @@
     </QtMoc>
     <ClInclude Include="..\include\xdynamics_gui\xLineSeries.h" />
     <QtMoc Include="..\include\xdynamics_gui\xparticle_result_dlg.h">
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles;.;$(USING_CUDA_SAMPLE_VERSION)\common\inc;.\GeneratedFiles\$(ConfigurationName);$(USING_QT_VERSION)\include\QtCore;$(USING_QT_VERSION)\include\QtGui;$(USING_QT_VERSION)\include\QtANGLE;$(USING_QT_VERSION)\include\QtOpenGL;$(USING_QT_VERSION)\include\QtOpenGLExtensions;$(USING_QT_VERSION)\include\QtWidgets;$(USING_IRRLICHT_VERSION)\include;C:\xdynamics\include\xdynamics_gui;C:\xdynamics\include;$(USING_QT_VERSION)\include;$(USING_CUDA_VERSION)\include;$(USING_QT_VERSION)\include\QtCharts;$(QTDIR)\include\QtCharts;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets</IncludePath>
+      <Define Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ADD_;_WINDOWS;_USE_MATH_DEFINES;UNICODE;_UNICODE;WIN32;WIN64;_DEBUG;QT_CHARTS_LIB;QT_CORE_LIB;QT_GUI_LIB;QT_OPENGL_LIB;QT_WIDGETS_LIB;%(PreprocessorDefinitions)</Define>
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles;.;$(USING_CUDA_SAMPLE_VERSION)\common\inc;.\GeneratedFiles\$(ConfigurationName);$(USING_QT_VERSION)\include\QtCore;$(USING_QT_VERSION)\include\QtGui;$(USING_QT_VERSION)\include\QtANGLE;$(USING_QT_VERSION)\include\QtOpenGL;$(USING_QT_VERSION)\include\QtOpenGLExtensions;$(USING_QT_VERSION)\include\QtWidgets;$(USING_IRRLICHT_VERSION)\include;C:\xdynamics\include\xdynamics_gui;C:\xdynamics\include;$(USING_QT_VERSION)\include\QtCharts;$(USING_QT_VERSION)\include;$(USING_CUDA_VERSION)\include;$(QTDIR)\include\QtCharts;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets</IncludePath>
+      <Define Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_USE_MATH_DEFINES;UNICODE;_UNICODE;WIN32;WIN64;QT_NO_DEBUG;NDEBUG;QT_CHARTS_LIB;QT_CORE_LIB;QT_GUI_LIB;QT_OPENGL_LIB;QT_WIDGETS_LIB;%(PreprocessorDefinitions)</Define>
+    </QtMoc>
+    <ClInclude Include="..\include\xdynamics_gui\xMessageBox.h" />
+    <QtMoc Include="..\include\xdynamics_gui\xProgressDialog.h">
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles;.;$(USING_CUDA_SAMPLE_VERSION)\common\inc;.\GeneratedFiles\$(ConfigurationName);$(USING_QT_VERSION)\include\QtCore;$(USING_QT_VERSION)\include\QtGui;$(USING_QT_VERSION)\include\QtANGLE;$(USING_QT_VERSION)\include\QtOpenGL;$(USING_QT_VERSION)\include\QtOpenGLExtensions;$(USING_QT_VERSION)\include\QtWidgets;$(USING_IRRLICHT_VERSION)\include;C:\xdynamics\include\xdynamics_gui;C:\xdynamics\include;$(USING_QT_VERSION)\include;$(USING_CUDA_VERSION)\include;$(USING_QT_VERSION)\include\QtCharts;$(QTDIR)\include\QtCharts;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets</IncludePath>
       <Define Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ADD_;_WINDOWS;_USE_MATH_DEFINES;UNICODE;_UNICODE;WIN32;WIN64;_DEBUG;QT_CHARTS_LIB;QT_CORE_LIB;QT_GUI_LIB;QT_OPENGL_LIB;QT_WIDGETS_LIB;%(PreprocessorDefinitions)</Define>
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles;.;$(USING_CUDA_SAMPLE_VERSION)\common\inc;.\GeneratedFiles\$(ConfigurationName);$(USING_QT_VERSION)\include\QtCore;$(USING_QT_VERSION)\include\QtGui;$(USING_QT_VERSION)\include\QtANGLE;$(USING_QT_VERSION)\include\QtOpenGL;$(USING_QT_VERSION)\include\QtOpenGLExtensions;$(USING_QT_VERSION)\include\QtWidgets;$(USING_IRRLICHT_VERSION)\include;C:\xdynamics\include\xdynamics_gui;C:\xdynamics\include;$(USING_QT_VERSION)\include\QtCharts;$(USING_QT_VERSION)\include;$(USING_CUDA_VERSION)\include;$(QTDIR)\include\QtCharts;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets</IncludePath>

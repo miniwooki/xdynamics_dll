@@ -16,14 +16,22 @@ public:
 //QMap<unsigned int, distribution_data>& get_distribution_result();
 private:
 	void append(unsigned int id, double px, double py, double pz, double vx, double vy, double vz);
-	void append_particle_base(double t, double px, double py, double pz, double vx, double vy, double vz);
+	void append_particle_base(unsigned int i, double t, double px, double py, double pz, double vx, double vy, double vz);
 
 private slots:
 	void click_load();
 	void click_export();
 	void click_exit();
+	void edit_target_part();
+	void edit_target_particle();
+	void enable_part();
+	void enable_time();
 
 private:
+	unsigned int m_part;
+	unsigned int m_particle;
 	xResultManager* xrm;
 	load_target ltg;
+	QStringList part_labels;
+	QStringList time_labels;
 };

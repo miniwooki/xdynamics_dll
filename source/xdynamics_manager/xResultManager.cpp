@@ -489,7 +489,7 @@ float * xResultManager::get_particle_velocity_result_ptr()
 
 float * xResultManager::get_cluster_position_result_ptr()
 {
-	//return c_cluster_pos;
+	return NULL;// c_cluster_pos;
 }
 
 float * xResultManager::get_particle_color_result_ptr()
