@@ -250,8 +250,8 @@ void xContact::Hertz_Mindlin(
 		double S_t = c.ks * sqrt(c.eq_r * cdist);
 		double ft1 = S_t * ds + c.vs * sqrt(S_t * c.eq_m) * dot(dv, s_hat);
 		double ft2 = c.fric * length(Fn);
-		double ft3 = c.s_fric * length(Fn);
-		Ft = (ft1 < ft3 ? 0.0 : ft2)/*min(ft1, ft2)*/ * s_hat;
+		//double ft3 = c.s_fric * length(Fn);
+		Ft = /*(ft1 < ft3 ? 0.0 : ft2)*/min(ft1, ft2) * s_hat;
 		//M = cross(cp, Ft);
 	}
 	//F = Fn + Ft;
@@ -290,7 +290,7 @@ void xContact::cudaMemoryAlloc(unsigned int np)
 	device_contact_property hcp = device_contact_property
 	{
 		mpp.Ei, mpp.Ej, mpp.Pri, mpp.Prj, mpp.Gi, mpp.Gj,
-		restitution, friction, rolling_factor, cohesion, stiffnessRatio, stiff_multiplyer
+		restitution, friction, s_friction, rolling_factor, cohesion, stiffnessRatio, stiff_multiplyer
 	};
 	checkCudaErrors(cudaMalloc((void**)&dcp, sizeof(device_contact_property)));
 	checkCudaErrors(cudaMemcpy(dcp, &hcp, sizeof(device_contact_property), cudaMemcpyHostToDevice));

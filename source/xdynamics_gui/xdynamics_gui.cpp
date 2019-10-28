@@ -211,7 +211,13 @@ bool xdynamics_gui::ReadViewModel(QString path)
 							vector3d p = xpm->Position();
 							xvo->setPosition(static_cast<float>(p.x), static_cast<float>(p.y), static_cast<float>(p.z));								
 						}
-					}
+						else
+						{
+							xPointMass* xpm = dynamic_cast<xPointMass*>(xdm->XObject()->XObject(name.toStdString()));
+							vector3d p = xpm->Position();
+							xvo->setPosition(static_cast<float>(p.x), static_cast<float>(p.y), static_cast<float>(p.z));
+						}
+					}										
 				}
 			}
 			xnavi->addChild(xModelNavigator::MASS_ROOT, name);

@@ -37,20 +37,15 @@ public:
 	double CriticalPoisson();
 	double CriticalYoungs();
 	double CriticalRadius();
-	//unsigned int nSingleSphere();
-	//unsigned int nClusterSphere();
-	//unsigned int NumParticleWithCluster();
-	//unsigned int* ClusterIndex();
-	//unsigned int* ClusterCount();
-	//unsigned int* ClusterBegin();
-	//vector3d* ClusterRelativeLocation();
+
 
 	double* GetPositionResultPointer(unsigned int pt);
 	double* GetVelocityResultPointer(unsigned int pt);
 // 	unsigned int RealTimeCreating();
 	void AllocParticleResultMemory(unsigned int npart, unsigned int np);
-	void SetCurrentParticlesFromPartResult(std::string path);
+	void SetCurrentParticlesFromPartResult(std::string path = "");
 	//void SetClusterInformation();
+	void SetChangeParticlesFilePath(std::string path);
 	void AddParticleCreatingCondition(xParticleObject* xpo, xParticleCreateCondition& xpcc);
 	unsigned int ExcuteCreatingCondition(double ct, unsigned int cstep, unsigned int cnp);
 	//static unsigned int GetNumLineParticles(double len, double r0, double r1 = 0);
@@ -67,10 +62,7 @@ public:
 	xParticleObject* CreateClusterParticle(std::string n, xMaterialType mt, vector3d& loc, vector3i& grid, xClusterObject* xo);
 	xParticleObject* CreateMassParticle(std::string n, xMaterialType mt, double rad, xPointMassData& d);
 	xParticleObject* CreatePlaneParticle(std::string n, xMaterialType mt, xPlaneParticleData& d);
-//	xParticleObject* CreateSPHParticles(xObject* xobj, double ps, unsigned int nlayer);
-//	xParticleObject* CreateBoundaryParticles(xObject* xobj, double lx, double ly, double lz, double ps);
-	//xParticleObject* CreateSPHLineParticle(std::string n, xMa)
-	//xParticleObject* CreateSPHPlaneParticleObject(std::string n, xMaterialType mt, xSPHPlaneObjectData& d);
+	
 
 private:
 	void setCriticalMaterial(double d, double y, double p);
@@ -102,6 +94,7 @@ private:
 //unsigned int *cluster_begin;
 	//vector3d* rcluster;
 	xMaterialType *r_type;
+	xstring c_filepath;
 };
 
 

@@ -366,9 +366,10 @@ xParticleObject* xParticleManager::CreateParticleFromList(
 
 void xParticleManager::SetCurrentParticlesFromPartResult(std::string path)
 {
+	std::string c_path = path.empty() ? c_filepath.toStdString() : path;
 	std::fstream qf;
 	std::cout << "SetCurrentParticleFromPartResult : " << path << std::endl;
-	qf.open(path, std::ios::binary | std::ios::in);
+	qf.open(c_path, std::ios::binary | std::ios::in);
 	double m_ct = 0;
 	unsigned int m_np = 0;
 	unsigned int m_ns = 0;
@@ -936,6 +937,11 @@ void xParticleManager::AllocParticleResultMemory(unsigned int npart, unsigned in
 	r_vel = new double[n * 3];
 	memset(r_pos, 0, sizeof(double) * n * 4);
 	memset(r_vel, 0, sizeof(double) * n * 3);
+}
+
+void xParticleManager::SetChangeParticlesFilePath(std::string path)
+{
+	c_filepath = path;
 }
 
 void xParticleManager::AddParticleCreatingCondition(xParticleObject* xpo, xParticleCreateCondition& xpcc)

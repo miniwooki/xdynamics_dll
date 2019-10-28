@@ -57,6 +57,7 @@ xPointMassData xXLSReader::ReadPointMassData(std::string& _name, int r, int& c, 
 	x = ReadStr(r, c++); x.split(",", 3, ptr + 7);
 	x = ReadStr(r, c++); x.split(",", 4, ptr + 10);
 	x = ReadStr(r, c++); x.split(",", 3, ptr + 14);
+
 	if (xve && v)
 	{
 		int t = VMARKER;
@@ -356,18 +357,31 @@ void xXLSReader::ReadMass(xMultiBodyModel* xmbd, vector2i rc)
 		{
 			if (IsEmptyCell(rc.x, rc.y)) break;
 			std::string name = ReadStr(rc.x, rc.y++);
-			xObject *obj = xObjectManager::XOM()->XObject(name);
+			xObject *obj = xObjectManager::XOM()->XObject(name);							
+			xPointMassData xpmd = ReadPointMassData(name, rc.x, rc.y);
+			if (!IsEmptyCell(rc.x, rc.y))
+			{
+				if (obj)
+				{
+					xPointMass* _xpm = dynamic_cast<xPointMass*>(obj);
+					_xpm->setPosition(xpmd.px, xpmd.py, xpmd.pz);
+				}
+				
+				rc.x++;
+				continue;
+			}				
 			xPointMass* xpm = NULL;
-			xpm = xmbd->CreatePointMass(name);
 			if (obj) obj->setMovingObject(true);
-			xPointMassData xpmd = ReadPointMassData(name, rc.x++, rc.y);
+			xpm = xmbd->CreatePointMass(name);
 			xpm->SetDataFromStructure(xmbd->NumMass(), xpmd);
+			
 // 			if (xpm->Shape() == MESH_SHAPE)
 // 				dynamic_cast<xMeshObject*>(xpm)->translation(new_vector3d(xpmd.px, xpmd.py, xpmd.pz));
 			
 			
 			//xpm->translation(xpm->Position());
 			// obj->TranslationPosition(xpm->Position());
+			rc.x++;
 			rc.y = init_col;
 		}
 	}
@@ -554,7 +568,8 @@ void xXLSReader::ReadDEMParticle(xDiscreteElementMethodModel* xdem, xObjectManag
 				if(ext == ".bin")
 				{
 					std::string p_path = ReadStr(rc.x, rc.y);
-					xdem->XParticleManager()->SetCurrentParticlesFromPartResult(p_path);
+					xdem->XParticleManager()->SetChangeParticlesFilePath(p_path);
+					//xdem->XParticleManager()->SetCurrentParticlesFromPartResult(p_path);
 				}
 				else
 				{

@@ -24,8 +24,10 @@ public:
 	xstring operator+ (const xstring& _xs);
 	xstring operator+ (const char* _wc);
 	xstring operator+= (const char* _wc);
+	bool operator<(const xstring& _xs);
+	bool operator>(const xstring& _xs);
 	char* text() const;
-	int size() const;
+	size_t size() const;
 	void split(const char* c, int n, int* data);
 	void split(const char* c, int n, double* data);
 	void split(const char* c, int n, std::string* data);
@@ -41,7 +43,7 @@ public:
 	//	friend ostream& operator<<(ostream& os, const xstring& xs);
 private:
 	std::vector<std::string> _n_split(const std::string& s, const char c);
-	int len;
+	size_t len;
 	char *wc;
 };
 xstring operator+ (const char* c, const xstring& s);

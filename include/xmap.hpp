@@ -10,9 +10,9 @@ class XDYNAMICS_API xmap
 	{
 		Key key;
 		T value;
-		xMapNode* left;
 		xMapNode* right;
-		xMapNode(Key k, T v, xMapNode* n) : key(k), value(v), left(n) {}
+		xMapNode* left;
+		xMapNode(Key k, T v) : key(k), value(v) {}
 	};
 	xMapNode* head;
 	xMapNode* tail;
@@ -21,14 +21,6 @@ public:
 	xmap() : head(0), tail(0), sz(0) {}
 	~xmap()
 	{
-		//iterator it = this->begin();
-		//while (it.has_next())
-		//{
-		//	delete it.current_node();
-		//	//it.current_node() = NULL;
-		//	sz--;
-		//	it.next();
-		//}
 		xMapNode *n = tail;
 		while (n != head)
 		{
@@ -54,23 +46,47 @@ public:
 		for (; it != end(); it.next())
 		{
 			delete it.value();
-			//delete it.current_node();
-		//	sz--;
 		}
 	}
 
 	void push_front(Key k, T v)
 	{
-		/*if(head)
-			head->right = head;*/
-		xMapNode *n = new xMapNode(k, v, head);
+		xMapNode *n = new xMapNode(k, v);
+		n->left = head;
 		if (head)
 			head->right = n;
 		head = n;
 		head->right = NULL;
-		//	head->right = head;
 		if (!sz) tail = head;
 		sz++;
+	}
+	void push_back(Key k, T v)
+	{
+		xMapNode *n = new xMapNode(k, v);
+		if (!sz)
+		{
+			head = n;
+			head->right = NULL;
+			tail = NULL;
+			head->left = tail;
+			sz++;
+		}
+		else if (sz == 1)
+		{
+			n->right = head;
+			tail = n;
+			tail->left = NULL;
+			head->left = tail;
+			sz++;
+		}
+		else
+		{
+			tail->left = n;
+			n->right = tail;
+			tail = n;
+			tail->left = NULL;
+			sz++;
+		}
 	}
 
 	T operator[] (Key k)
@@ -78,7 +94,6 @@ public:
 		xMapNode* n = find_node(k);
 		if (!n)
 		{
-			//push_front(k, T());
 			return NULL;// head->value;
 		}
 		return n->value;
@@ -89,9 +104,45 @@ public:
 		xMapNode* n = find_node(k);
 		if (!n)
 		{
-			push_front(k, v);
+			iterator it = begin();
+			if (it == end())
+			{
+				push_back(k, v);
+			}
+			else
+			{
+				n = new xMapNode(k, v);
+				it = begin();
+				for (; it != end(); it.next())
+				{
+					if (it.key() > n->key)
+						break;
+				}
+				xMapNode *cn = it.current_node();
+				if (cn == NULL)
+				{
+					push_back(k, v);
+					delete n;
+					return 0;
+				}
+				xMapNode *pn = cn->right;
+				n->left = cn;
+				n->right = cn->right;
+				cn->right = n;
+				//cn = n;
+				if (pn)
+				{
+					pn->left = n;
+				}
+				else
+				{
+					head = n;
+					tail = cn;
+				}
+				sz++;
+				//push_back(k, v);
+			}
 			return 0;
-			//return NULL;// head->value;
 		}
 		return -1;
 	}

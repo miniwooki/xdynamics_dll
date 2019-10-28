@@ -137,7 +137,7 @@ char* xstring::text() const
 	return wc;
 }
 
-int xstring::size() const
+size_t xstring::size() const
 {
 	return len;
 }
@@ -212,3 +212,18 @@ std::vector<std::string> xstring::_n_split(const std::string& s, const char c)
 	return result;
 }
 
+bool xstring::operator<(const xstring& _xs)
+{
+	std::string a = text();
+	std::string b = _xs.text();
+	int c = a.compare(b);
+	return c == -1 ? true : false;
+}
+
+bool xstring::operator>(const xstring& _xs)
+{
+	std::string a = text();
+	std::string b = _xs.text();
+	int c = a.compare(b);
+	return c == -1 ? false : true;
+}

@@ -261,13 +261,9 @@ int xDynamicsManager::OpenModelXLS(const char* n)
 		}
 		if (xdem || xsph)
 		{
-			std::string pv_path = full_path + ".par";
-			if(xdem) xdem->XParticleManager()->ExportParticleDataForView(pv_path);
+		
 			//else if (xsph) xsph->ExportParticleDataForView(pv_path);
-			int vot = VPARTICLE;
-			xve.Write((char*)&vot, sizeof(xViewObjectType));
-			int ns = pv_path.size(); xve.Write((char*)&ns, sizeof(int));
-			xve.Write((char*)pv_path.c_str(), sizeof(char)*pv_path.size());
+			
 			if (xSimulation::dt == 0.0)
 			{
 				xParticleManager *xpm = xdem->XParticleManager();
@@ -277,7 +273,15 @@ int xDynamicsManager::OpenModelXLS(const char* n)
 					xpm->CriticalYoungs(),
 					xpm->CriticalPoisson());
 				xSimulation::setTimeStep(new_dt);
+				
 			}
+			xdem->XParticleManager()->SetCurrentParticlesFromPartResult();
+			std::string pv_path = full_path + ".par";
+			if (xdem) xdem->XParticleManager()->ExportParticleDataForView(pv_path);
+			int vot = VPARTICLE;
+			xve.Write((char*)&vot, sizeof(xViewObjectType));
+			int ns = pv_path.size(); xve.Write((char*)&ns, sizeof(int));
+			xve.Write((char*)pv_path.c_str(), sizeof(char)*pv_path.size());
 		}
  		xve.Close();
 	}

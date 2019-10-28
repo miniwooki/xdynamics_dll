@@ -120,6 +120,7 @@ struct device_wave_damping
 struct device_dem_parameters
 {
 	bool rollingCondition;
+	int contact_model;
 	unsigned int np;
 	unsigned int nmp;
 	unsigned int nCluster;
@@ -221,6 +222,7 @@ struct device_contact_property
 	double Gi, Gj;
 	double rest;
 	double fric;
+	double s_fric;
 	double rfric;
 	double coh;
 	//double coh_s;
@@ -236,7 +238,10 @@ struct device_force_constant
 	double ks;
 	double vs;
 	double mu;
+	double mu_s;
 	double ms;
+	double eq_r;
+	double eq_m;
 };
 
 struct device_force_constant_d
@@ -274,7 +279,7 @@ void XDYNAMICS_API cu_calculateHashAndIndexForPolygonSphere(
 void XDYNAMICS_API cu_reorderDataAndFindCellStart(unsigned int* hash, unsigned int* index, unsigned int* cstart, unsigned int* cend, unsigned int* sorted_index, unsigned int np, /*unsigned int nsphere,*/ unsigned int ncell);
 
 void XDYNAMICS_API cu_calculate_p2p(
-	const int tcm, double* pos, double* ep, double* vel,
+	double* pos, double* ep, double* vel,
 	double* omega, double* force,
 	double* moment, double* mass, double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd,
@@ -283,7 +288,7 @@ void XDYNAMICS_API cu_calculate_p2p(
 
 // Function for contact between particle and plane
 void XDYNAMICS_API cu_plane_contact_force(
-	const int tcm, device_plane_info* plan, device_body_info* dbi, device_contact_property *cp,
+	device_plane_info* plan, device_body_info* dbi, device_contact_property *cp,
 	device_body_force* dbfm,
 	double* pos, double* ep, double* vel, double* omega,
 	double* force, double* moment, double* mass,
@@ -292,7 +297,7 @@ void XDYNAMICS_API cu_plane_contact_force(
 	unsigned int np, unsigned int nplane);
 
 void XDYNAMICS_API cu_cube_contact_force(
-	const int tcm, device_plane_info* plan,
+	device_plane_info* plan,
 	double* pos, double* ep, double* vel, double* omega,
 	double* force, double* moment, double* mass,
 	unsigned int np, device_contact_property *cp);
@@ -309,7 +314,7 @@ void XDYNAMICS_API cu_particle_polygonObject_collision(
 
 // Function for contact between particle and cylinder
 void XDYNAMICS_API cu_cylinder_contact_force(
-	const int tcm, device_cylinder_info* cyl, device_body_info* bi, 
+	const int i, device_cylinder_info* cyl, device_body_info* bi, 
 	device_contact_property *cp,
 	double* pos, double* ep, double* vel, double* omega,
 	double* force, double* moment, double* mass,

@@ -390,41 +390,56 @@ __global__ void reorderDataAndFindCellStart_kernel(
 }
 
 __device__ device_force_constant getConstant(
-	int tcm, double ir, double jr, double im, double jm,
+	double ir, double jr, double im, double jm,
 	double iE, double jE, double ip, double jp,
 	double iG, double jG, double rest,
-	double fric, double rfric, double sratio)
+	double fric, double s_fric, double rfric, double sratio)
 {
-	device_force_constant dfc = { 0, 0, 0, 0, 0, 0 };
+	device_force_constant dfc = { 0, 0, 0, 0, 0, 0, 0,0,0 };
 	double Meq = jm ? (im * jm) / (im + jm) : im;
 	double Req = jr ? (ir * jr) / (ir + jr) : ir;
 	double Eeq = (iE * jE) / (iE*(1 - jp * jp) + jE * (1 - ip * ip));
-	switch (tcm)
-	{
-	case 0: {
-		double Geq = (iG * jG) / (iG*(2 - jp) + jG * (2 - ip));
-		double ln_e = log(rest);
-		double xi = ln_e / sqrt(ln_e * ln_e + M_PI * M_PI);
-		dfc.kn = (4.0 / 3.0) * Eeq * sqrt(Req);
-		dfc.vn = -2.0 * sqrt(5.0 / 6.0) * xi * sqrt(dfc.kn * Meq);
-		dfc.ks = 8.0 * Geq * sqrt(Req);
-		dfc.vs = -2.0 * sqrt(5.0 / 6.0) * xi * sqrt(dfc.ks * Meq);
-		dfc.mu = fric;
-		dfc.ms = rfric;
-		break;
-	}
-	case 1: {
-		//printf("rest : %f, Meq : %f", rest, Meq);
-		double beta = (M_PI / log(rest));
-		dfc.kn = (4.0 / 3.0) * Eeq * sqrt(Req);
-		dfc.vn = sqrt((4.0 * Meq * dfc.kn) / (1.0 + beta * beta));
-		dfc.ks = dfc.kn * sratio;
-		dfc.vs = dfc.vn * sratio;
-		dfc.mu = fric;
-		dfc.ms = rfric;
-		break;
-	}
-	}
+	double Seq = (2.0 * (2.0 - ip) * (1.0 + ip) / iE) + (2.0 * (2.0 - jp) * (1.0 + jp) / jE);
+	Seq = 1.0 / Seq;
+	double lne = log(rest);
+	double beta = -lne * sqrt(1.0 / (lne*lne + M_PI * M_PI));
+	dfc.eq_m = Meq;
+	dfc.eq_r = Req;
+	dfc.kn = (4.0 / 3.0) * Eeq * sqrt(Req);
+	dfc.vn = beta;
+	dfc.ks = cte.contact_model == 1 ? 8.0 * Seq : dfc.kn * sratio;
+	dfc.vs = cte.contact_model == 1 ? 2.0 * sqrt(5.0 / 6.0) * beta : dfc.vn * sratio;
+	dfc.mu = fric;
+	dfc.mu_s = s_fric;
+	dfc.ms = rfric;
+	//switch (tcm)
+	//{
+	//case 0: {
+	//	double Geq = (iG * jG) / (iG*(2 - jp) + jG * (2 - ip));
+	//	double ln_e = log(rest);
+	//	double xi = ln_e / sqrt(ln_e * ln_e + M_PI * M_PI);
+	//	dfc.kn = (4.0 / 3.0) * Eeq * sqrt(Req);
+	//	dfc.vn = -2.0 * sqrt(5.0 / 6.0) * xi * sqrt(dfc.kn * Meq);
+	//	dfc.ks = 8.0 * Geq * sqrt(Req);
+	//	dfc.vs = -2.0 * sqrt(5.0 / 6.0) * xi * sqrt(dfc.ks * Meq);
+	//	dfc.mu = fric;
+	//	dfc.mu_s = s_fric;
+	//	dfc.ms = rfric;
+	//	break;
+	//}
+	//case 1: {
+	//	//printf("rest : %f, Meq : %f", rest, Meq);
+	//	double beta = (M_PI / log(rest));
+	//	dfc.kn = (4.0 / 3.0) * Eeq * sqrt(Req);
+	//	dfc.vn = sqrt((4.0 * Meq * dfc.kn) / (1.0 + beta * beta));
+	//	dfc.ks = dfc.kn * sratio;
+	//	dfc.vs = dfc.vn * sratio;
+	//	dfc.mu = fric;
+	//	dfc.mu_s = s_fric;
+	//	dfc.ms = rfric;
+	//	break;
+	//}
+	//}
 
 	// 	dfc.kn = /*(16.f / 15.f)*sqrt(er) * eym * pow((T)((15.f * em * 1.0f) / (16.f * sqrt(er) * eym)), (T)0.2f);*/ (4.0f / 3.0f)*sqrt(er)*eym;
 	// 	dfc.vn = sqrt((4.0f*em * dfc.kn) / (1 + beta * beta));
@@ -462,73 +477,6 @@ __device__ double cohesionForce(
 	return cf;
 }
 
-// __device__ bool calForce(
-// 	float ir,
-// 	float jr,
-// 	float im,
-// 	float jm,
-// 	float rest,
-// 	float sh,
-// 	float fric,
-// 	float rfric,
-// 	float E,
-// 	float pr,
-// 	float coh,
-// 	float4 ipos,
-// 	float4 jpos,
-// 	float3 ivel,
-// 	float3 jvel,
-// 	float3 iomega,
-// 	float3 jomega,
-// 	float3& force,
-// 	float3& moment
-// 	/*float *riv*/)
-// {
-// 	float3 relative_pos = make_float3(jpos - ipos);
-// 	float dist = length(relative_pos);
-// 	float collid_dist = (ir + jr) - dist;
-// 	float3 shear_force = make_float3(0.f);
-// 	if (collid_dist <= 0){
-// 		//*riv = 0.f;
-// 		return false;
-// 	}
-// 	else{
-// 		float rcon = ir - 0.5f * collid_dist;
-// 		float3 unit = relative_pos / dist;
-// 		float3 relative_vel = jvel + cross(jomega, -jr * unit) - (ivel + cross(iomega, ir * unit));
-// 		//*riv = abs(length(relative_vel));
-// 		device_force_constant<float> c = getConstant<float>(ir, jr, im, jm, E, E, pr, pr, sh, sh, rest, fric, rfric);
-// 		float fsn = -c.kn * pow(collid_dist, 1.5f);
-// 		float fca = cohesionForce(ir, jr, E, E, pr, pr, coh, fsn);
-// 		float fsd = c.vn * dot(relative_vel, unit);
-// 		float3 single_force = (fsn + fca + fsd) * unit;
-// 		//float3 single_force = (-c.kn * pow(collid_dist, 1.5f) + c.vn * dot(relative_vel, unit)) * unit;
-// 		float3 single_moment = make_float3(0, 0, 0);
-// 		float3 e = relative_vel - dot(relative_vel, unit) * unit;
-// 		float mag_e = length(e);
-// 		if (mag_e){
-// 			float3 s_hat = e / mag_e;
-// 			float ds = mag_e * cte.dt;
-// 			float fst = -c.ks * ds;
-// 			float fdt = c.vs * dot(relative_vel, s_hat);
-// 			shear_force = (fst + fdt) * s_hat;
-// 			if (length(shear_force) >= c.mu * length(single_force))
-// 				shear_force = c.mu * fsn * s_hat;
-// 			single_moment = cross(rcon * unit, shear_force);
-// 			if (length(iomega)){
-// 				float3 on = iomega / length(iomega);
-// 				single_moment += -rfric * fsn * rcon * on;
-// 			}
-// 			//shear_force = min(c.ks * ds + c.vs * (dot(relative_vel, s_hat)), c.mu * length(single_force)) * s_hat;
-// 			//single_moment = cross(ir * unit, shear_force);
-// 		}
-// 		force += single_force + shear_force;
-// 		moment += single_moment;
-// 	}
-// 	
-// 	return true;
-// }
-
 __device__ double limit_cohesion_depth(
 	double ir, double jr, double iE, double jE, double ip, double jp, double coh)
 {
@@ -548,33 +496,28 @@ __device__ double JKR_seperation_force(double ir, double jr, double coh)
 
 __device__ void HMCModel(
 	device_force_constant c, double ir, double jr, double Ei, double Ej, double pri, double prj, double coh,
-	double rcon, double cdist, double3 iomega,
-	double3 dv, double3 unit, double3& Ft, double3& Fn, double3& M)
+	double cdist, double3 iomega, double& _ds, double& dots,
+	double3 dv, double3 unit, double3& Ft, double3& Fn)
 {
 	// 	if (coh && cdist < 1.0E-8)
 	// 		return;
 
 	double fsn = -c.kn * pow(cdist, 1.5);
 	double fdn = c.vn * dot(dv, unit);
-	double fca = cohesionForce(ir, jr, Ei, Ej, pri, prj, coh, fsn);
+	double fca = -cohesionForce(ir, jr, Ei, Ej, pri, prj, coh, fsn + fdn);
 	// 	if ((fsn + fca + fdn) < 0 && ir)
 	// 		return;
 	Fn = (fsn + fca + fdn) * unit;
 	double3 e = dv - dot(dv, unit) * unit;
 	double mag_e = length(e);
 	if (mag_e) {
-		double3 s_hat = -(e / mag_e);
-		double ds = mag_e * cte.dt;
-		double fst = -c.ks * ds;
-		double fdt = c.vs * dot(dv, s_hat);
-		Ft = (fst + fdt) * s_hat;
-		if (length(Ft) >= c.mu * length(Fn))
-			Ft = c.mu * fsn * s_hat;
-		M = cross(ir * unit, Ft);
-		if (length(iomega)) {
-			double3 on = iomega / length(iomega);
-			M += c.ms * fsn * rcon * on;
-		}
+		double3 s_hat = (e / mag_e);
+		double s_dot = dot(dv, s_hat);
+		double ds = _ds + cte.dt * (s_dot + dots);
+		_ds = ds;
+		dots = s_dot;
+		double S_t = c.ks * sqrt(c.eq_r * cdist);
+		Ft = min(S_t * ds + c.vs * sqrt(S_t * c.eq_m), c.mu * length(Fn)) * s_hat;
 	}
 }
 
@@ -597,11 +540,6 @@ __device__ void DHSModel(
 		_ds = ds;
 		dots = s_dot;
 		Ft = min(c.ks * ds + c.vs * (dot(dv, sh)), c.mu * length(Fn)) * sh;
-		//M = cross(ir * unit, Fn + Ft);
-		/*if (length(iomega)){
-		double3 on = iomega / length(iomega);
-		M += c.ms * fsn * rcon * on;
-		}*/
 	}
 }
 
@@ -705,7 +643,7 @@ __global__ void calcluate_clusters_contact_kernel(
 									break;
 								}
 							}
-							double rcon = ir - 0.5 * cdist;							
+							//double rcon = ir - 0.5 * cdist;							
 							double3 unit = rp / dist;
 							double3 cpt = make_double3(ipos.x, ipos.y, ipos.z) + ir * unit;
 							double3 dcpr = cpt - make_double3(icpos.x, icpos.y, icpos.z);
@@ -713,23 +651,13 @@ __global__ void calcluate_clusters_contact_kernel(
 							//double3 rc = ir * unit;
 							double3 rv = jvel + cross(jomega, dcpr_j) - (ivel + cross(iomega, dcpr));
 							device_force_constant c = getConstant(
-								1, ir, jr, im, jm, cp->Ei, cp->Ej,
+								ir, jr, im, jm, cp->Ei, cp->Ej,
 								cp->pri, cp->prj, cp->Gi, cp->Gj,
-								cp->rest, cp->fric, cp->rfric, cp->sratio);
-							switch (1)
+								cp->rest, cp->fric, cp->s_fric, cp->rfric, cp->sratio);
+							switch (cte.contact_model)
 							{
-							case 0:
-								HMCModel(
-									c, ir, jr, cp->Ei, cp->Ej, cp->pri, cp->prj,
-									cp->coh, rcon, cdist, iomega,
-									rv, unit, Ft, Fn, M);
-								break;
-							case 1:
-								DHSModel(
-									c, ir, jr, cp->Ei, cp->Ej, cp->pri, cp->prj,
-									cp->coh, cdist, iomega, sd.x, sd.y,
-									rv, unit, Ft, Fn);
-								break;
+							case 1:	HMCModel(c, ir, jr, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, cdist, iomega, sd.x, sd.y, rv, unit, Ft, Fn); break;
+							case 0:	DHSModel(c, ir, jr, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, cdist, iomega, sd.x, sd.y, rv, unit, Ft, Fn); break;
 							}
 							calculate_previous_rolling_resistance(
 								cp->rfric, ir, jr, dcpr, Fn, Ft, res, tma);
@@ -754,7 +682,6 @@ __global__ void calcluate_clusters_contact_kernel(
 	rres[id] += res;
 }
 
-template <int TCM>
 __global__ void calculate_p2p_kernel(
 	double4* pos, double4* ep, double3* vel,
 	double4* ev, double3* force,
@@ -833,13 +760,13 @@ __global__ void calculate_p2p_kernel(
 							double3 dcpr_j = cpt - make_double3(jpos.x, jpos.y, jpos.z);
 							double3 rv = jvel + cross(jomega, dcpr_j) - (ivel + cross(iomega, dcpr));
 							//printf("relative velocity : [%f, %f, %f]\n", rv.x, rv.y, rv.z);
-							device_force_constant c = getConstant(TCM, ir, jr, im, jm, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->Gi, cp->Gj, cp->rest, cp->fric, cp->rfric, cp->sratio);
+							device_force_constant c = getConstant(ir, jr, im, jm, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->Gi, cp->Gj, cp->rest, cp->fric, cp->s_fric, cp->rfric, cp->sratio);
 						
-							//switch (TCM)
-						//	{
-							//case 0: HMCModel(c, ir, jr, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, rcon, cdist, iomega, rv, unit, Ft, Fn, M); break;
-							DHSModel(c, ir, jr, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, cdist, iomega, sd.x, sd.y, rv, unit, Ft, Fn);// break;
-							//}
+							switch (cte.contact_model)
+							{
+							case 1: HMCModel(c, ir, jr, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, cdist, iomega, sd.x, sd.y, rv, unit, Ft, Fn); break;
+							case 0: DHSModel(c, ir, jr, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, cdist, iomega, sd.x, sd.y, rv, unit, Ft, Fn); break;
+							}
 		
 							calculate_previous_rolling_resistance(cp->rfric, ir, jr, dcpr, Fn, Ft, res, tma);
 							sumF += Fn + Ft;
@@ -1051,12 +978,14 @@ __global__ void cluster_plane_contact_kernel(
 			double3 oj = toAngularVelocity(bi.ep, bi.ed);
 			double3 dv = bi.vel + cross(oj, dcpr_j) - (ivel + cross(iomega, dcpr));
 			device_force_constant c = getConstant(
-				1, r, 0.0, m, bi.mass, cp->Ei, cp->Ej,
+				r, 0.0, m, bi.mass, cp->Ei, cp->Ej,
 				cp->pri, cp->prj, cp->Gi, cp->Gj,
-				cp->rest, cp->fric, cp->rfric, cp->sratio);
-
-			DHSModel(c, r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, cdist,	iomega, sd.x, sd.y, dv, unit, Ft, Fn);
-		
+				cp->rest, cp->s_fric, cp->fric, cp->rfric, cp->sratio);
+			switch (cte.contact_model)
+			{
+			case 0:	DHSModel(c, r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, cdist, iomega, sd.x, sd.y, dv, unit, Ft, Fn); break;
+			case 1: HMCModel(c, r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, cdist, iomega, sd.x, sd.y, dv, unit, Ft, Fn); break;
+			}
 			calculate_previous_rolling_resistance(
 				cp->rfric, r, 0, dcpr, Fn, Ft, res, tma);
 			m_force = Fn + Ft;
@@ -1165,57 +1094,38 @@ __global__ void plane_contact_force_kernel(
 		double cdist = particle_plane_contact_detection(pl, ipos3, wp, unit, r);
 		if (cp->coh)
 			coh_s = limit_cohesion_depth(r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh);
-		//printf("cdist : %f\n", cdist);
-		//printf("coh : %f, coh_s : %f\n", cp->coh, coh_s);
-		//printf("Ei*/ : %f, Ej : %f, pri : %f, pri : %f", c.kn, c.vn, c.ks, c.vs);
+		
 		double2 sd = make_double2(0.0, 0.0);
 		double3 m_force = make_double3(0, 0, 0);
 		double3 cpt = ipos3 + r * unit;
 		double3 dcpr_j = cpt - bi.pos;
-	//	if(id == 685)
-		//printf("[%d] plane contact. - %e\n", id, cdist);
-		////double3 m_moment = make_double3(0, 0, 0);
 		if (cdist > 0) {
 			//printf("[%d][%d] body pos : [%e, %e, %e]\n", k, pl.mid, bi.pos.x, bi.pos.y, bi.pos.z);
 			
 			for (unsigned int i = 0; i < 3; i++)
 				if (p_pair_id[i] == k){ sd = p_tsd[i]; break; }
-			
-			//double rcon = r - 0.5 * cdist;
-			//double3 rc = r * unit;
-			
 			double3 dcpr = cpt - ipos3;			
 			double3 oj = toAngularVelocity(bi.ep, bi.ed);
 			double3 dv = bi.vel + cross(oj, dcpr_j) - (ivel + cross(iomega, dcpr));
 			//printf("body_vel : [%f, %f, %f]\n", bi.vel.x, bi.vel.y, bi.vel.z);
-			device_force_constant c = getConstant(1, r, 0.0, m, 0.0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->Gi, cp->Gj, cp->rest, cp->fric, cp->rfric, cp->sratio);
-			/*printf("cdist : %e\n", cdist);
-			printf("ipos : [%e, %e, %e]\n", ipos3.x, ipos3.y, ipos3.z);
-			printf("jpos : [%e, %e, %e]\n", bi.pos.x, bi.pos.y, bi.pos.z);
-			printf("ivel : [%e, %e, %e]\n", ivel.x, ivel.y, ivel.z);
-			printf("bvel : [%e, %e, %e]\n", bi.vel.x, bi.vel.y, bi.vel.z);
-			printf("dcpi : [%e, %e, %e]\n", dcpr.x, dcpr.y, dcpr.z);
-			printf("dcpj : [%e, %e, %e]\n", dcpr_j.x, dcpr_j.y, dcpr_j.z);
-			printf("omei : [%e, %e, %e]\n", iomega.x, iomega.y, iomega.z);
-			printf("omej : [%e, %e, %e]\n", oj.x, oj.y, oj.z);
-			printf("revv : [%e, %e, %e]\n", dv.x, dv.y, dv.z);
-			printf("coef : [%e, %e, %e, %e]\n", c.kn, c.vn, c.ks, c.vs);
-			printf("sdsd : [%e, %e]\n", sd.x, sd.y);*/
-			DHSModel(c, r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, cdist, iomega, sd.x, sd.y, dv, unit, Ft, Fn);
+			device_force_constant c = getConstant(r, 0.0, m, 0.0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->Gi, cp->Gj, cp->rest, cp->fric, cp->s_fric, cp->rfric, cp->sratio);
+			switch (cte.contact_model)
+			{
+			case 0: DHSModel(c, r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, cdist, iomega, sd.x, sd.y, dv, unit, Ft, Fn); break;
+			case 1: HMCModel(c, r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, cdist, iomega, sd.x, sd.y, dv, unit, Ft, Fn); break;
+			}
+			
 			
 			calculate_previous_rolling_resistance(cp->rfric, r, 0, dcpr, Fn, Ft, res, tma);
 			//printf("kn : %f, cn : %f, ks : %f, cs : %f", c.kn, c.vn, c.ks, c.vs);
 			m_force = Fn + Ft;
-			/*printf("norF : [%e, %e, %e]\n", Fn.x, Fn.y, Fn.z);
-			printf("tanF : [%e, %e, %e]\n", Ft.x, Ft.y, Ft.z);*/
-			//m_moment = cross(dcpr, m_force);
+	
 			sumF += m_force;
 			sumM += cross(dcpr, m_force);
 			fx[id] += -m_force.x;// dbf[id] += -m_force;
 			fy[id] += -m_force.y;
 			fz[id] += -m_force.z;
-			//printf("[%d] plane force : [%e, %e, %e]\n", id, m_force.x, m_force.y, m_force.z);
-			//printf("[%d][%d] summa force : [%e, %e, %e]\n", id, dbf[id].x, dbf[id].y, dbf[id].z);
+	
 			double3 bmoment = -cross(dcpr_j, m_force);
 			mx[id] += bmoment.x;// -cross(dcpr_j, m_force);
 			my[id] += bmoment.y;
@@ -1334,9 +1244,13 @@ __device__ void particle_cylinder_contact_force(
 	double3 rc = cpt - ipos;// r * unit;
 	double3 dv = dbi.vel + cross(omega, po2cp) - (ivel + cross(iomega, rc));
 
-	device_force_constant c = getConstant(1, r, 0, m, 0, cp.Ei, cp.Ej, cp.pri, cp.prj, cp.Gi, cp.Gj, cp.rest, cp.fric, cp.rfric, cp.sratio);
+	device_force_constant c = getConstant(r, 0, m, 0, cp.Ei, cp.Ej, cp.pri, cp.prj, cp.Gi, cp.Gj, cp.rest, cp.fric, cp.s_fric, cp.rfric, cp.sratio);
 	//printf("%f, %f, %f, %f\n", c.kn, c.ks, c.vn, c.vs);
-	DHSModel(c, r, 0, cp.Ei, cp.Ej, cp.pri, cp.prj, cp.coh, cdist, iomega, sd.x, sd.y, dv, unit, Ft, Fn);
+	switch (cte.contact_model)
+	{
+	case 0:	DHSModel(c, r, 0, cp.Ei, cp.Ej, cp.pri, cp.prj, cp.coh, cdist, iomega, sd.x, sd.y, dv, unit, Ft, Fn); break;
+	case 1: HMCModel(c, r, 0, cp.Ei, cp.Ej, cp.pri, cp.prj, cp.coh, cdist, iomega, sd.x, sd.y, dv, unit, Ft, Fn); break;
+	}
 
 	calculate_previous_rolling_resistance(cp.rfric, r, 0, rc, Fn, Ft, res, tma);
 	//printf("Fn = [%e, %e, %e]\n", Fn.x, Fn.z, Fn.y);
@@ -1983,9 +1897,13 @@ __device__ void particle_triangle_contact_force(
 		if (p_pair_id[i] == dtci.id){ sd = p_tsd[i]; break; }
 	double3 rc = dtci.cpt - ipos;
 	double3 dv = db.vel + cross(jomega, po2cp) - (ivel + cross(iomega, rc));
-	device_force_constant c = getConstant(1, r, 0, m, db.mass, cmp.Ei, cmp.Ej, cmp.pri, cmp.prj, cmp.Gi, cmp.Gj, cmp.rest, cmp.fric, cmp.rfric, cmp.sratio);
+	device_force_constant c = getConstant(r, 0, m, db.mass, cmp.Ei, cmp.Ej, cmp.pri, cmp.prj, cmp.Gi, cmp.Gj, cmp.rest, cmp.fric, cmp.s_fric, cmp.rfric, cmp.sratio);
+	switch (cte.contact_model)
+	{
+	case 0: DHSModel(c, r, 0, cmp.Ei, cmp.Ej, cmp.pri, cmp.prj, cmp.coh, cdist, iomega, sd.x, sd.y, dv, unit, Ft, Fn); break;
+	case 1: HMCModel(c, r, 0, cmp.Ei, cmp.Ej, cmp.pri, cmp.prj, cmp.coh, cdist, iomega, sd.x, sd.y, dv, unit, Ft, Fn); break;
+	}
 	
-	DHSModel( c, r, 0, cmp.Ei, cmp.Ej, cmp.pri, cmp.prj, cmp.coh, cdist, iomega, sd.x, sd.y, dv, unit, Ft, Fn);
 
 	calculate_previous_rolling_resistance(cmp.rfric, r, 0, rc, Fn, Ft, res, tma);
 	double3 m_force = Fn + Ft;
@@ -2076,8 +1994,13 @@ __device__ void cluster_triangle_contact_force(
 	double3 jomega = toAngularVelocity(db.ep, db.ed);
 	//printf("jomega : [%e, %e, %e]\n", jomega.x, jomega.y, jomega.z);
 	double3 dv = db.vel + cross(jomega, po2cp) - (ivel + cross(iomega, dcpr));
-	device_force_constant c = getConstant(1, r, 0, m, db.mass, cmp.Ei, cmp.Ej, cmp.pri, cmp.prj, cmp.Gi, cmp.Gj, cmp.rest, cmp.fric, cmp.rfric, cmp.sratio);
-	DHSModel(c, r, 0, cmp.Ei, cmp.Ej, cmp.pri, cmp.prj, cmp.coh, cdist, iomega, sd.x, sd.y, dv, unit, Ft, Fn);
+	device_force_constant c = getConstant(r, 0, m, db.mass, cmp.Ei, cmp.Ej, cmp.pri, cmp.prj, cmp.Gi, cmp.Gj, cmp.rest, cmp.fric, cmp.s_fric, cmp.rfric, cmp.sratio);
+	
+	switch (cte.contact_model)
+	{
+		case 0: DHSModel(c, r, 0, cmp.Ei, cmp.Ej, cmp.pri, cmp.prj, cmp.coh, cdist, iomega, sd.x, sd.y, dv, unit, Ft, Fn); break;
+		case 1: HMCModel(c, r, 0, cmp.Ei, cmp.Ej, cmp.pri, cmp.prj, cmp.coh, cdist, iomega, sd.x, sd.y, dv, unit, Ft, Fn); break;
+	}
 	calculate_previous_rolling_resistance(cmp.rfric, r, 0, dcpr, Fn, Ft, res, tma);
 	double3 m_force = Fn + Ft;
 	sum_force += m_force;

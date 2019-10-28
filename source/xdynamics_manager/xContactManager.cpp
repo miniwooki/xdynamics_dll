@@ -569,7 +569,7 @@ void xContactManager::deviceCollision(
 	{
 		if (cpp)
 		{
-			cu_calculate_p2p(1, pos, ep, vel, ev, force, moment, mass,
+			cu_calculate_p2p(pos, ep, vel, ev, force, moment, mass,
 				d_Tmax, d_RRes, d_pair_count_pp, d_pair_id_pp, d_tsd_pp, sorted_id,
 				cell_start, cell_end, cpp->DeviceContactProperty(), np);
 		}
@@ -577,7 +577,7 @@ void xContactManager::deviceCollision(
 		{
 			if (cpplane->NumContact())
 			{
-				cu_plane_contact_force(1, cpplane->devicePlaneInfo(),
+				cu_plane_contact_force(cpplane->devicePlaneInfo(),
 					cpplane->devicePlaneBodyInfo(), cpplane->DeviceContactProperty(),
 					cpplane->deviceBodyForceAndMoment(),
 					pos, ep, vel,

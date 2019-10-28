@@ -103,6 +103,8 @@ int xDiscreteElementMethodSimulation::Initialize(
 	// 	{
 	// 	case grid_base::NEIGHBORHOOD: dtor = new neighborhood_cell; break;
 	// 	}
+	//pos[0] = 0;
+	//pos[2] = 0;
 	if (dtor)
 	{
 		dtor->setWorldOrigin(new_vector3d(-1.0, -1.0, -1.0));
@@ -188,6 +190,7 @@ int xDiscreteElementMethodSimulation::Initialize(
 		}
 		device_dem_parameters dp;
 		dp.np = np;
+		dp.contact_model = (int)xContact::ContactForceModel();
 		dp.nmp = nMassParticle;
 		dp.nCluster = ns < np ? ns : 0;
 		dp.nClusterObject = xpm->nClusterObject();
