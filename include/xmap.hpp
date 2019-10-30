@@ -30,12 +30,6 @@ public:
 			tn = NULL;
 			sz--;
 		}
-		/*if (head)
-		{
-			delete head;
-			head = NULL;
-			sz--;
-		}*/
 	}
 
 	unsigned int size() { return sz; }

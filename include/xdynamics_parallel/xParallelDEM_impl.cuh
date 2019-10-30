@@ -2082,8 +2082,8 @@ __global__ void particle_polygonObject_collision_kernel(
 						if (k >= cte.np)
 						{
 							k -= cte.np;
-							if (k < bindex || k >= eindex)
-								continue;
+							///if (k < bindex || k >= eindex)
+							//	continue;
 							int t = -1;
 							double3 cpt = closestPtPointTriangle(dpi[k], ipos, ir, t);
 							device_contact_property cmp = cp[dpi[k].id];

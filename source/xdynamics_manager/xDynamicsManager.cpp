@@ -261,9 +261,6 @@ int xDynamicsManager::OpenModelXLS(const char* n)
 		}
 		if (xdem || xsph)
 		{
-		
-			//else if (xsph) xsph->ExportParticleDataForView(pv_path);
-			
 			if (xSimulation::dt == 0.0)
 			{
 				xParticleManager *xpm = xdem->XParticleManager();

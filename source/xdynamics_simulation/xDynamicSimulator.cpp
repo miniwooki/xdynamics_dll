@@ -368,7 +368,7 @@ bool xDynamicsSimulator::xRunSimulationThread(double ct, unsigned int cstep)
 		if (xmbd)
 		{
 			if (checkXerror(xmbd->OneStepSimulation(ct, cstep)))
-				return false;
+				throw runtime_error(xDynamicsError::getErrorString());
 			if (xdem)
 				xdem->updateObjectFromMBD();
 			//xmbd->SetZeroBodyForce();
@@ -377,6 +377,11 @@ bool xDynamicsSimulator::xRunSimulationThread(double ct, unsigned int cstep)
 	catch (std::bad_alloc &e)
 	{
 
+	}
+	catch (std::exception &e)
+	{
+		xLog::log("Exception in dynamic simulator : " + std::string(e.what()));
+		return false;
 	}
 	if (checkStopCondition())
 		xSimulation::triggerStopSimulation();
