@@ -1,27 +1,60 @@
 #include "xdynamics_object/xParticlePlaneContact.h"
 #include "xdynamics_object/xPlaneObject.h"
 
+double* xParticlePlaneContact::d_tsd_ppl = nullptr;
+unsigned int* xParticlePlaneContact::d_pair_count_ppl = nullptr;
+unsigned int* xParticlePlaneContact::d_pair_id_ppl = nullptr;
+
 xParticlePlaneContact::xParticlePlaneContact()
 	: xContact()
+	, pair_count_ppl(nullptr)
+	, pair_id_ppl(nullptr)
+	, p(nullptr)
+	, pe(nullptr)
 {
 
 }
 
-xParticlePlaneContact::xParticlePlaneContact(std::string _name)
+xParticlePlaneContact::xParticlePlaneContact(std::string _name, xObject* o1, xObject* o2)
 	: xContact(_name, PARTICLE_PANE)
+	, pair_count_ppl(nullptr)
+	, pair_id_ppl(nullptr)
+	, p(nullptr)
+	, pe(nullptr)
 {
-
+	if (o1->Shape() == MESH_SHAPE)
+	{
+		pe = dynamic_cast<xPlaneObject*>(o1);
+		p = dynamic_cast<xParticleObject*>(o2);
+	}
+	else
+	{
+		pe = dynamic_cast<xPlaneObject*>(o2);
+		p = dynamic_cast<xParticleObject*>(o1);
+	}
 }
 
 xParticlePlaneContact::xParticlePlaneContact(const xContact& xc)
 	: xContact(xc)
+	, pair_count_ppl(nullptr)
+	, pair_id_ppl(nullptr)
+	, p(nullptr)
+	, pe(nullptr)
 {
 
 }
 
 xParticlePlaneContact::~xParticlePlaneContact()
 {
-
+	if (d_pair_count_ppl) checkCudaErrors(cudaFree(d_pair_count_ppl)); d_pair_count_ppl = NULL;
+	if (d_pair_id_ppl) checkCudaErrors(cudaFree(d_pair_id_ppl)); d_pair_id_ppl = NULL;
+	if (d_tsd_ppl) checkCudaErrors(cudaFree(d_tsd_ppl)); d_tsd_ppl = NULL;
+	if (pair_count_ppl) delete[] pair_count_ppl; pair_count_ppl = NULL;
+	if (pair_id_ppl) delete[] pair_id_ppl; pair_id_ppl = NULL;
+	if (tsd_ppl) delete[] tsd_ppl; tsd_ppl = NULL;
+	if (dpi) delete[] dpi; dpi = NULL;
+	if (pair_count_ppl) delete[] pair_count_ppl; pair_count_ppl = NULL;
+	if (tsd_ppl) delete[] tsd_ppl; tsd_ppl = NULL;
 }
 
 xPlaneObject* xParticlePlaneContact::PlaneObject()
@@ -34,81 +67,46 @@ void xParticlePlaneContact::setPlane(xPlaneObject* _pe)
 	//pe = _pe;
 }
 
-void xParticlePlaneContact::cuda_collision(double *pos, double *vel, double *omega, double *mass, double *force, double *moment, unsigned int *sorted_id, unsigned int *cell_start, unsigned int *cell_end, unsigned int np)
+void xParticlePlaneContact::save_contact_result(unsigned int pt, unsigned int np)
 {
-	//geometry_motion_condition gmc = pe->MotionCondition();
-// 	if (gmc.enable && simulation::ctime >= gmc.st)
-// 	{
-// 		hpi.xw = pe->XW();
-// 		hpi.w2 = pe->W2();
-// 		hpi.w3 = pe->W3();
-// 		hpi.w4 = pe->W4();
-// 		hpi.pa = pe->PA();
-// 		hpi.pb = pe->PB();
-// 		hpi.u1 = pe->U1();
-// 		hpi.u2 = pe->U2();
-// 		hpi.uw = pe->UW();
-// 
-// 		checkCudaErrors(cudaMemcpy(dpi, &hpi, sizeof(device_plane_info), cudaMemcpyHostToDevice));
-// 	}
-	//cu_plane_contact_force(1, dpi, pos, vel, omega, force, moment, mass, np, dcp);
+	if (xSimulation::Gpu())
+	{
+		checkXerror(cudaMemcpy(pair_count_ppl, d_pair_count_ppl, sizeof(unsigned int) * np, cudaMemcpyDeviceToHost));
+		checkXerror(cudaMemcpy(pair_id_ppl, d_pair_id_ppl, sizeof(unsigned int) * np * MAX_P2PL_COUNT, cudaMemcpyDeviceToHost));
+		checkXerror(cudaMemcpy(tsd_ppl, d_tsd_ppl, sizeof(double2) * np * MAX_P2PL_COUNT, cudaMemcpyDeviceToHost));
+		xDynamicsManager::This()->XResult()->save_p2pl_contact_data(pair_count_ppl, pair_id_ppl, tsd_ppl);
+	}	
 }
-
-// void xParticlePlaneContact::updateCollisionPair(unsigned int id, xContactPairList& xcpl, double r, vector3d pos, double rj = 0, vector3d posj = new_vector3d(0.0, 0.0, 0.0))
-// {
-// 	vector3d dp = pos - pe->XW();
-// 	vector3d wp = new_vector3d(dot(dp, pe->U1()), dot(dp, pe->U2()), dot(dp, pe->UW()));
-// 	vector3d u;
-// 
-// 	double cdist = particle_plane_contact_detection(pe, u, pos, wp, r);
-// 	if (cdist > 0){
-// 		xPairData pd = { PLANE_SHAPE, id, cdist, u.x, u.y, u.z };
-// 		xcpl.insertPlaneContactPair(pd);
-// 	}
-// }
 
 void xParticlePlaneContact::collision(
-	double r, double m, vector3d& pos, vector3d& vel, vector3d& omega, vector3d& F, vector3d& M)
+	unsigned int id, double *pos, double *ep, double *vel, double *ev,
+	double *mass, double* inertia,
+	double *force, double *moment,
+	unsigned int *sorted_id,
+	unsigned int *cell_start,
+	unsigned int *cell_end,
+	unsigned int np)
 {
-	// 	simulation::isGpu()
-	// 		? cu_plane_contact_force
-	// 		(
-	// 		1, dpi, pos, vel, omega, force, moment, mass, np, dcp
-	// 		)
-	// 		: hostCollision
-	// 		(
-	// 		pos, vel, omega, mass, force, moment, np
-	// 		);
-	// 
-	// 	return true;
-	//singleCollision(pe, m, r, pos, vel, omega, F, M);
-	// 	;// force[i] += F;
-	// 	;// moment[i] += M;
+	cu_plane_contact_force(id, dpi, dbi, dcp, pos, ep, vel,	ev, force, moment, mass, 
+		dTmax, dRRes, d_pair_count_ppl, d_pair_id_ppl, d_tsd_ppl, np);
 }
 
-void xParticlePlaneContact::cudaMemoryAlloc_planeObject()
+void xParticlePlaneContact::alloc_memories(unsigned int np)
 {
-	//device_plane_info *_dpi = new device_plane_info;
-// 	hpi.l1 = pe->L1();
-// 	hpi.l2 = pe->L2();
-// 	hpi.xw = pe->XW();
-// 	hpi.uw = pe->UW();
-// 	hpi.u1 = pe->U1();
-// 	hpi.u2 = pe->U2();
-// 	hpi.pa = pe->PA();
-// 	hpi.pb = pe->PB();
-// 	hpi.w2 = pe->W2();
-// 	hpi.w3 = pe->W3();
-// 	hpi.w4 = pe->W4();
-// 	checkCudaErrors(cudaMalloc((void**)&dpi, sizeof(device_plane_info)));
-// 	checkCudaErrors(cudaMemcpy(dpi, &hpi, sizeof(device_plane_info), cudaMemcpyHostToDevice));
-	//delete _dpi;
-}
-
-void xParticlePlaneContact::cudaMemoryAlloc(unsigned int np)
-{
-	xContact::cudaMemoryAlloc(np);
-	cudaMemoryAlloc_planeObject();
+	xContact::alloc_memories(np);
+	if (xSimulation::Gpu())
+	{
+		checkXerror(cudaMalloc((void**)&dpi, sizeof(device_triangle_info)));
+		checkXerror(cudaMalloc((void**)&d_pair_count_ppl, sizeof(unsigned int) * np));
+		checkXerror(cudaMalloc((void**)&d_pair_id_ppl, sizeof(unsigned int) * np * MAX_P2MS_COUNT));
+		checkXerror(cudaMalloc((void**)&d_tsd_ppl, sizeof(double2) * np * MAX_P2MS_COUNT));
+		checkXerror(cudaMemset(d_pair_count_ppl, 0, sizeof(unsigned int) * np));
+		checkXerror(cudaMemset(d_pair_id_ppl, 0, sizeof(unsigned int) * np * MAX_P2MS_COUNT));
+		checkXerror(cudaMemset(d_tsd_ppl, 0, sizeof(double2) * np * MAX_P2MS_COUNT));
+		pair_count_ppl = new unsigned int[np];
+		pair_id_ppl = new unsigned int[np * MAX_P2MS_COUNT];
+		tsd_ppl = new double[2 * np * MAX_P2MS_COUNT];
+	}
 }
 
 bool xParticlePlaneContact::detect_contact(vector4f& p, xPlaneObject& pe, vector3f& cpoint)
@@ -229,33 +227,4 @@ double xParticlePlaneContact::particle_plane_contact_detection(	xPlaneObject* _p
 // 
 // 
  	return -1.0f;
-}
-
-void xParticlePlaneContact::singleCollision(
-	xPlaneObject* _pe, double mass, double rad, vector3d& pos, vector3d& vel,
-	vector3d& omega, vector3d& force, vector3d& moment)
-{
-// 	vector3d dp = pos - _pe->XW();
-// 	vector3d wp = new_vector3d(dot(dp, _pe->U1()), dot(dp, _pe->U2()), dot(dp, _pe->UW()));
-// 	vector3d u;
-// 
-// 	double cdist = particle_plane_contact_detection(_pe, u, pos, wp, rad);
-// 	if (cdist > 0){
-// 		double rcon = rad - 0.5 * cdist;
-// 		vector3d cp = rcon * u;
-// 		//unsigned int ci = (unsigned int)(i / particle_cluster::perCluster());
-// 		//vector3d c2p = cp - ps->getParticleClusterFromParticleID(ci)->center();
-// 		vector3d dv = -(vel);// +omega.cross(rad * u));
-// 
-// 		xContactParameters c = getContactParameters(
-// 			rad, 0.0,
-// 			mass, 0.0,
-// 			mpp.Ei, mpp.Ej,
-// 			mpp.Pri, mpp.Prj,
-// 			mpp.Gi, mpp.Gj);
-// 		switch (force_model)
-// 		{
-// 		case DHS: DHSModel(c, cdist, cp, dv, u, force, moment); break;
-// 		}
-// 	}
 }

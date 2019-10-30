@@ -2,8 +2,19 @@
 #include "xdynamics_object/xParticleObject.h"
 #include "xdynamics_object/xMeshObject.h"
 
+int xParticleMeshObjectContact::nmoving = 0;
+unsigned int xParticleMeshObjectContact::n_mesh_sphere = 0;
+
 xParticleMeshObjectContact::xParticleMeshObjectContact()
 	: xContact()
+	, maxRadii(0)
+	, d_tsd_ptri(nullptr)
+	, d_pair_count_ptri(nullptr)
+	, d_pair_id_ptri(nullptr)
+	, pair_count_ptri(nullptr)
+	, pair_id_ptri(nullptr)
+	, p(nullptr)
+	, po(nullptr)
 {
 
 }
@@ -11,8 +22,13 @@ xParticleMeshObjectContact::xParticleMeshObjectContact()
 xParticleMeshObjectContact::xParticleMeshObjectContact(std::string _name, xObject* o1, xObject* o2)
 	: xContact(_name, PARTICLE_MESH_SHAPE)
 	, maxRadii(0)
-	, p(NULL)
-	, po(NULL)
+	, d_tsd_ptri(nullptr)
+	, d_pair_count_ptri(nullptr)
+	, d_pair_id_ptri(nullptr)
+	, pair_count_ptri(nullptr)
+	, pair_id_ptri(nullptr)
+	, p(nullptr)
+	, po(nullptr)
 {
 	if (o1->Shape() == MESH_SHAPE)
 	{
@@ -29,9 +45,112 @@ xParticleMeshObjectContact::xParticleMeshObjectContact(std::string _name, xObjec
 
 xParticleMeshObjectContact::~xParticleMeshObjectContact()
 {
-	// 	if (hpi) delete[] hpi; hpi = NULL;
-	// 	if (dpi) checkCudaErrors(cudaFree(dpi)); dpi = NULL;
-	//if (hsphere) delete[] hsphere; hsphere = NULL;
+	if (d_pair_count_ptri) checkCudaErrors(cudaFree(d_pair_count_ptri)); d_pair_count_ptri = NULL;
+	if (d_pair_id_ptri) checkCudaErrors(cudaFree(d_pair_id_ptri)); d_pair_id_ptri = NULL;
+	if (d_tsd_ptri) checkCudaErrors(cudaFree(d_tsd_ptri)); d_tsd_ptri = NULL;
+	if (pair_count_ptri) delete[] pair_count_ptri; pair_count_ptri = NULL;
+	if (pair_id_ptri) delete[] pair_id_ptri; pair_id_ptri = NULL;
+	if (tsd_ptri) delete[] tsd_ptri; tsd_ptri = NULL;
+	if (dti) delete[] dti; dti = NULL;
+	if (pair_count_ptri) delete[] pair_count_ptri; pair_count_ptri = NULL;
+	if (tsd_ptri) delete[] tsd_ptri; tsd_ptri = NULL;
+}
+
+bool xParticleMeshObjectContact::define()
+{
+	if (po)
+	{
+		if (po->MovingObject() || po->CompulsionMovingObject())
+			nmoving++;
+		n_mesh_sphere += po->NumTriangle();
+	}
+	//foreach(xParticleMeshObjectContact* cpm, cpmesh)
+	//{
+	//	xMeshObject* pobj = cpm->MeshObject();
+	//	if (pobj->MovingObject() || pobj->CompulsionMovingObject())
+	//		nmoving++;
+	//	npolySphere += pobj->NumTriangle();
+	//}
+	//nPobjs = cpmesh.size();
+	hsphere = new vector4d[po->NumTriangle()];
+	hlocal = new vector3d[po->NumTriangle()];
+	hmi = new host_mesh_info;
+	hcp = new xContactMaterialParameters;
+	hmp = new xMaterialPair;
+	//hpmi = new host_mesh_mass_info[nPobjs];
+	//memset(hpmi, 0, sizeof(host_mesh_mass_info) * nPobjs);
+	// 	if (simulation::isCpu())
+	// 		dsphere = (double*)hsphere;
+// 	if (!pct)
+// 	{
+// 		pct = new polygonContactType[nPobjs];
+// 		memset(pct, 0, sizeof(polygonContactType) * nPobjs);
+// 	}
+	double maxRadii = 0.0;
+	unsigned int idx = 0;
+//	for (it = cpmesh.begin(); it != cpmesh.end(); it.next())
+	{
+		//xParticleMeshObjectContact* cpm = it.value();
+		xContactMaterialParameters cp = { 0, };
+		xMaterialPair xmp = { 0, };
+		//xMeshObject* pobj = cpm->MeshObject();
+		vector3d *vList = (vector3d *)po->VertexList();
+		//		unsigned int a, b, c;
+		cp.restitution = this->Restitution();
+		cp.stiffness_ratio = this->StiffnessRatio();
+		cp.friction = this->Friction();
+		cp.s_friction = this->StaticFriction();
+		cp.rolling_friction = this->RollingFactor();
+		cp.stiffness_multiplyer = this->StiffMultiplyer();
+		xmp = this->MaterialPropertyPair();
+		hcp[idx] = cp;
+		hmp[idx] = xmp;
+		//pair_ip.insert(idx, pobj);
+		//ePolySphere += pobj->NumTriangle();
+		unsigned int vi = 0;
+		//vector3d* hlocal = new vector3d[npolySphere];
+		double* t_radius = new double[po->NumTriangle()];
+		for (unsigned int i = 0; i < po->NumTriangle(); i++)
+		{
+			//			host_mesh_info po;
+			hti[i].id = i;
+			hti[i].sid = 0;
+			vector3d pos = po->Position();
+			euler_parameters ep = po->EulerParameters();
+			//unsigned int s = vi * 9;
+			vector3d p = pos + ToGlobal(ep, vList[vi++]);
+			vector3d q = pos + ToGlobal(ep, vList[vi++]);
+			vector3d r = pos + ToGlobal(ep, vList[vi++]);
+			hti[i].P = make_double3(p.x, p.y, p.z);
+			hti[i].Q = make_double3(q.x, q.y, q.z);
+			hti[i].R = make_double3(r.x, r.y, r.z);
+			//hpi[i].indice.z = vi++;
+			vector4d csph = xUtilityFunctions::FitSphereToTriangle(p, q, r, 0.8);
+			//double rad = length(ctri - hpi[i].P);
+			if (csph.w > maxRadii)
+				maxRadii = csph.w;
+			hsphere[i] = csph;// new_vector4d(ctri.x, ctri.y, ctri.z, rad);
+			vector3d r_pos = ToLocal(ep, (new_vector3d(csph.x - pos.x, csph.y - pos.y, csph.z - pos.z)));
+			hlocal[i] = r_pos;
+			t_radius[i] = csph.w;
+		}
+		//	ExportTriangleSphereLocalPosition(pobj->Name().toStdString(), bPolySphere, ePolySphere, hlocal, t_radius);
+		//bPolySphere += pobj->NumTriangle();
+		delete[] t_radius;
+		//delete[] hlocal; hlocal = NULL;
+		/*std::fstream fs;
+		fs.open("C:/xdynamics/tri_sphere.txt", std::ios::out);
+		for (unsigned int i = 0; i < pobj->NumTriangle(); i++)
+		{
+			fs << hsphere[i].x << " " << hsphere[i].y << " " << hsphere[i].z << " " << hsphere[i].w << std::endl;
+		}
+		fs.close();*/
+		idx++;
+	}
+	max_sphere_radius = maxRadii;
+	if (xSimulation::Cpu())
+		dsphere = (double *)hsphere;
+	return true;
 }
 
 // bool contact_particles_polygonObject::collision(
@@ -50,20 +169,70 @@ xParticleMeshObjectContact::~xParticleMeshObjectContact()
 // 	return true;
 // }
 
-void xParticleMeshObjectContact::cudaMemoryAlloc(unsigned int np)
+void xParticleMeshObjectContact::alloc_memories(unsigned int np)
 {
-	// 	contact::cudaMemoryAlloc();
-	// 	if (!dpi)
-	// 	{
-	// 		checkCudaErrors(cudaMalloc((void**)&dpi, sizeof(device_polygon_info) * nPolySphere));
-	// 		checkCudaErrors(cudaMemcpy(dpi, hpi, sizeof(device_polygon_info) * nPolySphere, cudaMemcpyHostToDevice));
-	// 	}
+	xContact::alloc_memories(np);
+	if (xSimulation::Gpu())
+	{
+		checkXerror(cudaMalloc((void**)&dti, sizeof(device_triangle_info) * po->NumTriangle()));
+		checkXerror(cudaMalloc((void**)&d_pair_count_ptri, sizeof(unsigned int) * np));
+		checkXerror(cudaMalloc((void**)&d_pair_id_ptri, sizeof(unsigned int) * np * MAX_P2MS_COUNT));
+		checkXerror(cudaMalloc((void**)&d_tsd_ptri, sizeof(double2) * np * MAX_P2MS_COUNT));
+		checkXerror(cudaMemset(d_pair_count_ptri, 0, sizeof(unsigned int) * np));
+		checkXerror(cudaMemset(d_pair_id_ptri, 0, sizeof(unsigned int) * np * MAX_P2MS_COUNT));
+		checkXerror(cudaMemset(d_tsd_ptri, 0, sizeof(double2) * np * MAX_P2MS_COUNT));
+		pair_count_ptri = new unsigned int[np];
+		pair_id_ptri = new unsigned int[np * MAX_P2MS_COUNT];
+		tsd_ptri = new double[2 * np * MAX_P2MS_COUNT];
+	}
+	
+	///xDynamicsManager::This()->XResult()->set_p2tri_contact_data((int)MAX_P2MS_COUNT);
 }
 
-void xParticleMeshObjectContact::cuda_collision(double *pos, double *vel, double *omega, double *mass, double *force, double *moment, unsigned int *sorted_id, unsigned int *cell_start, unsigned int *cell_end, unsigned int np)
+void xParticleMeshObjectContact::save_contact_result(unsigned int pt, unsigned int np)
 {
-
+	if (xSimulation::Gpu())
+	{
+		checkXerror(cudaMemcpy(pair_count_ptri, d_pair_count_ptri, sizeof(unsigned int) * np, cudaMemcpyDeviceToHost));
+		checkXerror(cudaMemcpy(pair_id_ptri, d_pair_id_ptri, sizeof(unsigned int) * np * MAX_P2MS_COUNT, cudaMemcpyDeviceToHost));
+		checkXerror(cudaMemcpy(tsd_ptri, d_tsd_ptri, sizeof(double2) * np * MAX_P2MS_COUNT, cudaMemcpyDeviceToHost));
+		xDynamicsManager::This()->XResult()->save_p2tri_contact_data(pair_count_ptri, pair_id_ptri, tsd_ptri);
+	}
+	
 }
+
+void xParticleMeshObjectContact::collision(
+	double *pos, double *ep, double *vel, double *ev,
+	double *mass, double* inertia,
+	double *force, double *moment,
+	unsigned int *sorted_id,
+	unsigned int *cell_start,
+	unsigned int *cell_end,
+	unsigned int np)
+{
+	if (xSimulation::Gpu())
+	{
+		double fm[6] = { 0, };
+		cu_particle_polygonObject_collision(
+			dti, dbi, pos, ep, vel, ev, force, moment, mass,
+			dTmax, dRRes, d_pair_count_ptri, d_pair_id_ptri, d_tsd_ptri,
+			d_tri_sph,	sorted_id, cell_start, cell_end, dcp, np);
+		fm[0] = reduction(xContact::deviceBodyForceX(), np);
+		fm[1] = reduction(xContact::deviceBodyForceY(), np);
+		fm[2] = reduction(xContact::deviceBodyForceZ(), np);
+		fm[3] = reduction(xContact::deviceBodyMomentX(), np);
+		fm[4] = reduction(xContact::deviceBodyMomentY(), np);
+		fm[5] = reduction(xContact::deviceBodyMomentZ(), np);
+		po->addAxialForce(fm[0], fm[1], fm[2]);
+		po->addAxialMoment(fm[3], fm[4], fm[5]);
+	}
+}
+
+unsigned int xParticleMeshObjectContact::GetNumMeshSphere()
+{
+	return n_mesh_sphere;
+}
+
 
 // void contact_particles_polygonObject::allocPolygonInformation(unsigned int _nPolySphere)
 // {

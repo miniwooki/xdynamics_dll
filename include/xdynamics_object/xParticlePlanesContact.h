@@ -78,7 +78,7 @@ private:
 	host_plane_info* hpi;
 	device_plane_info* dpi;
 	device_body_info* dbi;
-	device_body_force* dbf;
+	//device_body_force* dbf;
 	xmap<unsigned int, xPlaneObject*> pair_ip;
 	xmap<unsigned int, xContact*> pair_contact;
 

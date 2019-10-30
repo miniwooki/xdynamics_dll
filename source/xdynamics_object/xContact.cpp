@@ -284,7 +284,7 @@ xMaterialPair xContact::MaterialPropertyPair() const { return mpp; }
 //device_contact_property* DeviceContactProperty() const { return dcp; }
 xContactPairType xContact::PairType() const { return type; }
 
-void xContact::cudaMemoryAlloc(unsigned int np)
+void xContact::alloc_memories(unsigned int np)
 {
 	if (dcp) return;
 	device_contact_property hcp = device_contact_property

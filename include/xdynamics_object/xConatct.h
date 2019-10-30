@@ -6,6 +6,8 @@
 #include "xdynamics_algebra/xAlgebraMath.h"
 #include "xdynamics_object/xContactPairList.h"
 #include "xstring.h"
+#include "xdynamics_simulation/xSimulation.h"
+#include "xdynamics_manager/xDynamicsManager.h"
 //#include <QtCore/QString>
 
 class xObject;
@@ -65,16 +67,16 @@ public:
 		double fric, double rfric, double coh);
 	// 		contactForce_type cft, double rest, double ratio, double fric);
 	void setMaterialPair(xMaterialPair _mpp);// { mpp = _mpp; }
-	virtual void cuda_collision(
-		double *pos, double *vel,
-		double *omega, double *mass,
+	virtual void collision(
+		unsigned int id, double *pos, double *ep, double *vel, double *ev,
+		double *mass, double* inertia,
 		double *force, double *moment,
 		unsigned int *sorted_id,
 		unsigned int *cell_start,
 		unsigned int *cell_end,
-		unsigned int np) = 0;
+		unsigned int np);
 
-	virtual void cudaMemoryAlloc(unsigned int np);
+	virtual void alloc_memories(unsigned int np);
 	static unsigned int count;
 
 protected:
@@ -101,6 +103,8 @@ protected:
 // 	device_contact_property_f* dcp_f;
 	xObject* iobj;
 	xObject* jobj;
+	static double* dTmax;
+	static double* dRRes;
 	static double* dbfx;
 	static double* dbfy;
 	static double* dbfz;

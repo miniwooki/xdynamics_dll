@@ -142,16 +142,15 @@ void cu_calculate_p2p(
 }
 
 void cu_plane_contact_force(
-	device_plane_info* plan, device_body_info* dbi, 
-	device_contact_property *cp, device_body_force* dbfm,
-	double* pos, double* ep, double* vel, double* ev,
+	unsigned int k, device_plane_info* plan, device_body_info* dbi,
+	device_contact_property *cp, double* pos, double* ep, double* vel, double* ev,
 	double* force, double* moment, double* mass,
 	double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd,
-	unsigned int np, unsigned int nplane)
+	unsigned int np)
 {
 	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
-	memset(dbfm, 0, sizeof(device_body_force) * nplane);
+	//memset(dbfm, 0, sizeof(device_body_force) * nplane);
 
 	
 	double* fx = xContact::deviceBodyForceX();
@@ -163,22 +162,22 @@ void cu_plane_contact_force(
 	double* mz = xContact::deviceBodyMomentZ();
 	/*checkCudaErrors(cudaMalloc((void**)&dbf, sizeof(double3) * np));
 	checkCudaErrors(cudaMalloc((void**)&dbm, sizeof(double3) * np));*/
-	for (unsigned int i = 0; i < nplane; i++)
-	{
+	//for (unsigned int i = 0; i < nplane; i++)
+	//{
 		plane_contact_force_kernel << < numBlocks, numThreads >> > (
-			plan, i, dbi, cp+i, fx, fy, fz, mx, my, mz,
+			plan, k, dbi, cp, fx, fy, fz, mx, my, mz,
 			(double4 *)pos, (double4 *)ep, (double3 *)vel, (double4 *)ev,
 			(double3 *)force, (double3 *)moment, mass,
 			(double3 *)tmax, rres,
 			pair_count, pair_id, (double2 *)tsd, np);
 
-		dbfm[i].force.x += reduction(fx, np);
-		dbfm[i].force.y += reduction(fy, np);
-		dbfm[i].force.z += reduction(fz, np);
-		dbfm[i].moment.x += reduction(mx, np);
-		dbfm[i].moment.y += reduction(my, np);
-		dbfm[i].moment.z += reduction(mz, np);
-	}
+	/*dbfm[i].force.x += reduction(fx, np);
+	dbfm[i].force.y += reduction(fy, np);
+	dbfm[i].force.z += reduction(fz, np);
+	dbfm[i].moment.x += reduction(mx, np);
+	dbfm[i].moment.y += reduction(my, np);
+	dbfm[i].moment.z += reduction(mz, np);*/
+	//}
 	/*checkCudaErrors(cudaFree(dbf));
 	checkCudaErrors(cudaFree(dbm));*/
 }

@@ -41,7 +41,7 @@ void xvMarker::draw(GLenum eMode)
 		if (markerScaleFlag)
 			glScalef(scale, scale, scale);
 		bool isAnimation = (xvAnimationController::Play() || xvAnimationController::getFrame()) && isAttachMass;
-		if (isAnimation)
+		if (isAnimation && xvObject::pmrs)
 		{
 			double t = 180 / M_PI;
 			unsigned int idx = xvAnimationController::getFrame();

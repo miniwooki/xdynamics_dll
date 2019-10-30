@@ -103,50 +103,47 @@ private:
 	//int *d_type_count;
 	//unsigned int *d_old_pair_count;
 	unsigned int *d_pair_count_pp;
-	unsigned int *d_pair_count_ppl;
-	unsigned int *d_pair_count_ptri;
+	//unsigned int *d_pair_count_ppl;
+	//unsigned int *d_pair_count_ptri;
 	unsigned int *d_pair_count_pcyl;
 	unsigned int *d_pair_id_pp;
-	unsigned int *d_pair_id_ppl;
-	unsigned int *d_pair_id_ptri;
+	//unsigned int *d_pair_id_ppl;
+	//unsigned int *d_pair_id_ptri;
 	unsigned int *d_pair_id_pcyl;
 
 	double *d_tsd_pp;
-	double *d_tsd_ppl;
-	double *d_tsd_ptri;
+	//double *d_tsd_ppl;
+	//double *d_tsd_ptri;
 	double *d_tsd_pcyl;
 
 	unsigned int* pair_count_pp;
-	unsigned int* pair_count_ppl;
-	unsigned int* pair_count_ptri;
+	//unsigned int* pair_count_ppl;
+	//unsigned int* pair_count_ptri;
 	unsigned int* pair_count_pcyl;
 	unsigned int* pair_id_pp;
-	unsigned int* pair_id_ppl;
-	unsigned int* pair_id_ptri;
+	//unsigned int* pair_id_ppl;
+	//unsigned int* pair_id_ptri;
 	unsigned int* pair_id_pcyl;
 
 	double* tsd_pp;
-	double* tsd_ppl;
-	double* tsd_ptri;
+	//double* tsd_ppl;
+	//double* tsd_ptri;
 	double* tsd_pcyl;
-// 	unsigned int *d_old_pair_start;
-// 	unsigned int *d_pair_start;
-//	pair_data* d_pppd;
+
 	double* d_Tmax;
 	double* d_RRes;
 	vector3d* Tmax;
 	double* RRes;
 	xmap<xstring, xContact*> cots;
-	xmap<xstring, xParticleMeshObjectContact*> cpmesh;
+	xmap<int, xContact*> cpplanes;
+	xmap<int, xContact*> cpmeshes;
 	//QMap<QString, xParticleCylinderContact*> cpcylinder;
 	xContactPairList* xcpl;
 	//QMap<QString, contact_particles_polygonObject*> cppos;
 	xParticlePlanesContact* cpplane;
 	xParticleParticleContact* cpp;
-	xParticleMeshObjectsContact* cpmeshes;
+	//xParticleMeshObjectsContact* cpmeshes;
 	xParticleCylindersContact* cpcylinders;
-	//contact_particles_particles* cpp;
-	//contact_particles_polygonObjects* cppoly;
 };
 
 #endif

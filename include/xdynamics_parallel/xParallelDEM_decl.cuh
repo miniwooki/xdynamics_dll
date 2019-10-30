@@ -18,6 +18,11 @@ typedef unsigned int uint;
 //__constant__ device_parameters cte;
 //double3 toDouble3(VEC3D& v3) { return double3(v3.x, v3.y, v3.z); }
 //inline double3 change_cuda_double3(VEC3D& v3) { return make_double3(v3.x, v3.y, v3.z); }
+inline __host__ vector3d ToVector3D(const double3 d3)
+{
+	return vector3d(d3.x, d3.y, d3.z);
+}
+
 inline __host__ __device__ int sign(double L)
 {
 	return L < 0 ? -1 : 1;
@@ -288,13 +293,12 @@ void XDYNAMICS_API cu_calculate_p2p(
 
 // Function for contact between particle and plane
 void XDYNAMICS_API cu_plane_contact_force(
-	device_plane_info* plan, device_body_info* dbi, device_contact_property *cp,
-	device_body_force* dbfm,
+	unsigned int k, device_plane_info* plan, device_body_info* dbi, device_contact_property *cp,
 	double* pos, double* ep, double* vel, double* omega,
 	double* force, double* moment, double* mass,
 	double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd,
-	unsigned int np, unsigned int nplane);
+	unsigned int np);
 
 void XDYNAMICS_API cu_cube_contact_force(
 	device_plane_info* plan,
@@ -310,7 +314,7 @@ void XDYNAMICS_API cu_particle_polygonObject_collision(
 	double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd, double* dsph,
 	unsigned int* sidx, unsigned int* cstart, unsigned int* cend, device_contact_property *cp,
-	unsigned int np, unsigned int bindex, unsigned int eindex/*, double3* mpos, double3* mf, double3* mm, double3& _mf, double3& _mm*/);
+	unsigned int np);// , unsigned int bindex, unsigned int eindex/*, double3* mpos, double3* mf, double3* mm, double3& _mf, double3& _mm*/);
 
 // Function for contact between particle and cylinder
 void XDYNAMICS_API cu_cylinder_contact_force(

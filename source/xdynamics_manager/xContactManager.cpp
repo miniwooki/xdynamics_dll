@@ -12,31 +12,31 @@ xContactManager::xContactManager()
 	: cpp(NULL)
 	, ncontact(0)
 	, ncobject(0)
-	, cpmeshes(NULL)
+	//, cpmeshes(NULL)
 	, cpplane(NULL)
 	, d_pair_count_pp(NULL)
-	, d_pair_count_ppl(NULL)
-	, d_pair_count_ptri(NULL)
+	//, d_pair_count_ppl(NULL)
+	//, d_pair_count_ptri(NULL)
 	, d_pair_count_pcyl(NULL)
 	, d_pair_id_pp(NULL)
-	, d_pair_id_ppl(NULL)
-	, d_pair_id_ptri(NULL)
+	//, d_pair_id_ppl(NULL)
+	//, d_pair_id_ptri(NULL)
 	, d_pair_id_pcyl(NULL)
 	, d_tsd_pp(NULL)
-	, d_tsd_ppl(NULL)
-	, d_tsd_ptri(NULL)
+	// d_tsd_ppl(NULL)
+	//, d_tsd_ptri(NULL)
 	, d_tsd_pcyl(NULL)
 	, pair_count_pp(NULL)
-	, pair_count_ppl(NULL)
-	, pair_count_ptri(NULL)
+	//, pair_count_ppl(NULL)
+	//, pair_count_ptri(NULL)
 	, pair_count_pcyl(NULL)
 	, pair_id_pp(NULL)
-	, pair_id_ppl(NULL)
-	, pair_id_ptri(NULL)
+	//, pair_id_ppl(NULL)
+	//, pair_id_ptri(NULL)
 	, pair_id_pcyl(NULL)
 	, tsd_pp(NULL)
-	, tsd_ppl(NULL)
-	, tsd_ptri(NULL)
+	//, tsd_ppl(NULL)
+	//, tsd_ptri(NULL)
 	, tsd_pcyl(NULL)
 	, d_Tmax(NULL)
 	, d_RRes(NULL)
@@ -52,7 +52,7 @@ xContactManager::~xContactManager()
 {
 	if (cots.size()) cots.delete_all();//qDeleteAll(cots);
 // 	if (cpp) delete cpp; cpp = NULL;
- 	if (cpmeshes) delete cpmeshes; cpmeshes = NULL;
+ 	//if (cpmeshes) delete cpmeshes; cpmeshes = NULL;
  	if (cpplane) delete cpplane; cpplane = NULL;
 	if (Tmax) delete[] Tmax; Tmax = NULL;
 	if (RRes) delete[] RRes; RRes = NULL;
@@ -64,31 +64,31 @@ xContactManager::~xContactManager()
 	//}
 
 	if (d_pair_count_pp) checkCudaErrors(cudaFree(d_pair_count_pp)); d_pair_count_pp = NULL;
-	if (d_pair_count_ppl) checkCudaErrors(cudaFree(d_pair_count_ppl)); d_pair_count_ppl = NULL;
-	if (d_pair_count_ptri) checkCudaErrors(cudaFree(d_pair_count_ptri)); d_pair_count_ptri = NULL;
+	//if (d_pair_count_ppl) checkCudaErrors(cudaFree(d_pair_count_ppl)); d_pair_count_ppl = NULL;
+	//if (d_pair_count_ptri) checkCudaErrors(cudaFree(d_pair_count_ptri)); d_pair_count_ptri = NULL;
 	if (d_pair_count_pcyl) checkCudaErrors(cudaFree(d_pair_count_pcyl)); d_pair_count_pcyl = NULL;
 	if (d_pair_id_pp) checkCudaErrors(cudaFree(d_pair_id_pp)); d_pair_id_pp = NULL;
-	if (d_pair_id_ppl) checkCudaErrors(cudaFree(d_pair_id_ppl)); d_pair_id_ppl = NULL;
-	if (d_pair_id_ptri) checkCudaErrors(cudaFree(d_pair_id_ptri)); d_pair_id_ptri = NULL;
+	//if (d_pair_id_ppl) checkCudaErrors(cudaFree(d_pair_id_ppl)); d_pair_id_ppl = NULL;
+	//if (d_pair_id_ptri) checkCudaErrors(cudaFree(d_pair_id_ptri)); d_pair_id_ptri = NULL;
 	if (d_pair_id_pcyl) checkCudaErrors(cudaFree(d_pair_id_pcyl)); d_pair_id_pcyl = NULL;
 	if (d_tsd_pp) checkCudaErrors(cudaFree(d_tsd_pp)); d_tsd_pp = NULL;
-	if (d_tsd_ppl) checkCudaErrors(cudaFree(d_tsd_ppl)); d_tsd_ppl = NULL;
-	if (d_tsd_ptri) checkCudaErrors(cudaFree(d_tsd_ptri)); d_tsd_ptri = NULL;
+	//if (d_tsd_ppl) checkCudaErrors(cudaFree(d_tsd_ppl)); d_tsd_ppl = NULL;
+	//if (d_tsd_ptri) checkCudaErrors(cudaFree(d_tsd_ptri)); d_tsd_ptri = NULL;
 	if (d_tsd_pcyl) checkCudaErrors(cudaFree(d_tsd_pcyl)); d_tsd_pcyl = NULL;
 	if (d_Tmax) checkCudaErrors(cudaFree(d_Tmax)); d_Tmax = NULL;
 	if (d_RRes) checkCudaErrors(cudaFree(d_RRes)); d_RRes = NULL;
 
 	if (pair_count_pp) delete[] pair_count_pp; pair_count_pp = NULL;
-	if (pair_count_ppl) delete[] pair_count_ppl; pair_count_ppl = NULL;
-	if (pair_count_ptri) delete[] pair_count_ptri; pair_count_ptri = NULL;
+	//if (pair_count_ppl) delete[] pair_count_ppl; pair_count_ppl = NULL;
+	//if (pair_count_ptri) delete[] pair_count_ptri; pair_count_ptri = NULL;
 	if (pair_count_pcyl) delete[] pair_count_pcyl; pair_count_pcyl = NULL;
 	if (pair_id_pp) delete[] pair_id_pp; pair_id_pp = NULL;
-	if (pair_id_ppl) delete[] pair_id_ppl; pair_id_ppl = NULL;
-	if (pair_id_ptri) delete[] pair_id_ptri; pair_id_ptri = NULL;
+//	if (pair_id_ppl) delete[] pair_id_ppl; pair_id_ppl = NULL;
+	//if (pair_id_ptri) delete[] pair_id_ptri; pair_id_ptri = NULL;
 	if (pair_id_pcyl) delete[] pair_id_pcyl; pair_id_pcyl = NULL;
 	if (tsd_pp) delete[] tsd_pp; tsd_pp = NULL;
-	if (tsd_ppl) delete[] tsd_ppl; tsd_ppl = NULL;
-	if (tsd_ptri) delete[] tsd_ptri; tsd_ptri = NULL;
+//	if (tsd_ppl) delete[] tsd_ppl; tsd_ppl = NULL;
+	///if (tsd_ptri) delete[] tsd_ptri; tsd_ptri = NULL;
 	if (tsd_pcyl) delete[] tsd_pcyl; tsd_pcyl = NULL;
 	if (Tmax) delete[] Tmax; Tmax = NULL;
 	if (RRes) delete[] RRes; RRes = NULL;
@@ -116,8 +116,14 @@ xContact* xContactManager::CreateContactPair(
 	{
 	case PARTICLE_PARTICLE:	cpp = new xParticleParticleContact(n); c = cpp;	break;
 	case PARTICLE_CUBE:	c = new xParticleCubeContact(n, o1, o2); break;
-	case PARTICLE_PANE:	c = new xParticlePlaneContact(n); break;
-	case PARTICLE_MESH_SHAPE: c = new xParticleMeshObjectContact(n, o1, o2); cpmesh.insert(c->Name(), dynamic_cast<xParticleMeshObjectContact*>(c)); break;
+	case PARTICLE_PANE:	
+		c = new xParticlePlaneContact(n, o1, o2); 
+		cpplanes.insert(cpplanes.size(), c);
+		break;
+	case PARTICLE_MESH_SHAPE: 
+		c = new xParticleMeshObjectContact(n, o1, o2); 
+		cpmeshes.insert(cpmeshes.size(), c);
+		break;// cpmesh.insert(c->Name(), dynamic_cast<xParticleMeshObjectContact*>(c)); break;
 	case PARTICLE_CYLINDER: c = new xParticleCylinderContact(n, o1, o2); break;
 	}
 	xMaterialPair mpp =
@@ -146,12 +152,18 @@ xContact* xContactManager::CreateContactPair(
 unsigned int xContactManager::setupParticlesMeshObjectsContact()
 {
 	unsigned int n = 0;
+	xmap<int, xContact*>::iterator it = cpmeshes.begin();
+	while (it.has_next())
+	{
+		dynamic_cast<xParticleMeshObjectContact*>(it.value())->define();
+	}
+	/*for(xmap<int, xContact*>::iterator it = cpmeshes.begin(); it !=cpmeshes.end())
 	if (cpmesh.size() && !cpmeshes)
 	{
 		cpmeshes = new xParticleMeshObjectsContact;
 		n = cpmeshes->define(cpmesh);
-	}
-	return n;
+	}*/
+	return xParticleMeshObjectContact::GetNumMeshSphere();
 }
 
 void xContactManager::setupParticlesCylindersContact()
@@ -359,15 +371,15 @@ void xContactManager::allocPairList(unsigned int np)
 		}
 		if (cpmeshes)
 		{
-			pair_count_ptri = new unsigned int[np];
-			pair_id_ptri = new unsigned int[np * MAX_P2MS_COUNT];
-			tsd_ptri = new double[2 * np * MAX_P2MS_COUNT];
-			checkXerror(cudaMalloc((void**)&d_pair_count_ptri, sizeof(unsigned int) * np));
-			checkXerror(cudaMalloc((void**)&d_pair_id_ptri, sizeof(unsigned int) * np * MAX_P2MS_COUNT));
-			checkXerror(cudaMalloc((void**)&d_tsd_ptri, sizeof(double2) * np * MAX_P2MS_COUNT));
-			checkXerror(cudaMemset(d_pair_count_ptri, 0, sizeof(unsigned int) * np));
-			checkXerror(cudaMemset(d_pair_id_ptri, 0, sizeof(unsigned int) * np * MAX_P2MS_COUNT));
-			checkXerror(cudaMemset(d_tsd_ptri, 0, sizeof(double2) * np * MAX_P2MS_COUNT));
+		//	pair_count_ptri = new unsigned int[np];
+			//pair_id_ptri = new unsigned int[np * MAX_P2MS_COUNT];
+			//tsd_ptri = new double[2 * np * MAX_P2MS_COUNT];
+			//checkXerror(cudaMalloc((void**)&d_pair_count_ptri, sizeof(unsigned int) * np));
+			//checkXerror(cudaMalloc((void**)&d_pair_id_ptri, sizeof(unsigned int) * np * MAX_P2MS_COUNT));
+			//checkXerror(cudaMalloc((void**)&d_tsd_ptri, sizeof(double2) * np * MAX_P2MS_COUNT));
+			//checkXerror(cudaMemset(d_pair_count_ptri, 0, sizeof(unsigned int) * np));
+			//checkXerror(cudaMemset(d_pair_id_ptri, 0, sizeof(unsigned int) * np * MAX_P2MS_COUNT));
+			//checkXerror(cudaMemset(d_tsd_ptri, 0, sizeof(double2) * np * MAX_P2MS_COUNT));
 			xDynamicsManager::This()->XResult()->set_p2tri_contact_data((int)MAX_P2MS_COUNT);
 		}
 		checkXerror(cudaMalloc((void**)&d_Tmax, sizeof(double3) * np));
@@ -381,37 +393,37 @@ void xContactManager::SaveStepResult(unsigned int pt, unsigned int np)
 {
 	/*unsigned int *count = NULL, *id = NULL;
 	double2 *tsd = NULL;*/
-	if (xSimulation::Gpu())
-	{
-		if (cpp)
-		{
-			checkXerror(cudaMemcpy(pair_count_pp, d_pair_count_pp, sizeof(unsigned int) * np, cudaMemcpyDeviceToHost));
-			checkXerror(cudaMemcpy(pair_id_pp, d_pair_id_pp, sizeof(unsigned int) * np * MAX_P2P_COUNT, cudaMemcpyDeviceToHost));
-			checkXerror(cudaMemcpy(tsd_pp, d_tsd_pp, sizeof(double2) * np * MAX_P2P_COUNT, cudaMemcpyDeviceToHost));
-			xDynamicsManager::This()->XResult()->save_p2p_contact_data(pair_count_pp, pair_id_pp, tsd_pp);
-		}			
-		if (cpplane)
-		{
-			checkXerror(cudaMemcpy(pair_count_ppl, d_pair_count_ppl, sizeof(unsigned int) * np, cudaMemcpyDeviceToHost));
-			checkXerror(cudaMemcpy(pair_id_ppl, d_pair_id_ppl, sizeof(unsigned int) * np * MAX_P2PL_COUNT, cudaMemcpyDeviceToHost));
-			checkXerror(cudaMemcpy(tsd_ppl, d_tsd_ppl, sizeof(double2) * np * MAX_P2PL_COUNT, cudaMemcpyDeviceToHost));
-			xDynamicsManager::This()->XResult()->save_p2pl_contact_data(pair_count_ppl, pair_id_ppl, tsd_ppl);
-		}			
-		if (cpcylinders)
-		{
-			checkXerror(cudaMemcpy(pair_count_pcyl, d_pair_count_pcyl, sizeof(unsigned int) * np, cudaMemcpyDeviceToHost));
-			checkXerror(cudaMemcpy(pair_id_pcyl, d_pair_id_pcyl, sizeof(unsigned int) * np * MAX_P2CY_COUNT, cudaMemcpyDeviceToHost));
-			checkXerror(cudaMemcpy(tsd_pcyl, d_tsd_pcyl, sizeof(double2) * np * MAX_P2CY_COUNT, cudaMemcpyDeviceToHost));
-			xDynamicsManager::This()->XResult()->save_p2cyl_contact_data(pair_count_pcyl, pair_id_pcyl, tsd_pcyl);
-		}			
-		if (cpmeshes)
-		{
-			checkXerror(cudaMemcpy(pair_count_ptri, d_pair_count_ptri, sizeof(unsigned int) * np, cudaMemcpyDeviceToHost));
-			checkXerror(cudaMemcpy(pair_id_ptri, d_pair_id_ptri, sizeof(unsigned int) * np * MAX_P2MS_COUNT, cudaMemcpyDeviceToHost));
-			checkXerror(cudaMemcpy(tsd_ptri, d_tsd_ptri, sizeof(double2) * np * MAX_P2MS_COUNT, cudaMemcpyDeviceToHost));
-			xDynamicsManager::This()->XResult()->save_p2tri_contact_data(pair_count_ptri, pair_id_ptri, tsd_ptri);
-		}			
-	}
+	//if (xSimulation::Gpu())
+	//{
+	//	if (cpp)
+	//	{
+	//		checkXerror(cudaMemcpy(pair_count_pp, d_pair_count_pp, sizeof(unsigned int) * np, cudaMemcpyDeviceToHost));
+	//		checkXerror(cudaMemcpy(pair_id_pp, d_pair_id_pp, sizeof(unsigned int) * np * MAX_P2P_COUNT, cudaMemcpyDeviceToHost));
+	//		checkXerror(cudaMemcpy(tsd_pp, d_tsd_pp, sizeof(double2) * np * MAX_P2P_COUNT, cudaMemcpyDeviceToHost));
+	//		xDynamicsManager::This()->XResult()->save_p2p_contact_data(pair_count_pp, pair_id_pp, tsd_pp);
+	//	}			
+	//	if (cpplane)
+	//	{
+	//		checkXerror(cudaMemcpy(pair_count_ppl, d_pair_count_ppl, sizeof(unsigned int) * np, cudaMemcpyDeviceToHost));
+	//		checkXerror(cudaMemcpy(pair_id_ppl, d_pair_id_ppl, sizeof(unsigned int) * np * MAX_P2PL_COUNT, cudaMemcpyDeviceToHost));
+	//		checkXerror(cudaMemcpy(tsd_ppl, d_tsd_ppl, sizeof(double2) * np * MAX_P2PL_COUNT, cudaMemcpyDeviceToHost));
+	//		xDynamicsManager::This()->XResult()->save_p2pl_contact_data(pair_count_ppl, pair_id_ppl, tsd_ppl);
+	//	}			
+	//	if (cpcylinders)
+	//	{
+	//		checkXerror(cudaMemcpy(pair_count_pcyl, d_pair_count_pcyl, sizeof(unsigned int) * np, cudaMemcpyDeviceToHost));
+	//		checkXerror(cudaMemcpy(pair_id_pcyl, d_pair_id_pcyl, sizeof(unsigned int) * np * MAX_P2CY_COUNT, cudaMemcpyDeviceToHost));
+	//		checkXerror(cudaMemcpy(tsd_pcyl, d_tsd_pcyl, sizeof(double2) * np * MAX_P2CY_COUNT, cudaMemcpyDeviceToHost));
+	//		xDynamicsManager::This()->XResult()->save_p2cyl_contact_data(pair_count_pcyl, pair_id_pcyl, tsd_pcyl);
+	//	}			
+	//	if (cpmeshes)
+	//	{
+	//		/*checkXerror(cudaMemcpy(pair_count_ptri, d_pair_count_ptri, sizeof(unsigned int) * np, cudaMemcpyDeviceToHost));
+	//		checkXerror(cudaMemcpy(pair_id_ptri, d_pair_id_ptri, sizeof(unsigned int) * np * MAX_P2MS_COUNT, cudaMemcpyDeviceToHost));
+	//		checkXerror(cudaMemcpy(tsd_ptri, d_tsd_ptri, sizeof(double2) * np * MAX_P2MS_COUNT, cudaMemcpyDeviceToHost));*/
+	//		//xDynamicsManager::This()->XResult()->save_p2tri_contact_data(pair_count_ptri, pair_id_ptri, tsd_ptri);
+	//	}			
+	//}
 }
 
 void xContactManager::set_from_part_result(std::fstream & fs)
@@ -430,7 +442,7 @@ void xContactManager::updateCollisionPair(
 	xClusterInformation* xci,
 	unsigned int np)
 {
-	for (unsigned int i = 0; i < np; i++)
+	/*for (unsigned int i = 0; i < np; i++)
 	{
 		unsigned int count = 0;
 		unsigned int neach = 1;
@@ -483,7 +495,7 @@ void xContactManager::updateCollisionPair(
 		}
 		if (count > 1)
 			std::cout << "mesh contact overlab occured." << std::endl;
-	}
+	}*/
 }
 
 void xContactManager::deviceCollision(
@@ -492,167 +504,173 @@ void xContactManager::deviceCollision(
 	unsigned int *sorted_id, unsigned int *cell_start,
 	unsigned int *cell_end, xClusterInformation* xci, unsigned int np)
 {
+	for (xmap<int, xParticlePlaneContact*>::iterator it = cpplanes.begin(); it != cpplanes.end(); it.next())
+	{
+		it.value()->collision(it.key(), pos, ep, vel, ev, mass, inertia, force, moment, sorted_id, cell_start, cell_end, np);
+	}
+
+
 	if (xci)
 	{
-		if (cpp)
-		{
-			cu_clusters_contact(pos, cpos, ep, vel, ev, force, moment, mass,
-				d_Tmax, d_RRes, d_pair_count_pp, d_pair_id_pp, d_tsd_pp, sorted_id,
-				cell_start, cell_end, cpp->DeviceContactProperty(), xci, np);
-		}
-		if (cpplane)
-		{
-			if (cpplane->NumContact())
-			{
-				cu_cluster_plane_contact(
-					cpplane->devicePlaneInfo(),
-					cpplane->devicePlaneBodyInfo(),
-					cpplane->deviceBodyForceAndMoment(),
-					cpplane->DeviceContactProperty(),
-					pos, cpos, ep, vel,
-					ev, force, moment, mass,
-					d_Tmax, d_RRes, d_pair_count_ppl, d_pair_id_ppl, d_tsd_ppl, xci,
-					np, cpplane->NumPlanes());
-				cpplane->getPlaneContactForce();
-			}
-		}
-		if (cpmeshes)
-		{
-			if (cpmeshes->NumContactObjects())
-			{
-				//cpmeshes->updateMeshMassData();
-				unsigned int bPolySphere = 0;
-				unsigned int ePolySphere = 0;
-				unsigned int cnt = 0;
-				device_body_force *dbfm = cpmeshes->deviceBodyForceAndMoment();
-				memset(dbfm, 0, sizeof(device_body_force) * cpmeshes->NumContactObjects());
-				for (xmap<xstring, xParticleMeshObjectContact*>::iterator it = cpmesh.begin(); it != cpmesh.end(); it.next())// (xParticleMeshObjectContact* cpm, cpmesh)
-				{
-					xParticleMeshObjectContact* cpm = it.value();
-					ePolySphere = cpm->MeshObject()->NumTriangle();
-					cu_cluster_meshes_contact(
-						cpmeshes->deviceTrianglesInfo(),
-						cpmeshes->devicePolygonObjectMassInfo(),
-						pos, cpos, ep, vel, ev, force, moment, cpmeshes->DeviceContactProperty(), mass,
-						d_Tmax, d_RRes, d_pair_count_ptri, d_pair_id_ptri, d_tsd_ptri,
-						sorted_id, cell_start, cell_end, xci, bPolySphere, ePolySphere, np);
-					bPolySphere += cpm->MeshObject()->NumTriangle();
-					dbfm[cnt].force.x += reduction(xContact::deviceBodyForceX(), np);
-					dbfm[cnt].force.y += reduction(xContact::deviceBodyForceY(), np);
-					dbfm[cnt].force.z += reduction(xContact::deviceBodyForceZ(), np);
-					dbfm[cnt].moment.x += reduction(xContact::deviceBodyMomentX(), np);
-					dbfm[cnt].moment.y += reduction(xContact::deviceBodyMomentY(), np);
-					dbfm[cnt].moment.z += reduction(xContact::deviceBodyMomentZ(), np);
-					//dbfm[cnt].force = reductionD3(xContact::deviceBodyForce(), np);
-					//dbfm[cnt].moment = reductionD3(xContact::deviceBodyMoment(), np);
-					cnt++;
-				}
+		//if (cpp)
+		//{
+		//	cu_clusters_contact(pos, cpos, ep, vel, ev, force, moment, mass,
+		//		d_Tmax, d_RRes, d_pair_count_pp, d_pair_id_pp, d_tsd_pp, sorted_id,
+		//		cell_start, cell_end, cpp->DeviceContactProperty(), xci, np);
+		//}
+		//if (cpplane)
+		//{
+		//	if (cpplane->NumContact())
+		//	{
+		//		cu_cluster_plane_contact(
+		//			cpplane->devicePlaneInfo(),
+		//			cpplane->devicePlaneBodyInfo(),
+		//			cpplane->deviceBodyForceAndMoment(),
+		//			cpplane->DeviceContactProperty(),
+		//			pos, cpos, ep, vel,
+		//			ev, force, moment, mass,
+		//			d_Tmax, d_RRes, d_pair_count_ppl, d_pair_id_ppl, d_tsd_ppl, xci,
+		//			np, cpplane->NumPlanes());
+		//		cpplane->getPlaneContactForce();
+		//	}
+		//}
+		//if (cpmeshes)
+		//{
+		//	if (cpmeshes->NumContactObjects())
+		//	{
+		//		////cpmeshes->updateMeshMassData();
+		//		//unsigned int bPolySphere = 0;
+		//		//unsigned int ePolySphere = 0;
+		//		//unsigned int cnt = 0;
+		//		//device_body_force *dbfm = cpmeshes->deviceBodyForceAndMoment();
+		//		//memset(dbfm, 0, sizeof(device_body_force) * cpmeshes->NumContactObjects());
+		//		//for (xmap<xstring, xParticleMeshObjectContact*>::iterator it = cpmesh.begin(); it != cpmesh.end(); it.next())// (xParticleMeshObjectContact* cpm, cpmesh)
+		//		//{
+		//		//	xParticleMeshObjectContact* cpm = it.value();
+		//		//	ePolySphere = cpm->MeshObject()->NumTriangle();
+		//		//	cu_cluster_meshes_contact(
+		//		//		cpmeshes->deviceTrianglesInfo(),
+		//		//		cpmeshes->devicePolygonObjectMassInfo(),
+		//		//		pos, cpos, ep, vel, ev, force, moment, cpmeshes->DeviceContactProperty(), mass,
+		//		//		d_Tmax, d_RRes, d_pair_count_ptri, d_pair_id_ptri, d_tsd_ptri,
+		//		//		sorted_id, cell_start, cell_end, xci, bPolySphere, ePolySphere, np);
+		//		//	bPolySphere += cpm->MeshObject()->NumTriangle();
+		//		//	dbfm[cnt].force.x += reduction(xContact::deviceBodyForceX(), np);
+		//		//	dbfm[cnt].force.y += reduction(xContact::deviceBodyForceY(), np);
+		//		//	dbfm[cnt].force.z += reduction(xContact::deviceBodyForceZ(), np);
+		//		//	dbfm[cnt].moment.x += reduction(xContact::deviceBodyMomentX(), np);
+		//		//	dbfm[cnt].moment.y += reduction(xContact::deviceBodyMomentY(), np);
+		//		//	dbfm[cnt].moment.z += reduction(xContact::deviceBodyMomentZ(), np);
+		//		//	//dbfm[cnt].force = reductionD3(xContact::deviceBodyForce(), np);
+		//		//	//dbfm[cnt].moment = reductionD3(xContact::deviceBodyMoment(), np);
+		//		//	cnt++;
+		//		//}
 
-				cpmeshes->getMeshContactForce();
-			}
-		}
-		if (cpcylinders)
-		{
-			cu_cluster_cylinder_contact(
-				cpcylinders->deviceCylinderInfo(),
-				cpcylinders->deviceCylinderBodyInfo(),
-				cpcylinders->deviceCylinderBodyForceAndMoment(), xci,
-				cpcylinders->DeviceContactProperty(),
-				pos, cpos, ep, vel, ev, force, moment, mass,
-				d_Tmax, d_RRes, d_pair_count_pcyl, d_pair_id_pcyl, d_tsd_pcyl,
-				np, cpcylinders->NumContact());
-			cpcylinders->getCylinderContactForce();
-		}
-		cu_decide_cluster_rolling_friction_moment(d_Tmax, d_RRes, inertia, ep, ev, moment, xci, np);
+		//		//cpmeshes->getMeshContactForce();
+		//	}
+		//}
+		//if (cpcylinders)
+		//{
+		//	cu_cluster_cylinder_contact(
+		//		cpcylinders->deviceCylinderInfo(),
+		//		cpcylinders->deviceCylinderBodyInfo(),
+		//		cpcylinders->deviceCylinderBodyForceAndMoment(), xci,
+		//		cpcylinders->DeviceContactProperty(),
+		//		pos, cpos, ep, vel, ev, force, moment, mass,
+		//		d_Tmax, d_RRes, d_pair_count_pcyl, d_pair_id_pcyl, d_tsd_pcyl,
+		//		np, cpcylinders->NumContact());
+		//	cpcylinders->getCylinderContactForce();
+		//}
+		//cu_decide_cluster_rolling_friction_moment(d_Tmax, d_RRes, inertia, ep, ev, moment, xci, np);
 	}
 	else
 	{
-		if (cpp)
-		{
-			cu_calculate_p2p(pos, ep, vel, ev, force, moment, mass,
-				d_Tmax, d_RRes, d_pair_count_pp, d_pair_id_pp, d_tsd_pp, sorted_id,
-				cell_start, cell_end, cpp->DeviceContactProperty(), np);
-		}
-		if (cpplane)
-		{
-			if (cpplane->NumContact())
-			{
-				cu_plane_contact_force(cpplane->devicePlaneInfo(),
-					cpplane->devicePlaneBodyInfo(), cpplane->DeviceContactProperty(),
-					cpplane->deviceBodyForceAndMoment(),
-					pos, ep, vel,
-					ev, force, moment, mass,
-					d_Tmax, d_RRes, d_pair_count_ppl, d_pair_id_ppl, d_tsd_ppl, np, cpplane->NumPlanes());
-				cpplane->getPlaneContactForce();
-			}
-		}
-		if (cpcylinders)
-		{
-			if (cpcylinders->NumContact())
-			{
+		//if (cpp)
+		//{
+		//	cu_calculate_p2p(pos, ep, vel, ev, force, moment, mass,
+		//		d_Tmax, d_RRes, d_pair_count_pp, d_pair_id_pp, d_tsd_pp, sorted_id,
+		//		cell_start, cell_end, cpp->DeviceContactProperty(), np);
+		//}
+		//if (cpplane)
+		//{
+		//	if (cpplane->NumContact())
+		//	{
+		//		cu_plane_contact_force(cpplane->devicePlaneInfo(),
+		//			cpplane->devicePlaneBodyInfo(), cpplane->DeviceContactProperty(),
+		//			cpplane->deviceBodyForceAndMoment(),
+		//			pos, ep, vel,
+		//			ev, force, moment, mass,
+		//			d_Tmax, d_RRes, d_pair_count_ppl, d_pair_id_ppl, d_tsd_ppl, np, cpplane->NumPlanes());
+		//		cpplane->getPlaneContactForce();
+		//	}
+		//}
+		//if (cpcylinders)
+		//{
+		//	if (cpcylinders->NumContact())
+		//	{
 
-				device_body_force* dbfm = cpcylinders->deviceCylinderBodyForceAndMoment();
-				memset(dbfm, 0, sizeof(device_body_force) * cpcylinders->NumContact());
-				for (unsigned int i = 0 ; i < cpcylinders->NumContact(); i++)
-				{
-					cu_cylinder_contact_force(i, cpcylinders->deviceCylinderInfo(),
-						cpcylinders->deviceCylinderBodyInfo(),
-						cpcylinders->DeviceContactProperty(),
-						pos, ep, vel, ev, force, moment, mass,
-						d_Tmax, d_RRes, d_pair_count_pcyl, d_pair_id_pcyl, d_tsd_pcyl, np, cpcylinders->NumContact());
-					dbfm[i].force.x += reduction(xContact::deviceBodyForceX(), np);
-					dbfm[i].force.y += reduction(xContact::deviceBodyForceY(), np);
-					dbfm[i].force.z += reduction(xContact::deviceBodyForceZ(), np);
-					dbfm[i].moment.x += reduction(xContact::deviceBodyMomentX(), np);
-					dbfm[i].moment.y += reduction(xContact::deviceBodyMomentY(), np);
-					dbfm[i].moment.z += reduction(xContact::deviceBodyMomentZ(), np);
-					/*dbfm[i].force = dbfm[i].force + reductionD3(xContact::deviceBodyForce(), np);
-					dbfm[i].moment = dbfm[i].moment + reductionD3(xContact::deviceBodyMoment(), n*///p);
-				}
-				
-				cpcylinders->getCylinderContactForce();
-			}			
-		}
-		if (cpmeshes)
-		{
+		//		device_body_force* dbfm = cpcylinders->deviceCylinderBodyForceAndMoment();
+		//		memset(dbfm, 0, sizeof(device_body_force) * cpcylinders->NumContact());
+		//		for (unsigned int i = 0 ; i < cpcylinders->NumContact(); i++)
+		//		{
+		//			cu_cylinder_contact_force(i, cpcylinders->deviceCylinderInfo(),
+		//				cpcylinders->deviceCylinderBodyInfo(),
+		//				cpcylinders->DeviceContactProperty(),
+		//				pos, ep, vel, ev, force, moment, mass,
+		//				d_Tmax, d_RRes, d_pair_count_pcyl, d_pair_id_pcyl, d_tsd_pcyl, np, cpcylinders->NumContact());
+		//			dbfm[i].force.x += reduction(xContact::deviceBodyForceX(), np);
+		//			dbfm[i].force.y += reduction(xContact::deviceBodyForceY(), np);
+		//			dbfm[i].force.z += reduction(xContact::deviceBodyForceZ(), np);
+		//			dbfm[i].moment.x += reduction(xContact::deviceBodyMomentX(), np);
+		//			dbfm[i].moment.y += reduction(xContact::deviceBodyMomentY(), np);
+		//			dbfm[i].moment.z += reduction(xContact::deviceBodyMomentZ(), np);
+		//			/*dbfm[i].force = dbfm[i].force + reductionD3(xContact::deviceBodyForce(), np);
+		//			dbfm[i].moment = dbfm[i].moment + reductionD3(xContact::deviceBodyMoment(), n*///p);
+		//		}
+		//		
+		//		cpcylinders->getCylinderContactForce();
+		//	}			
+		//}
+		//if (cpmeshes)
+		//{
 
 
-			if (cpmeshes->NumContactObjects())
-			{
-				//cpmeshes->updateMeshMassData();
-				unsigned int bPolySphere = 0;
-				unsigned int ePolySphere = 0;
-				unsigned int cnt = 0;
-				device_body_force *dbfm = cpmeshes->deviceBodyForceAndMoment();
-				memset(dbfm, 0, sizeof(device_body_force) * cpmeshes->NumContactObjects());
-				for (xmap<xstring, xParticleMeshObjectContact*>::iterator it = cpmesh.begin(); it != cpmesh.end(); it.next())
-				{
-					xParticleMeshObjectContact* cpm = it.value();
-					ePolySphere = cpm->MeshObject()->NumTriangle();
-					cu_particle_polygonObject_collision(
-						cpmeshes->deviceTrianglesInfo(),
-						cpmeshes->devicePolygonObjectMassInfo(), 
-						pos, ep, vel, ev, force, moment, mass,
-						d_Tmax, d_RRes, d_pair_count_ptri, d_pair_id_ptri, d_tsd_ptri, 
-						cpmeshes->SphereData(),
-						sorted_id, cell_start, cell_end, 
-						cpmeshes->DeviceContactProperty(),
-						np,
-						bPolySphere, ePolySphere);
-					bPolySphere += cpm->MeshObject()->NumTriangle();
-					dbfm[cnt].force.x += reduction(xContact::deviceBodyForceX(), np);
-					dbfm[cnt].force.y += reduction(xContact::deviceBodyForceY(), np);
-					dbfm[cnt].force.z += reduction(xContact::deviceBodyForceZ(), np);
-					dbfm[cnt].moment.x += reduction(xContact::deviceBodyMomentX(), np);
-					dbfm[cnt].moment.y += reduction(xContact::deviceBodyMomentY(), np);
-					dbfm[cnt].moment.z += reduction(xContact::deviceBodyMomentZ(), np);
-					/*dbfm[cnt].force = reductionD3(xContact::deviceBodyForce(), np);
-					dbfm[cnt].moment = reductionD3(xContact::deviceBodyMoment(), np);*/
-					cnt++;
-				}
-				cpmeshes->getMeshContactForce();
-			}
-		}
+		//	if (cpmeshes->NumContactObjects())
+		//	{
+		//		////cpmeshes->updateMeshMassData();
+		//		//unsigned int bPolySphere = 0;
+		//		//unsigned int ePolySphere = 0;
+		//		//unsigned int cnt = 0;
+		//		//device_body_force *dbfm = cpmeshes->deviceBodyForceAndMoment();
+		//		//memset(dbfm, 0, sizeof(device_body_force) * cpmeshes->NumContactObjects());
+		//		//for (xmap<xstring, xParticleMeshObjectContact*>::iterator it = cpmesh.begin(); it != cpmesh.end(); it.next())
+		//		//{
+		//		//	xParticleMeshObjectContact* cpm = it.value();
+		//		//	ePolySphere = cpm->MeshObject()->NumTriangle();
+		//		//	cu_particle_polygonObject_collision(
+		//		//		cpmeshes->deviceTrianglesInfo(),
+		//		//		cpmeshes->devicePolygonObjectMassInfo(), 
+		//		//		pos, ep, vel, ev, force, moment, mass,
+		//		//		d_Tmax, d_RRes, d_pair_count_ptri, d_pair_id_ptri, d_tsd_ptri, 
+		//		//		cpmeshes->SphereData(),
+		//		//		sorted_id, cell_start, cell_end, 
+		//		//		cpmeshes->DeviceContactProperty(),
+		//		//		np,
+		//		//		bPolySphere, ePolySphere);
+		//		//	bPolySphere += cpm->MeshObject()->NumTriangle();
+		//		//	dbfm[cnt].force.x += reduction(xContact::deviceBodyForceX(), np);
+		//		//	dbfm[cnt].force.y += reduction(xContact::deviceBodyForceY(), np);
+		//		//	dbfm[cnt].force.z += reduction(xContact::deviceBodyForceZ(), np);
+		//		//	dbfm[cnt].moment.x += reduction(xContact::deviceBodyMomentX(), np);
+		//		//	dbfm[cnt].moment.y += reduction(xContact::deviceBodyMomentY(), np);
+		//		//	dbfm[cnt].moment.z += reduction(xContact::deviceBodyMomentZ(), np);
+		//		//	/*dbfm[cnt].force = reductionD3(xContact::deviceBodyForce(), np);
+		//		//	dbfm[cnt].moment = reductionD3(xContact::deviceBodyMoment(), np);*/
+		//		//	cnt++;
+		//	//	}
+		//		//cpmeshes->getMeshContactForce();
+		//	}
+		//}
 		cu_decide_rolling_friction_moment(d_Tmax, d_RRes, inertia, ep, ev, moment, np);
 	}
 }

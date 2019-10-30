@@ -228,6 +228,7 @@ void xvMeshObject::draw(GLenum eMode)
 			glRotated(ang.z, 0, 0, 1);
 		}
 
+
 	//	glColor3f(1.0f, 0.0f, 0.0f);
 		glPolygonMode(GL_FRONT_AND_BACK, drawingMode);
 		glUseProgram(program.Program());
