@@ -26,7 +26,7 @@ bool xDynamicsError::_check(int result, char const *const func, const char* cons
 	{
 		sprintf_s(err, "XDynamics error at %s:%d code=%d(%s) \"%s\" \n", file, line, result, _xdynamicsGetErrorEnum(result), func);
 	//	xLog::log(err);// std::cout << err << std::endl;//printf("%s", err);
-		throw runtime_error(err);
+		//throw runtime_error(err);
 		//return result;
 		//xdynamicsReset();
 		//exit(0);

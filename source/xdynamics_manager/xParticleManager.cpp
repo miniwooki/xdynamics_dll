@@ -366,6 +366,8 @@ xParticleObject* xParticleManager::CreateParticleFromList(
 
 void xParticleManager::SetCurrentParticlesFromPartResult(std::string path)
 {
+	if (c_filepath.size() == 0 && path.empty())
+		return;
 	std::string c_path = path.empty() ? c_filepath.toStdString() : path;
 	std::fstream qf;
 	std::cout << "SetCurrentParticleFromPartResult : " << path << std::endl;

@@ -365,8 +365,7 @@ void xXLSReader::ReadMass(xMultiBodyModel* xmbd, vector2i rc)
 				{
 					xPointMass* _xpm = dynamic_cast<xPointMass*>(obj);
 					_xpm->setPosition(xpmd.px, xpmd.py, xpmd.pz);
-				}
-				
+				}				
 				rc.x++;
 				continue;
 			}				
@@ -374,13 +373,6 @@ void xXLSReader::ReadMass(xMultiBodyModel* xmbd, vector2i rc)
 			if (obj) obj->setMovingObject(true);
 			xpm = xmbd->CreatePointMass(name);
 			xpm->SetDataFromStructure(xmbd->NumMass(), xpmd);
-			
-// 			if (xpm->Shape() == MESH_SHAPE)
-// 				dynamic_cast<xMeshObject*>(xpm)->translation(new_vector3d(xpmd.px, xpmd.py, xpmd.pz));
-			
-			
-			//xpm->translation(xpm->Position());
-			// obj->TranslationPosition(xpm->Position());
 			rc.x++;
 			rc.y = init_col;
 		}

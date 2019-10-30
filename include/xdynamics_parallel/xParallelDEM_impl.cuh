@@ -2055,7 +2055,7 @@ __global__ void particle_polygonObject_collision_kernel(
 	double3 sum_force = make_double3(0, 0, 0);
 	double3 sum_moment = make_double3(0, 0, 0);
 	//unsigned int new_count = sid;
-	unsigned int new_count = sid + (bindex ? old_count : 0);
+	unsigned int new_count = sid;// +(bindex ? old_count : 0);
 	
 	unsigned int start_index = 0;
 	unsigned int end_index = 0;
@@ -2082,8 +2082,8 @@ __global__ void particle_polygonObject_collision_kernel(
 						if (k >= cte.np)
 						{
 							k -= cte.np;
-							if (k < bindex || k >= eindex)
-								continue;
+							///if (k < bindex || k >= eindex)
+							//	continue;
 							int t = -1;
 							double3 cpt = closestPtPointTriangle(dpi[k], ipos, ir, t);
 							device_contact_property cmp = cp[dpi[k].id];
