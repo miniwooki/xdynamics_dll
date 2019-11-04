@@ -84,6 +84,10 @@ void xContact::setContactForceModel(xContactForceModelType xcfmt)
 	force_model = xcfmt;
 }
 
+// void xContact::initialize()
+// {
+// 
+// }
 
 void xContact::setCohesion(double d)
 {

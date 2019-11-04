@@ -78,7 +78,7 @@ xdynamics_gui::xdynamics_gui(int _argc, char** _argv, QWidget *parent)
 	QMainWindow::show();
 	
 	addDockWidget(Qt::BottomDockWidgetArea, xcw);
-	this->setWindowState(Qt::WindowState::WindowMaximized);
+	//this->setWindowState(Qt::WindowState::WindowMaximized);
 	setupMainOperations();
 	setupObjectOperations();
 	setupShorcutOperations();
@@ -1012,7 +1012,7 @@ void xdynamics_gui::xReleaseResultCallThread()
 		delete pbar;
 		pbar = NULL;
 	}
-	
+	wsim->set_start_state();
 }
 
 void xdynamics_gui::xContextMenuProcess(QString nm, contextMenuType vot)
@@ -1045,6 +1045,8 @@ void xdynamics_gui::deleteFileByEXT(QString ext)
 
 void xdynamics_gui::xRunSimulationThread(double dt, unsigned int st, double et)
 {
+	if (sThread && wsim->is_simulationing())
+		xStopSimulationThread();
 	sThread = new xSimulationThread;
 	
 	if(wsim->get_enable_starting_point() == false)
@@ -1085,4 +1087,5 @@ void xdynamics_gui::xRunSimulationThread(double dt, unsigned int st, double et)
 	pbar->setMaximum(xSimulation::nstep);
 	ui.statusBar->addWidget(pbar, 1);
 	sThread->start();
+	wsim->set_stop_state();
 }

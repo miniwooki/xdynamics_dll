@@ -45,7 +45,7 @@ void xNeiborhoodCell::detection(double *pos, unsigned int np, unsigned int sid)
 {
 	if (xSimulation::Gpu())
 	{
-		cu_calculateHashAndIndex(d_cell_id, d_body_id, pos, np);
+		cu_calculateHashAndIndex(d_cell_id, d_body_id, pos, sid, np);
 		//	qDebug() << "detection0 done";
 		//if (snp && spos)
 		//{

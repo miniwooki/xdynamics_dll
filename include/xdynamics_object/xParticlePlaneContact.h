@@ -44,17 +44,20 @@ public:
 	
 	virtual void define(unsigned int idx, unsigned int np);
 	virtual void update();
-
+	//virtual void initialize();
 	static void savePartData(unsigned int np);
 	static bool detect_contact(vector4f& p, xPlaneObject& pl, vector3f& cpoint);
+	static void local_initialize();
 
 private:
+	
+
 	double particle_plane_contact_detection(xPlaneObject* _pe, vector3d& u, vector3d& xp, vector3d& wp, double r);
 	friend class xParticleCubeContact;
 	//void cudaMemoryAlloc_planeObject();
-	bool allocated_static;
+	static bool allocated_static;
 	unsigned int id;
-	
+	static unsigned int defined_count;
 	static double *d_tsd_ppl;
 	static unsigned int *d_pair_count_ppl;
 	static unsigned int *d_pair_id_ppl;

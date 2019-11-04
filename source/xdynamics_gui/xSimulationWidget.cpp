@@ -6,6 +6,7 @@ wsimulation::wsimulation(QWidget* parent /* = NULL */)
 	: QWidget(parent)
 	, is_check_starting_point(false)
 	, starting_part(0)
+	, is_simulation_ing(false)
 {
 	setupUi(this);
 	connect(PBSolve, SIGNAL(clicked()), this, SLOT(SolveButton()));
@@ -42,6 +43,21 @@ QString wsimulation::get_starting_point_path()
 	return LE_StartingPoint->text();
 }
 
+bool wsimulation::is_simulationing()
+{
+	return is_simulation_ing;
+}
+
+void wsimulation::set_stop_state()
+{
+	PBSolve->setText("Stop!!!");
+}
+
+void wsimulation::set_start_state()
+{
+	PBSolve->setText("Solve");
+}
+
 void wsimulation::StartingPointButton()
 {
 	emit clickedStartPointButton();
@@ -58,6 +74,7 @@ void wsimulation::SolveButton()
 	double dt = LETimeStep->text().toDouble();
 	unsigned int st = LESaveStep->text().toUInt();
 	double et = LEEndTime->text().toDouble();
+	is_simulation_ing = true;
 	emit clickedSolveButton(dt, st, et);
 }
 

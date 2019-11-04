@@ -79,7 +79,7 @@ public:
 		unsigned int np) = 0;
 
 	virtual void define(unsigned int idx, unsigned int np);
-
+	//virtual void initialize();
 	virtual void update();
 	//virtual void save_result(unsigned int pt, unsigned int np);
 	//virtual void save_contact_result()

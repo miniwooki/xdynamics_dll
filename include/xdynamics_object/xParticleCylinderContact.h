@@ -41,12 +41,15 @@ public:
 
 	virtual void define(unsigned int idx, unsigned int np);
 	virtual void update();
-
+	//virtual void initialize();
 	static void savePartData(unsigned int np);
+	static void local_initialize();
 
 private:
-	bool allocated_static;
+	
+	static bool allocated_static;
 	unsigned int id;
+	static unsigned int defined_count;
 	static unsigned int *d_pair_count_pcyl;
 	static unsigned int *d_pair_id_pcyl;
 	static double *d_tsd_pcyl;

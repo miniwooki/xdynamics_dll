@@ -54,7 +54,7 @@ struct global_parameters
 	double max_radius;
 };
 
-static global_parameters gps = { FLT_MAX };
+static global_parameters gps = { -FLT_MAX };
 //#include "xstring.h"
 //#include <string>
 

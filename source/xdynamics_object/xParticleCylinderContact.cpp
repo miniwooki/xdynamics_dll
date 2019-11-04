@@ -4,6 +4,9 @@
 #include "xdynamics_simulation/xSimulation.h"
 #include "xdynamics_manager/xDynamicsManager.h"
 
+unsigned int xParticleCylinderContact::defined_count = 0;
+bool xParticleCylinderContact::allocated_static = false;
+
 double* xParticleCylinderContact::d_tsd_pcyl = nullptr;
 unsigned int* xParticleCylinderContact::d_pair_count_pcyl = nullptr;
 unsigned int* xParticleCylinderContact::d_pair_id_pcyl = nullptr;
@@ -17,7 +20,6 @@ xParticleCylinderContact::xParticleCylinderContact()
 	, id(0)
 	, p_ptr(NULL)
 	, c_ptr(NULL)
-	, allocated_static(false)
 {
 
 }
@@ -27,7 +29,6 @@ xParticleCylinderContact::xParticleCylinderContact(std::string _name, xObject* o
 	, id(0)
 	, p_ptr(NULL)
 	, c_ptr(NULL)
-	, allocated_static(false)
 {
 	if (o1->Shape() == CYLINDER_SHAPE)
 	{
@@ -60,7 +61,7 @@ xParticleCylinderContact::~xParticleCylinderContact()
 
 void xParticleCylinderContact::define(unsigned int idx, unsigned int np)
 {
-	id = idx;
+	id = defined_count;
 	xContact::define(idx, np);
 	hci =
 	{
@@ -95,6 +96,12 @@ void xParticleCylinderContact::define(unsigned int idx, unsigned int np)
 		xDynamicsManager::This()->XResult()->set_p2cyl_contact_data((int)MAX_P2CY_COUNT);
 		update();
 	}
+	defined_count++;
+}
+
+void xParticleCylinderContact::local_initialize()
+{
+	defined_count = 0;
 }
 
 void xParticleCylinderContact::update()
@@ -127,6 +134,11 @@ void xParticleCylinderContact::update()
 		checkXerror(cudaMemcpy(dbi, &hbi, sizeof(device_body_info), cudaMemcpyHostToDevice));
 	}
 }
+
+// void xParticleCylinderContact::initialize()
+// {
+// 	xParticleCylinderContact::local_initialize();
+// }
 
 void xParticleCylinderContact::savePartData(unsigned int np)
 {

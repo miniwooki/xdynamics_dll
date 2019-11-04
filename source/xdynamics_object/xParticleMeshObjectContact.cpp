@@ -3,6 +3,8 @@
 #include "xdynamics_object/xMeshObject.h"
 #include "xdynamics_manager/xDynamicsManager.h"
 
+unsigned int xParticleMeshObjectContact::defined_count = 0;
+bool xParticleMeshObjectContact::allocated_static = false;
 // int xParticleMeshObjectContact::nmoving = 0;
 double* xParticleMeshObjectContact::d_tsd_ptri = nullptr;
 unsigned int* xParticleMeshObjectContact::d_pair_count_ptri = nullptr;
@@ -22,7 +24,6 @@ xParticleMeshObjectContact::xParticleMeshObjectContact()
 	, po(nullptr)
 	, hsphere(nullptr)
 	, hlocal(nullptr)
-	, allocated_static(false)
 {
 
 }
@@ -34,7 +35,6 @@ xParticleMeshObjectContact::xParticleMeshObjectContact(std::string _name, xObjec
 	, po(nullptr)
 	, hsphere(nullptr)
 	, hlocal(nullptr)
-	, allocated_static(false)
 {
 	if (o1->Shape() == MESH_SHAPE)
 	{
@@ -70,9 +70,9 @@ xParticleMeshObjectContact::~xParticleMeshObjectContact()
 
 void xParticleMeshObjectContact::define(unsigned int idx, unsigned int np)
 {
+	id = defined_count;
 	xContact::define(idx, np);
-	
-	
+
 	hsphere = new vector4d[po->NumTriangle()];
 	hlocal = new vector3d[po->NumTriangle()];
 	host_triangle_info* hti = new host_triangle_info[po->NumTriangle()];
@@ -152,6 +152,7 @@ void xParticleMeshObjectContact::define(unsigned int idx, unsigned int np)
 	update();
 	gps.max_radius = maxRadii;
 	n_mesh_sphere += po->NumTriangle();
+	defined_count++;
 }
 
 void xParticleMeshObjectContact::update()
@@ -172,6 +173,11 @@ void xParticleMeshObjectContact::update()
 		cu_update_meshObjectData(dvList, dsphere, dlocal, dti, dbi, n_mesh_sphere);
 	}
 }
+
+// void xParticleMeshObjectContact::initialize()
+// {
+// 	xParticleMeshObjectContact::local_initialize();
+// }
 
 double * xParticleMeshObjectContact::MeshSphere()
 {
@@ -223,6 +229,11 @@ void xParticleMeshObjectContact::savePartData(unsigned int np)
 unsigned int xParticleMeshObjectContact::GetNumMeshSphere()
 {
 	return n_mesh_sphere;
+}
+
+void xParticleMeshObjectContact::local_initialize()
+{
+	defined_count = 0;
 }
 
 // void contact_particles_polygonObject::allocPolygonInformation(unsigned int _nPolySphere)

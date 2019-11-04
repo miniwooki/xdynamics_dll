@@ -14,9 +14,13 @@ public:
 	bool get_enable_starting_point();
 	unsigned int get_starting_part();
 	QString get_starting_point_path();
+	bool is_simulationing();
+	void set_stop_state();
+	void set_start_state();
 
 private:
 	bool is_check_starting_point;
+	bool is_simulation_ing;
 	unsigned int starting_part;
 	public slots:
 	void UpdateInformation();

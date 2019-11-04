@@ -41,15 +41,17 @@ public:
 
 	virtual void define(unsigned int idx, unsigned int np);
 	virtual void update();
-
+	//virtual void initialize();
 	static void savePartData(unsigned int np);
 	static unsigned int GetNumMeshSphere();
 	//static double GetMaxSphereRadius();
-
+	static void local_initialize();
 private:
 	//static double max_sphere_radius;
 	//static int nmoving;
-	bool allocated_static;
+	
+	static unsigned int defined_count;
+	static bool allocated_static;
 	static unsigned int n_mesh_sphere;
 	unsigned int id;
 	vector4d *hsphere;

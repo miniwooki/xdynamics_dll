@@ -53,7 +53,10 @@ void xContactManager::CreateContactPair(
 
 	switch (pt)
 	{
-		case PARTICLE_PARTICLE:	cpp = new xParticleParticleContact(n); break;
+		case PARTICLE_PARTICLE:	
+			cpp = new xParticleParticleContact(n); 
+			cots.insert(n, cpp);
+			break;
 		case PARTICLE_CUBE:	
 		{
 			xCubeObject* cube = dynamic_cast<xCubeObject*>(o1->Shape() == CUBE_SHAPE ? o1 : o2);
@@ -63,7 +66,7 @@ void xContactManager::CreateContactPair(
 				std::stringstream ss;
 				ss << n << i;
 				xPlaneObject* plane = cube->Planes() + i;
-				xParticlePlaneContact *c = new xParticlePlaneContact(ss.str(), o1, o2); break;
+				xParticlePlaneContact *c = new xParticlePlaneContact(ss.str(), particles, plane);
 				cpplanes.insert(cpplanes.size(), c);
 				cots.insert(ss.str(), c);
 			}
@@ -89,6 +92,9 @@ void xContactManager::CreateContactPair(
 
 void xContactManager::defineContacts(unsigned int np)
 {
+	xParticlePlaneContact::local_initialize();
+	xParticleMeshObjectContact::local_initialize();
+	xParticleCylinderContact::local_initialize();
 	for (xmap<xstring, xContact*>::iterator it = cots.begin(); it != cots.end(); it.next())
 	{
 		switch (it.value()->PairType())

@@ -313,7 +313,7 @@ __global__ void vv_update_cluster_velocity_kernel(
 
 
 __global__ void calculateHashAndIndex_kernel(
-	unsigned int* hash, unsigned int* index, double4* pos, unsigned int np)
+	unsigned int* hash, unsigned int* index, double4* pos, unsigned int sid, unsigned int np)
 {
 	unsigned id = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
 	if (id >= (np)) return;
@@ -324,8 +324,8 @@ __global__ void calculateHashAndIndex_kernel(
 	unsigned _hash = calcGridHash(gridPos);
 	/*if(_hash >= cte.ncell)
 	printf("Over limit - hash number : %d", _hash);*/
-	hash[id] = _hash;
-	index[id] = id;
+	hash[sid + id] = _hash;
+	index[sid + id] = id;
 }
 
 __global__ void calculateHashAndIndexForPolygonSphere_kernel(
@@ -1052,11 +1052,11 @@ __global__ void plane_contact_force_kernel(
 
 	if (id >= np)
 		return;
-	unsigned int p_pair_id[3];
-	double2 p_tsd[3];
+	unsigned int p_pair_id[MAX_P2PL_COUNT];
+	double2 p_tsd[MAX_P2PL_COUNT];
 	//device_body_info db[cte.nplane] = { 0, };
-	unsigned int sid = id * 3;
-	for (unsigned int i = 0; i < 3; i++)
+	unsigned int sid = id * MAX_P2PL_COUNT;
+	for (unsigned int i = 0; i < MAX_P2PL_COUNT; i++)
 	{
 		p_pair_id[i] = pair_id[sid + i];
 		p_tsd[i] = tsd[sid + i];
@@ -1118,7 +1118,7 @@ __global__ void plane_contact_force_kernel(
 			
 			
 			calculate_previous_rolling_resistance(cp->rfric, r, 0, dcpr, Fn, Ft, res, tma);
-			//printf("kn : %f, cn : %f, ks : %f, cs : %f", c.kn, c.vn, c.ks, c.vs);
+			printf("kn : %f, cn : %f, ks : %f, cs : %f", c.kn, c.vn, c.ks, c.vs);
 			m_force = Fn + Ft;
 	
 			sumF += m_force;

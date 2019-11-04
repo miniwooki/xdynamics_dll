@@ -271,7 +271,7 @@ void XDYNAMICS_API vv_update_position(
 void XDYNAMICS_API vv_update_velocity(
 	double *vel, double *acc, double* ep, double *ev, double *ea, double *force, double *moment, double* mass, double* iner, unsigned int np);
 
-void XDYNAMICS_API cu_calculateHashAndIndex(unsigned int* hash, unsigned int* index, double *pos, unsigned int np);
+void XDYNAMICS_API cu_calculateHashAndIndex(unsigned int* hash, unsigned int* index, double *pos, unsigned int sid, unsigned int np);
 void XDYNAMICS_API cu_calculateHashAndIndexForPolygonSphere(
 	unsigned int* hash, unsigned int* index,
 	unsigned int sid, unsigned int nsphere, double *sphere);

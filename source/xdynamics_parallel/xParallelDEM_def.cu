@@ -72,10 +72,11 @@ void cu_calculateHashAndIndex(
 	unsigned int* hash,
 	unsigned int* index,
 	double *pos,
+	unsigned int sid,
 	unsigned int np)
 {
 	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
-	calculateHashAndIndex_kernel << < numBlocks, numThreads >> > (hash, index, (double4 *)pos, np);
+	calculateHashAndIndex_kernel << < numBlocks, numThreads >> > (hash, index, (double4 *)pos, sid, np);
 }
 
 void cu_calculateHashAndIndexForPolygonSphere(

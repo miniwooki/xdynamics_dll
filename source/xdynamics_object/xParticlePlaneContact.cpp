@@ -3,6 +3,9 @@
 #include "xdynamics_object/xParticleObject.h"
 #include "xdynamics_manager/xDynamicsManager.h"
 
+unsigned int xParticlePlaneContact::defined_count = 0;
+bool xParticlePlaneContact::allocated_static = false;
+
 double* xParticlePlaneContact::d_tsd_ppl = nullptr;
 unsigned int* xParticlePlaneContact::d_pair_count_ppl = nullptr;
 unsigned int* xParticlePlaneContact::d_pair_id_ppl = nullptr;
@@ -15,7 +18,7 @@ xParticlePlaneContact::xParticlePlaneContact()
 	: xContact()
 	, p(nullptr)
 	, pe(nullptr)
-	, allocated_static(false)
+	//, allocated_static(false)
 {
 
 }
@@ -24,7 +27,7 @@ xParticlePlaneContact::xParticlePlaneContact(std::string _name, xObject* o1, xOb
 	: xContact(_name, PARTICLE_PANE)
 	, p(nullptr)
 	, pe(nullptr)
-	, allocated_static(false)
+	//, allocated_static(false)
 {
 	if (o1 && o2)
 	{
@@ -57,17 +60,17 @@ xParticlePlaneContact::~xParticlePlaneContact()
 
 void xParticlePlaneContact::define(unsigned int idx, unsigned int np)
 {
-	id = idx;
+	id = defined_count;
 	xContact::define(idx, np);
-	host_plane_info hpi =
-	{
-		id,
-		pe->L1(), pe->L2(),
-		pe->U1(), pe->U2(),
-		pe->UW(), pe->XW(),
-		pe->PA(), pe->PB(),
-		pe->W2(), pe->W3(), pe->W4()
-	};
+	//host_plane_info hpi =
+	//{
+	//	id,
+	//	pe->L1(), pe->L2(),
+	//	pe->U1(), pe->U2(),
+	//	pe->UW(), pe->XW(),
+	//	pe->PA(), pe->PB(),
+	//	pe->W2(), pe->W3(), pe->W4()
+	//};
 	if (xSimulation::Gpu())
 	{
 		if (!allocated_static)
@@ -81,13 +84,27 @@ void xParticlePlaneContact::define(unsigned int idx, unsigned int np)
 			checkXerror(cudaMemset(d_pair_count_ppl, 0, sizeof(unsigned int) * np));
 			checkXerror(cudaMemset(d_pair_id_ppl, 0, sizeof(unsigned int) * np * MAX_P2MS_COUNT));
 			checkXerror(cudaMemset(d_tsd_ppl, 0, sizeof(double2) * np * MAX_P2MS_COUNT));
+			
 			allocated_static = true;
 		}
 		checkXerror(cudaMalloc((void**)&dpi, sizeof(device_plane_info)));		
-		checkXerror(cudaMemcpy(dpi, &hpi, sizeof(device_plane_info), cudaMemcpyHostToDevice));
-		xDynamicsManager::This()->XResult()->set_p2pl_contact_data((int)MAX_P2PL_COUNT);
+		checkXerror(cudaMalloc((void**)&dbi, sizeof(device_body_info)));
+		//checkXerror(cudaMemcpy(dpi, &hpi, sizeof(device_plane_info), cudaMemcpyHostToDevice));
+		
 		update();
 	}
+	xDynamicsManager::This()->XResult()->set_p2pl_contact_data((int)MAX_P2PL_COUNT);
+	defined_count++;
+}
+
+// void xParticlePlaneContact::initialize()
+// {
+// 	xParticlePlaneContact::local_initialize();
+// }
+
+void xParticlePlaneContact::local_initialize()
+{
+	defined_count = 0;
 }
 
 void xParticlePlaneContact::update()
@@ -121,7 +138,7 @@ void xParticlePlaneContact::update()
 	//hpi[id] = new_hpi;
 
 	//if (xSimulation::Gpu())
-		checkXerror(cudaMemcpy(dpi, &hpi, sizeof(device_plane_info), cudaMemcpyHostToDevice));
+	checkXerror(cudaMemcpy(dpi, &hpi, sizeof(device_plane_info), cudaMemcpyHostToDevice));
 		//}
 	//}
 	if (xSimulation::Gpu())
@@ -182,7 +199,7 @@ void xParticlePlaneContact::collision(
 	unsigned int *cell_end,
 	unsigned int np)
 {
-	/*if (xSimulation::Gpu())
+	if (xSimulation::Gpu())
 	{
 		double fm[6] = { 0, };
 		cu_plane_contact_force(dpi, dbi, dcp, pos, ep, vel, ev, force, moment, mass,
@@ -198,7 +215,7 @@ void xParticlePlaneContact::collision(
 			pe->addAxialForce(fm[0], fm[1], fm[2]);
 			pe->addAxialMoment(fm[3], fm[4], fm[5]);
 		}
-	}	*/
+	}	
 }
 
 //void xParticlePlaneContact::alloc_memories(unsigned int np)
