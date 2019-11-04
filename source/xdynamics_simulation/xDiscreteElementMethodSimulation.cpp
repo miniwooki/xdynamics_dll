@@ -199,14 +199,12 @@ int xDiscreteElementMethodSimulation::Initialize(
 		dp.nClusterObject = xpm->nClusterObject();
 		dp.rollingCondition = false;// xmd->RollingCondition();
 		dp.nsphere = 0;
-		if (xcm->ContactParticlesPlanes())
-			dp.nplane = xcm->ContactParticlesPlanes()->NumPlanes();
-		else
-			dp.nplane = 0;
-		if (xcm->ContactParticlesCylinders())
-			dp.ncylinder = xcm->ContactParticlesCylinders()->NumContact();
-		else
-			dp.ncylinder = 0;
+///		if (xcm->ContactParticlesPlanes())
+		dp.nplane = xcm->PPLContacts().size();
+	//	if (xcm->ContactParticlesCylinders())
+		dp.ncylinder = xcm->PCYLContacts().size();
+	//	else
+		//	dp.ncylinder = 0;
 		dp.ncell = dtor->nCell();
 		dp.nTsdaConnection = nTsdaConnection;
 		dp.nTsdaConnectionList = nTsdaConnectionList;

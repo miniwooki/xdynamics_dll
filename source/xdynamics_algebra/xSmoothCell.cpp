@@ -49,7 +49,7 @@ void xSmoothCell::initialize(unsigned int np)
 
 }
 
-void xSmoothCell::detection(double *pos /* = NULL */, double* spos /* = NULL */, unsigned int np /* = 0 */, unsigned int snp /* = 0 */)
+void xSmoothCell::detection(double *pos, unsigned int np, unsigned int sid)
 {
 
 }

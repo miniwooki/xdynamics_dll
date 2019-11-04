@@ -1,5 +1,7 @@
 #include "xdynamics_object/xParticlePlaneContact.h"
 #include "xdynamics_object/xPlaneObject.h"
+#include "xdynamics_object/xParticleObject.h"
+#include "xdynamics_manager/xDynamicsManager.h"
 
 double* xParticlePlaneContact::d_tsd_ppl = nullptr;
 unsigned int* xParticlePlaneContact::d_pair_count_ppl = nullptr;
@@ -24,27 +26,21 @@ xParticlePlaneContact::xParticlePlaneContact(std::string _name, xObject* o1, xOb
 	, pe(nullptr)
 	, allocated_static(false)
 {
-	if (o1->Shape() == PLANE_SHAPE)
+	if (o1 && o2)
 	{
-		pe = dynamic_cast<xPlaneObject*>(o1);
-		p = dynamic_cast<xParticleObject*>(o2);
-	}
-	else
-	{
-		pe = dynamic_cast<xPlaneObject*>(o2);
-		p = dynamic_cast<xParticleObject*>(o1);
-	}
-	mpp = { o1->Youngs(), o2->Youngs(), o1->Poisson(), o2->Poisson(), o1->Shear(), o2->Shear() };
+		if (o1->Shape() == PLANE_SHAPE)
+		{
+			pe = dynamic_cast<xPlaneObject*>(o1);
+			p = dynamic_cast<xParticleObject*>(o2);
+		}
+		else
+		{
+			pe = dynamic_cast<xPlaneObject*>(o2);
+			p = dynamic_cast<xParticleObject*>(o1);
+		}
+		mpp = { o1->Youngs(), o2->Youngs(), o1->Poisson(), o2->Poisson(), o1->Shear(), o2->Shear() };
+	}	
 }
-
-//xParticlePlaneContact::xParticlePlaneContact(const xContact& xc)
-//	: xContact(xc)
-//	, p(nullptr)
-//	, pe(nullptr)
-//	, allocated_static(false)
-//{
-//
-//}
 
 xParticlePlaneContact::~xParticlePlaneContact()
 {
@@ -186,7 +182,7 @@ void xParticlePlaneContact::collision(
 	unsigned int *cell_end,
 	unsigned int np)
 {
-	if (xSimulation::Gpu())
+	/*if (xSimulation::Gpu())
 	{
 		double fm[6] = { 0, };
 		cu_plane_contact_force(dpi, dbi, dcp, pos, ep, vel, ev, force, moment, mass,
@@ -202,7 +198,7 @@ void xParticlePlaneContact::collision(
 			pe->addAxialForce(fm[0], fm[1], fm[2]);
 			pe->addAxialMoment(fm[3], fm[4], fm[5]);
 		}
-	}	
+	}	*/
 }
 
 //void xParticlePlaneContact::alloc_memories(unsigned int np)

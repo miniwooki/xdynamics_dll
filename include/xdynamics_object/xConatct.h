@@ -7,7 +7,6 @@
 #include "xdynamics_object/xContactPairList.h"
 #include "xstring.h"
 #include "xdynamics_simulation/xSimulation.h"
-#include "xdynamics_manager/xDynamicsManager.h"
 //#include <QtCore/QString>
 
 class xObject;
@@ -77,8 +76,10 @@ public:
 		unsigned int *sorted_id,
 		unsigned int *cell_start,
 		unsigned int *cell_end,
-		unsigned int np)=0;
+		unsigned int np) = 0;
+
 	virtual void define(unsigned int idx, unsigned int np);
+
 	virtual void update();
 	//virtual void save_result(unsigned int pt, unsigned int np);
 	//virtual void save_contact_result()
@@ -108,8 +109,7 @@ protected:
 // 	device_contact_property_f* dcp_f;
 	xObject* iobj;
 	xObject* jobj;
-	static double* dTmax;
-	static double* dRRes;
+
 	static double* dbfx;
 	static double* dbfy;
 	static double* dbfz;

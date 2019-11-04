@@ -27,15 +27,17 @@ public:
 	void CreateContactPair(
 		std::string n, xContactForceModelType method, xObject* fo, xObject* so, xContactParameterData& d);
 
-	unsigned int setupParticlesMeshObjectsContact();
+	//unsigned int setupParticlesMeshObjectsContact();
 	void setupParticlesPlanesContact();
-	void setupParticlesCylindersContact();
+	//void setupParticlesCylindersContact();
 	void setNumClusterObject(unsigned int nc);
 	void defineContacts(unsigned int np);
 	//double* SphereData();
 	//double* HostSphereData();
 	//float* SphereData_f();
 	xmap<int, xParticleMeshObjectContact*>& PMContacts();
+	xmap<int, xParticlePlaneContact*>& PPLContacts();
+	xmap<int, xParticleCylinderContact*>& PCYLContacts();
 	void insertContact(xContact* c);
 	xContact* Contact(std::string n);// { return cots[n]; }
 	//QMap<QString, QString>& Logs() { return logs; }

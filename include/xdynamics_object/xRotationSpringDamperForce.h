@@ -14,11 +14,11 @@ public:
 	void SetupDataFromListData(xRSDAData&d, std::string data);
 	void ConvertGlobalToLocalOfBodyConnectionPosition(unsigned int i, xPointMass* pm);
 
-	unsigned int NumSpringDamperConnection();
-	unsigned int NumSpringDamperConnectionList();
-	unsigned int NumSpringDamperConnectionValue();
-	unsigned int NumSpringDamperBodyConnection();
-	unsigned int NumSpringDamperBodyConnectionData();
+	size_t NumSpringDamperConnection();
+	size_t NumSpringDamperConnectionList();
+	size_t NumSpringDamperConnectionValue();
+	size_t NumSpringDamperBodyConnection();
+	size_t NumSpringDamperBodyConnectionData();
 
 	xSpringDamperConnectionInformation* xSpringDamperConnection();
 	xSpringDamperConnectionData* xSpringDamperConnectionList();
@@ -51,11 +51,11 @@ private:
 	double l;
 	double dl;
 
-	unsigned int nsdci;
-	unsigned int nkcvalue;
-	unsigned int nConnection;
-	unsigned int nBodyConnection;
-	unsigned int nBodyConnectionData;
+	size_t nsdci;
+	size_t nkcvalue;
+	size_t nConnection;
+	size_t nBodyConnection;
+	size_t nBodyConnectionData;
 	xSpringDamperCoefficient *kc_value;
 	xSpringDamperConnectionInformation* xsdci;
 	xSpringDamperConnectionData *connection_data;

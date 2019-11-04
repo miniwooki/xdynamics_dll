@@ -71,7 +71,7 @@ void xpass_distribution_dlg::click_analysis()
 
 	xPlaneObject plane("area");
 	plane.define(p0, p1, p2, p3);
-	xParticlePlaneContact c("passing");
+	xParticlePlaneContact c("passing", nullptr, nullptr);
 	float* ptrs = xrm->get_particle_position_result_ptr();
 	QString spart = qslist.at(0);
 	int begin = spart.lastIndexOf("/");

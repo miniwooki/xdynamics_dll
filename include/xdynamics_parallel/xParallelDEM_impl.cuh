@@ -1839,7 +1839,7 @@ __device__ void particle_triangle_contact_force(
 	device_triangle_contact_info& dtci,
 	int t,
 	unsigned int id,
-	device_triangle_info* dpi,
+	device_triangle_info* dti,
 	device_contact_property *cp,
 	device_body_info* dbi,
 	double* fx,
@@ -1864,7 +1864,7 @@ __device__ void particle_triangle_contact_force(
 	double3& tma,
 	unsigned int& new_count)
 {
-	device_triangle_info tri = dpi[dtci.id];
+	device_triangle_info tri = dti[dtci.id];
 	double3 qp = tri.Q - tri.P;
 	double3 rp = tri.R - tri.P;
 	//	double rcon = r - 0.5 * cdist;
@@ -1873,7 +1873,7 @@ __device__ void particle_triangle_contact_force(
 	//double3 dcpr_j = cpt - make_double3(jcpos.x, jcpos.y, jcpos.z);
 	unit = unit / length(unit);
 	double2 sd = make_double2(0.0, 0.0);
-	unsigned int pidx = dpi[dtci.id].id;
+	unsigned int pidx = dti[dtci.id].id;
 	device_contact_property cmp = cp[pidx];
 	device_body_info db = dbi[pidx];
 	//device_mesh_mass_info pmi = dpmi[pidx];
@@ -2023,13 +2023,13 @@ __device__ void cluster_triangle_contact_force(
 }
 
 __global__ void particle_polygonObject_collision_kernel(
-	device_triangle_info* dpi, device_body_info* dbi, 
+	device_triangle_info* dti, device_body_info* dbi, 
 	double* fx, double* fy, double* fz, double* mx, double* my, double* mz,
 	double4 *pos, double4 *ep, double3 *vel, double4 *ev, double3 *force, double3 *moment,
 	double* mass, double3* tmax, double* rres,
 	unsigned int* pair_count, unsigned int* pair_id, double2* tsd, double4* dsph,
 	unsigned int* sorted_index, unsigned int* cstart, unsigned int* cend,
-	device_contact_property *cp, unsigned int bindex, unsigned int eindex, unsigned int np)
+	device_contact_property *cp, unsigned int np, unsigned int ntriangle)
 {
 	unsigned id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
 	//unsigned int np = _np;
@@ -2071,6 +2071,7 @@ __global__ void particle_polygonObject_collision_kernel(
 	unsigned int ncl = 0;
 	unsigned int ncp = 0;
 	double coh_s = 0;
+	unsigned int sk = dti[0].id;
 	double3 previous_line_cpt = make_double3(0.0, 0.0, 0.0);
 	double3 previous_point_cpt = make_double3(0.0, 0.0, 0.0);
 	for (int z = -1; z <= 1; z++) {
@@ -2082,18 +2083,18 @@ __global__ void particle_polygonObject_collision_kernel(
 				if (start_index != 0xffffffff) {
 					end_index = cend[grid_hash];
 					for (unsigned int j = start_index; j < end_index; j++) {
-						unsigned int k = sorted_index[j];
-						if (k >= cte.np)
+						unsigned int tk = sorted_index[j];
+						if (tk >= cte.np)
 						{
-							k -= cte.np;
+							tk -= cte.np + sk;
 							///if (k < bindex || k >= eindex)
 							//	continue;
 							int t = -1;
-							double3 cpt = closestPtPointTriangle(dpi[k], ipos, ir, t);
-							device_contact_property cmp = cp[dpi[k].id];
+							double3 cpt = closestPtPointTriangle(dti[tk], ipos, ir, t);
+							//device_contact_property cmp = cp;
 							double cdist = ir - length(ipos - cpt);
-							if (cmp.coh)
-								coh_s = limit_cohesion_depth(ir, 0, cmp.Ei, cmp.Ej, cmp.pri, cmp.prj, cmp.coh);
+							if (cp->coh)
+								coh_s = limit_cohesion_depth(ir, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh);
 							if (cdist > 0)
 							{
 								//printf("cidst : %f, contact_type : %d\n", cdist, t);
@@ -2111,18 +2112,18 @@ __global__ void particle_polygonObject_collision_kernel(
 								}
 								switch (t)
 								{
-								case 2: ctriangle[nct++] = { k, cpt }; break;
-								case 1: cline[ncl++] = { k, cpt }; break;
-								case 0: cpoint[ncp++] = { k, cpt }; break;
+								case 2: ctriangle[nct++] = { tk, cpt }; break;
+								case 1: cline[ncl++] = { tk, cpt }; break;
+								case 0: cpoint[ncp++] = { tk, cpt }; break;
 								}
 							}
 							else if(cdist <= 0 && abs(cdist) < abs(coh_s))
 							{
 								switch (t)
 								{
-								case 2: ctriangle[nct++] = { k, cpt }; break;
-								case 1: cline[ncl++] = { k, cpt }; break;
-								case 0: cpoint[ncp++] = { k, cpt }; break;
+								case 2: ctriangle[nct++] = { tk, cpt }; break;
+								case 1: cline[ncl++] = { tk, cpt }; break;
+								case 0: cpoint[ncp++] = { tk, cpt }; break;
 								}
 							}
 						}
@@ -2138,7 +2139,7 @@ __global__ void particle_polygonObject_collision_kernel(
 	//printf("tlp : [%d - %d - %d]\n", nct, ncl, ncp);
 	for (unsigned int k = 0; k < nct; k++)
 		particle_triangle_contact_force(
-			ctriangle[k], 0, id, dpi, cp, dbi, 
+			ctriangle[k], 0, id, dti, cp, dbi, 
 			fx, fy, fz, mx, my, mz,
 			ipos, ivel, iomega, old_count, 
 			p_pair_id, p_tsd, pair_id, tsd, 
@@ -2153,7 +2154,7 @@ __global__ void particle_polygonObject_collision_kernel(
 			//	continue;
 			//previous_cpt = cline[k].cpt;
 			particle_triangle_contact_force(
-				cline[k], 1, id, dpi, cp, dbi, 
+				cline[k], 1, id, dti, cp, dbi, 
 				fx, fy, fz, mx, my, mz,
 				ipos, ivel, iomega, old_count, p_pair_id, p_tsd, pair_id, tsd, ir, im, sum_force, sum_moment, res, tma, new_count);
 		}
@@ -2169,7 +2170,7 @@ __global__ void particle_polygonObject_collision_kernel(
 			//	continue;
 		//	previous_cpt = cpoint[k].cpt;
 			particle_triangle_contact_force(
-				cpoint[k], 2, id, dpi, cp, dbi, 
+				cpoint[k], 2, id, dti, cp, dbi, 
 				fx, fy, fz, mx, my, mz,
 				ipos, ivel, iomega, old_count, p_pair_id, p_tsd, pair_id, tsd, ir, im, sum_force, sum_moment, res, tma, new_count);
 		}			

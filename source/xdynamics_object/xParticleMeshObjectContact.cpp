@@ -1,15 +1,16 @@
 #include "xdynamics_object/xParticleMeshObjectContact.h"
 #include "xdynamics_object/xParticleObject.h"
 #include "xdynamics_object/xMeshObject.h"
+#include "xdynamics_manager/xDynamicsManager.h"
 
 // int xParticleMeshObjectContact::nmoving = 0;
-double* xParticlePlaneContact::d_tsd_ppl = nullptr;
-unsigned int* xParticlePlaneContact::d_pair_count_ppl = nullptr;
-unsigned int* xParticlePlaneContact::d_pair_id_ppl = nullptr;
+double* xParticleMeshObjectContact::d_tsd_ptri = nullptr;
+unsigned int* xParticleMeshObjectContact::d_pair_count_ptri = nullptr;
+unsigned int* xParticleMeshObjectContact::d_pair_id_ptri = nullptr;
 
-double* xParticlePlaneContact::tsd_ppl = nullptr;
-unsigned int* xParticlePlaneContact::pair_count_ppl = nullptr;
-unsigned int* xParticlePlaneContact::pair_id_ppl = nullptr;
+double* xParticleMeshObjectContact::tsd_ptri = nullptr;
+unsigned int* xParticleMeshObjectContact::pair_count_ptri = nullptr;
+unsigned int* xParticleMeshObjectContact::pair_id_ptri = nullptr;
 
 unsigned int xParticleMeshObjectContact::n_mesh_sphere = 0;
 //double xParticleMeshObjectContact::max_sphere_radius = 0;
@@ -71,7 +72,7 @@ void xParticleMeshObjectContact::define(unsigned int idx, unsigned int np)
 {
 	xContact::define(idx, np);
 	
-	n_mesh_sphere += po->NumTriangle();
+	
 	hsphere = new vector4d[po->NumTriangle()];
 	hlocal = new vector3d[po->NumTriangle()];
 	host_triangle_info* hti = new host_triangle_info[po->NumTriangle()];
@@ -79,7 +80,7 @@ void xParticleMeshObjectContact::define(unsigned int idx, unsigned int np)
 	//xMaterialPair hmp = { 0, };
 
 	double maxRadii = 0.0;
-	unsigned int idx = 0;
+	//unsigned int idx = 0;
 
 	xContactMaterialParameters cp = { 0, };
 	xMaterialPair xmp = { 0, };
@@ -99,7 +100,7 @@ void xParticleMeshObjectContact::define(unsigned int idx, unsigned int np)
 	for (unsigned int i = 0; i < po->NumTriangle(); i++)
 	{
 		hti[i].id = i;
-		hti[i].sid = 0;
+		hti[i].tid = n_mesh_sphere + i;
 		vector3d pos = po->Position();
 		euler_parameters ep = po->EulerParameters();
 		//unsigned int s = vi * 9;
@@ -150,6 +151,7 @@ void xParticleMeshObjectContact::define(unsigned int idx, unsigned int np)
 	}
 	update();
 	gps.max_radius = maxRadii;
+	n_mesh_sphere += po->NumTriangle();
 }
 
 void xParticleMeshObjectContact::update()
@@ -192,7 +194,7 @@ void xParticleMeshObjectContact::collision(
 		cu_particle_polygonObject_collision(
 			dti, dbi, pos, ep, vel, ev, force, moment, mass,
 			tmax, rres, d_pair_count_ptri, d_pair_id_ptri, d_tsd_ptri,
-			dsphere, sorted_id, cell_start, cell_end, dcp, np);
+			dsphere, sorted_id, cell_start, cell_end, dcp, np, po->NumTriangle());
 		if (po->isDynamicsBody())
 		{
 			fm[0] = reduction(xContact::deviceBodyForceX(), np);

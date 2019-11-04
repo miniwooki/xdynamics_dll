@@ -1,5 +1,6 @@
 #include "xdynamics_object/xParticleParticleContact.h"
 #include "xdynamics_simulation/xSimulation.h"
+#include "xdynamics_manager/xDynamicsManager.h"
 
 xParticleParticleContact::xParticleParticleContact()
 	: xContact()

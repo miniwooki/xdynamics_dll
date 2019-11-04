@@ -12,7 +12,7 @@ class XDYNAMICS_API xParticleMeshObjectContact : public xContact
 	struct host_triangle_info
 	{
 		int id;
-		unsigned int sid;
+		unsigned int tid;
 		//vector3ui indice;
 		vector3d P;
 		vector3d Q;

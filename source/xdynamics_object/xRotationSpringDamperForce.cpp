@@ -216,7 +216,7 @@ void xRotationSpringDamperForce::SetupDataFromListData(xRSDAData&d, std::string 
 
 void xRotationSpringDamperForce::ConvertGlobalToLocalOfBodyConnectionPosition(unsigned int i, xPointMass* pm)
 {
-	unsigned int sid = connection_body_info[i].sid;
+	size_t sid = connection_body_info[i].sid;
 	xSpringDamperBodyConnectionData *d = NULL;
 	for (unsigned int i = 0; i < connection_body_info[i].nconnection; i++)
 	{
@@ -229,27 +229,27 @@ void xRotationSpringDamperForce::ConvertGlobalToLocalOfBodyConnectionPosition(un
 	}
 }
 
-unsigned int xRotationSpringDamperForce::NumSpringDamperConnection()
+size_t xRotationSpringDamperForce::NumSpringDamperConnection()
 {
 	return nsdci;
 }
 
-unsigned int xRotationSpringDamperForce::NumSpringDamperConnectionList()
+size_t xRotationSpringDamperForce::NumSpringDamperConnectionList()
 {
 	return nConnection;
 }
 
-unsigned int xRotationSpringDamperForce::NumSpringDamperConnectionValue()
+size_t xRotationSpringDamperForce::NumSpringDamperConnectionValue()
 {
 	return nkcvalue;
 }
 
-unsigned int xRotationSpringDamperForce::NumSpringDamperBodyConnection()
+size_t xRotationSpringDamperForce::NumSpringDamperBodyConnection()
 {
 	return nBodyConnection;
 }
 
-unsigned int xRotationSpringDamperForce::NumSpringDamperBodyConnectionData()
+size_t xRotationSpringDamperForce::NumSpringDamperBodyConnectionData()
 {
 	return nBodyConnectionData;
 }
@@ -409,7 +409,7 @@ void xRotationSpringDamperForce::xCalculateForceForDEM(
 		euler_parameters ei = e[mid];// pm->EulerParameters();
 		euler_parameters edi = ed[mid];// pm->DEulerParameters();
 		matrix33d Ai = GlobalTransformationMatrix(ei);
-		unsigned int sid = connection_body_info[i].sid;
+		size_t sid = connection_body_info[i].sid;
 		xSpringDamperBodyConnectionData d = { 0, };
 
 		for (unsigned int j = 0; j < connection_body_info[i].nconnection; j++)
@@ -449,7 +449,7 @@ void xRotationSpringDamperForce::xCalculateForceFromDEM(
 	euler_parameters ei = pm->EulerParameters();
 	euler_parameters edi = pm->DEulerParameters();
 	matrix33d Ai = GlobalTransformationMatrix(ei);
-	unsigned int sid = connection_body_info[i].sid;
+	size_t sid = connection_body_info[i].sid;
 	xSpringDamperBodyConnectionData d = { 0, };
 	vector4d* dem_pos = (vector4d*)pos;
 	vector3d* dem_vel = (vector3d*)vel;

@@ -259,7 +259,7 @@ typedef struct { unsigned int sid, count, neach; }xClusterInformation;
 typedef struct { unsigned int id, sid, ntsda; }xSpringDamperConnectionInformation;
 typedef struct { unsigned int jd, kc_id; double init_l; }xSpringDamperConnectionData;
 typedef struct { double k, c; }xSpringDamperCoefficient;
-typedef struct { const char* cbody; unsigned int sid, nconnection; }xSpringDamperBodyConnectionInfo;
+typedef struct { const char* cbody; size_t sid, nconnection; }xSpringDamperBodyConnectionInfo;
 typedef struct{ unsigned int ci, kc_id; double init_l, rx, ry, rz; }xSpringDamperBodyConnectionData;
 /*typedef struct{ double tstart, dpdt }xObjectMovingCondition;*/
 

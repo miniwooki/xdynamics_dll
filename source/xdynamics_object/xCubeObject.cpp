@@ -42,12 +42,12 @@ bool xCubeObject::define(vector3d& min, vector3d& max)
 	size.y = length((max_p - new_vector3d(max_p.x, min_p.y, max_p.z)));
 	size.z = length((max_p - new_vector3d(max_p.x, max_p.y, min_p.z)));
 
-	planes[0].define(this->MovingObject(), min_p, min_p + new_vector3d(0, 0, size.z), min_p + new_vector3d(size.x, 0, 0));
-	planes[1].define(this->MovingObject(), min_p, min_p + new_vector3d(0, size.y, 0), min_p + new_vector3d(0, 0, size.z));
-	planes[2].define(this->MovingObject(), min_p + new_vector3d(size.x, 0, 0), min_p + new_vector3d(size.x, 0, size.z), min_p + new_vector3d(size.x, size.y, 0));
-	planes[3].define(this->MovingObject(), min_p, min_p + new_vector3d(size.x, 0, 0), min_p + new_vector3d(0, size.y, 0));
-	planes[4].define(this->MovingObject(), min_p + new_vector3d(0, 0, size.z), min_p + new_vector3d(0, size.y, size.z), min_p + new_vector3d(size.x, 0, size.z));
-	planes[5].define(this->MovingObject(), min_p + new_vector3d(0, size.y, 0), min_p + new_vector3d(size.x, size.y, 0), min_p + new_vector3d(0, size.y, size.z));
+	planes[0].define(this->isDynamicsBody(), min_p, min_p + new_vector3d(0, 0, size.z), min_p + new_vector3d(size.x, 0, 0));
+	planes[1].define(this->isDynamicsBody(), min_p, min_p + new_vector3d(0, size.y, 0), min_p + new_vector3d(0, 0, size.z));
+	planes[2].define(this->isDynamicsBody(), min_p + new_vector3d(size.x, 0, 0), min_p + new_vector3d(size.x, 0, size.z), min_p + new_vector3d(size.x, size.y, 0));
+	planes[3].define(this->isDynamicsBody(), min_p, min_p + new_vector3d(size.x, 0, 0), min_p + new_vector3d(0, size.y, 0));
+	planes[4].define(this->isDynamicsBody(), min_p + new_vector3d(0, 0, size.z), min_p + new_vector3d(0, size.y, size.z), min_p + new_vector3d(size.x, 0, size.z));
+	planes[5].define(this->isDynamicsBody(), min_p + new_vector3d(0, size.y, 0), min_p + new_vector3d(size.x, size.y, 0), min_p + new_vector3d(0, size.y, size.z));
 	return true;
 }
 

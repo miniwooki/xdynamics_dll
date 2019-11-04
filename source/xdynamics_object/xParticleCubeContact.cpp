@@ -44,7 +44,7 @@ xCubeObject* xParticleCubeContact::CubeObject()
 void xParticleCubeContact::collision(
 	double r, double m, vector3d& pos, vector3d& vel, vector3d& omega, vector3d& F, vector3d& M)
 {
-	xParticlePlaneContact cpps(*this);
+	/*xParticlePlaneContact cpps(*this);
 	xPlaneObject* planes = cu->Planes();
 	for (unsigned int j = 0; j < 6; j++)
 	{
@@ -52,7 +52,7 @@ void xParticleCubeContact::collision(
 		cpps.singleCollision(planes + j, m, r, pos, vel, omega, m_f, m_m);
 		F += m_f;
 		M += m_m;
-	}
+	}*/
 }
 
 void xParticleCubeContact::cuda_collision(
@@ -66,7 +66,7 @@ void xParticleCubeContact::cuda_collision(
 
 void xParticleCubeContact::cudaMemoryAlloc(unsigned int np)
 {
-	xContact::cudaMemoryAlloc(np);
+	/*xContact::cudaMemoryAlloc(np);
 	device_plane_info *_dpi = new device_plane_info[6];
 	xPlaneObject* pl = cu->Planes();
 	for (unsigned i = 0; i < 6; i++)
@@ -87,5 +87,5 @@ void xParticleCubeContact::cudaMemoryAlloc(unsigned int np)
 
 	checkCudaErrors(cudaMalloc((void**)&dpi, sizeof(device_plane_info) * 6));
 	checkCudaErrors(cudaMemcpy(dpi, _dpi, sizeof(device_plane_info) * 6, cudaMemcpyHostToDevice));
-	delete[] _dpi;
+	delete[] _dpi;*/
 }

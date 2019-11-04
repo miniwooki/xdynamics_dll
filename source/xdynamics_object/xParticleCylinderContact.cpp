@@ -2,14 +2,15 @@
 #include "xdynamics_object/xParticleObject.h"
 #include "xdynamics_object/xCylinderObject.h"
 #include "xdynamics_simulation/xSimulation.h"
+#include "xdynamics_manager/xDynamicsManager.h"
 
-double* xParticlePlaneContact::d_tsd_ppl = nullptr;
-unsigned int* xParticlePlaneContact::d_pair_count_ppl = nullptr;
-unsigned int* xParticlePlaneContact::d_pair_id_ppl = nullptr;
+double* xParticleCylinderContact::d_tsd_pcyl = nullptr;
+unsigned int* xParticleCylinderContact::d_pair_count_pcyl = nullptr;
+unsigned int* xParticleCylinderContact::d_pair_id_pcyl = nullptr;
 
-double* xParticlePlaneContact::tsd_ppl = nullptr;
-unsigned int* xParticlePlaneContact::pair_count_ppl = nullptr;
-unsigned int* xParticlePlaneContact::pair_id_ppl = nullptr;
+double* xParticleCylinderContact::tsd_pcyl = nullptr;
+unsigned int* xParticleCylinderContact::pair_count_pcyl = nullptr;
+unsigned int* xParticleCylinderContact::pair_id_pcyl = nullptr;
 
 xParticleCylinderContact::xParticleCylinderContact()
 	: xContact()

@@ -277,8 +277,9 @@ int xDynamicsManager::OpenModelXLS(const char* n)
 			if (xdem) xdem->XParticleManager()->ExportParticleDataForView(pv_path);
 			int vot = VPARTICLE;
 			xve.Write((char*)&vot, sizeof(xViewObjectType));
-			int ns = pv_path.size(); xve.Write((char*)&ns, sizeof(int));
-			xve.Write((char*)pv_path.c_str(), sizeof(char)*pv_path.size());
+			int pvsz = static_cast<int>(pv_path.size());
+			xve.Write((char*)&pvsz, sizeof(int));
+			xve.Write((char*)pv_path.c_str(), sizeof(char)*pvsz);
 		}
  		xve.Close();
 	}

@@ -356,7 +356,7 @@ void xMeshObject::splitTriangles(double to)
 	//delete[] vertice;
 	delete[] vertexList;
 	delete[] normalList;
-	ntriangle = temp_tri.size();
+	ntriangle = static_cast<unsigned int>(temp_tri.size());
 	//vertice = new double[ntriangle * 9];
 	normalList = new double[ntriangle * 9];
 	vertexList = new double[ntriangle * 9];

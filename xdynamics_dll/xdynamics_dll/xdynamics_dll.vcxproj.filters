@@ -204,9 +204,6 @@
     <ClCompile Include="..\..\source\xdynamics_object\xParticleMeshObjectContact.cpp">
       <Filter>소스 파일\xdynamics_object\contactPair</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\xdynamics_object\xParticleMeshObjectsContact.cpp">
-      <Filter>소스 파일\xdynamics_object\contactPair</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\xdynamics_object\xKinematicConstraint.cpp">
       <Filter>소스 파일\xdynamics_object\joint</Filter>
     </ClCompile>
@@ -220,9 +217,6 @@
       <Filter>소스 파일\xdynamics_object\contactPair</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\xdynamics_object\xContact.cpp">
-      <Filter>소스 파일\xdynamics_object\contactPair</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\xdynamics_object\xParticlePlanesContact.cpp">
       <Filter>소스 파일\xdynamics_object\contactPair</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\xViewExporter.cpp">
@@ -277,9 +271,6 @@
       <Filter>소스 파일\xdynamics_object\shapeObject</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\xdynamics_object\xParticleCylinderContact.cpp">
-      <Filter>소스 파일\xdynamics_object\contactPair</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\xdynamics_object\xParticleCylindersContact.cpp">
       <Filter>소스 파일\xdynamics_object\contactPair</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\xColorControl.cpp">
@@ -431,9 +422,6 @@
     <ClInclude Include="..\..\include\xdynamics_object\xParticleMeshObjectContact.h">
       <Filter>헤더 파일\xdynamics_object\contactPair</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\xdynamics_object\xParticleMeshObjectsContact.h">
-      <Filter>헤더 파일\xdynamics_object\contactPair</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\xdynamics_object\xForce.h">
       <Filter>헤더 파일\xdynamics_object\force</Filter>
     </ClInclude>
@@ -447,9 +435,6 @@
       <Filter>헤더 파일\xdynamics_object\contactPair</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\xdynamics_object\xConatct.h">
-      <Filter>헤더 파일\xdynamics_object\contactPair</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\xdynamics_object\xParticlePlanesContact.h">
       <Filter>헤더 파일\xdynamics_object\contactPair</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\xViewExporter.h">
@@ -508,9 +493,6 @@
     </ClInclude>
     <ClInclude Include="..\..\include\xdynamics_object\xCylinderObject.h">
       <Filter>헤더 파일\xdynamics_object\shapeObject</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\xdynamics_object\xParticleCylindersContact.h">
-      <Filter>헤더 파일\xdynamics_object\contactPair</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\xlist.hpp">
       <Filter>헤더 파일</Filter>

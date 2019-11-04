@@ -10,7 +10,7 @@ public:
 	~xSmoothCell();
 
 	virtual void initialize(unsigned int np);
-	virtual void detection(double *pos = NULL, double* spos = NULL, unsigned int np = 0, unsigned int snp = 0);
+	virtual void detection(double *pos, unsigned int np, unsigned int sid);
 
 	void setWorldBoundary(vector3d bMin, vector3d bMax);
 	vector3d MinimumGridPosition();

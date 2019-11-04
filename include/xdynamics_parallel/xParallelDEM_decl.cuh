@@ -149,7 +149,7 @@ struct device_dem_parameters
 struct device_triangle_info
 {
 	int id;
-	unsigned int sid;
+	unsigned int tid;
 	double3 P;
 	double3 Q;
 	double3 R;
@@ -308,7 +308,7 @@ void XDYNAMICS_API cu_particle_polygonObject_collision(
 	double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd, double* dsph,
 	unsigned int* sidx, unsigned int* cstart, unsigned int* cend, device_contact_property *cp,
-	unsigned int np);// , unsigned int bindex, unsigned int eindex/*, double3* mpos, double3* mf, double3* mm, double3& _mf, double3& _mm*/);
+	unsigned int np, unsigned int ntriangle);// , unsigned int bindex, unsigned int eindex/*, double3* mpos, double3* mf, double3* mm, double3& _mf, double3& _mm*/);
 
 // Function for contact between particle and cylinder
 void XDYNAMICS_API cu_cylinder_contact_force(

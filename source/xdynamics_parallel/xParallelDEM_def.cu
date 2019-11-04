@@ -241,7 +241,7 @@ void cu_particle_polygonObject_collision(
 	double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd, double* dsph,
 	unsigned int* sorted_index, unsigned int* cstart, unsigned int* cend, device_contact_property *cp,
-	unsigned int np, unsigned int bindex, unsigned int eindex)
+	unsigned int np, unsigned int ntriangle)
 {
 	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
 	
@@ -258,7 +258,7 @@ void cu_particle_polygonObject_collision(
 		(double3 *)force, (double3 *)moment, mass,
 		(double3 *)tmax, rres,
 		pair_count, pair_id, (double2 *)tsd, (double4 *)dsph,
-		sorted_index, cstart, cend, cp, bindex, eindex, np);
+		sorted_index, cstart, cend, cp, np, ntriangle);
 }
 
 void cu_decide_rolling_friction_moment(
