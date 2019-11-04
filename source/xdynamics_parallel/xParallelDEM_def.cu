@@ -142,7 +142,7 @@ void cu_calculate_p2p(
 }
 
 void cu_plane_contact_force(
-	unsigned int k, device_plane_info* plan, device_body_info* dbi,
+	 device_plane_info* plan, device_body_info* dbi,
 	device_contact_property *cp, double* pos, double* ep, double* vel, double* ev,
 	double* force, double* moment, double* mass,
 	double* tmax, double* rres,
@@ -165,7 +165,7 @@ void cu_plane_contact_force(
 	//for (unsigned int i = 0; i < nplane; i++)
 	//{
 		plane_contact_force_kernel << < numBlocks, numThreads >> > (
-			plan, k, dbi, cp, fx, fy, fz, mx, my, mz,
+			plan, dbi, cp, fx, fy, fz, mx, my, mz,
 			(double4 *)pos, (double4 *)ep, (double3 *)vel, (double4 *)ev,
 			(double3 *)force, (double3 *)moment, mass,
 			(double3 *)tmax, rres,
@@ -206,13 +206,13 @@ void cu_cube_contact_force(
 }
 
 void cu_cylinder_contact_force(
-	const int i, device_cylinder_info* cyl, 
+	device_cylinder_info* cyl, 
 	device_body_info* bi, device_contact_property *cp,
 	double* pos, double* ep, double* vel, double* ev,
 	double* force, double* moment,
 	double* mass, double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd, 
-	unsigned int np, unsigned int ncylinder)
+	unsigned int np)
 {
 	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
 	//memset(dbfm, 0, sizeof(device_body_force) * ncylinder);
@@ -225,7 +225,7 @@ void cu_cylinder_contact_force(
 	double* mz = xContact::deviceBodyMomentZ();
 
 	cylinder_contact_force_kernel << < numBlocks, numThreads >> > (
-		cyl, i, bi, fx, fy, fz, mx, my, mz, 
+		cyl, bi, fx, fy, fz, mx, my, mz, 
 		(double4 *)pos, (double4 *)ep, (double3 *)vel, (double4 *)ev,
 		(double3 *)force, (double3 *)moment, cp, mass,
 		(double3*)tmax, rres, pair_count, pair_id, (double2 *)tsd, np);

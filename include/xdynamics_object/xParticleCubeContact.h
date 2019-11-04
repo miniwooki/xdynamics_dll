@@ -28,6 +28,7 @@ public:
 	virtual void cudaMemoryAlloc(unsigned int np);
 
 private:
+
 	xParticleObject* p;
 	xCubeObject* cu;
 	device_plane_info *dpi;

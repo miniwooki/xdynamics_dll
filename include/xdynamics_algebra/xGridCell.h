@@ -11,7 +11,9 @@ public:
 
 	void clear();
 	virtual void initialize(unsigned int np);
-	virtual void detection(double *pos = NULL, double* spos = NULL, unsigned int np = 0, unsigned int snp = 0) = 0;
+	virtual void detection(double *pos, unsigned int np, unsigned int sid) = 0;
+	void rearrange_cell();
+	void reorderDataAndFindCellStart(unsigned int id, unsigned int begin, unsigned int end);
 
 	void setWorldOrigin(vector3d _wo) { wo = _wo; }
 	void setCellSize(double _cs) { cs = _cs; }

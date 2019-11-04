@@ -578,6 +578,11 @@ xParticleObject* xParticleManager::CreatePlaneParticle(
 	return xpo;
 }
 
+double xParticleManager::GetMaxParticleRadius()
+{
+	return maximum_radius;
+}
+
 xParticleObject* xParticleManager::CreateCircleParticle(
 	std::string n, xMaterialType mt, unsigned int _np, xCircleParticleData& d)
 {

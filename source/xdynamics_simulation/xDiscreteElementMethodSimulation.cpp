@@ -51,12 +51,13 @@ int xDiscreteElementMethodSimulation::Initialize(
 	xcm = _xcm;
 	if (xcm)
 	{
-		nPolySphere = xcm->setupParticlesMeshObjectsContact();
-		xcm->setupParticlesPlanesContact();
-		xcm->setupParticlesCylindersContact();
+		xcm->defineContacts(ns);
+		//nPolySphere = xcm->setupParticlesMeshObjectsContact();
+		//xcm->setupParticlesPlanesContact();
+		//xcm->setupParticlesCylindersContact();
 		xcm->allocPairList(np);
-		if (nPolySphere)
-			maxRadius = xcm->ContactParticlesMeshObjects()->MaxRadiusOfPolySphere();
+		//if (nPolySphere)
+		//	maxRadius = xcm->ContactParticlesMeshObjects()->MaxRadiusOfPolySphere();
 		xcm->setNumClusterObject(nco);
 	/*	if (xdem->XParticleManager()->NumClusterSet())
 			xdem->XParticleManager()->SetClusterInformation();*/
@@ -97,6 +98,8 @@ int xDiscreteElementMethodSimulation::Initialize(
 		if (r > maxRadius) maxRadius = r;
 		if (r < minRadius) minRadius = r;
 	}
+	if (gps.max_radius < maxRadius)
+		gps.max_radius = maxRadius;
 	double new_dt = CriticalTimeStep(minRadius);
 	dtor = new xNeiborhoodCell;
 	// 	switch (md->SortType())
@@ -109,7 +112,7 @@ int xDiscreteElementMethodSimulation::Initialize(
 	{
 		dtor->setWorldOrigin(new_vector3d(-1.0, -1.0, -1.0));
 		dtor->setGridSize(new_vector3ui(128, 128, 128));
-		dtor->setCellSize(maxRadius * 2.0);
+		dtor->setCellSize(gps.max_radius * 2.0);
 		dtor->initialize(np + nPolySphere);
 	}
 	// 	switch (md->IntegrationType())
@@ -179,14 +182,14 @@ int xDiscreteElementMethodSimulation::Initialize(
 			
 		if (xcm)
 		{
-			if (xcm->ContactParticles())
+			/*if (xcm->ContactParticles())
 				xcm->ContactParticles()->cudaMemoryAlloc(np);
 			if (xcm->ContactParticlesMeshObjects())
 				xcm->ContactParticlesMeshObjects()->cudaMemoryAlloc(np);
 			if (xcm->ContactParticlesPlanes())
 				xcm->ContactParticlesPlanes()->cudaMemoryAlloc(np);
 			if (xcm->ContactParticlesCylinders())
-				xcm->ContactParticlesCylinders()->cudaMemoryAlloc(np);
+				xcm->ContactParticlesCylinders()->cudaMemoryAlloc(np);*/
 		}
 		device_dem_parameters dp;
 		dp.np = np;

@@ -48,6 +48,13 @@
 
 //#include <QtCore/QString>
 #include <string>
+
+struct global_parameters
+{
+	double max_radius;
+};
+
+static global_parameters gps = { FLT_MAX };
 //#include "xstring.h"
 //#include <string>
 
@@ -310,6 +317,15 @@ typedef struct
 	double nx, ny, nz;
 	double tx, ty, tz;
 }xCorner;
+
+struct host_body_info
+{
+	double mass;
+	double px, py, pz;
+	double vx, vy, vz;
+	double e0, e1, e2, e3;
+	double ed0, ed1, ed2, ed3;
+};
 
 typedef struct
 {

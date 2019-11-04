@@ -32,7 +32,7 @@ xParticlePlanesContact::~xParticlePlanesContact()
 
 void xParticlePlanesContact::define(unsigned int id, xParticlePlaneContact* d)
 {
-	xPlaneObject *p = d->PlaneObject();
+	/*xPlaneObject *p = d->PlaneObject();
 	if (p->MovingObject())
 		nmoving++;
 	xContactMaterialParameters cp = { 0, };
@@ -58,7 +58,7 @@ void xParticlePlanesContact::define(unsigned int id, xParticlePlaneContact* d)
 		p->W2(), p->W3(), p->W4()
 	};
 	nContactObject++;
-	pair_contact.insert(id, d);
+	pair_contact.insert(id, d);*/
 }
 
 void xParticlePlanesContact::define(unsigned int id, xParticleCubeContact* d)
@@ -179,7 +179,7 @@ device_body_info * xParticlePlanesContact::devicePlaneBodyInfo()
 
 device_body_force * xParticlePlanesContact::deviceBodyForceAndMoment()
 {
-	return dbf;
+	//return dbf;
 }
 
 unsigned int xParticlePlanesContact::NumPlanes()

@@ -370,7 +370,7 @@ void xXLSReader::ReadMass(xMultiBodyModel* xmbd, vector2i rc)
 				continue;
 			}				
 			xPointMass* xpm = NULL;
-			if (obj) obj->setMovingObject(true);
+			if (obj) obj->setDynamicsBody(true);
 			xpm = xmbd->CreatePointMass(name);
 			xpm->SetDataFromStructure(xmbd->NumMass(), xpmd);
 			rc.x++;
@@ -638,7 +638,7 @@ void xXLSReader::ReadContact(xContactManager* xcm, vector2i rc)
 				throw runtime_error(std::string("You have defined a contact[") + name + "] for an object[" + obj0 + "] that does not exist.");
 			if (obj1_ptr == NULL)
 				throw runtime_error(std::string("You have defined a contact[") + name + "] for an object[" + obj1 + "] that does not exist.");
-			xContact* xc = xcm->CreateContactPair(
+			xcm->CreateContactPair(
 				name,
 				method,
 				obj0_ptr,

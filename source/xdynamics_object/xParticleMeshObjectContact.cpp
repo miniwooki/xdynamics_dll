@@ -2,33 +2,38 @@
 #include "xdynamics_object/xParticleObject.h"
 #include "xdynamics_object/xMeshObject.h"
 
-int xParticleMeshObjectContact::nmoving = 0;
+// int xParticleMeshObjectContact::nmoving = 0;
+double* xParticlePlaneContact::d_tsd_ppl = nullptr;
+unsigned int* xParticlePlaneContact::d_pair_count_ppl = nullptr;
+unsigned int* xParticlePlaneContact::d_pair_id_ppl = nullptr;
+
+double* xParticlePlaneContact::tsd_ppl = nullptr;
+unsigned int* xParticlePlaneContact::pair_count_ppl = nullptr;
+unsigned int* xParticlePlaneContact::pair_id_ppl = nullptr;
+
 unsigned int xParticleMeshObjectContact::n_mesh_sphere = 0;
+//double xParticleMeshObjectContact::max_sphere_radius = 0;
 
 xParticleMeshObjectContact::xParticleMeshObjectContact()
 	: xContact()
-	, maxRadii(0)
-	, d_tsd_ptri(nullptr)
-	, d_pair_count_ptri(nullptr)
-	, d_pair_id_ptri(nullptr)
-	, pair_count_ptri(nullptr)
-	, pair_id_ptri(nullptr)
+	, id(0)
 	, p(nullptr)
 	, po(nullptr)
+	, hsphere(nullptr)
+	, hlocal(nullptr)
+	, allocated_static(false)
 {
 
 }
 
 xParticleMeshObjectContact::xParticleMeshObjectContact(std::string _name, xObject* o1, xObject* o2)
 	: xContact(_name, PARTICLE_MESH_SHAPE)
-	, maxRadii(0)
-	, d_tsd_ptri(nullptr)
-	, d_pair_count_ptri(nullptr)
-	, d_pair_id_ptri(nullptr)
-	, pair_count_ptri(nullptr)
-	, pair_id_ptri(nullptr)
+	, id(0)
 	, p(nullptr)
 	, po(nullptr)
+	, hsphere(nullptr)
+	, hlocal(nullptr)
+	, allocated_static(false)
 {
 	if (o1->Shape() == MESH_SHAPE)
 	{
@@ -48,163 +53,134 @@ xParticleMeshObjectContact::~xParticleMeshObjectContact()
 	if (d_pair_count_ptri) checkCudaErrors(cudaFree(d_pair_count_ptri)); d_pair_count_ptri = NULL;
 	if (d_pair_id_ptri) checkCudaErrors(cudaFree(d_pair_id_ptri)); d_pair_id_ptri = NULL;
 	if (d_tsd_ptri) checkCudaErrors(cudaFree(d_tsd_ptri)); d_tsd_ptri = NULL;
+	if (dsphere) checkXerror(cudaFree(dsphere)); dsphere = NULL;
+	if (dlocal) checkXerror(cudaFree(dlocal)); dlocal = NULL;
+	if (dvList) checkXerror(cudaFree(dvList)); dvList = NULL;
+	if (dti) checkXerror(cudaFree(dti)); dti = NULL;
+	if (dbi) checkXerror(cudaFree(dbi)); dbi = NULL;
+
 	if (pair_count_ptri) delete[] pair_count_ptri; pair_count_ptri = NULL;
 	if (pair_id_ptri) delete[] pair_id_ptri; pair_id_ptri = NULL;
 	if (tsd_ptri) delete[] tsd_ptri; tsd_ptri = NULL;
-	if (dti) delete[] dti; dti = NULL;
-	if (pair_count_ptri) delete[] pair_count_ptri; pair_count_ptri = NULL;
-	if (tsd_ptri) delete[] tsd_ptri; tsd_ptri = NULL;
+
+	if (hsphere) delete[] hsphere; hsphere = nullptr;
+	if (hlocal) delete[] hlocal; hlocal = nullptr;
 }
 
-bool xParticleMeshObjectContact::define()
+void xParticleMeshObjectContact::define(unsigned int idx, unsigned int np)
 {
-	if (po)
-	{
-		if (po->MovingObject() || po->CompulsionMovingObject())
-			nmoving++;
-		n_mesh_sphere += po->NumTriangle();
-	}
-	//foreach(xParticleMeshObjectContact* cpm, cpmesh)
-	//{
-	//	xMeshObject* pobj = cpm->MeshObject();
-	//	if (pobj->MovingObject() || pobj->CompulsionMovingObject())
-	//		nmoving++;
-	//	npolySphere += pobj->NumTriangle();
-	//}
-	//nPobjs = cpmesh.size();
+	xContact::define(idx, np);
+	
+	n_mesh_sphere += po->NumTriangle();
 	hsphere = new vector4d[po->NumTriangle()];
 	hlocal = new vector3d[po->NumTriangle()];
-	hmi = new host_mesh_info;
-	hcp = new xContactMaterialParameters;
-	hmp = new xMaterialPair;
-	//hpmi = new host_mesh_mass_info[nPobjs];
-	//memset(hpmi, 0, sizeof(host_mesh_mass_info) * nPobjs);
-	// 	if (simulation::isCpu())
-	// 		dsphere = (double*)hsphere;
-// 	if (!pct)
-// 	{
-// 		pct = new polygonContactType[nPobjs];
-// 		memset(pct, 0, sizeof(polygonContactType) * nPobjs);
-// 	}
+	host_triangle_info* hti = new host_triangle_info[po->NumTriangle()];
+	//xContactMaterialParameters hcp = { 0, };
+	//xMaterialPair hmp = { 0, };
+
 	double maxRadii = 0.0;
 	unsigned int idx = 0;
-//	for (it = cpmesh.begin(); it != cpmesh.end(); it.next())
+
+	xContactMaterialParameters cp = { 0, };
+	xMaterialPair xmp = { 0, };
+	vector3d *vList = (vector3d *)po->VertexList();
+
+	//hcp.restitution = this->Restitution();
+	//hcp.stiffness_ratio = this->StiffnessRatio();
+	//hcp.friction = this->Friction();
+	//hcp.s_friction = this->StaticFriction();
+	//hcp.rolling_friction = this->RollingFactor();
+	//hcp.stiffness_multiplyer = this->StiffMultiplyer();
+	//hmp = this->MaterialPropertyPair();
+
+	unsigned int vi = 0;
+
+	double* t_radius = new double[po->NumTriangle()];
+	for (unsigned int i = 0; i < po->NumTriangle(); i++)
 	{
-		//xParticleMeshObjectContact* cpm = it.value();
-		xContactMaterialParameters cp = { 0, };
-		xMaterialPair xmp = { 0, };
-		//xMeshObject* pobj = cpm->MeshObject();
-		vector3d *vList = (vector3d *)po->VertexList();
-		//		unsigned int a, b, c;
-		cp.restitution = this->Restitution();
-		cp.stiffness_ratio = this->StiffnessRatio();
-		cp.friction = this->Friction();
-		cp.s_friction = this->StaticFriction();
-		cp.rolling_friction = this->RollingFactor();
-		cp.stiffness_multiplyer = this->StiffMultiplyer();
-		xmp = this->MaterialPropertyPair();
-		hcp[idx] = cp;
-		hmp[idx] = xmp;
-		//pair_ip.insert(idx, pobj);
-		//ePolySphere += pobj->NumTriangle();
-		unsigned int vi = 0;
-		//vector3d* hlocal = new vector3d[npolySphere];
-		double* t_radius = new double[po->NumTriangle()];
-		for (unsigned int i = 0; i < po->NumTriangle(); i++)
-		{
-			//			host_mesh_info po;
-			hti[i].id = i;
-			hti[i].sid = 0;
-			vector3d pos = po->Position();
-			euler_parameters ep = po->EulerParameters();
-			//unsigned int s = vi * 9;
-			vector3d p = pos + ToGlobal(ep, vList[vi++]);
-			vector3d q = pos + ToGlobal(ep, vList[vi++]);
-			vector3d r = pos + ToGlobal(ep, vList[vi++]);
-			hti[i].P = make_double3(p.x, p.y, p.z);
-			hti[i].Q = make_double3(q.x, q.y, q.z);
-			hti[i].R = make_double3(r.x, r.y, r.z);
-			//hpi[i].indice.z = vi++;
-			vector4d csph = xUtilityFunctions::FitSphereToTriangle(p, q, r, 0.8);
-			//double rad = length(ctri - hpi[i].P);
-			if (csph.w > maxRadii)
-				maxRadii = csph.w;
-			hsphere[i] = csph;// new_vector4d(ctri.x, ctri.y, ctri.z, rad);
-			vector3d r_pos = ToLocal(ep, (new_vector3d(csph.x - pos.x, csph.y - pos.y, csph.z - pos.z)));
-			hlocal[i] = r_pos;
-			t_radius[i] = csph.w;
-		}
-		//	ExportTriangleSphereLocalPosition(pobj->Name().toStdString(), bPolySphere, ePolySphere, hlocal, t_radius);
-		//bPolySphere += pobj->NumTriangle();
-		delete[] t_radius;
-		//delete[] hlocal; hlocal = NULL;
-		/*std::fstream fs;
-		fs.open("C:/xdynamics/tri_sphere.txt", std::ios::out);
-		for (unsigned int i = 0; i < pobj->NumTriangle(); i++)
-		{
-			fs << hsphere[i].x << " " << hsphere[i].y << " " << hsphere[i].z << " " << hsphere[i].w << std::endl;
-		}
-		fs.close();*/
-		idx++;
+		hti[i].id = i;
+		hti[i].sid = 0;
+		vector3d pos = po->Position();
+		euler_parameters ep = po->EulerParameters();
+		//unsigned int s = vi * 9;
+		vector3d p = pos + ToGlobal(ep, vList[vi++]);
+		vector3d q = pos + ToGlobal(ep, vList[vi++]);
+		vector3d r = pos + ToGlobal(ep, vList[vi++]);
+		hti[i].P = new_vector3d(p.x, p.y, p.z);
+		hti[i].Q = new_vector3d(q.x, q.y, q.z);
+		hti[i].R = new_vector3d(r.x, r.y, r.z);
+		//hpi[i].indice.z = vi++;
+		vector4d csph = xUtilityFunctions::FitSphereToTriangle(p, q, r, 0.8);
+		//double rad = length(ctri - hpi[i].P);
+		if (csph.w > maxRadii)
+			maxRadii = csph.w;
+		hsphere[i] = csph;// new_vector4d(ctri.x, ctri.y, ctri.z, rad);
+		vector3d r_pos = ToLocal(ep, (new_vector3d(csph.x - pos.x, csph.y - pos.y, csph.z - pos.z)));
+		hlocal[i] = r_pos;
+		t_radius[i] = csph.w;
 	}
-	max_sphere_radius = maxRadii;
+	delete[] t_radius;
+
 	if (xSimulation::Cpu())
 		dsphere = (double *)hsphere;
-	return true;
-}
-
-// bool contact_particles_polygonObject::collision(
-// 	double *dpos, double *dvel,
-// 	double *domega, double *dmass, 
-// 	double *dforce, double *dmoment, 
-// 	unsigned int *sorted_id, unsigned int *cell_start, 
-// 	unsigned int *cell_end, unsigned int np)
-// {
-// // 	simulation::isGpu()
-// // 		? cu_particle_polygonObject_collision
-// // 		(1, dpi, po->deviceSphereSet(), dpos, dvel, domega, dforce, dmoment, dmass
-// // 		, sorted_id, cell_start, cell_end, dcp, np)
-// // 		: hostCollision(
-// // 		dpos, dvel, domega, dmass, dforce, dmoment, sorted_id, cell_start, cell_end, np);
-// 	return true;
-// }
-
-void xParticleMeshObjectContact::alloc_memories(unsigned int np)
-{
-	xContact::alloc_memories(np);
-	if (xSimulation::Gpu())
+	else
 	{
+		checkXerror(cudaMalloc((void**)&dsphere, sizeof(double) * po->NumTriangle() * 4));
+		checkXerror(cudaMalloc((void**)&dlocal, sizeof(double) * po->NumTriangle() * 3));
+		checkXerror(cudaMalloc((void**)&dvList, sizeof(double) * po->NumTriangle() * 9));
 		checkXerror(cudaMalloc((void**)&dti, sizeof(device_triangle_info) * po->NumTriangle()));
-		checkXerror(cudaMalloc((void**)&d_pair_count_ptri, sizeof(unsigned int) * np));
-		checkXerror(cudaMalloc((void**)&d_pair_id_ptri, sizeof(unsigned int) * np * MAX_P2MS_COUNT));
-		checkXerror(cudaMalloc((void**)&d_tsd_ptri, sizeof(double2) * np * MAX_P2MS_COUNT));
-		checkXerror(cudaMemset(d_pair_count_ptri, 0, sizeof(unsigned int) * np));
-		checkXerror(cudaMemset(d_pair_id_ptri, 0, sizeof(unsigned int) * np * MAX_P2MS_COUNT));
-		checkXerror(cudaMemset(d_tsd_ptri, 0, sizeof(double2) * np * MAX_P2MS_COUNT));
-		pair_count_ptri = new unsigned int[np];
-		pair_id_ptri = new unsigned int[np * MAX_P2MS_COUNT];
-		tsd_ptri = new double[2 * np * MAX_P2MS_COUNT];
+		checkXerror(cudaMalloc((void**)&dbi, sizeof(device_body_info)));
+		checkXerror(cudaMemcpy(dsphere, hsphere, sizeof(double) * po->NumTriangle() * 4, cudaMemcpyHostToDevice));
+		checkXerror(cudaMemcpy(dti, hti, sizeof(device_triangle_info) * po->NumTriangle(), cudaMemcpyHostToDevice));
+		checkXerror(cudaMemcpy(dlocal, hlocal, sizeof(vector3d) * po->NumTriangle(), cudaMemcpyHostToDevice));
+		checkXerror(cudaMemcpy(dvList, vList, sizeof(double) * po->NumTriangle() * 9, cudaMemcpyHostToDevice));
+		if (!allocated_static)
+		{
+			checkXerror(cudaMalloc((void**)&d_pair_count_ptri, sizeof(unsigned int) * np));
+			checkXerror(cudaMalloc((void**)&d_pair_id_ptri, sizeof(unsigned int) * np * MAX_P2MS_COUNT));
+			checkXerror(cudaMalloc((void**)&d_tsd_ptri, sizeof(double2) * np * MAX_P2MS_COUNT));
+			checkXerror(cudaMemset(d_pair_count_ptri, 0, sizeof(unsigned int) * np));
+			checkXerror(cudaMemset(d_pair_id_ptri, 0, sizeof(unsigned int) * np * MAX_P2MS_COUNT));
+			checkXerror(cudaMemset(d_tsd_ptri, 0, sizeof(double2) * np * MAX_P2MS_COUNT));
+			pair_count_ptri = new unsigned int[np];
+			pair_id_ptri = new unsigned int[np * MAX_P2MS_COUNT];
+			tsd_ptri = new double[2 * np * MAX_P2MS_COUNT];
+			allocated_static;
+		}		
 	}
-	
-	///xDynamicsManager::This()->XResult()->set_p2tri_contact_data((int)MAX_P2MS_COUNT);
+	update();
+	gps.max_radius = maxRadii;
 }
 
-void xParticleMeshObjectContact::save_contact_result(unsigned int pt, unsigned int np)
+void xParticleMeshObjectContact::update()
 {
 	if (xSimulation::Gpu())
 	{
-		checkXerror(cudaMemcpy(pair_count_ptri, d_pair_count_ptri, sizeof(unsigned int) * np, cudaMemcpyDeviceToHost));
-		checkXerror(cudaMemcpy(pair_id_ptri, d_pair_id_ptri, sizeof(unsigned int) * np * MAX_P2MS_COUNT, cudaMemcpyDeviceToHost));
-		checkXerror(cudaMemcpy(tsd_ptri, d_tsd_ptri, sizeof(double2) * np * MAX_P2MS_COUNT, cudaMemcpyDeviceToHost));
-		xDynamicsManager::This()->XResult()->save_p2tri_contact_data(pair_count_ptri, pair_id_ptri, tsd_ptri);
+		euler_parameters ep = po->EulerParameters();
+		euler_parameters ed = po->DEulerParameters();
+		device_body_info bi = 
+		{
+			po->Mass(),
+			po->Position().x, po->Position().y, po->Position().z,
+			po->Velocity().x, po->Velocity().y, po->Velocity().z,
+			ep.e0, ep.e1, ep.e2, ep.e3,
+			ed.e0, ed.e1, ed.e2, ed.e3
+		};
+		checkXerror(cudaMemcpy(dbi, &bi, sizeof(device_body_info), cudaMemcpyHostToDevice));
+		cu_update_meshObjectData(dvList, dsphere, dlocal, dti, dbi, n_mesh_sphere);
 	}
-	
+}
+
+double * xParticleMeshObjectContact::MeshSphere()
+{
+	return xSimulation::Gpu() ? dsphere : (double*)hsphere;
 }
 
 void xParticleMeshObjectContact::collision(
 	double *pos, double *ep, double *vel, double *ev,
 	double *mass, double* inertia,
 	double *force, double *moment,
+	double *tmax, double* rres,
 	unsigned int *sorted_id,
 	unsigned int *cell_start,
 	unsigned int *cell_end,
@@ -215,16 +191,30 @@ void xParticleMeshObjectContact::collision(
 		double fm[6] = { 0, };
 		cu_particle_polygonObject_collision(
 			dti, dbi, pos, ep, vel, ev, force, moment, mass,
-			dTmax, dRRes, d_pair_count_ptri, d_pair_id_ptri, d_tsd_ptri,
-			d_tri_sph,	sorted_id, cell_start, cell_end, dcp, np);
-		fm[0] = reduction(xContact::deviceBodyForceX(), np);
-		fm[1] = reduction(xContact::deviceBodyForceY(), np);
-		fm[2] = reduction(xContact::deviceBodyForceZ(), np);
-		fm[3] = reduction(xContact::deviceBodyMomentX(), np);
-		fm[4] = reduction(xContact::deviceBodyMomentY(), np);
-		fm[5] = reduction(xContact::deviceBodyMomentZ(), np);
-		po->addAxialForce(fm[0], fm[1], fm[2]);
-		po->addAxialMoment(fm[3], fm[4], fm[5]);
+			tmax, rres, d_pair_count_ptri, d_pair_id_ptri, d_tsd_ptri,
+			dsphere, sorted_id, cell_start, cell_end, dcp, np);
+		if (po->isDynamicsBody())
+		{
+			fm[0] = reduction(xContact::deviceBodyForceX(), np);
+			fm[1] = reduction(xContact::deviceBodyForceY(), np);
+			fm[2] = reduction(xContact::deviceBodyForceZ(), np);
+			fm[3] = reduction(xContact::deviceBodyMomentX(), np);
+			fm[4] = reduction(xContact::deviceBodyMomentY(), np);
+			fm[5] = reduction(xContact::deviceBodyMomentZ(), np);
+			po->addAxialForce(fm[0], fm[1], fm[2]);
+			po->addAxialMoment(fm[3], fm[4], fm[5]);
+		}		
+	}
+}
+
+void xParticleMeshObjectContact::savePartData(unsigned int np)
+{
+	if (xSimulation::Gpu())
+	{
+		checkXerror(cudaMemcpy(pair_count_ptri, d_pair_count_ptri, sizeof(unsigned int) * np, cudaMemcpyDeviceToHost));
+		checkXerror(cudaMemcpy(pair_id_ptri, d_pair_id_ptri, sizeof(unsigned int) * np * MAX_P2MS_COUNT, cudaMemcpyDeviceToHost));
+		checkXerror(cudaMemcpy(tsd_ptri, d_tsd_ptri, sizeof(double2) * np * MAX_P2MS_COUNT, cudaMemcpyDeviceToHost));
+		xDynamicsManager::This()->XResult()->save_p2tri_contact_data(pair_count_ptri, pair_id_ptri, tsd_ptri);
 	}
 }
 
@@ -232,7 +222,6 @@ unsigned int xParticleMeshObjectContact::GetNumMeshSphere()
 {
 	return n_mesh_sphere;
 }
-
 
 // void contact_particles_polygonObject::allocPolygonInformation(unsigned int _nPolySphere)
 // {

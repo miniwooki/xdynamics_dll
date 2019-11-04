@@ -63,6 +63,7 @@ public:
 	xParticleObject* CreateMassParticle(std::string n, xMaterialType mt, double rad, xPointMassData& d);
 	xParticleObject* CreatePlaneParticle(std::string n, xMaterialType mt, xPlaneParticleData& d);
 	
+	double GetMaxParticleRadius();
 
 private:
 	void setCriticalMaterial(double d, double y, double p);
@@ -88,6 +89,7 @@ private:
 	double maximum_youngs_modulus;
 	double minimum_poisson_ratio;
 	double minimum_radius;
+	double maximum_radius;
 	//bool *isCluster;
 	//unsigned int *cluster_index;
 	//unsigned int *cluster_count;

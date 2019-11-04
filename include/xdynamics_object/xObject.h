@@ -23,7 +23,7 @@ public:
 	void setDensity(double _d);
 	void setYoungs(double _y);
 	void setPoisson(double _p);
-	void setMovingObject(bool ismo);
+	void setDynamicsBody(bool ismo);
 	void setShapeType(xShapeType xst);
 	void setMaterialType(xMaterialType xmt);
 	void setConnectedGeometryName(std::string n);
@@ -35,7 +35,7 @@ public:
 	double Poisson() const;// { return p; }
 	double Shear() const;
 	double Volume() const;
-	bool MovingObject() const;
+	//bool setDynamicsBody() const;
 	bool CompulsionMovingObject() const;
 	xShapeType Shape() const;
 	xMaterialType Material() const;
@@ -43,6 +43,7 @@ public:
 	std::string Name() const;
 	std::string ConnectedGeometryName() const;
 	int ObjectID() const;
+	bool isDynamicsBody() const;
 
 protected:
 	static int count;
@@ -51,8 +52,9 @@ protected:
 	xShapeType shape;
 	xMaterialType material;
 	bool is_compulsion_moving_object;
-	bool is_mass_moving_object;
+	//bool is_mass_moving_object;
 	int id;
+	bool is_dynamics_body;
 // 	static unsigned int count;
 // 	dimension_type dim;
 // 	unsigned int id;

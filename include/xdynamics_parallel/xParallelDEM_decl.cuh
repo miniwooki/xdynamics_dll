@@ -18,10 +18,10 @@ typedef unsigned int uint;
 //__constant__ device_parameters cte;
 //double3 toDouble3(VEC3D& v3) { return double3(v3.x, v3.y, v3.z); }
 //inline double3 change_cuda_double3(VEC3D& v3) { return make_double3(v3.x, v3.y, v3.z); }
-inline __host__ vector3d ToVector3D(const double3 d3)
-{
-	return vector3d(d3.x, d3.y, d3.z);
-}
+//inline __host__ vector3d ToVector3D(const double3 d3)
+//{
+//	return vector3d(d3.x, d3.y, d3.z);
+//}
 
 inline __host__ __device__ int sign(double L)
 {
@@ -153,15 +153,11 @@ struct device_triangle_info
 	double3 P;
 	double3 Q;
 	double3 R;
-	double3 V;
-	double3 W;
-	double3 N;
 };
 
 struct device_plane_info
 {
-	bool ismoving;
-	unsigned int mid;
+	unsigned int id;
 	double l1, l2;
 	double3 u1;
 	double3 u2;
@@ -210,9 +206,7 @@ struct device_tsda_connection_body_data
 
 struct device_cylinder_info
 {
-	bool ismoving;
 	unsigned int id;
-	unsigned int mid;
 	unsigned int empty_part;
 	double thickness;
 	double3 len_rr;// len, rbase, rtop;
@@ -293,7 +287,7 @@ void XDYNAMICS_API cu_calculate_p2p(
 
 // Function for contact between particle and plane
 void XDYNAMICS_API cu_plane_contact_force(
-	unsigned int k, device_plane_info* plan, device_body_info* dbi, device_contact_property *cp,
+	device_plane_info* plan, device_body_info* dbi, device_contact_property *cp,
 	double* pos, double* ep, double* vel, double* omega,
 	double* force, double* moment, double* mass,
 	double* tmax, double* rres,
@@ -318,13 +312,13 @@ void XDYNAMICS_API cu_particle_polygonObject_collision(
 
 // Function for contact between particle and cylinder
 void XDYNAMICS_API cu_cylinder_contact_force(
-	const int i, device_cylinder_info* cyl, device_body_info* bi, 
+	device_cylinder_info* cyl, device_body_info* bi, 
 	device_contact_property *cp,
 	double* pos, double* ep, double* vel, double* omega,
 	double* force, double* moment, double* mass,
 	double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd,
-	unsigned int np, unsigned int ncylinder);
+	unsigned int np);
 
 void XDYNAMICS_API cu_decide_rolling_friction_moment(
 	double* tmax,

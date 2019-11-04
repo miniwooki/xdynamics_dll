@@ -28,7 +28,20 @@ int xIntegratorVV::OneStepSimulation(double ct, unsigned int cstep)
 	m_np = xdem->XParticleManager()->ExcuteCreatingCondition(ct, cstep, m_np);
 	//std::cout << m_np << std::endl;
 	this->updatePosition(dpos, dcpos, dvel, dacc, dep, davel, daacc, m_np);
-	dtor->detection(dpos, (nPolySphere ? xcm->ContactParticlesMeshObjects()->SphereData() : NULL), nco ? np : m_np, nPolySphere);
+	dtor->detection(dpos, nco ? np : m_np, 0);
+	if (xcm->PMContacts().size())
+	{
+		unsigned int sid = np;
+		xmap<int, xParticleMeshObjectContact*>::iterator it = xcm->PMContacts().begin();
+		while (it.has_next())
+		{
+			double* m_sphere = it.value()->MeshSphere();
+			unsigned int ntri = it.value()->MeshObject()->NumTriangle();
+			dtor->detection(m_sphere, ntri, sid);
+			sid += ntri;
+		}
+	}
+	dtor->rearrange_cell();
 //	std::cout << "after detection " << std::endl;
 	if (xcm)
 	{

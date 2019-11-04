@@ -284,22 +284,40 @@ xMaterialPair xContact::MaterialPropertyPair() const { return mpp; }
 //device_contact_property* DeviceContactProperty() const { return dcp; }
 xContactPairType xContact::PairType() const { return type; }
 
-void xContact::alloc_memories(unsigned int np)
+void xContact::setContactParameters(xContactParameterData & d)
 {
-	if (dcp) return;
-	device_contact_property hcp = device_contact_property
+	//mpp = mp;
+	restitution = d.rest;
+	stiffnessRatio = d.rto;
+	s_friction = d.mu_s;
+	friction = d.mu;
+	cohesion = d.coh;
+	rolling_factor = d.rf;
+}
+
+void xContact::define(unsigned int idx, unsigned int np)
+{
+	if (xSimulation::Gpu())
 	{
-		mpp.Ei, mpp.Ej, mpp.Pri, mpp.Prj, mpp.Gi, mpp.Gj,
-		restitution, friction, s_friction, rolling_factor, cohesion, stiffnessRatio, stiff_multiplyer
-	};
-	checkCudaErrors(cudaMalloc((void**)&dcp, sizeof(device_contact_property)));
-	checkCudaErrors(cudaMemcpy(dcp, &hcp, sizeof(device_contact_property), cudaMemcpyHostToDevice));
-	if (!dbfx) checkCudaErrors(cudaMalloc((void**)&dbfx, sizeof(double) * np));
-	if (!dbfy) checkCudaErrors(cudaMalloc((void**)&dbfy, sizeof(double) * np));
-	if (!dbfz) checkCudaErrors(cudaMalloc((void**)&dbfz, sizeof(double) * np));
-	if (!dbmx) checkCudaErrors(cudaMalloc((void**)&dbmx, sizeof(double) * np));
-	if (!dbmy) checkCudaErrors(cudaMalloc((void**)&dbmy, sizeof(double) * np));
-	if (!dbmz) checkCudaErrors(cudaMalloc((void**)&dbmz, sizeof(double) * np));
+		device_contact_property hcp = device_contact_property
+		{
+			mpp.Ei, mpp.Ej, mpp.Pri, mpp.Prj, mpp.Gi, mpp.Gj,
+			restitution, friction, s_friction, rolling_factor, cohesion, stiffnessRatio, stiff_multiplyer
+		};
+		checkCudaErrors(cudaMalloc((void**)&dcp, sizeof(device_contact_property)));
+		checkCudaErrors(cudaMemcpy(dcp, &hcp, sizeof(device_contact_property), cudaMemcpyHostToDevice));
+		if (!dbfx) checkCudaErrors(cudaMalloc((void**)&dbfx, sizeof(double) * np));
+		if (!dbfy) checkCudaErrors(cudaMalloc((void**)&dbfy, sizeof(double) * np));
+		if (!dbfz) checkCudaErrors(cudaMalloc((void**)&dbfz, sizeof(double) * np));
+		if (!dbmx) checkCudaErrors(cudaMalloc((void**)&dbmx, sizeof(double) * np));
+		if (!dbmy) checkCudaErrors(cudaMalloc((void**)&dbmy, sizeof(double) * np));
+		if (!dbmz) checkCudaErrors(cudaMalloc((void**)&dbmz, sizeof(double) * np));
+	}	
+}
+
+void xContact::update()
+{
+
 }
 
 double xContact::StiffMultiplyer() const

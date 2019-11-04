@@ -10,7 +10,7 @@ xObject::xObject(xShapeType _s)
 	, p(0)
 	, sm(0)
 	, shape(_s)
-	, is_mass_moving_object(false)
+	, is_dynamics_body(false)
 	, is_compulsion_moving_object(false)
 {
 	id = count++;
@@ -25,7 +25,7 @@ xObject::xObject(std::string _name, xShapeType _s)
 	, p(0)
 	, sm(0)
 	, shape(_s)
-	, is_mass_moving_object(false)
+	, is_dynamics_body(false)
 	, is_compulsion_moving_object(false)
 {
 	id = count++;
@@ -39,7 +39,7 @@ xObject::xObject(const xObject& o)
 	, p(o.Poisson())
 	, sm(o.Shear())
 	, vol(o.Volume())
-	, is_mass_moving_object(o.MovingObject())
+	, is_dynamics_body(o.isDynamicsBody())
 	, is_compulsion_moving_object(o.CompulsionMovingObject())
 {
 
@@ -85,6 +85,11 @@ int xObject::ObjectID() const
 	return id;
 }
 
+bool xObject::isDynamicsBody() const
+{
+	return is_dynamics_body;
+}
+
 double xObject::Density() const
 { 
 	return d; 
@@ -108,11 +113,11 @@ double xObject::Volume() const
 {
 	return vol;
 }
-
-bool xObject::MovingObject() const
-{
-	return is_mass_moving_object;
-}
+//
+//bool xObject::MovingObject() const
+//{
+//	return is_mass_moving_object;
+//}
 
 bool xObject::CompulsionMovingObject() const
 {
@@ -134,9 +139,9 @@ void xObject::setPoisson(double _p)
 	p = _p;
 }
 
-void xObject::setMovingObject(bool ismo)
+void xObject::setDynamicsBody(bool ismo)
 {
-	is_mass_moving_object = ismo;
+	is_dynamics_body = ismo;
 }
 
 xShapeType xObject::Shape() const

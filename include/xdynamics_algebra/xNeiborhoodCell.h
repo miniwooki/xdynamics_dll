@@ -10,11 +10,11 @@ public:
 	xNeiborhoodCell();
 	virtual ~xNeiborhoodCell();
 
-	virtual void detection(double *pos = NULL, double* spos = NULL, unsigned int np = 0, unsigned int snp = 0);
+	virtual void detection(double *pos, unsigned int np, unsigned int sid);
 
 private:
-	void _detection(vector4d* pos, vector4d* spos, unsigned int np, unsigned int snp);
-	void reorderDataAndFindCellStart(unsigned int id, unsigned int begin, unsigned int end);
+	void _detection(vector4d* pos, unsigned int np, unsigned int sid);
+	
 };
 
 #endif

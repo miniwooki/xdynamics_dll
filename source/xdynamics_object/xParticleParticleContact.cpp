@@ -3,38 +3,69 @@
 
 xParticleParticleContact::xParticleParticleContact()
 	: xContact()
-// 	, d_pair_idx(NULL)
-// 	, d_pair_other(NULL)
-// 	, d_tan(NULL)
+	, d_pair_count_pp(nullptr)
+	, d_pair_id_pp(nullptr)
+	, d_tsd_pp(nullptr)
+	, pair_count_pp(nullptr)
+	, pair_id_pp(nullptr)
+	, tsd_pp(nullptr)
 {
 
 }
 
 xParticleParticleContact::xParticleParticleContact(std::string _name)
 	: xContact(_name, PARTICLE_PARTICLE)
+	, d_pair_count_pp(nullptr)
+	, d_pair_id_pp(nullptr)
+	, d_tsd_pp(nullptr)
+	, pair_count_pp(nullptr)
+	, pair_id_pp(nullptr)
+	, tsd_pp(nullptr)
 {
 
 }
 
 xParticleParticleContact::~xParticleParticleContact()
 {
-// 	if (d_pair_idx) checkCudaErrors(cudaFree(d_pair_idx)); d_pair_idx = NULL;
-// 	if (d_pair_other) checkCudaErrors(cudaFree(d_pair_other)); d_pair_other = NULL;
-// 	if (d_tan) checkCudaErrors(cudaFree(d_tan)); d_tan = NULL;
+	if (d_pair_count_pp) checkCudaErrors(cudaFree(d_pair_count_pp)); d_pair_count_pp = NULL;
+	if (d_pair_id_pp) checkCudaErrors(cudaFree(d_pair_id_pp)); d_pair_id_pp = NULL;
+	if (d_tsd_pp) checkCudaErrors(cudaFree(d_tsd_pp)); d_tsd_pp = NULL;
+	if (pair_count_pp) delete[] pair_count_pp; pair_count_pp = NULL;
+	if (pair_id_pp) delete[] pair_id_pp; pair_id_pp = NULL;
+	if (tsd_pp) delete[] tsd_pp; tsd_pp = NULL;
 }
 
-void xParticleParticleContact::cudaMemoryAlloc(unsigned int np)
+void xParticleParticleContact::define(unsigned int idx, unsigned int np)
 {
-	xContact::cudaMemoryAlloc(np);
+
+	xContact::define(idx, np);
 	if (xSimulation::Gpu())
 	{
-// 		checkCudaErrors(cudaMalloc((void**)&d_pair_idx, sizeof(unsigned int) * np * 2));
-// 		checkCudaErrors(cudaMalloc((void**)&d_pair_other, sizeof(unsigned int) * np * MAXIMUM_PAIR_NUMBER));
-// 		checkCudaErrors(cudaMalloc((void**)&d_tan, sizeof(double) * np * MAXIMUM_PAIR_NUMBER));
-// 		checkCudaErrors(cudaMemset(d_pair_idx, 0, sizeof(unsigned int) * np * 2));
-// 		checkCudaErrors(cudaMemset(d_pair_other, 0, sizeof(unsigned int) * np * MAXIMUM_PAIR_NUMBER));
-// 		checkCudaErrors(cudaMemset(d_tan, 0, sizeof(unsigned int) * np * MAXIMUM_PAIR_NUMBER));
+		pair_count_pp = new unsigned int[np];
+		pair_id_pp = new unsigned int[np * MAX_P2P_COUNT];
+		tsd_pp = new double[2 * np * MAX_P2P_COUNT];
+		checkXerror(cudaMalloc((void**)&d_pair_count_pp, sizeof(unsigned int) * np));
+		checkXerror(cudaMalloc((void**)&d_pair_id_pp, sizeof(unsigned int) * np * MAX_P2P_COUNT));
+		checkXerror(cudaMalloc((void**)&d_tsd_pp, sizeof(double2) * np * MAX_P2P_COUNT));
+		checkXerror(cudaMemset(d_pair_count_pp, 0, sizeof(unsigned int) * np));
+		checkXerror(cudaMemset(d_pair_id_pp, 0, sizeof(unsigned int) * np * MAX_P2P_COUNT));
+		checkXerror(cudaMemset(d_tsd_pp, 0, sizeof(double2) * np * MAX_P2P_COUNT));
 	}
+	
+	xDynamicsManager::This()->XResult()->set_p2p_contact_data((int)MAX_P2P_COUNT);
+}
+
+void xParticleParticleContact::update()
+{
+
+}
+
+void xParticleParticleContact::savePartData(unsigned int np)
+{
+	checkXerror(cudaMemcpy(pair_count_pp, d_pair_count_pp, sizeof(unsigned int) * np, cudaMemcpyDeviceToHost));
+	checkXerror(cudaMemcpy(pair_id_pp, d_pair_id_pp, sizeof(unsigned int) * np * MAX_P2P_COUNT, cudaMemcpyDeviceToHost));
+	checkXerror(cudaMemcpy(tsd_pp, d_tsd_pp, sizeof(double2) * np * MAX_P2P_COUNT, cudaMemcpyDeviceToHost));
+	xDynamicsManager::This()->XResult()->save_p2p_contact_data(pair_count_pp, pair_id_pp, tsd_pp);
 }
 
 void xParticleParticleContact::deviceContactCount(double* pos, unsigned int *sorted_id, unsigned int *cstart, unsigned int *cend, unsigned int np)
@@ -227,12 +258,22 @@ void xParticleParticleContact::updateCollisionPair(
 	}
 }
 
-void xParticleParticleContact::cuda_collision(
-	double *pos, double *vel, double *omega,
-	double *mass, double *force, double *moment,
-	unsigned int *sorted_id, unsigned int *cell_start,
-	unsigned int *cell_end, unsigned int np)
+void xParticleParticleContact::collision(
+	double *pos, double *ep, double *vel, double *ev,
+	double *mass, double* inertia,
+	double *force, double *moment,
+	double *tmax, double* rres,
+	unsigned int *sorted_id,
+	unsigned int *cell_start,
+	unsigned int *cell_end,
+	unsigned int np)
 {
+	if (xSimulation::Gpu())
+	{
+		cu_calculate_p2p(pos, ep, vel, ev, force, moment, mass,
+			tmax, rres, d_pair_count_pp, d_pair_id_pp, d_tsd_pp, sorted_id,
+			cell_start, cell_end, dcp, np);
+	}
 // 	cu_check_no_collision_pair(pos, d_pair_idx, d_pair_other, np);
 // 	cu_check_new_collision_pair(pos, d_pair_idx, d_pair_other, sorted_id, cell_start, cell_end, np);
 // 	cu_calculate_particle_collision_with_pair(pos, vel , omega, mass, d_tan, force, moment, d_pair_idx, d_pair_other, dcp, np);

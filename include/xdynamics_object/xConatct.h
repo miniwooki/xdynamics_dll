@@ -56,6 +56,7 @@ public:
 	static xContactForceModelType ContactForceModel();
 	device_contact_property* DeviceContactProperty() const;// { return dcp; }
 	xContactPairType PairType() const;
+	void setContactParameters(xContactParameterData& d);
 
 	xContactParameters getContactParameters(
 		double ir, double jr,
@@ -67,16 +68,20 @@ public:
 		double fric, double rfric, double coh);
 	// 		contactForce_type cft, double rest, double ratio, double fric);
 	void setMaterialPair(xMaterialPair _mpp);// { mpp = _mpp; }
+
 	virtual void collision(
-		unsigned int id, double *pos, double *ep, double *vel, double *ev,
+		double *pos, double *ep, double *vel, double *ev,
 		double *mass, double* inertia,
 		double *force, double *moment,
+		double *tmax, double* rres,
 		unsigned int *sorted_id,
 		unsigned int *cell_start,
 		unsigned int *cell_end,
-		unsigned int np);
-
-	virtual void alloc_memories(unsigned int np);
+		unsigned int np)=0;
+	virtual void define(unsigned int idx, unsigned int np);
+	virtual void update();
+	//virtual void save_result(unsigned int pt, unsigned int np);
+	//virtual void save_contact_result()
 	static unsigned int count;
 
 protected:
@@ -118,9 +123,8 @@ protected:
 	double stiffnessRatio;
 	double s_friction;
 	double friction;
-	double rolling_factor;
+	double rolling_factor;	
 	double stiff_multiplyer;
 };
-
 
 #endif

@@ -6,10 +6,9 @@
 #include "xdynamics_object/xParticleParticleContact.h"
 #include "xdynamics_object/xParticlePlaneContact.h"
 #include "xdynamics_object/xParticleCubeContact.h"
-#include "xdynamics_object/xParticleMeshObjectsContact.h"
-#include "xdynamics_object/xParticlePlanesContact.h"
-//#include "xdynamics_object/xParticleCylinderContact.h"
-#include "xdynamics_object/xParticleCylindersContact.h"
+#include "xdynamics_object/xParticleMeshObjectContact.h"
+#include "xdynamics_object/xParticleCylinderContact.h"
+//#include "xdynamics_object/xParticleCylindersContact.h"
 
 //#include <QtCore/qlist.h>
 
@@ -25,24 +24,26 @@ public:
 
 // 	void Save(QTextStream& qts);
 // 	void Open(QTextStream& qts, particleManager* pm, geometryObjects* objs);
-	xContact* CreateContactPair(
+	void CreateContactPair(
 		std::string n, xContactForceModelType method, xObject* fo, xObject* so, xContactParameterData& d);
 
 	unsigned int setupParticlesMeshObjectsContact();
 	void setupParticlesPlanesContact();
 	void setupParticlesCylindersContact();
 	void setNumClusterObject(unsigned int nc);
+	void defineContacts(unsigned int np);
 	//double* SphereData();
 	//double* HostSphereData();
 	//float* SphereData_f();
+	xmap<int, xParticleMeshObjectContact*>& PMContacts();
 	void insertContact(xContact* c);
 	xContact* Contact(std::string n);// { return cots[n]; }
 	//QMap<QString, QString>& Logs() { return logs; }
 	xmap<xstring, xContact*>& Contacts();// { return cots; }
 	xParticleParticleContact* ContactParticles();// { return cpp; }
-	xParticleMeshObjectsContact* ContactParticlesMeshObjects();// { return cpmeshes; }
-	xParticlePlanesContact* ContactParticlesPlanes();
-	xParticleCylindersContact* ContactParticlesCylinders();
+	//xParticleMeshObjectsContact* ContactParticlesMeshObjects();// { return cpmeshes; }
+	//xParticlePlanesContact* ContactParticlesPlanes();
+	//xParticleCylindersContact* ContactParticlesCylinders();
 
 	bool runCollision(
 		double *pos, double* cpos, double* ep, double *vel,
@@ -102,48 +103,51 @@ private:
 	unsigned int ncobject;
 	//int *d_type_count;
 	//unsigned int *d_old_pair_count;
-	unsigned int *d_pair_count_pp;
-	//unsigned int *d_pair_count_ppl;
-	//unsigned int *d_pair_count_ptri;
-	unsigned int *d_pair_count_pcyl;
-	unsigned int *d_pair_id_pp;
-	//unsigned int *d_pair_id_ppl;
-	//unsigned int *d_pair_id_ptri;
-	unsigned int *d_pair_id_pcyl;
+	//unsigned int *d_pair_count_pp;
+	////unsigned int *d_pair_count_ppl;
+	////unsigned int *d_pair_count_ptri;
+	////unsigned int *d_pair_count_pcyl;
+	//unsigned int *d_pair_id_pp;
+	////unsigned int *d_pair_id_ppl;
+	////unsigned int *d_pair_id_ptri;
+	////unsigned int *d_pair_id_pcyl;
 
-	double *d_tsd_pp;
-	//double *d_tsd_ppl;
-	//double *d_tsd_ptri;
-	double *d_tsd_pcyl;
+	//double *d_tsd_pp;
+	////double *d_tsd_ppl;
+	////double *d_tsd_ptri;
+	////double *d_tsd_pcyl;
 
-	unsigned int* pair_count_pp;
-	//unsigned int* pair_count_ppl;
-	//unsigned int* pair_count_ptri;
-	unsigned int* pair_count_pcyl;
-	unsigned int* pair_id_pp;
-	//unsigned int* pair_id_ppl;
-	//unsigned int* pair_id_ptri;
-	unsigned int* pair_id_pcyl;
+	//unsigned int* pair_count_pp;
+	////unsigned int* pair_count_ppl;
+	////unsigned int* pair_count_ptri;
+	////unsigned int* pair_count_pcyl;
+	//unsigned int* pair_id_pp;
+	////unsigned int* pair_id_ppl;
+	////unsigned int* pair_id_ptri;
+	////unsigned int* pair_id_pcyl;
 
-	double* tsd_pp;
+	//double* tsd_pp;
 	//double* tsd_ppl;
 	//double* tsd_ptri;
-	double* tsd_pcyl;
+	//double* tsd_pcyl;
 
 	double* d_Tmax;
 	double* d_RRes;
 	vector3d* Tmax;
 	double* RRes;
+	unsigned int n_total_mesh_sphere;
 	xmap<xstring, xContact*> cots;
-	xmap<int, xContact*> cpplanes;
-	xmap<int, xContact*> cpmeshes;
+	xParticleParticleContact* cpp;
+	xmap<int, xParticlePlaneContact*> cpplanes;
+	xmap<int, xParticleMeshObjectContact*> cpmeshes;
+	xmap<int, xParticleCylinderContact*> cpcylinders;
 	//QMap<QString, xParticleCylinderContact*> cpcylinder;
 	xContactPairList* xcpl;
 	//QMap<QString, contact_particles_polygonObject*> cppos;
-	xParticlePlanesContact* cpplane;
-	xParticleParticleContact* cpp;
+	//xParticlePlanesContact* cpplane;
+	
 	//xParticleMeshObjectsContact* cpmeshes;
-	xParticleCylindersContact* cpcylinders;
+	//xParticleCylindersContact* cpcylinders;
 };
 
 #endif

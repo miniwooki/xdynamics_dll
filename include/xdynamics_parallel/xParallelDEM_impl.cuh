@@ -808,56 +808,56 @@ __global__ void calculate_p2p_kernel(
 }
 
 __device__ double particle_plane_contact_detection(
-	device_plane_info& pe, double3& xp, double3& wp, double3& u, double r)
+	device_plane_info* pe, double3& xp, double3& wp, double3& u, double r)
 {
-	double a_l1 = pow(wp.x - pe.l1, 2.0);
-	double b_l2 = pow(wp.y - pe.l2, 2.0);
+	double a_l1 = pow(wp.x - pe->l1, 2.0);
+	double b_l2 = pow(wp.y - pe->l2, 2.0);
 	double sqa = wp.x * wp.x;
 	double sqb = wp.y * wp.y;
 	double sqc = wp.z * wp.z;
 	double sqr = r * r;
 
 	//double h = 0;
-	//if (abs(wp.z) < 1.5 * r && (wp.x > 0 && wp.x < pe.l1) && (wp.y > 0 && wp.y < pe.l2)) {
+	//if (abs(wp.z) < 1.5 * r && (wp.x > 0 && wp.x < pe->l1) && (wp.y > 0 && wp.y < pe->l2)) {
 		
 ///	}
 
 	if (wp.x < 0 && wp.y < 0 && (sqa + sqb + sqc) < sqr) {
-		double3 Xsw = xp - pe.xw;
+		double3 Xsw = xp - pe->xw;
 		double h = length(Xsw);// .length();
 		u = Xsw / h;
 		return r - h;
 	}
-	else if (wp.x > pe.l1 && wp.y < 0 && (a_l1 + sqb + sqc) < sqr) {
-		double3 Xsw = xp - pe.w2;
+	else if (wp.x > pe->l1 && wp.y < 0 && (a_l1 + sqb + sqc) < sqr) {
+		double3 Xsw = xp - pe->w2;
 		double h = length(Xsw);// .length();
 		u = Xsw / h;
 		return r - h;
 	}
-	else if (wp.x > pe.l1 && wp.y > pe.l2 && (a_l1 + b_l2 + sqc) < sqr) {
-		double3 Xsw = xp - pe.w3;
+	else if (wp.x > pe->l1 && wp.y > pe->l2 && (a_l1 + b_l2 + sqc) < sqr) {
+		double3 Xsw = xp - pe->w3;
 		double h = length(Xsw);// .length();
 		u = Xsw / h;
 		return r - h;
 	}
-	else if (wp.x < 0 && wp.y > pe.l2 && (sqa + b_l2 + sqc) < sqr) {
-		double3 Xsw = xp - pe.w4;
+	else if (wp.x < 0 && wp.y > pe->l2 && (sqa + b_l2 + sqc) < sqr) {
+		double3 Xsw = xp - pe->w4;
 		double h = length(Xsw);// .length();
 		u = Xsw / h;
 		return r - h;
 	}
-	if ((wp.x > 0 && wp.x < pe.l1) && wp.y < 0 && (sqb + sqc) < sqr) {
-		double3 Xsw = xp - pe.xw;
-		double3 wj_wi = pe.w2 - pe.xw;
+	if ((wp.x > 0 && wp.x < pe->l1) && wp.y < 0 && (sqb + sqc) < sqr) {
+		double3 Xsw = xp - pe->xw;
+		double3 wj_wi = pe->w2 - pe->xw;
 		double3 us = wj_wi / length(wj_wi);// .length();
 		double3 h_star = Xsw - (dot(Xsw, us)) * us;
 		double h = length(h_star);// .length();
 		u = -h_star / h;
 		return r - h;
 	}
-	else if ((wp.x > 0 && wp.x < pe.l1) && wp.y > pe.l2 && (b_l2 + sqc) < sqr) {
-		double3 Xsw = xp - pe.w4;
-		double3 wj_wi = pe.w3 - pe.w4;
+	else if ((wp.x > 0 && wp.x < pe->l1) && wp.y > pe->l2 && (b_l2 + sqc) < sqr) {
+		double3 Xsw = xp - pe->w4;
+		double3 wj_wi = pe->w3 - pe->w4;
 		double3 us = wj_wi / length(wj_wi);// .length();
 		double3 h_star = Xsw - (dot(Xsw, us)) * us;
 		double h = length(h_star);// .length();
@@ -865,29 +865,29 @@ __device__ double particle_plane_contact_detection(
 		return r - h;
 
 	}
-	else if ((wp.x > 0 && wp.y < pe.l2) && wp.x < 0 && (sqr + sqc) < sqr) {
-		double3 Xsw = xp - pe.xw;
-		double3 wj_wi = pe.w4 - pe.xw;
+	else if ((wp.x > 0 && wp.y < pe->l2) && wp.x < 0 && (sqr + sqc) < sqr) {
+		double3 Xsw = xp - pe->xw;
+		double3 wj_wi = pe->w4 - pe->xw;
 		double3 us = wj_wi / length(wj_wi);// .length();
 		double3 h_star = Xsw - (dot(Xsw, us)) * us;
 		double h = length(h_star);// .length();
 		u = -h_star / h;
 		return r - h;
 	}
-	else if ((wp.x > 0 && wp.y < pe.l2) && wp.x > pe.l1 && (a_l1 + sqc) < sqr) {
-		double3 Xsw = xp - pe.w2;
-		double3 wj_wi = pe.w3 - pe.w2;
+	else if ((wp.x > 0 && wp.y < pe->l2) && wp.x > pe->l1 && (a_l1 + sqc) < sqr) {
+		double3 Xsw = xp - pe->w2;
+		double3 wj_wi = pe->w3 - pe->w2;
 		double3 us = wj_wi / length(wj_wi);// .length();
 		double3 h_star = Xsw - (dot(Xsw, us)) * us;
 		double h = length(h_star);// .length();
 		u = -h_star / h;
 		return r - h;
 	}
-	else if ((wp.x > 0 && wp.x < pe.l1) && (wp.y > 0 && wp.y < pe.l2))
+	else if ((wp.x > 0 && wp.x < pe->l1) && (wp.y > 0 && wp.y < pe->l2))
 	{
-		double3 dp = xp - pe.xw;
-		double3 uu = pe.uw / length(pe.uw);
-		int pp = -sign(dot(dp, pe.uw));// dp.dot(pe.UW()));
+		double3 dp = xp - pe->xw;
+		double3 uu = pe->uw / length(pe->uw);
+		int pp = -sign(dot(dp, pe->uw));// dp.dot(pe->UW()));
 		u = -uu;
 		double collid_dist = r - abs(dot(dp, u));// dp.dot(u));
 		return collid_dist;
@@ -954,16 +954,16 @@ __global__ void cluster_plane_contact_kernel(
 	double3 tma = make_double3(0.0, 0.0, 0.0);
 	//for (unsigned int k = 0; k < cte.nplane; k++)
 	//{
-		device_plane_info pl = plane[k];
-		device_body_info bi = dbi[pl.mid];
-		double3 dp = make_double3(ipos.x, ipos.y, ipos.z) - pl.xw;
+		//device_plane_info pl = plane[k];
+		//device_body_info bi = dbi[pl.mid];
+		double3 dp = make_double3(ipos.x, ipos.y, ipos.z) - plane->xw;
 		double3 unit = make_double3(0, 0, 0);
-		double3 wp = make_double3(dot(dp, pl.u1), dot(dp, pl.u2), dot(dp, pl.uw));
+		double3 wp = make_double3(dot(dp, plane->u1), dot(dp, plane->u2), dot(dp, plane->uw));
 		double3 m_force = make_double3(0, 0, 0);
 		double3 cpt = ipos3 + r * unit;
-		double3 dcpr_j = cpt - bi.pos;
+		double3 dcpr_j = cpt - dbi->pos;
 		double coh_s = 0;
-		double cdist = particle_plane_contact_detection(pl, ipos3, wp, unit, r);
+		double cdist = particle_plane_contact_detection(plane, ipos3, wp, unit, r);
 		double2 sd = make_double2(0.0, 0.0);
 		if (cp->coh)
 			coh_s = limit_cohesion_depth(r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh);
@@ -975,10 +975,10 @@ __global__ void cluster_plane_contact_kernel(
 			double3 cpt = ipos3 + r * unit;
 			double3 dcpr = cpt - make_double3(icpos.x, icpos.y, icpos.z);
 			//double3 rc = r * unit;
-			double3 oj = toAngularVelocity(bi.ep, bi.ed);
-			double3 dv = bi.vel + cross(oj, dcpr_j) - (ivel + cross(iomega, dcpr));
+			double3 oj = toAngularVelocity(dbi->ep, dbi->ed);
+			double3 dv = dbi->vel + cross(oj, dcpr_j) - (ivel + cross(iomega, dcpr));
 			device_force_constant c = getConstant(
-				r, 0.0, m, bi.mass, cp->Ei, cp->Ej,
+				r, 0.0, m, dbi->mass, cp->Ei, cp->Ej,
 				cp->pri, cp->prj, cp->Gi, cp->Gj,
 				cp->rest, cp->s_fric, cp->fric, cp->rfric, cp->sratio);
 			switch (cte.contact_model)
@@ -1041,7 +1041,7 @@ __global__ void cluster_plane_contact_kernel(
 }
 
 __global__ void plane_contact_force_kernel(
-	device_plane_info *plane, unsigned int k, device_body_info* dbi, device_contact_property *cp,
+	device_plane_info *plane, device_body_info* dbi, device_contact_property *cp,
 	double* fx, double* fy, double* fz, double* mx, double* my, double* mz,
 	double4* pos, double4 *ep, double3* vel, double4* ev,
 	double3* force, double3* moment, double* mass,
@@ -1069,6 +1069,7 @@ __global__ void plane_contact_force_kernel(
 	double4 ipos = pos[id];
 	double3 ipos3 = make_double3(ipos.x, ipos.y, ipos.z);
 	double r = ipos.w;
+	unsigned int k = plane->id;
 	double3 ivel = vel[id];
 	double3 iomega = toAngularVelocity(ep[id], ev[id]);
 
@@ -1085,28 +1086,28 @@ __global__ void plane_contact_force_kernel(
 	//for (unsigned int k = 0; k < cte.nplane; k++)
 	//{
 		double coh_s = 0;
-		device_plane_info pl = plane[k];
-		device_body_info bi = dbi[pl.mid];
+		//device_plane_info pl = plane[k];
+		//device_body_info bi = dbi[pl.mid];
 		//
-		double3 dp = make_double3(ipos.x, ipos.y, ipos.z) - pl.xw;
+		double3 dp = make_double3(ipos.x, ipos.y, ipos.z) - plane->xw;
 		double3 unit = make_double3(0, 0, 0);
-		double3 wp = make_double3(dot(dp, pl.u1), dot(dp, pl.u2), dot(dp, pl.uw));
-		double cdist = particle_plane_contact_detection(pl, ipos3, wp, unit, r);
+		double3 wp = make_double3(dot(dp, plane->u1), dot(dp, plane->u2), dot(dp, plane->uw));
+		double cdist = particle_plane_contact_detection(plane, ipos3, wp, unit, r);
 		if (cp->coh)
 			coh_s = limit_cohesion_depth(r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh);
 		
 		double2 sd = make_double2(0.0, 0.0);
 		double3 m_force = make_double3(0, 0, 0);
 		double3 cpt = ipos3 + r * unit;
-		double3 dcpr_j = cpt - bi.pos;
+		double3 dcpr_j = cpt - dbi->pos;
 		if (cdist > 0) {
 			//printf("[%d][%d] body pos : [%e, %e, %e]\n", k, pl.mid, bi.pos.x, bi.pos.y, bi.pos.z);
 			
 			for (unsigned int i = 0; i < 3; i++)
 				if (p_pair_id[i] == k){ sd = p_tsd[i]; break; }
-			double3 dcpr = cpt - ipos3;			
-			double3 oj = toAngularVelocity(bi.ep, bi.ed);
-			double3 dv = bi.vel + cross(oj, dcpr_j) - (ivel + cross(iomega, dcpr));
+			double3 dcpr = cpt - ipos3;	
+			double3 oj = toAngularVelocity(dbi->ep, dbi->ed);
+			double3 dv = dbi->vel + cross(oj, dcpr_j) - (ivel + cross(iomega, dcpr));
 			//printf("body_vel : [%f, %f, %f]\n", bi.vel.x, bi.vel.y, bi.vel.z);
 			device_force_constant c = getConstant(r, 0.0, m, 0.0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->Gi, cp->Gj, cp->rest, cp->fric, cp->s_fric, cp->rfric, cp->sratio);
 			switch (cte.contact_model)
@@ -1201,8 +1202,8 @@ __device__ double3 toGlobal(double3& A_1, double3& A_2, double3& A_3, double3& v
 }
 
 __device__ void particle_cylinder_contact_force(
-	device_cylinder_info& dci,
-	device_contact_property& cp,
+	device_cylinder_info* dci,
+	device_contact_property* cp,
 	device_body_info* dpmi,
 	double* fx,
 	double* fy,
@@ -1233,26 +1234,26 @@ __device__ void particle_cylinder_contact_force(
 	unsigned int& new_count)
 {
 	double2 sd = make_double2(0.0, 0.0);
-	device_body_info dbi = dpmi[dci.mid];
-	double3 po2cp = cpt - dbi.pos;
+	//device_body_info dbi = dpmi[dci->mid];
+	double3 po2cp = cpt - dpmi->pos;
 
 	double3 Fn = make_double3(0.0, 0.0, 0.0);
 	double3 Ft = make_double3(0, 0, 0);
-	double3 omega = toAngularVelocity(dbi.ep, dbi.ed);
+	double3 omega = toAngularVelocity(dpmi->ep, dpmi->ed);
 	for (unsigned int i = 0; i < MAX_P2CY_COUNT; i++)
 		if (p_pair_id[i] == pid) { sd = p_tsd[i]; break; }
 	double3 rc = cpt - ipos;// r * unit;
-	double3 dv = dbi.vel + cross(omega, po2cp) - (ivel + cross(iomega, rc));
+	double3 dv = dpmi->vel + cross(omega, po2cp) - (ivel + cross(iomega, rc));
 
-	device_force_constant c = getConstant(r, 0, m, 0, cp.Ei, cp.Ej, cp.pri, cp.prj, cp.Gi, cp.Gj, cp.rest, cp.fric, cp.s_fric, cp.rfric, cp.sratio);
+	device_force_constant c = getConstant(r, 0, m, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->Gi, cp->Gj, cp->rest, cp->fric, cp->s_fric, cp->rfric, cp->sratio);
 	//printf("%f, %f, %f, %f\n", c.kn, c.ks, c.vn, c.vs);
 	switch (cte.contact_model)
 	{
-	case 0:	DHSModel(c, r, 0, cp.Ei, cp.Ej, cp.pri, cp.prj, cp.coh, cdist, iomega, sd.x, sd.y, dv, unit, Ft, Fn); break;
-	case 1: HMCModel(c, r, 0, cp.Ei, cp.Ej, cp.pri, cp.prj, cp.coh, cdist, iomega, sd.x, sd.y, dv, unit, Ft, Fn); break;
+	case 0:	DHSModel(c, r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, cdist, iomega, sd.x, sd.y, dv, unit, Ft, Fn); break;
+	case 1: HMCModel(c, r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, cdist, iomega, sd.x, sd.y, dv, unit, Ft, Fn); break;
 	}
 
-	calculate_previous_rolling_resistance(cp.rfric, r, 0, rc, Fn, Ft, res, tma);
+	calculate_previous_rolling_resistance(cp->rfric, r, 0, rc, Fn, Ft, res, tma);
 	//printf("Fn = [%e, %e, %e]\n", Fn.x, Fn.z, Fn.y);
 	//printf("Ft = [%e, %e, %e]\n", Ft.x, Ft.z, Ft.y);
 	double3 m_force = Fn + Ft;
@@ -1279,8 +1280,8 @@ __device__ void particle_cylinder_contact_force(
 }
 
 __device__ double particle_cylinder_contact_detection(
-	device_cylinder_info& cy, 
-	device_body_info& bi,
+	device_cylinder_info* cy, 
+	device_body_info* bi,
 	double3& p, 
 	double3& u,  
 	double r,
@@ -1288,12 +1289,12 @@ __device__ double particle_cylinder_contact_detection(
 {
 	double dist = -1.0;
 	double3 cp = make_double3(0.0, 0.0, 0.0);
-	double3 cyl_pos = bi.pos;// c_ptr->Position();
+	double3 cyl_pos = bi->pos;// c_ptr->Position();
 	//printf("cylinder_position : [%f, %f, %f]\n", cyl_pos.x, cyl_pos.y, cyl_pos.z);
-	double4 cyl_ep = bi.ep;// c_ptr->EulerParameters();
+	double4 cyl_ep = bi->ep;// c_ptr->EulerParameters();
 	//printf("cylinder_ep : [%f, %f, %f, %f]\n", cyl_ep.x, cyl_ep.y, cyl_ep.z, cyl_ep.w);
-	double3 cyl_base = cyl_pos + toGlobal(cy.pbase, cyl_ep);
-	double3 cyl_top = cyl_pos + toGlobal(cy.ptop, cyl_ep);// cinfo.ptop);
+	double3 cyl_base = cyl_pos + toGlobal(cy->pbase, cyl_ep);
+	double3 cyl_top = cyl_pos + toGlobal(cy->ptop, cyl_ep);// cinfo.ptop);
 	double3 ab = cyl_top - cyl_base;// make_double3(cy->ptop.x - cy->pbase.x, cy->ptop.y - cy->pbase.y, cy->ptop.z - cy->pbase.z);
 	//double3 p = make_double3(pt.x, pt.y, pt.z);
 	double t = dot(p - cyl_base, ab) / dot(ab, ab);
@@ -1309,27 +1310,27 @@ __device__ double particle_cylinder_contact_detection(
 		double gab = 0;
 		u = (_cp - p) / dist;
 	//	cp = _cp - cy.len_rr.z * u;
-		if (dist < cy.len_rr.z)
+		if (dist < cy->len_rr.z)
 		{
 			isInnerContact = true;
 			u = -u;
-			gab = dist + r - cy.len_rr.y;
+			gab = dist + r - cy->len_rr.y;
 		}
 		else
-			gab = cy.len_rr.y + r - dist;
+			gab = cy->len_rr.y + r - dist;
 		return gab;
 	}
 	else {
 		_cp = cyl_base + t * ab;
 		dist = length(p - _cp);
-		double thick = cy.thickness;
+		double thick = cy->thickness;
 		int one = thick ? 1 : 0;
-		if (dist < cy.len_rr.z + thick && dist > one * cy.len_rr.z) {
-			double3 OtoCp = bi.pos - _cp;
+		if (dist < cy->len_rr.z + thick && dist > one * cy->len_rr.z) {
+			double3 OtoCp = bi->pos - _cp;
 			double OtoCp_ = length(OtoCp);
 			u = OtoCp / OtoCp_;
 		//	cp = _cp - cy.len_rr.z * u;
-			return cy.len_rr.x * 0.5 + r - OtoCp_;
+			return cy->len_rr.x * 0.5 + r - OtoCp_;
 		}
 	/*	double3 A_1 = makeTFM_1(cy->ep);
 		double3 A_2 = makeTFM_2(cy->ep);
@@ -1338,22 +1339,22 @@ __device__ double particle_cylinder_contact_detection(
 		double3 at = toLocal(_at, cyl_ep);
 		//double r = length(at);
 		cp = cyl_top;
-		if (abs(at.y) > cy.len_rr.x) {
+		if (abs(at.y) > cy->len_rr.x) {
 			_at = p - cyl_base;
 			at = toLocal(_at, cyl_ep);
 			cp = cyl_base;
 		}
 		double pi = atan(at.x / at.z);
 		if (pi < 0 && at.z < 0) {
-			_cp.x = cy.len_rr.z * sin(-pi);
+			_cp.x = cy->len_rr.z * sin(-pi);
 		}
 		else if (pi > 0 && at.x < 0 && at.z < 0) {
-			_cp.x = cy.len_rr.z * sin(-pi);
+			_cp.x = cy->len_rr.z * sin(-pi);
 		}
 		else {
-			_cp.x = cy.len_rr.z * sin(pi);
+			_cp.x = cy->len_rr.z * sin(pi);
 		}
-		_cp.z = cy.len_rr.z * cos(pi);
+		_cp.z = cy->len_rr.z * cos(pi);
 		if (at.z < 0 && _cp.z > 0) {
 			_cp.z = -_cp.z;
 		}
@@ -1374,16 +1375,16 @@ __device__ double particle_cylinder_contact_detection(
 }
 
 __device__ double particle_cylinder_inner_base_or_top_contact_detection(
-	device_cylinder_info& cy, 
-	device_body_info& bi,
+	device_cylinder_info* cy, 
+	device_body_info* bi,
 	double3& p, double3 & u, double3 & cp, unsigned int empty, double r)
 {
 	//isInnerContact = false;
 	double dist = -1.0;
-	double3 cyl_pos = bi.pos;// c_ptr;// ->Position();
-	double4 cyl_ep = bi.ep;// .c_ptr->EulerParameters();
-	double3 cyl_base = cyl_pos + toGlobal(cy.pbase, cyl_ep);
-	double3 cyl_top = cyl_pos + toGlobal(cy.ptop, cyl_ep);
+	double3 cyl_pos = bi->pos;// c_ptr;// ->Position();
+	double4 cyl_ep = bi->ep;// .c_ptr->EulerParameters();
+	double3 cyl_base = cyl_pos + toGlobal(cy->pbase, cyl_ep);
+	double3 cyl_top = cyl_pos + toGlobal(cy->ptop, cyl_ep);
 	double3 ab = cyl_top - cyl_base;
 	//double3 p = new_vector3d(pt.x, pt.y, pt.z);
 	double t = dot(p - cyl_base, ab) / dot(ab, ab);
@@ -1396,12 +1397,12 @@ __device__ double particle_cylinder_inner_base_or_top_contact_detection(
 	if (empty == 2 && t < 0.4)
 		return 0.0;
 	//printf("empty : %d\n", empty);
-	if (dist < cy.len_rr.z) {
+	if (dist < cy->len_rr.z) {
 		double3 OtoCp = cyl_pos - _cp;
 		double OtoCp_ = length(OtoCp);
 		u = -OtoCp / OtoCp_;
 		cp = p + r * u;// _cp - hci.len_rr.z * u;
-		gab = r + OtoCp_ - cy.len_rr.x * 0.5;// +r - OtoCp_;
+		gab = r + OtoCp_ - cy->len_rr.x * 0.5;// +r - OtoCp_;
 	}
 
 	return gab;
@@ -1472,22 +1473,22 @@ __global__ void cluster_cylinder_contact_force_kernel(
 
 	bool isInnerContact = false;
 	double coh_s = 0;
-	device_cylinder_info dci = cy[k];
+	//device_cylinder_info dci = cy[k];
 	//if (dci.ismoving)
-	dbi = bi[k];
-	device_contact_property dcp = cp[k];
+	//dbi = bi[k];
+	//device_contact_property dcp = cp[k];
 	double3 unit = make_double3(0, 0, 0);
-	cdist = particle_cylinder_contact_detection(dci, dbi, ipos3, unit, r, isInnerContact);
+	cdist = particle_cylinder_contact_detection(cy, bi, ipos3, unit, r, isInnerContact);
 	//double cdist = particle_plane_contact_detection(pl, ipos3, wp, unit, r);
-	if (dcp.coh)
-		coh_s = limit_cohesion_depth(r, 0, dcp.Ei, dcp.Ej, dcp.pri, dcp.prj, dcp.coh);
+	if (cp->coh)
+		coh_s = limit_cohesion_depth(r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh);
 	double2 sd = make_double2(0.0, 0.0);
 	cpt = ipos3 + r * unit;
 	double3 icpos3 = make_double3(icpos.x, icpos.y, icpos.z);
 	if (cdist > 0)
 	{
 		particle_cylinder_contact_force(
-			dci, dcp, bi, fx, fy, fz, mx, my, mz, 
+			cy, cp, bi, fx, fy, fz, mx, my, mz, 
 			icpos3, ivel, iomega, cpt, unit, cdist, id, k,
 			old_count, p_pair_id, p_tsd, pair_id, tsd, r, m,
 			sumF, sumM, res, tma, coh_s, new_count);
@@ -1495,8 +1496,8 @@ __global__ void cluster_cylinder_contact_force_kernel(
 	else if (cdist <= 0 && abs(cdist) < abs(coh_s))
 	{
 		//printf("plane seperation cohesion contact. - %f", cdist);
-		double f = JKR_seperation_force(r, 0, dcp.coh);
-		double cf = cohesionForce(r, 0, dcp.Ei, dcp.Ej, dcp.pri, dcp.prj, dcp.coh, f);
+		double f = JKR_seperation_force(r, 0, cp->coh);
+		double cf = cohesionForce(r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, f);
 		//printf("f : %f, cf : %f\n", f, cf);
 		double3 m_force = -cf * unit;
 		sumF = sumF + m_force;
@@ -1513,12 +1514,13 @@ __global__ void cluster_cylinder_contact_force_kernel(
 	}
 	if (isInnerContact)
 	{
-		cdist = particle_cylinder_inner_base_or_top_contact_detection(dci, dbi, ipos3, unit, cpt, dci.empty_part, r);
+		cdist = particle_cylinder_inner_base_or_top_contact_detection(
+			cy, bi, ipos3, unit, cpt, cy->empty_part, r);
 		if (cdist > 0)
 		{
 
 			particle_cylinder_contact_force(
-				dci, dcp, bi, fx, fy, fz, mx, my, mz, 
+				cy, cp, bi, fx, fy, fz, mx, my, mz, 
 				icpos3, ivel, iomega, cpt, unit, cdist, id, k + 1000,
 				old_count, p_pair_id, p_tsd, pair_id, tsd, r, m,
 				sumF, sumM, res, tma, coh_s, new_count);
@@ -1526,15 +1528,15 @@ __global__ void cluster_cylinder_contact_force_kernel(
 		}
 		else if (cdist <= 0 && abs(cdist) < abs(coh_s))
 		{
-			double f = JKR_seperation_force(r, 0, dcp.coh);
-			double cf = cohesionForce(r, 0, dcp.Ei, dcp.Ej, dcp.pri, dcp.prj, dcp.coh, f);
+			double f = JKR_seperation_force(r, 0, cp->coh);
+			double cf = cohesionForce(r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, f);
 			double3 m_force = -cf * unit;
 			sumF = sumF + m_force;
 			fx[id] += -m_force.x;
 			fy[id] += -m_force.y;
 			fz[id] += -m_force.z;
 			//dbm[id] += -cross(cpt - dbi.pos, m_force);
-			double3 m_moment = -cross(cpt - dbi.pos, m_force);
+			double3 m_moment = -cross(cpt - bi->pos, m_force);
 			mx[id] += m_moment.x;// -cross(cpt - dbi.pos, m_force);
 			my[id] += m_moment.y;
 			mz[id] += m_moment.z;
@@ -1552,7 +1554,7 @@ __global__ void cluster_cylinder_contact_force_kernel(
 }
 
 __global__ void cylinder_contact_force_kernel(
-	device_cylinder_info *cy, unsigned int k, device_body_info* bi,
+	device_cylinder_info *cy, device_body_info* bi,
 	double *fx, double* fy, double* fz, double* mx, double* my, double* mz,
 	double4* pos, double4 *ep, double3* vel, double4* ev,
 	double3* force, double3* moment, device_contact_property *cp,
@@ -1575,6 +1577,7 @@ __global__ void cylinder_contact_force_kernel(
 	fx[id] = fy[id] = fz[id] = 0.0;// make_double3(0, 0, 0);
 	mx[id] = my[id] = mz[id] = 0.0;// dbm[id] = make_double3(0, 0, 0);
 	unsigned int old_count = pair_count[id];
+	unsigned int k = cy->id;
 	double m = mass[id];
 	double4 ipos = pos[id];
 	double3 ipos3 = make_double3(ipos.x, ipos.y, ipos.z);
@@ -1592,28 +1595,28 @@ __global__ void cylinder_contact_force_kernel(
 
 	double res = 0.0;
 	double3 tma = make_double3(0.0, 0.0, 0.0);
-	device_body_info dbi = { 0, };
+	//device_body_info dbi = { 0, };
 	double cdist = 0;
 	double3 cpt = make_double3(0.0, 0.0, 0.0);
 
 	bool isInnerContact = false;
 	double coh_s = 0;
-	device_cylinder_info dci = cy[k];
+	//device_cylinder_info dci = cy[k];
 	//if (dci.ismoving)
-	dbi = bi[k];
-	device_contact_property dcp = cp[k];
+	//dbi = bi[k];
+	//device_contact_property dcp = cp[k];
 	double3 unit = make_double3(0, 0, 0);
-	cdist = particle_cylinder_contact_detection(dci, dbi, ipos3, unit, r, isInnerContact);
+	cdist = particle_cylinder_contact_detection(cy, bi, ipos3, unit, r, isInnerContact);
 	//double cdist = particle_plane_contact_detection(pl, ipos3, wp, unit, r);
-	if (dcp.coh)
-		coh_s = limit_cohesion_depth(r, 0, dcp.Ei, dcp.Ej, dcp.pri, dcp.prj, dcp.coh);
+	if (cp->coh)
+		coh_s = limit_cohesion_depth(r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh);
 	double2 sd = make_double2(0.0, 0.0);
 	cpt = ipos3 + r * unit;
 	if (cdist > 0)
 	{
 		//printf("cylinder contact distance : %f\n", cdist);
 		particle_cylinder_contact_force(
-			dci, dcp, bi, fx, fy, fz, mx, my, mz, 
+			cy, cp, bi, fx, fy, fz, mx, my, mz, 
 			ipos3, ivel, iomega, cpt, unit, cdist, id, k,
 			old_count, p_pair_id, p_tsd, pair_id, tsd, r, m,
 			sumF, sumM, res, tma, coh_s, new_count);
@@ -1622,8 +1625,8 @@ __global__ void cylinder_contact_force_kernel(
 	{
 		//printf("...............cohesion0");
 		//printf("plane seperation cohesion contact. - %f", cdist);
-		double f = JKR_seperation_force(r, 0, dcp.coh);
-		double cf = cohesionForce(r, 0, dcp.Ei, dcp.Ej, dcp.pri, dcp.prj, dcp.coh, f);
+		double f = JKR_seperation_force(r, 0, cp->coh);
+		double cf = cohesionForce(r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, f);
 		//printf("f : %f, cf : %f\n", f, cf);
 		double3 m_force = -cf * unit;
 		sumF = sumF + m_force;
@@ -1632,7 +1635,7 @@ __global__ void cylinder_contact_force_kernel(
 		fy[id] += -m_force.y;
 		fz[id] += -m_force.z;
 		//dbm[id] += -cross(cpt - dbi.pos, m_force);
-		double3 m_moment = -cross(cpt - dbi.pos, m_force);
+		double3 m_moment = -cross(cpt - bi->pos, m_force);
 		mx[id] += m_moment.x;
 		my[id] += m_moment.y;
 		mz[id] += m_moment.z;
@@ -1644,12 +1647,13 @@ __global__ void cylinder_contact_force_kernel(
 	}
 	if (isInnerContact)
 	{
-		cdist = particle_cylinder_inner_base_or_top_contact_detection(dci, dbi, ipos3, unit, cpt, dci.empty_part, r);
+		cdist = particle_cylinder_inner_base_or_top_contact_detection(
+			cy, bi, ipos3, unit, cpt, cy->empty_part, r);
 		if (cdist > 0)
 		{
 
 			particle_cylinder_contact_force(
-				dci, dcp, bi, fx, fy, fz, mx, my, mz, 
+				cy, cp, bi, fx, fy, fz, mx, my, mz, 
 				ipos3, ivel, iomega, cpt, unit, cdist, id, k + 1000,
 				old_count, p_pair_id, p_tsd, pair_id, tsd, r, m,
 				sumF, sumM, res, tma, coh_s, new_count);
@@ -1658,15 +1662,15 @@ __global__ void cylinder_contact_force_kernel(
 		else if (cdist <= 0 && abs(cdist) < abs(coh_s))
 		{
 			//printf("...............cohesion1");
-			double f = JKR_seperation_force(r, 0, dcp.coh);
-			double cf = cohesionForce(r, 0, dcp.Ei, dcp.Ej, dcp.pri, dcp.prj, dcp.coh, f);
+			double f = JKR_seperation_force(r, 0, cp->coh);
+			double cf = cohesionForce(r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, f);
 			double3 m_force = -cf * unit;
 			sumF = sumF + m_force;
 			fx[id] += -m_force.x;
 			fy[id] += -m_force.y;
 			fz[id] += -m_force.z;
 		/*	dbm[id] += -cross(cpt - dbi.pos, m_force);*/
-			double3 m_moment = -cross(cpt - dbi.pos, m_force);
+			double3 m_moment = -cross(cpt - bi->pos, m_force);
 			mx[id] += m_moment.x;
 			my[id] += m_moment.y;
 			mz[id] += m_moment.z;
@@ -1790,9 +1794,9 @@ __device__ double3 closestPtPointTriangle(
 		return cpt;
 }
 
-__device__ bool checkConcave(device_triangle_info* dpi, unsigned int* tid, unsigned int kid, double4* dsph, unsigned int cnt)
+__device__ bool checkConcave(device_triangle_info* dti, unsigned int* tid, unsigned int kid, double4* dsph, unsigned int cnt)
 {
-	double3 p1 = make_double3(0, 0, 0);
+	/*double3 p1 = make_double3(0, 0, 0);
 	double3 u1 = make_double3(0, 0, 0);
 	double3 p2 = make_double3(dsph[kid].x, dsph[kid].y, dsph[kid].z);
 	double3 u2 = dpi[kid].N;
@@ -1808,7 +1812,7 @@ __device__ bool checkConcave(device_triangle_info* dpi, unsigned int* tid, unsig
 			tid[cnt++] = id;
 			return true;
 		}
-	}
+	}*/
 	return false;
 }
 

@@ -1,6 +1,7 @@
 #include "xdynamics_algebra/xGridCell.h"
 #include "xdynamics_simulation/xSimulation.h"
 #include "xdynamics_parallel/xParallelDEM_decl.cuh"
+#include "thrust/sort.h"
 
 vector3d xGridCell::wo;				// world origin
 double xGridCell::cs = 0.0;			// cell size
@@ -58,6 +59,43 @@ void xGridCell::initialize(unsigned int np)
 		d_cell_start = cell_start;
 		d_cell_end = cell_end;
 	}
+}
+
+void xGridCell::reorderDataAndFindCellStart(
+	unsigned int id, unsigned int begin, unsigned int end)
+{
+	cell_start[id] = begin;
+	cell_end[id] = end;
+	unsigned dim = 0, bid = 0;
+	for (unsigned i(begin); i < end; i++) {
+		sorted_id[i] = body_id[i];
+	}
+}
+
+void xGridCell::rearrange_cell()
+{
+	if(xSimulation::Gpu())
+		cu_reorderDataAndFindCellStart(d_cell_id, d_body_id, d_cell_start, d_cell_end, d_sorted_id, nse,/* md->numPolygonSphere(),*/ ng);
+	else
+	{
+		thrust::sort_by_key(cell_id, cell_id + nse, body_id);
+		memset(cell_start, 0xffffffff, sizeof(unsigned int) * ng);
+		memset(cell_end, 0, sizeof(unsigned int)*ng);
+		unsigned int begin = 0, end = 0, id = 0;
+		bool ispass;
+		while (end++ != nse) {
+			ispass = true;
+			id = cell_id[begin];
+			if (id != cell_id[end]) {
+				end - begin > 1 ? ispass = false : reorderDataAndFindCellStart(id, begin++, end);
+			}
+			if (!ispass) {
+				reorderDataAndFindCellStart(id, begin, end);
+				begin = end;
+			}
+		}
+	}
+	
 }
 
 void xGridCell::allocMemory(unsigned int n)
