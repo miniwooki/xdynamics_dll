@@ -8,7 +8,7 @@ class XDYNAMICS_API xParticleParticleContact : public xContact
 {
 public:
 	xParticleParticleContact();
-	xParticleParticleContact(std::string _name);
+	xParticleParticleContact(std::string _name, xObject* o1, xObject* o2);
 	virtual ~xParticleParticleContact();
 
 	void cppCollision(
@@ -19,11 +19,12 @@ public:
 		vector3d& F, vector3d& M, xClusterInformation* xci, unsigned int nco);
 
 	void updateCollisionPair(
-		unsigned int id, bool isc, xContactPairList& xcpl,
+		unsigned int ip, unsigned int jp, bool isc,
 		double ri, double rj, vector3d& posi, vector3d& posj);
 
-	virtual void collision(
-		double *pos, double *ep, double *vel, double *ev,
+	virtual void collision_gpu(
+		double *pos, double* cpos, xClusterInformation* xci,
+		double *ep, double *vel, double *ev,
 		double *mass, double* inertia,
 		double *force, double *moment,
 		double *tmax, double* rres,
@@ -31,6 +32,13 @@ public:
 		unsigned int *cell_start,
 		unsigned int *cell_end,
 		unsigned int np);
+
+	virtual void collision_cpu(
+		vector4d * pos, euler_parameters * ep, vector3d * vel,
+		euler_parameters * ev, double* mass, double & rres, vector3d & tmax,
+		vector3d & force, vector3d & moment, unsigned int nco,
+		xClusterInformation * xci, vector4d * cpos);
+
 	//virtual void cudaMemoryAlloc(unsigned int np);
 	virtual void define(unsigned int idx, unsigned int np);
 	virtual void update();
@@ -46,6 +54,8 @@ private:
 	unsigned int* pair_count_pp;
 	unsigned int* pair_id_pp;
 	double* tsd_pp;
+
+	xmap<vector2ui, xPairData*> c_pairs;
 };
 
 #endif

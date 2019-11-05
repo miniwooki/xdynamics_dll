@@ -50,11 +50,12 @@ void xContactManager::CreateContactPair(
 		}		
 	}
 	xContactPairType pt = getContactPair(o1->Shape(), o2->Shape());
-
+	xContact *_c = nullptr;
 	switch (pt)
 	{
 		case PARTICLE_PARTICLE:	
-			cpp = new xParticleParticleContact(n); 
+			cpp = new xParticleParticleContact(n, o1, o2); 
+			cpp->setContactParameters(d);
 			cots.insert(n, cpp);
 			break;
 		case PARTICLE_CUBE:	
@@ -67,6 +68,7 @@ void xContactManager::CreateContactPair(
 				ss << n << i;
 				xPlaneObject* plane = cube->Planes() + i;
 				xParticlePlaneContact *c = new xParticlePlaneContact(ss.str(), particles, plane);
+				c->setContactParameters(d);
 				cpplanes.insert(cpplanes.size(), c);
 				cots.insert(ss.str(), c);
 			}
@@ -74,20 +76,21 @@ void xContactManager::CreateContactPair(
 		}			
 		case PARTICLE_PANE:	
 		{
-			xParticlePlaneContact *c = new xParticlePlaneContact(n, o1, o2);
+			xParticlePlaneContact *c = new xParticlePlaneContact(n, o1, o2); _c = c;
+			c->setContactParameters(d);
 			cpplanes.insert(cpplanes.size(), c);
 			cots.insert(n, c);
 			break;
 		}		
 		case PARTICLE_MESH_SHAPE: 
 		{
-			xParticleMeshObjectContact* c = new xParticleMeshObjectContact(n, o1, o2);
+			xParticleMeshObjectContact* c = new xParticleMeshObjectContact(n, o1, o2); _c = c;
+			c->setContactParameters(d);
 			cpmeshes.insert(cpmeshes.size(), c);
 			cots.insert(n, c);
 			break;// cpmesh.insert(c->Name(), dynamic_cast<xParticleMeshObjectContact*>(c)); break;
 		}		
 	}
-
 }
 
 void xContactManager::defineContacts(unsigned int np)
@@ -365,7 +368,8 @@ void xContactManager::updateCollisionPair(
 	xClusterInformation* xci,
 	unsigned int np)
 {
-	/*for (unsigned int i = 0; i < np; i++)
+
+	for (unsigned int i = 0; i < np; i++)
 	{
 		unsigned int count = 0;
 		unsigned int neach = 1;
@@ -376,10 +380,10 @@ void xContactManager::updateCollisionPair(
 					neach = xci[j].neach;
 		vector3d p = new_vector3d(pos[i].x, pos[i].y, pos[i].z);
 		double r = pos[i].w;
-		if (cpplane)
-			cpplane->updateCollisionPair(xcpl[i], r, p);
-		if (cpcylinders)
-			cpcylinders->updateCollisionPair(xcpl[i], r, p);
+		for (xmap<int, xParticlePlaneContact*>::iterator it = cpplanes.begin(); it != cpplanes.end(); it.next())
+			it.value()->updateCollisionPair(i, r, p);
+		for(xmap<int, xParticleCylinderContact*>::iterator it = cpcylinders.begin(); it != cpcylinders.end(); it.next())
+			it.value()->updateCollisionPair(i, r, p);
 		vector3i gp = xGridCell::getCellNumber(p.x, p.y, p.z);
 		unsigned int old_id = 0;
 		vector3d old_cpt = new_vector3d(FLT_MAX, FLT_MAX, FLT_MAX);
@@ -403,22 +407,25 @@ void xContactManager::updateCollisionPair(
 									vector3d jp = new_vector3d(pos[k].x, pos[k].y, pos[k].z);
 									double jr = pos[k].w;
 									unsigned int ck = k / neach;
-									cpp->updateCollisionPair(k, ncobject ? 1 : 0, xcpl[i], r, jr, p, jp);
+									cpp->updateCollisionPair(i, k, ncobject ? 1 : 0, r, jr, p, jp);
 								}
 							}
 							else if (k >= np)
 							{
-								if (cpmeshes->updateCollisionPair(k - np, xcpl[i], r, p, old_id, old_cpt, old_unit, ctype))
-									count++;
+								for (xmap<int, xParticleMeshObjectContact*>::iterator it = cpmeshes.begin(); it != cpmeshes.end(); it.next())
+								{
+									if(it.value()->check_this_mesh(k-np))
+										it.value()->updateCollisionPair(k - np, r, p, old_id, old_cpt, old_unit, ctype);
+								}								
 							}
 						}
 					}
-				}
+				}	
 			}
 		}
 		if (count > 1)
 			std::cout << "mesh contact overlab occured." << std::endl;
-	}*/
+	}
 }
 
 void xContactManager::deviceCollision(
@@ -431,17 +438,10 @@ void xContactManager::deviceCollision(
 	while (it.has_next())
 	{
 		xContact* cot = it.value();
-		cot->collision(
-			pos, ep, vel, ev, mass, inertia, force, moment, 
-			d_Tmax, d_RRes, sorted_id, cell_start, cell_end, np);
+		cot->collision_gpu(pos, cpos, xci, ep, vel, ev, mass, inertia, force, moment, d_Tmax, d_RRes, sorted_id, cell_start, cell_end, np);
 		it.next();
 	}
 	cu_decide_rolling_friction_moment(d_Tmax, d_RRes, inertia, ep, ev, moment, np);
-	/*for (xmap<int, xContact*>::iterator it = cpplanes.begin(); it != cpplanes.end(); it.next())
-	{
-		it.value()->collision(it.key(), pos, ep, vel, ev, mass, inertia, force, moment, sorted_id, cell_start, cell_end, np);
-	}*/
-
 
 	if (xci)
 	{
@@ -624,6 +624,7 @@ void xContactManager::hostCollision(
 	xClusterInformation* xci,
 	unsigned int np)
 {
+
 	updateCollisionPair(pos, sorted_id, cell_start, cell_end, xci, np);
 	for (unsigned int i = 0; i < np; i++)
 	{
@@ -644,16 +645,12 @@ void xContactManager::hostCollision(
 		vector3d M = new_vector3d(0.0, 0.0, 0.0);
 		double R = 0;
 		vector3d T = new_vector3d(0.0, 0.0, 0.0);
-		xContactPairList* pairs = &xcpl[i];
-		vector3d p = new_vector3d(pos[i].x, pos[i].y, pos[i].z);
-		vector3d v = vel[ci];
 		vector3d o = ToAngularVelocity(ep[ci], ev[ci]);
-
-		double m = mass[ci];
-		double j = inertia[ci];
-		double r = pos[i].w;
-		for (xmap<xstring, xContact*>::iterator it = cots.begin(); it != cots.end(); it.next());
+		//xContactPairList* pairs = &xcpl[i];
+		
+		for (xmap<xstring, xContact*>::iterator it = cots.begin(); it != cots.end(); it.next())
 		{
+			it.value()->collision_cpu(pos, ep, vel, ev, mass, R, T, F, M, ncobject, xci, cpos);
 			//it.value()->collision();
 		}
 		/*if (cpplane)
@@ -667,7 +664,7 @@ void xContactManager::hostCollision(
 
 		force[i] += F;
 		moment[i] += M;
-
+		double j = inertia[ci];
 		vector3d _Tmax = j * xSimulation::dt * o - T;
 		if (length(_Tmax) && R)
 		{

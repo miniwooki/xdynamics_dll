@@ -32,8 +32,9 @@ public:
 	//void define(unsigned int idx, unsigned int np);
 	void setPlane(xPlaneObject* _pe);
 	//irtual void updateCollisionPair(unsigned int id, xContactPairList& xcpl, double r, vector3d pos, double rj = 0, vector3d posj = new_vector3d(0.0, 0.0, 0.0));
-	virtual void collision(
-		double *pos, double *ep, double *vel, double *ev,
+	virtual void collision_gpu(
+		double *pos, double* cpos, xClusterInformation* xci,
+		double *ep, double *vel, double *ev,
 		double *mass, double* inertia,
 		double *force, double *moment,
 		double *tmax, double* rres,
@@ -41,6 +42,14 @@ public:
 		unsigned int *cell_start,
 		unsigned int *cell_end,
 		unsigned int np);
+
+	virtual void collision_cpu(
+		vector4d * pos, euler_parameters * ep, vector3d * vel,
+		euler_parameters * ev, double* mass, double & rres, vector3d & tmax,
+		vector3d & force, vector3d & moment, unsigned int nco,
+		xClusterInformation * xci, vector4d * cpos);
+
+	void updateCollisionPair(unsigned int pid, double r, vector3d pos);
 	
 	virtual void define(unsigned int idx, unsigned int np);
 	virtual void update();
@@ -71,12 +80,12 @@ private:
 
 	device_plane_info* dpi;
 	device_body_info* dbi;
-	device_body_force* dbf;
+	//device_body_force* dbf;
 
  	xParticleObject* p;
  	xPlaneObject *pe;
-	//device_plane_info *dpi;
-	//host_plane_info hpi;
+
+	xmap<unsigned int, xPairData*> c_pairs;
 };
 
 #endif

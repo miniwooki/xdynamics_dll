@@ -173,6 +173,9 @@ XDYNAMICS_API vector3i ToVector3I(vector3d& v3)
 
 int xSign(double v) { return v >= 0 ? 1 : -1; }
 
+bool operator== (const vector2ui &v1, const vector2ui &v2) { return (v1.x == v2.x) && (v1.y == v2.y); }
+bool operator> (const vector2ui &v1, const vector2ui &v2) { return (v1.x > v2.x) && (v1.y > v2.y); }
+
 // Define vector3 operators
 vector3i operator+ (const vector3i &v1, const vector3i &v2) { return vector3i{ v1.x + v2.x, v1.y + v2.y, v1.z + v2.z }; }
 vector3i operator- (const vector3i &v1, const vector3i &v2) { return vector3i{ v1.x - v2.x, v1.y - v2.y, v1.z - v2.z }; }

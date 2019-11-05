@@ -29,8 +29,9 @@ public:
 	virtual ~xParticleCylinderContact();
 	
 	xCylinderObject* CylinderObject();
-	virtual void collision(
-		double *pos, double *ep, double *vel, double *ev,
+	virtual void collision_gpu(
+		double *pos, double* cpos, xClusterInformation* xci,
+		double *ep, double *vel, double *ev,
 		double *mass, double* inertia,
 		double *force, double *moment,
 		double *tmax, double* rres,
@@ -38,6 +39,16 @@ public:
 		unsigned int *cell_start,
 		unsigned int *cell_end,
 		unsigned int np);
+
+	virtual void collision_cpu(
+		vector4d * pos, euler_parameters * ep, vector3d * vel,
+		euler_parameters * ev, double* mass, double & rres, vector3d & tmax,
+		vector3d & force, vector3d & moment, unsigned int nco,
+		xClusterInformation * xci, vector4d * cpos);
+
+	void updateCollisionPair(unsigned int id,double r, vector3d pos);
+	double particle_cylinder_inner_base_or_top_contact_detection(vector3d & pt, vector3d & u, vector3d & cp, double r);
+	double particle_cylinder_contact_detection(vector3d& pt, vector3d& u, vector3d& cp, double r, bool& isInnerContact);
 
 	virtual void define(unsigned int idx, unsigned int np);
 	virtual void update();
@@ -67,6 +78,8 @@ private:
 	xParticleObject* p_ptr;
 	xCylinderObject* c_ptr;
 	cc_contact_type cct;
+
+	xmap<unsigned int, xPairData*> c_pairs;
 };
 
 #endif

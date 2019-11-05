@@ -242,7 +242,7 @@ void cu_particle_polygonObject_collision(
 	double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd, double* dsph,
 	unsigned int* sorted_index, unsigned int* cstart, unsigned int* cend, device_contact_property *cp,
-	unsigned int np, unsigned int ntriangle)
+	unsigned int np)
 {
 	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
 	
@@ -259,7 +259,7 @@ void cu_particle_polygonObject_collision(
 		(double3 *)force, (double3 *)moment, mass,
 		(double3 *)tmax, rres,
 		pair_count, pair_id, (double2 *)tsd, (double4 *)dsph,
-		sorted_index, cstart, cend, cp, np, ntriangle);
+		sorted_index, cstart, cend, cp, np);
 }
 
 void cu_decide_rolling_friction_moment(
@@ -349,16 +349,16 @@ void cu_clusters_contact(
 }
 
 void cu_cluster_plane_contact(
-	device_plane_info* plan, device_body_info* dbi, device_body_force* dbfm,
+	device_plane_info* plan, device_body_info* dbi,
 	device_contact_property *cp,
 	double* pos, double* cpos, double* ep, double* vel, double* ev,
 	double* force, double* moment, double* mass,
 	double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd, 
-	xClusterInformation* xci, unsigned int np, unsigned int nplanes)
+	xClusterInformation* xci, unsigned int np)
 {
 	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
-	memset(dbfm, 0, sizeof(device_body_force) * nplanes);
+	//memset(dbfm, 0, sizeof(device_body_force) * nplanes);
 	double* fx = xContact::deviceBodyForceX();
 	double* fy = xContact::deviceBodyForceY();
 	double* fz = xContact::deviceBodyForceZ();
@@ -367,44 +367,42 @@ void cu_cluster_plane_contact(
 	double* my = xContact::deviceBodyMomentY();
 	double* mz = xContact::deviceBodyMomentZ();
 	//double3* h_dbf = new double3[np];
-	for (unsigned int i = 0; i < nplanes; i++)
-	{
-		cluster_plane_contact_kernel << < numBlocks, numThreads >> > (
-			plan, i, dbi, 
-			fx, fy, fz, mx, my, mz,
-			(double4 *)pos, 
-			(double4*)cpos, 
-			(double4 *)ep, 
-			(double3 *)vel, 
-			(double4 *)ev,
-			(double3 *)force, 
-			(double3 *)moment,
-			cp, mass,
-			(double3 *)tmax, rres,
-			pair_count, pair_id, 
-			(double2 *)tsd, xci, np);
+
+	cluster_plane_contact_kernel << < numBlocks, numThreads >> > (
+		plan, dbi,
+		fx, fy, fz, mx, my, mz,
+		(double4 *)pos,
+		(double4*)cpos,
+		(double4 *)ep,
+		(double3 *)vel,
+		(double4 *)ev,
+		(double3 *)force,
+		(double3 *)moment,
+		cp, mass,
+		(double3 *)tmax, rres,
+		pair_count, pair_id,
+		(double2 *)tsd, xci, np);
 		//cudaMemcpy(h_dbf, dbf, sizeof(double3) * np, cudaMemcpyDeviceToHost);
-		dbfm[i].force.x += reduction(fx, np);
-		dbfm[i].force.y += reduction(fy, np);
-		dbfm[i].force.z += reduction(fz, np);
-		dbfm[i].moment.x += reduction(mx, np);
-		dbfm[i].moment.y += reduction(my, np);
-		dbfm[i].moment.z += reduction(mz, np);
-	}
+		//dbfm[i].force.x += reduction(fx, np);
+		//dbfm[i].force.y += reduction(fy, np);
+		//dbfm[i].force.z += reduction(fz, np);
+		//dbfm[i].moment.x += reduction(mx, np);
+		//dbfm[i].moment.y += reduction(my, np);
+		//dbfm[i].moment.z += reduction(mz, np);
+	
 }
 
 void cu_cluster_cylinder_contact(
 	device_cylinder_info* cyl, device_body_info* bi,
-	device_body_force* dbfm, xClusterInformation* xci,
-	device_contact_property *cp,
+	xClusterInformation* xci, device_contact_property *cp,
 	double* pos, double* cpos, double* ep, double* vel, double* ev,
 	double* force, double* moment, double* mass,
 	double* tmax, double* rres,
 	unsigned int* pair_count, unsigned int *pair_id, double* tsd,
-	unsigned int np, unsigned int ncylinder)
+	unsigned int np)
 {
 	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
-	memset(dbfm, 0, sizeof(device_body_force) * ncylinder);
+	//memset(dbfm, 0, sizeof(device_body_force) * ncylinder);
 	double* fx = xContact::deviceBodyForceX();
 	double* fy = xContact::deviceBodyForceY();
 	double* fz = xContact::deviceBodyForceZ();
@@ -412,21 +410,13 @@ void cu_cluster_cylinder_contact(
 	double* mx = xContact::deviceBodyMomentX();
 	double* my = xContact::deviceBodyMomentY();
 	double* mz = xContact::deviceBodyMomentZ();
-	for (unsigned int i = 0; i < ncylinder; i++)
-	{
-		cluster_cylinder_contact_force_kernel << < numBlocks, numThreads >> > (
-			cyl, i, bi, fx, fy, fz, mx, my, mz,
-			(double4 *)pos, (double4 *)cpos,
-			(double4 *)ep, (double3 *)vel, (double4 *)ev,
-			(double3 *)force, (double3 *)moment, xci, cp, mass,
-			(double3*)tmax, rres, pair_count, pair_id, (double2 *)tsd, np);
-		dbfm[i].force.x += reduction(fx, np);
-		dbfm[i].force.y += reduction(fy, np);
-		dbfm[i].force.z += reduction(fz, np);
-		dbfm[i].moment.x += reduction(mx, np);
-		dbfm[i].moment.y += reduction(my, np);
-		dbfm[i].moment.z += reduction(mz, np);
-	}
+
+	cluster_cylinder_contact_force_kernel << < numBlocks, numThreads >> > (
+		cyl, bi, fx, fy, fz, mx, my, mz,
+		(double4 *)pos, (double4 *)cpos,
+		(double4 *)ep, (double3 *)vel, (double4 *)ev,
+		(double3 *)force, (double3 *)moment, xci, cp, mass,
+		(double3*)tmax, rres, pair_count, pair_id, (double2 *)tsd, np);
 }
 
 void cu_cluster_meshes_contact(
@@ -450,8 +440,6 @@ void cu_cluster_meshes_contact(
 	unsigned int * cstart, 
 	unsigned int * cend, 
 	xClusterInformation * xci,
-	unsigned int bindex,
-	unsigned int eindex,
 	unsigned int np)
 {
 	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
@@ -478,7 +466,7 @@ void cu_cluster_meshes_contact(
 		pair_count, pair_id,
 		(double2*)tsd, sorted_index,
 		cstart, cend,
-		xci, bindex, eindex, np);
+		xci, np);
 }
 
 void cu_decide_cluster_rolling_friction_moment(

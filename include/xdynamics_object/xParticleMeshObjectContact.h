@@ -28,9 +28,14 @@ public:
 	xMeshObject* MeshObject() { return po; }
 	double* MeshSphere();
 	
-	//virtual void updateCollisionPair(unsigned int id, xContactPairList& xcpl, double r, vector3d pos, double rj = 0, vector3d posj = new_vector3d(0.0, 0.0, 0.0));
-	virtual void collision(
-		double *pos, double *ep, double *vel, double *ev,
+	bool checkOverlab(vector3i ctype, vector3d p, vector3d c, vector3d u0, vector3d u1);
+	vector3d particle_polygon_contact_detection(host_triangle_info& hpi, vector3d& p, double r, int& ct);
+	bool updateCollisionPair(unsigned int id, double r, vector3d pos, unsigned int &oid, vector3d& ocpt, vector3d& ounit, vector3i& ctype);
+	void particle_triangle_contact_force(xTrianglePairData* d, double r, double m, vector3d& p, vector3d& v, vector3d& o, double &res, vector3d &tmax, vector3d& F, vector3d& M);
+
+	virtual void collision_gpu(
+		double *pos, double* cpos, xClusterInformation* xci,
+		double *ep, double *vel, double *ev,
 		double *mass, double* inertia,
 		double *force, double *moment,
 		double *tmax, double* rres,
@@ -39,6 +44,12 @@ public:
 		unsigned int *cell_end,
 		unsigned int np);
 
+	virtual void collision_cpu(
+		vector4d * pos, euler_parameters * ep, vector3d * vel,
+		euler_parameters * ev, double* mass, double & rres, vector3d & tmax,
+		vector3d & force, vector3d & moment, unsigned int nco,
+		xClusterInformation * xci, vector4d * cpos);
+
 	virtual void define(unsigned int idx, unsigned int np);
 	virtual void update();
 	//virtual void initialize();
@@ -46,6 +57,7 @@ public:
 	static unsigned int GetNumMeshSphere();
 	//static double GetMaxSphereRadius();
 	static void local_initialize();
+	bool check_this_mesh(unsigned int idx);
 private:
 	//static double max_sphere_radius;
 	//static int nmoving;
@@ -68,6 +80,7 @@ private:
 	//static double *d_tri_sph;
 	static unsigned int *d_pair_count_ptri;
 	static unsigned int *d_pair_id_ptri;
+	host_triangle_info* hti;
 	device_triangle_info* dti;
 	device_body_info *dbi;
 
@@ -79,6 +92,10 @@ private:
 
 	xParticleObject* p;
 	xMeshObject* po;
+
+	xmap<unsigned int, xTrianglePairData*> triangle_pair;
+	xmap<unsigned int, xTrianglePairData*> triangle_line_pair;
+	xmap<unsigned int, xTrianglePairData*> triangle_point_pair;
 };
 
 #endif

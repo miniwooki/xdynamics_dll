@@ -14,7 +14,7 @@ xParticleParticleContact::xParticleParticleContact()
 
 }
 
-xParticleParticleContact::xParticleParticleContact(std::string _name)
+xParticleParticleContact::xParticleParticleContact(std::string _name, xObject* o1, xObject* o2)
 	: xContact(_name, PARTICLE_PARTICLE)
 	, d_pair_count_pp(nullptr)
 	, d_pair_id_pp(nullptr)
@@ -23,7 +23,10 @@ xParticleParticleContact::xParticleParticleContact(std::string _name)
 	, pair_id_pp(nullptr)
 	, tsd_pp(nullptr)
 {
-
+	if (o1 && o2)
+	{
+		mpp = { o1->Youngs(), o2->Youngs(), o1->Poisson(), o2->Poisson(), o1->Shear(), o2->Shear() };
+	}
 }
 
 xParticleParticleContact::~xParticleParticleContact()
@@ -34,6 +37,8 @@ xParticleParticleContact::~xParticleParticleContact()
 	if (pair_count_pp) delete[] pair_count_pp; pair_count_pp = NULL;
 	if (pair_id_pp) delete[] pair_id_pp; pair_id_pp = NULL;
 	if (tsd_pp) delete[] tsd_pp; tsd_pp = NULL;
+
+	c_pairs.delete_all();
 }
 
 void xParticleParticleContact::define(unsigned int idx, unsigned int np)
@@ -189,7 +194,7 @@ void xParticleParticleContact::cppCollision(
 }
 
 void xParticleParticleContact::updateCollisionPair(
-	unsigned int id, bool isc, xContactPairList& xcpl, 
+	unsigned int ip, unsigned int jp, bool isc,
 	double ri, double rj, vector3d& posi, vector3d& posj)
 {
 	vector3d rp = posj - posi;
@@ -198,19 +203,19 @@ void xParticleParticleContact::updateCollisionPair(
 	//double rcon = pos[i].w - cdist;
 	unsigned int rid = 0;
 	vector3d u = rp / dist;
-	if (cdist > 0){
-		
+	vector2ui key = { ip, jp };
+	if (cdist > 0)
+	{		
 		vector3d cpt = posi + ri * u;
-		if (xcpl.IsNewParticleContactPair(id))
+		if (c_pairs.find(key) == c_pairs.end())// xcpl.IsNewParticleContactPair(id))
 		{
 			xPairData *pd = new xPairData;
-			*pd = { PARTICLES, true, 0, id, 0, 0, cpt.x, cpt.y, cpt.z, cdist, u.x, u.y, u.z };
-			xcpl.insertParticleContactPair(pd);
+			*pd = { PARTICLES, true, 0, 0, 0, 0, cpt.x, cpt.y, cpt.z, cdist, u.x, u.y, u.z };
+			c_pairs.insert(key, pd);// xcpl.insertParticleContactPair(pd);
 		}		
 		else
 		{
-			xPairData *pd = xcpl.ParticlePair(id);
-			
+			xPairData *pd = c_pairs.find(key).value();// xcpl.ParticlePair(id);
 			pd->gab = cdist;
 			pd->cpx = cpt.x;
 			pd->cpy = cpt.y;
@@ -225,12 +230,10 @@ void xParticleParticleContact::updateCollisionPair(
 		double coh_s = cohesionSeperationDepth(cohesion, ri, rj, mpp.Pri, mpp.Prj, mpp.Ei, mpp.Ej);
 		if (abs(cdist) < abs(coh_s))
 		{
-			xPairData *pd = xcpl.ParticlePair(id);
+			xPairData *pd = c_pairs.find(key).value();
 			vector3d cpt = posi + (ri + coh_s * 0.5) * u;
 			if (pd)
 			{
-				xPairData *pd = xcpl.ParticlePair(id);
-				
 				pd->gab = cdist;
 				pd->cpx = cpt.x;
 				pd->cpy = cpt.y;
@@ -242,25 +245,26 @@ void xParticleParticleContact::updateCollisionPair(
 			else
 			{
 				xPairData *pd = new xPairData;
-				*pd = { PARTICLES, true, 0, id, 0, 0, cpt.x, cpt.y, cpt.z, cdist, u.x, u.y, u.z };
-				xcpl.insertParticleContactPair(pd);
+				*pd = { PARTICLES, true, 0, 0, 0, 0, cpt.x, cpt.y, cpt.z, cdist, u.x, u.y, u.z };
+				c_pairs.insert(key, pd);// xcpl.insertParticleContactPair(pd);
 			}
 		}
 		else
 		{
-			xPairData *pd = xcpl.ParticlePair(id);
+			xPairData *pd = c_pairs.find(key).value();
 			if (pd)
 			{
-				//bool isc = pd->isc;
-				//if (!isc)
-				xcpl.deleteParticlePairData(id);
+				delete c_pairs.take(key);
+				//xcpl.deleteParticlePairData(id);
 			}
+				
 		}
 	}
 }
 
-void xParticleParticleContact::collision(
-	double *pos, double *ep, double *vel, double *ev,
+void xParticleParticleContact::collision_gpu(
+	double *pos, double* cpos, xClusterInformation* xci,
+	double *ep, double *vel, double *ev,
 	double *mass, double* inertia,
 	double *force, double *moment,
 	double *tmax, double* rres,
@@ -271,12 +275,84 @@ void xParticleParticleContact::collision(
 {
 	if (xSimulation::Gpu())
 	{
-		cu_calculate_p2p(pos, ep, vel, ev, force, moment, mass,
-			tmax, rres, d_pair_count_pp, d_pair_id_pp, d_tsd_pp, sorted_id,
-			cell_start, cell_end, dcp, np);
+		if(!cpos) cu_calculate_p2p(pos, ep, vel, ev, force, moment, mass, tmax, rres, d_pair_count_pp, d_pair_id_pp, d_tsd_pp, sorted_id, cell_start, cell_end, dcp, np);
+		else if (cpos) cu_clusters_contact(pos, cpos, ep, vel, ev, force, moment, mass, tmax, rres, d_pair_count_pp, d_pair_id_pp, d_tsd_pp, sorted_id, cell_start, cell_end, dcp, xci, np);
 	}
 // 	cu_check_no_collision_pair(pos, d_pair_idx, d_pair_other, np);
 // 	cu_check_new_collision_pair(pos, d_pair_idx, d_pair_other, sorted_id, cell_start, cell_end, np);
 // 	cu_calculate_particle_collision_with_pair(pos, vel , omega, mass, d_tan, force, moment, d_pair_idx, d_pair_other, dcp, np);
 // 	//cu_calculate_p2p(1, pos, vel, omega, force, moment, mass, sorted_id, cell_start, cell_end, dcp, np);
 }
+
+void xParticleParticleContact::collision_cpu(
+	vector4d * pos, euler_parameters * ep, vector3d * vel,
+	euler_parameters * ev, double* mass, double & rres, vector3d & tmax,
+	vector3d & force, vector3d & moment, unsigned int nco,
+	xClusterInformation * xci, vector4d * cpos)
+{
+	for (xmap<vector2ui, xPairData*>::iterator it = c_pairs.begin(); it != c_pairs.end(); it.next())
+	{
+		vector2ui ij = it.key();
+		xPairData* d = it.value();
+		vector3d m_fn = new_vector3d(0, 0, 0);
+		vector3d m_m = new_vector3d(0, 0, 0);
+		vector3d m_ft = new_vector3d(0, 0, 0);
+		unsigned int k = d->id;
+		unsigned int neach = 0;
+		unsigned int ci = ij.x;
+		unsigned int cj = ij.y;
+		vector3d cpi = new_vector3d(pos[ci].x, pos[ci].y, pos[ci].z);
+		vector3d cpj = new_vector3d(pos[cj].x, pos[cj].y, pos[cj].z);
+		if (nco && cpos)
+		{
+			for (unsigned int j = 0; j < nco; j++)
+				if (ij.x >= xci[j].sid && ij.x < xci[j].sid + xci[j].count * xci[j].neach)
+					neach = xci[j].neach;
+			ci = ij.x / neach;
+			cj = ij.y / neach;
+			//ci = i / neach;
+			cpi = new_vector3d(cpos[ci].x, cpos[ci].y, cpos[ci].z);
+			cpj = new_vector3d(cpos[cj].x, cpos[cj].y, cpos[cj].z);
+		}
+		double rcon = pos[ci].w - 0.5 * d->gab;
+		vector3d u = new_vector3d(d->nx, d->ny, d->nz);
+		vector3d cpt = new_vector3d(d->cpx, d->cpy, d->cpz);
+		vector3d dcpr = cpt - cpi;
+		vector3d dcpr_j = cpt - cpj;
+		//vector3d cp = rcon * u;
+		vector3d wi = ToAngularVelocity(ep[ci], ev[ci]);
+		vector3d wj = ToAngularVelocity(ep[cj], ev[cj]);
+		vector3d rv = vel[cj] + cross(wj, dcpr_j) - (vel[ci] + cross(wi, dcpr));
+		xContactParameters c = getContactParameters(
+			pos[ci].w, pos[cj].w,
+			mass[ci], mass[cj],
+			mpp.Ei, mpp.Ej,
+			mpp.Pri, mpp.Prj,
+			mpp.Gi, mpp.Gj,
+			restitution, stiffnessRatio, s_friction,
+			friction, rolling_factor, cohesion);
+		if (d->gab < 0 && abs(d->gab) < abs(c.coh_s))
+		{
+			double f = JKRSeperationForce(c, cohesion);
+			double cf = cohesionForce(cohesion, d->gab, c.coh_r, c.coh_e, c.coh_s, f);
+			force -= cf * u;
+			continue;
+		}
+		//else if (d->isc && d->gab < 0 && abs(d->gab) > abs(c.coh_s))
+		//{
+		//	d->isc = false;
+		//	continue;
+		//}
+		switch (xContact::ContactForceModel())
+		{
+		case DHS: DHSModel(c, d->gab, d->delta_s, d->dot_s, cohesion, rv, u, m_fn, m_ft); break;
+		case HERTZ_MINDLIN_NO_SLIP: Hertz_Mindlin(c, d->gab, d->delta_s, d->dot_s, cohesion, rv, u, m_fn, m_ft); break;
+		}
+		RollingResistanceForce(rolling_factor, pos[ci].w, pos[cj].w, dcpr, m_fn, m_ft, rres, tmax);
+		force += m_fn + m_ft;
+		moment += cross(dcpr, m_fn + m_ft);
+	}
+}
+
+
+

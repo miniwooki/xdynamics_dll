@@ -68,8 +68,9 @@ public:
 	// 		contactForce_type cft, double rest, double ratio, double fric);
 	void setMaterialPair(xMaterialPair _mpp);// { mpp = _mpp; }
 
-	virtual void collision(
-		double *pos, double *ep, double *vel, double *ev,
+	virtual void collision_gpu(
+		double *pos, double* cpos, xClusterInformation* xci, 
+		double *ep, double *vel, double *ev,
 		double *mass, double* inertia,
 		double *force, double *moment,
 		double *tmax, double* rres,
@@ -77,6 +78,12 @@ public:
 		unsigned int *cell_start,
 		unsigned int *cell_end,
 		unsigned int np) = 0;
+	virtual void collision_cpu(
+		vector4d * pos, euler_parameters * ep, vector3d * vel,
+		euler_parameters * ev, double* mass, double & rres, vector3d & tmax,
+		vector3d & force, vector3d & moment, unsigned int nco,
+		xClusterInformation * xci, vector4d * cpos
+	) = 0;
 
 	virtual void define(unsigned int idx, unsigned int np);
 	//virtual void initialize();

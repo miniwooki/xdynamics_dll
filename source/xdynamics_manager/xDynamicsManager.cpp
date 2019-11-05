@@ -32,8 +32,8 @@ xDynamicsManager::~xDynamicsManager()
 	if (xmbds.size()) xmbds.delete_all();// qDeleteAll(xmbds);
 	if (xdems.size()) xdems.delete_all();//  qDeleteAll(xdems);
 	if (xsphs.size()) xsphs.delete_all();
-	if(xoms.size()) xoms.delete_all();
-;	if (xcms.size()) xcms.delete_all();// qDeleteAll(xcms);
+	if (xoms.size()) xoms.delete_all();
+	if (xcms.size()) xcms.delete_all();// qDeleteAll(xcms);
 	xmbd = NULL;
 	xdem = NULL;
 	xsph = NULL;

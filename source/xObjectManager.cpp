@@ -79,10 +79,10 @@ xLineObject* xObjectManager::CreateLineShapeObject(std::string _name, int _xmt)
 	xstring name = _name;
 	xLineObject* xlo = new xLineObject(_name);
 	xlo->setMaterialType((xMaterialType)_xmt);
-	xMaterial xm = GetMaterialConstant(_xmt);
+	/*xMaterial xm = GetMaterialConstant(_xmt);
 	xlo->setDensity(xm.density);
 	xlo->setYoungs(xm.youngs);
-	xlo->setPoisson(xm.poisson);
+	xlo->setPoisson(xm.poisson);*/
 	objects.insert(name, xlo);
 	return xlo;
 }
@@ -92,10 +92,10 @@ xPlaneObject* xObjectManager::CreatePlaneShapeObject(std::string _name, int _xmt
 	xstring name = _name;
 	xPlaneObject* xpo = new xPlaneObject(_name);
 	xpo->setMaterialType((xMaterialType)_xmt);
-	xMaterial xm = GetMaterialConstant(_xmt);
-	xpo->setDensity(xm.density);
-	xpo->setYoungs(xm.youngs);
-	xpo->setPoisson(xm.poisson);
+	//xMaterial xm = GetMaterialConstant(_xmt);
+	//xpo->setDensity(xm.density);
+	//xpo->setYoungs(xm.youngs);
+	//xpo->setPoisson(xm.poisson);
 	objects.insert(name, xpo);
 	return xpo;
 }
@@ -105,10 +105,10 @@ xCubeObject* xObjectManager::CreateCubeShapeObject(std::string _name, int _xmt)
 	xstring name = _name;
 	xCubeObject* xco = new xCubeObject(_name);
 	xco->setMaterialType((xMaterialType)_xmt);
-	xMaterial xm = GetMaterialConstant(_xmt);
+	/*xMaterial xm = GetMaterialConstant(_xmt);
 	xco->setDensity(xm.density);
 	xco->setYoungs(xm.youngs);
-	xco->setPoisson(xm.poisson);
+	xco->setPoisson(xm.poisson);*/
 	objects.insert(name, xco);
 	return xco;
 }
@@ -117,11 +117,12 @@ xMeshObject* xObjectManager::CreateMeshShapeObject(std::string _name, int _xmt)
 {
 	xstring name = _name;
 	xMeshObject* xmo = new xMeshObject(_name);
-	xMaterial xm = GetMaterialConstant(_xmt);
-	xmo->setDensity(xm.density);
+	xmo->setMaterialType((xMaterialType)_xmt);
+	//xMaterial xm = GetMaterialConstant(_xmt);
+	/*xmo->setDensity(xm.density);
 	xmo->setYoungs(xm.youngs);
 	xmo->setPoisson(xm.poisson);
-	objects.insert(name, xmo);
+	objects.insert(name, xmo);*/
 	return xmo;
 }
 
@@ -129,11 +130,11 @@ xClusterObject * xObjectManager::CreateClusterShapeObject(std::string _name, int
 {
 	xstring name = _name;
 	xClusterObject* xco = new xClusterObject(_name);
-	xMaterial xm = GetMaterialConstant(_xmt);
+	//xMaterial xm = GetMaterialConstant(_xmt);
 	xco->setMaterialType((xMaterialType)_xmt);
-	xco->setDensity(xm.density);
-	xco->setYoungs(xm.youngs);
-	xco->setPoisson(xm.poisson);
+	//xco->setDensity(xm.density);
+	//xco->setYoungs(xm.youngs);
+	//xco->setPoisson(xm.poisson);
 	objects.insert(name, xco);
 	return xco;
 }
@@ -142,24 +143,18 @@ xCylinderObject* xObjectManager::CreateCylinderShapeObject(std::string _name, in
 {
 	xstring name = _name;
 	xCylinderObject* xco = new xCylinderObject(_name);
-	xMaterial xm = GetMaterialConstant(_xmt);
+	//xMaterial xm = GetMaterialConstant(_xmt);
 	xco->setMaterialType((xMaterialType)_xmt);
-	xco->setDensity(xm.density);
-	xco->setYoungs(xm.youngs);
-	xco->setPoisson(xm.poisson);
+	//xco->setDensity(xm.density);
+	//xco->setYoungs(xm.youngs);
+	//xco->setPoisson(xm.poisson);
 	objects.insert(name, xco);
 	return xco;
 }
 
 void xObjectManager::CreateSPHBoundaryParticles(xParticleManager* xpm)
 {
-// 	foreach(xObject *xo, XObjects())
-// 	{
-// 		if (xo->Material() == BOUNDARY)
-// 		{
-// 			xpm->CreateLineParticle
-// 		}
-// 	}
+
 }
 
 xmap<xstring, xObject*>& xObjectManager::CompulsionMovingObjects()

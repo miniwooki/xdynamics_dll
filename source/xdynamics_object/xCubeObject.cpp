@@ -48,6 +48,13 @@ bool xCubeObject::define(vector3d& min, vector3d& max)
 	planes[3].define(this->isDynamicsBody(), min_p, min_p + new_vector3d(size.x, 0, 0), min_p + new_vector3d(0, size.y, 0));
 	planes[4].define(this->isDynamicsBody(), min_p + new_vector3d(0, 0, size.z), min_p + new_vector3d(0, size.y, size.z), min_p + new_vector3d(size.x, 0, size.z));
 	planes[5].define(this->isDynamicsBody(), min_p + new_vector3d(0, size.y, 0), min_p + new_vector3d(size.x, size.y, 0), min_p + new_vector3d(0, size.y, size.z));
+	
+	planes[0].setMaterialType(this->Material());
+	planes[1].setMaterialType(this->Material());
+	planes[2].setMaterialType(this->Material());
+	planes[3].setMaterialType(this->Material());
+	planes[4].setMaterialType(this->Material());
+	planes[5].setMaterialType(this->Material());
 	return true;
 }
 

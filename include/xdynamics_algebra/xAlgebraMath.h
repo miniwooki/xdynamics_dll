@@ -7,6 +7,9 @@
 
 inline double frand() { return rand() / (double)RAND_MAX; }
 
+XDYNAMICS_API bool operator== (const vector2ui &v1, const vector2ui &v2);
+XDYNAMICS_API bool operator> (const vector2ui &v1, const vector2ui &v2);
+
 // Declaration vector3i operators
 XDYNAMICS_API vector3i operator+ (const vector3i &v1, const vector3i &v2);
 XDYNAMICS_API vector3i operator- (const vector3i &v1, const vector3i &v2);

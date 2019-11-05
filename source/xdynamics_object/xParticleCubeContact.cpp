@@ -41,8 +41,16 @@ xCubeObject* xParticleCubeContact::CubeObject()
 	return cu;
 }
 
-void xParticleCubeContact::collision(
-	double r, double m, vector3d& pos, vector3d& vel, vector3d& omega, vector3d& F, vector3d& M)
+void xParticleCubeContact::collision_gpu(
+	double *pos, double* cpos, xClusterInformation* xci,
+	double *ep, double *vel, double *ev,
+	double *mass, double* inertia,
+	double *force, double *moment,
+	double *tmax, double* rres,
+	unsigned int *sorted_id,
+	unsigned int *cell_start,
+	unsigned int *cell_end,
+	unsigned int np)
 {
 	/*xParticlePlaneContact cpps(*this);
 	xPlaneObject* planes = cu->Planes();
@@ -53,6 +61,16 @@ void xParticleCubeContact::collision(
 		F += m_f;
 		M += m_m;
 	}*/
+}
+
+void xParticleCubeContact::collision_cpu(
+	xContactPairList * pairs, unsigned int pid, unsigned int cid, double r,
+	vector4d * pos, euler_parameters * ep, 
+	vector3d * vel,	euler_parameters * ev, double* mass,
+	 double & rres, vector3d & tmax, 
+	vector3d & force, vector3d & moment, unsigned int nco, 
+	xClusterInformation * xci, vector4d * cpos)
+{
 }
 
 void xParticleCubeContact::cuda_collision(

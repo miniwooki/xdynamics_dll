@@ -62,6 +62,7 @@ public:
 	void allocPairList(unsigned int np);
 	void SaveStepResult(unsigned int pt, unsigned int np);
 	void set_from_part_result(std::fstream& fs);
+	
 
 private:
 	void updateCollisionPair(

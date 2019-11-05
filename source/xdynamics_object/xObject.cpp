@@ -157,6 +157,10 @@ void xObject::setShapeType(xShapeType xst)
 void xObject::setMaterialType(xMaterialType xmt)
 {
 	material = xmt;
+	xMaterial xm = GetMaterialConstant(xmt);
+	d = xm.density;
+	y = xm.youngs;
+	p = xm.poisson;
 }
 
 void xObject::setConnectedGeometryName(std::string n)
