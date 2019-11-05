@@ -56,9 +56,10 @@ void xParticleParticleContact::define(unsigned int idx, unsigned int np)
 		checkXerror(cudaMemset(d_pair_count_pp, 0, sizeof(unsigned int) * np));
 		checkXerror(cudaMemset(d_pair_id_pp, 0, sizeof(unsigned int) * np * MAX_P2P_COUNT));
 		checkXerror(cudaMemset(d_tsd_pp, 0, sizeof(double2) * np * MAX_P2P_COUNT));
+		xDynamicsManager::This()->XResult()->set_p2p_contact_data((int)MAX_P2P_COUNT);
 	}
 	
-	xDynamicsManager::This()->XResult()->set_p2p_contact_data((int)MAX_P2P_COUNT);
+	
 }
 
 void xParticleParticleContact::update()

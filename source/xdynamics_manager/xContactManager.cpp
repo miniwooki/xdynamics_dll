@@ -82,6 +82,14 @@ void xContactManager::CreateContactPair(
 			cots.insert(n, c);
 			break;
 		}		
+		case PARTICLE_CYLINDER:
+		{
+			xParticleCylinderContact *c = new xParticleCylinderContact(n, o1, o2);
+			c->setContactParameters(d);
+			cpcylinders.insert(cpcylinders.size(), c);
+			cots.insert(n, c);
+			break;
+		}
 		case PARTICLE_MESH_SHAPE: 
 		{
 			xParticleMeshObjectContact* c = new xParticleMeshObjectContact(n, o1, o2); _c = c;

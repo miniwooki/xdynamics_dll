@@ -154,6 +154,7 @@ void xParticleMeshObjectContact::define(unsigned int idx, unsigned int np)
 			tsd_ptri = new double[2 * np * MAX_P2MS_COUNT];
 			allocated_static;
 		}		
+		xDynamicsManager::This()->XResult()->set_p2cyl_contact_data((int)MAX_P2MS_COUNT);
 	}
 	update();
 	gps.max_radius = maxRadii;
