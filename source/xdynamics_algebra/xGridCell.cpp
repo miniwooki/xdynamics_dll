@@ -95,7 +95,7 @@ void xGridCell::rearrange_cell()
 			}
 		}
 	}
-	
+
 }
 
 void xGridCell::allocMemory(unsigned int n)

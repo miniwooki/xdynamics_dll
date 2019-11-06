@@ -322,10 +322,10 @@ __global__ void calculateHashAndIndex_kernel(
 
 	int3 gridPos = calcGridPos(make_double3(p.x, p.y, p.z));
 	unsigned _hash = calcGridHash(gridPos);
-	/*if(_hash >= cte.ncell)
-	printf("Over limit - hash number : %d", _hash);*/
+	//if(_hash >= cte.ncell)
+	//printf("%d hash number : %d\n",sid + id, _hash);
 	hash[sid + id] = _hash;
-	index[sid + id] = id;
+	index[sid + id] = sid + id;
 }
 
 __global__ void calculateHashAndIndexForPolygonSphere_kernel(
@@ -412,6 +412,15 @@ __device__ device_force_constant getConstant(
 	dfc.mu = fric;
 	dfc.mu_s = s_fric;
 	dfc.ms = rfric;
+	//printf("eq_m = %e\n", dfc.eq_m);
+	//printf("eq_r = %e\n", dfc.eq_r);
+	//printf("kn = %e\n", dfc.kn);
+	//printf("vn = %e\n", dfc.vn);
+	//printf("ks = %e\n", dfc.ks);
+	//printf("vs = %e\n", dfc.vs);
+	//printf("mu = %e\n", dfc.mu);
+	//printf("mu_s = %e\n", dfc.mu_s);
+	//printf("ms = %e\n", dfc.ms);
 	//switch (tcm)
 	//{
 	//case 0: {
@@ -1099,7 +1108,7 @@ __global__ void plane_contact_force_kernel(
 		double3 cpt = ipos3 + r * unit;
 		double3 dcpr_j = cpt - dbi->pos;
 		if (cdist > 0) {
-			//printf("[%d][%d] body pos : [%e, %e, %e]\n", k, pl.mid, bi.pos.x, bi.pos.y, bi.pos.z);
+			printf("plane body pos\n");
 			
 			for (unsigned int i = 0; i < 3; i++)
 				if (p_pair_id[i] == k){ sd = p_tsd[i]; break; }
@@ -2081,7 +2090,7 @@ __global__ void particle_polygonObject_collision_kernel(
 						unsigned int tk = sorted_index[j];
 						if (tk >= cte.np)
 						{
-							tk -= cte.np + sk;
+							tk -= cte.np + sk;							
 							///if (k < bindex || k >= eindex)
 							//	continue;
 							int t = -1;
@@ -2092,6 +2101,15 @@ __global__ void particle_polygonObject_collision_kernel(
 								coh_s = limit_cohesion_depth(ir, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh);
 							if (cdist > 0)
 							{
+								/*printf("seeee : %d, %d, %d", j, start_index, end_index);
+								printf("contact_type : %d\n", t);
+								printf("num_p : %d\n", cte.np);
+								printf("start_index : %d\n", sk);
+								printf("target_sphere : %d\n", tk);
+								printf("target_cdist : %e\n", cdist);
+								printf("P : [%e, %e, %e]\n", dti[tk].P.x, dti[tk].P.y, dti[tk].P.z);
+								printf("Q : [%e, %e, %e]\n", dti[tk].Q.x, dti[tk].Q.y, dti[tk].Q.z);
+								printf("R : [%e, %e, %e]\n", dti[tk].R.x, dti[tk].R.y, dti[tk].R.z);*/
 								//printf("cidst : %f, contact_type : %d\n", cdist, t);
 								if (t == 1)
 								{
@@ -2134,7 +2152,7 @@ __global__ void particle_polygonObject_collision_kernel(
 	//printf("tlp : [%d - %d - %d]\n", nct, ncl, ncp);
 	for (unsigned int k = 0; k < nct; k++)
 		particle_triangle_contact_force(
-			ctriangle[k], 0, id, dti, cp, dbi, 
+			ctriangle[k], 2, id, dti, cp, dbi, 
 			fx, fy, fz, mx, my, mz,
 			ipos, ivel, iomega, old_count, 
 			p_pair_id, p_tsd, pair_id, tsd, 
@@ -2151,7 +2169,9 @@ __global__ void particle_polygonObject_collision_kernel(
 			particle_triangle_contact_force(
 				cline[k], 1, id, dti, cp, dbi, 
 				fx, fy, fz, mx, my, mz,
-				ipos, ivel, iomega, old_count, p_pair_id, p_tsd, pair_id, tsd, ir, im, sum_force, sum_moment, res, tma, new_count);
+				ipos, ivel, iomega, old_count,
+				p_pair_id, p_tsd, pair_id, tsd, ir, im,
+				sum_force, sum_moment, res, tma, new_count);
 		}
 	}
 		
@@ -2165,7 +2185,7 @@ __global__ void particle_polygonObject_collision_kernel(
 			//	continue;
 		//	previous_cpt = cpoint[k].cpt;
 			particle_triangle_contact_force(
-				cpoint[k], 2, id, dti, cp, dbi, 
+				cpoint[k], 0, id, dti, cp, dbi, 
 				fx, fy, fz, mx, my, mz,
 				ipos, ivel, iomega, old_count, p_pair_id, p_tsd, pair_id, tsd, ir, im, sum_force, sum_moment, res, tma, new_count);
 		}			
@@ -2175,7 +2195,7 @@ __global__ void particle_polygonObject_collision_kernel(
 	force[id] += sum_force;
 	moment[id] += sum_moment;
 	if (length(sum_force))
-		printf("particle_force_with_mesh : [%d, %d, %d]-[%e, %e, %e]",nct, ncl, ncp, sum_force.x, sum_force.y, sum_force.z);
+		printf("particle_force_with_mesh : [%d, %d, %d]-[%e, %e, %e]\n",nct, ncl, ncp, sum_force.x, sum_force.y, sum_force.z);
 	///*if (new_count - sid > MAX_P2MS_COUNT)
 	//	printf("The total of contact with triangle */is over(%d)\n.", new_count - sid);
 	pair_count[id] = new_count - sid;
@@ -2625,10 +2645,10 @@ __global__ void updateMeshObjectData_kernel(
 	if (id >= np)
 		return;
 	int s = id * 9;
-	int mid = dpi[id].id;
+	//int mid = dpi[id].id;
 //	printf("idx(%d) : mid = %d\n", id, mid);
-	double3 pos = dbi[mid].pos;// dpmi[mid].origin;
-	double4 ep = dbi[mid].ep;// mep[mid];// dpmi[mid].ep;
+	double3 pos = dbi->pos;// dpmi[mid].origin;
+	double4 ep = dbi->ep;// mep[mid];// dpmi[mid].ep;
 	double4 sph = sphere[id];
 	double3 P = make_double3(vList[s + 0], vList[s + 1], vList[s + 2]);
 	double3 Q = make_double3(vList[s + 3], vList[s + 4], vList[s + 5]);
@@ -2641,29 +2661,29 @@ __global__ void updateMeshObjectData_kernel(
 	//printf("idx(%d) : Q = [%f, %f, %f]\n", id, Q.x, Q.y, Q.z);
 	//printf("idx(%d) : R = [%f, %f, %f]\n", id, R.x, R.y, R.z);
 
-	
-	double3 V = Q - P;
-	double3 W = R - P;
-	double3 N = cross(V, W);
-	N = N / length(N);
-	double3 M1 = 0.5 * (Q + P);
-	double3 M2 = 0.5 * (R + P);
-	double3 D1 = cross(N, V);
-	double3 D2 = cross(N, W);
-	double t;
-	if (abs(D1.x*D2.y - D1.y*D2.x) > 1E-13)
-	{
-		t = (D2.x*(M1.y - M2.y)) / (D1.x*D2.y - D1.y*D2.x) - (D2.y*(M1.x - M2.x)) / (D1.x*D2.y - D1.y*D2.x);
-	}
-	else if (abs(D1.x*D2.z - D1.z*D2.x) > 1E-13)
-	{
-		t = (D2.x*(M1.z - M2.z)) / (D1.x*D2.z - D1.z*D2.x) - (D2.z*(M1.x - M2.x)) / (D1.x*D2.z - D1.z*D2.x);
-	}
-	else if (abs(D1.y*D2.z - D1.z*D2.y) > 1E-13)
-	{
-		t = (D2.y*(M1.z - M2.z)) / (D1.y*D2.z - D1.z*D2.y) - (D2.z*(M1.y - M2.y)) / (D1.y*D2.z - D1.z*D2.y);
-	}
-	double3 ctri = M1 + t * D1;
+	//
+	//double3 V = Q - P;
+	//double3 W = R - P;
+	//double3 N = cross(V, W);
+	//N = N / length(N);
+	//double3 M1 = 0.5 * (Q + P);
+	//double3 M2 = 0.5 * (R + P);
+	//double3 D1 = cross(N, V);
+	//double3 D2 = cross(N, W);
+	//double t;
+	//if (abs(D1.x*D2.y - D1.y*D2.x) > 1E-13)
+	//{
+	//	t = (D2.x*(M1.y - M2.y)) / (D1.x*D2.y - D1.y*D2.x) - (D2.y*(M1.x - M2.x)) / (D1.x*D2.y - D1.y*D2.x);
+	//}
+	//else if (abs(D1.x*D2.z - D1.z*D2.x) > 1E-13)
+	//{
+	//	t = (D2.x*(M1.z - M2.z)) / (D1.x*D2.z - D1.z*D2.x) - (D2.z*(M1.x - M2.x)) / (D1.x*D2.z - D1.z*D2.x);
+	//}
+	//else if (abs(D1.y*D2.z - D1.z*D2.y) > 1E-13)
+	//{
+	//	t = (D2.y*(M1.z - M2.z)) / (D1.y*D2.z - D1.z*D2.y) - (D2.z*(M1.y - M2.y)) / (D1.y*D2.z - D1.z*D2.y);
+	//}
+	//double3 ctri = M1 + t * D1;
 	double3 r_pos = pos + toGlobal(dlocal[id], ep);
 	//if (id == 0)
 	//{
