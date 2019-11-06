@@ -146,18 +146,28 @@ public:
 		xMapNode* n = find_node(k);
 		if (n)
 		{
-			if (n != head)
-				n->right->left = n->left;
-			else
-				head = n->left;
-			if (n != tail)
-				n->left->right = n->right;
-			else
-				tail = n->right;
+			xMapNode *nl = n->left;
+			xMapNode *nr = n->right;
+			if(nl)
+				if (nr)
+					nr->left = nl;
+			
+			
+// 			if (n != head)
+// 				n->right->left = n->left;
+// 			else
+// 				head = n->left;
+// 			if (n != tail)
+// 				n->left->right = n->right;
+// 			else
+// 				tail = n->right;
 			sz--;
 			T o = n->value;
 			delete n;
 			n = NULL;
+			if (sz == 0)
+				head = nullptr;
+
 			return o;
 		}
 		return NULL;

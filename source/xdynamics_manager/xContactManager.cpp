@@ -82,6 +82,14 @@ void xContactManager::CreateContactPair(
 			cots.insert(n, c);
 			break;
 		}		
+		case PARTICLE_CYLINDER:
+		{
+			xParticleCylinderContact *c = new xParticleCylinderContact(n, o1, o2);
+			c->setContactParameters(d);
+			cpcylinders.insert(cpcylinders.size(), c);
+			cots.insert(n, c);
+			break;
+		}
 		case PARTICLE_MESH_SHAPE: 
 		{
 			xParticleMeshObjectContact* c = new xParticleMeshObjectContact(n, o1, o2); _c = c;
@@ -415,7 +423,7 @@ void xContactManager::updateCollisionPair(
 								for (xmap<int, xParticleMeshObjectContact*>::iterator it = cpmeshes.begin(); it != cpmeshes.end(); it.next())
 								{
 									if(it.value()->check_this_mesh(k-np))
-										it.value()->updateCollisionPair(k - np, r, p, old_id, old_cpt, old_unit, ctype);
+										it.value()->updateCollisionPair(i, k - np, r, p, old_id, old_cpt, old_unit, ctype);
 								}								
 							}
 						}

@@ -2054,7 +2054,7 @@ __global__ void particle_polygonObject_collision_kernel(
 	double3 sum_force = make_double3(0, 0, 0);
 	double3 sum_moment = make_double3(0, 0, 0);
 	//unsigned int new_count = sid;
-	unsigned int new_count = sid;// +(bindex ? old_count : 0);
+	unsigned int new_count = sid + old_count;
 	
 	unsigned int start_index = 0;
 	unsigned int end_index = 0;
@@ -2066,7 +2066,7 @@ __global__ void particle_polygonObject_collision_kernel(
 	unsigned int ncl = 0;
 	unsigned int ncp = 0;
 	double coh_s = 0;
-	unsigned int sk = dti[0].id;
+	unsigned int sk = dti[0].tid;
 	double3 previous_line_cpt = make_double3(0.0, 0.0, 0.0);
 	double3 previous_point_cpt = make_double3(0.0, 0.0, 0.0);
 	for (int z = -1; z <= 1; z++) {
@@ -2174,6 +2174,8 @@ __global__ void particle_polygonObject_collision_kernel(
 
 	force[id] += sum_force;
 	moment[id] += sum_moment;
+	if (length(sum_force))
+		printf("particle_force_with_mesh : [%d, %d, %d]-[%e, %e, %e]",nct, ncl, ncp, sum_force.x, sum_force.y, sum_force.z);
 	///*if (new_count - sid > MAX_P2MS_COUNT)
 	//	printf("The total of contact with triangle */is over(%d)\n.", new_count - sid);
 	pair_count[id] = new_count - sid;

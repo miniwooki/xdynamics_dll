@@ -56,9 +56,9 @@ xstring::~xstring()
 	//
 	if (wc)
 	{
-#ifdef _DEBUG
-		std::cout << "delete - " << wc << std::endl;
-#endif
+//#ifdef _DEBUG
+//		std::cout << "delete - " << wc << std::endl;
+//#endif
 		delete[] wc; wc = NULL;// SysFreeString(wc);
 	}
 		

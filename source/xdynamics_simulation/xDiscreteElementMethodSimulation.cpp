@@ -110,10 +110,11 @@ int xDiscreteElementMethodSimulation::Initialize(
 	//pos[2] = 0;
 	if (dtor)
 	{
+		unsigned int num_mesh_sphere = xParticleMeshObjectContact::GetNumMeshSphere();
 		dtor->setWorldOrigin(new_vector3d(-1.0, -1.0, -1.0));
 		dtor->setGridSize(new_vector3ui(128, 128, 128));
 		dtor->setCellSize(gps.max_radius * 2.0);
-		dtor->initialize(np + nPolySphere);
+		dtor->initialize(np + num_mesh_sphere);
 	}
 	// 	switch (md->IntegrationType())
 	// 	{

@@ -39,6 +39,7 @@ int xIntegratorVV::OneStepSimulation(double ct, unsigned int cstep)
 			unsigned int ntri = it.value()->MeshObject()->NumTriangle();
 			dtor->detection(m_sphere, ntri, sid);
 			sid += ntri;
+			it.next();
 		}
 	}
 	dtor->rearrange_cell();

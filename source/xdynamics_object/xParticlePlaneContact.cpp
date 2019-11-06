@@ -81,10 +81,10 @@ void xParticlePlaneContact::define(unsigned int idx, unsigned int np)
 		checkXerror(cudaMalloc((void**)&dpi, sizeof(device_plane_info)));		
 		checkXerror(cudaMalloc((void**)&dbi, sizeof(device_body_info)));
 		//checkXerror(cudaMemcpy(dpi, &hpi, sizeof(device_plane_info), cudaMemcpyHostToDevice));
+		xDynamicsManager::This()->XResult()->set_p2pl_contact_data((int)MAX_P2PL_COUNT);
 		
-		update();
 	}
-	xDynamicsManager::This()->XResult()->set_p2pl_contact_data((int)MAX_P2PL_COUNT);
+	update();
 	defined_count++;
 }
 
@@ -108,7 +108,7 @@ void xParticlePlaneContact::update()
 	hpi.u2 = hpi.pb / hpi.l2;
 	hpi.uw = cross(hpi.u1, hpi.u2);
 	
-	checkXerror(cudaMemcpy(dpi, &hpi, sizeof(device_plane_info), cudaMemcpyHostToDevice));
+	
 
 	if (xSimulation::Gpu())
 	{
@@ -123,6 +123,7 @@ void xParticlePlaneContact::update()
 			ed.e0, ed.e1, ed.e2, ed.e3
 		};
 		//}
+		checkXerror(cudaMemcpy(dpi, &hpi, sizeof(device_plane_info), cudaMemcpyHostToDevice));
 		checkXerror(cudaMemcpy(dbi, &hbi, sizeof(device_body_info), cudaMemcpyHostToDevice));
 	}
 
@@ -265,30 +266,10 @@ void xParticlePlaneContact::updateCollisionPair(unsigned int pid, double r, vect
 		}
 		else
 		{
-			xPairData *pd = c_pairs.find(pid).value();// .PlanePair(hpi.id);
-			pd->gab = cdist;
-			pd->cpx = cpt.x;
-			pd->cpy = cpt.y;
-			pd->cpz = cpt.z;
-			pd->nx = u.x;
-			pd->ny = u.y;
-			pd->nz = u.z;
-		}
-	}
-	else
-	{
-		xPairData *pd = c_pairs.find(pid).value();
-		if (pd)
-		{
-			bool isc = pd->isc;
-			if (!isc)
+			xmap<unsigned int, xPairData*>::iterator it = c_pairs.find(pid);
+			if (it != c_pairs.end())
 			{
-				if (c_pairs.find(pid) != c_pairs.end())
-					delete c_pairs.take(pid);
-			}				
-			else
-			{
-				vector3d cpt = pos + r * u;
+				xPairData *pd = it.value();// .PlanePair(hpi.id);
 				pd->gab = cdist;
 				pd->cpx = cpt.x;
 				pd->cpy = cpt.y;
@@ -296,8 +277,37 @@ void xParticlePlaneContact::updateCollisionPair(unsigned int pid, double r, vect
 				pd->nx = u.x;
 				pd->ny = u.y;
 				pd->nz = u.z;
+			}			
+		}
+	}
+	else
+	{
+		xmap<unsigned int, xPairData*>::iterator it = c_pairs.find(pid);
+		if (it != c_pairs.end())
+		{
+			xPairData *pd = it.value();
+			if (pd)
+			{
+				bool isc = pd->isc;
+				if (!isc)
+				{
+					if (c_pairs.find(pid) != c_pairs.end())
+						delete c_pairs.take(pid);
+				}
+				else
+				{
+					vector3d cpt = pos + r * u;
+					pd->gab = cdist;
+					pd->cpx = cpt.x;
+					pd->cpy = cpt.y;
+					pd->cpz = cpt.z;
+					pd->nx = u.x;
+					pd->ny = u.y;
+					pd->nz = u.z;
+				}
 			}
 		}
+		
 	}
 	
 	

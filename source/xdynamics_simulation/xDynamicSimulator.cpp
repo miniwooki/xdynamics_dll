@@ -547,6 +547,7 @@ bool xDynamicsSimulator::xRunSimulation()
 			if (savePartData(ct, part))
 			{
 				sprintf_s(buf, "Part%04d   %4.5f %10d      %5d      %4.5f     %4.5f    %s", part, ctime, cstep, eachStep, elapsed_time - previous_time, total_time, xUtilityFunctions::GetDateTimeFormat("%d-%m-%y %H:%M:%S", 0).c_str());
+				std::cout << buf << std::endl;
 				xLog::log(buf);
 			}
 			eachStep = 0;

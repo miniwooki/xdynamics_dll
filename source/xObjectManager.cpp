@@ -121,8 +121,8 @@ xMeshObject* xObjectManager::CreateMeshShapeObject(std::string _name, int _xmt)
 	//xMaterial xm = GetMaterialConstant(_xmt);
 	/*xmo->setDensity(xm.density);
 	xmo->setYoungs(xm.youngs);
-	xmo->setPoisson(xm.poisson);
-	objects.insert(name, xmo);*/
+	xmo->setPoisson(xm.poisson);*/
+	objects.insert(name, xmo);
 	return xmo;
 }
 

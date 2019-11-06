@@ -152,12 +152,14 @@ void xParticleMeshObjectContact::define(unsigned int idx, unsigned int np)
 			pair_count_ptri = new unsigned int[np];
 			pair_id_ptri = new unsigned int[np * MAX_P2MS_COUNT];
 			tsd_ptri = new double[2 * np * MAX_P2MS_COUNT];
-			allocated_static;
+			allocated_static = true;
 		}		
+		xDynamicsManager::This()->XResult()->set_p2tri_contact_data((int)MAX_P2MS_COUNT);
 	}
-	update();
+	
 	gps.max_radius = maxRadii;
 	n_mesh_sphere += po->NumTriangle();
+	update();
 	defined_count++;
 }
 
@@ -329,7 +331,7 @@ void xParticleMeshObjectContact::local_initialize()
 
 bool xParticleMeshObjectContact::check_this_mesh(unsigned int idx)
 {
-	if (idx >= hti[0].id && idx < hti[0].id)
+	if (idx >= hti[0].tid && idx < hti[po->NumTriangle() - 1].tid)
 		return true;
 	return false;
 }
@@ -402,7 +404,7 @@ bool xParticleMeshObjectContact::checkOverlab(vector3i ctype, vector3d p, vector
 }
 
 bool xParticleMeshObjectContact::updateCollisionPair(
-	unsigned int id, double r, vector3d pos, unsigned int &oid, vector3d& ocpt, vector3d& ounit, vector3i& ctype)
+	unsigned int pid, unsigned int id, double r, vector3d pos, unsigned int &oid, vector3d& ocpt, vector3d& ounit, vector3i& ctype)
 {
 	int t = -1;
 	unsigned int k = 0;
@@ -431,30 +433,36 @@ bool xParticleMeshObjectContact::updateCollisionPair(
 		}
 
 		//*(&(ctype.x) + t) += 1
-		bool is_new = pair->find(id) == pair->end();
+		bool is_new = pair->find(pid) == pair->end();
 		if (is_new)
 		{
 			xTrianglePairData* pd = new xTrianglePairData;
-			*pd = { MESH_SHAPE, true, 0, id, 0, 0, cdist, unit.x, unit.y, unit.z, cpt.x, cpt.y, cpt.z };
-			pair->insert(id, pd);// t == 0 ? triangle_pair.insert(id, pd) : (t == 1 ? triangle_line_pair.insert(id, pd) : triangle_point_pair.insert(id, pd));
+			*pd = { MESH_SHAPE, true, 0, pid, 0, 0, cdist, unit.x, unit.y, unit.z, cpt.x, cpt.y, cpt.z };
+			pair->insert(pid, pd);// t == 0 ? triangle_pair.insert(id, pd) : (t == 1 ? triangle_line_pair.insert(id, pd) : triangle_point_pair.insert(id, pd));
 			//xcpl.insertTriangleContactPair(pd);
 		}
 		else
 		{
-			xTrianglePairData *pd = pair->find(id).value();// t == 0 ? xcpl.TrianglePair(id) : (t == 1 ? xcpl.TriangleLinePair(id) : xcpl.TrianglePointPair(id));
-			pd->gab = cdist;
-			pd->cpx = cpt.x;
-			pd->cpy = cpt.y;
-			pd->cpz = cpt.z;
-			pd->nx = unit.x;
-			pd->ny = unit.y;
-			pd->nz = unit.z;
+			xmap<unsigned int, xTrianglePairData*>::iterator it = pair->find(pid);
+			if (it != pair->end())
+			{
+				xTrianglePairData* pd = it.value();
+				pd->gab = cdist;
+				pd->cpx = cpt.x;
+				pd->cpy = cpt.y;
+				pd->cpz = cpt.z;
+				pd->nx = unit.x;
+				pd->ny = unit.y;
+				pd->nz = unit.z;
+			}
+		//	xTrianglePairData *pd = pair->find(id).value();// t == 0 ? xcpl.TrianglePair(id) : (t == 1 ? xcpl.TriangleLinePair(id) : xcpl.TrianglePointPair(id));
+			
 		}
 		return true;
 	}
 	else
 	{
-		delete pair->take(id);
+		delete pair->take(pid);
 	}
 	return false;
 }

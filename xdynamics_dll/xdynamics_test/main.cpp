@@ -31,71 +31,72 @@ int main(int argc, char* argv[])
 // 	coordinatePartitioning(m, v);
 	xDynamicsManager *xdm = new xDynamicsManager;
 
-	if (argc != 1)	
-	{
-		/*xDynamicsSimulator* xds = *//*xdm.getSimulatorFromCommand(argc, argv);*/
-		if (xdm->getSimulatorFromCommand(argc, argv))
-		{
-// 			double dt = 0, et = 0;
-// 			unsigned int st = 0;Op
-// 			std::wcout
-// 				<< "Input the simulation conditions." << std::endl
-// 				<< "    - Time step : "; 
-// 			std::wcin >> dt;
-// 			std::wcout << "    - End time : ";
-// 			std::wcin >> et;
-// 			std::wcout << "    - Save step : ";
-// 			std::wcin >> st;
-// 			xds->xInitialize(dt, st, et);
-// 			xds->xRunSimulation();
-		}
-		else
-		{
-			std::string check_command = argv[1];
-			if (check_command == "-result")
-			{
-				xResultManager *xrm = new xResultManager;
-				if (argc > 2)
-				{
-					std::string check_model = argv[2];
-					xrm->xRun("C:/Users/xdynamics/Documents/xdynamics/", check_model);
-				}
-			/*	else
-				{
-					xrm->xRun("C:/Users/xdynamics/Documents/xdynamics", xUtilityFunctions::xstring(xModel::name));
-				}*/
-				//xdm.xRunResultWorld(argv[2]);
-			}
-			return 0;
-		}
-// 		delete xds;
-// 		return 0;
-	}
-	else
-	{
-// 		std::wstring check_command = argv[1];
-// 		if (check_command == L"-result")
-// 		{
-//			xResultManager xrm;
-//// 			if (argc > 2)
+//	if (argc != 1)	
+//	{
+//		/*xDynamicsSimulator* xds = *//*xdm.getSimulatorFromCommand(argc, argv);*/
+//		if (xdm->getSimulatorFromCommand(argc, argv))
+//		{
+//// 			double dt = 0, et = 0;
+//// 			unsigned int st = 0;Op
+//// 			std::wcout
+//// 				<< "Input the simulation conditions." << std::endl
+//// 				<< "    - Time step : "; 
+//// 			std::wcin >> dt;
+//// 			std::wcout << "    - End time : ";
+//// 			std::wcin >> et;
+//// 			std::wcout << "    - Save step : ";
+//// 			std::wcin >> st;
+//// 			xds->xInitialize(dt, st, et);
+//// 			xds->xRunSimulation();
+//		}
+//		else
+//		{
+//			std::string check_command = argv[1];
+//			if (check_command == "-result")
+//			{
+//				xResultManager *xrm = new xResultManager;
+//				if (argc > 2)
+//				{
+//					std::string check_model = argv[2];
+//					xrm->xRun("C:/Users/xdynamics/Documents/xdynamics/", check_model);
+//				}
+//			/*	else
+//				{
+//					xrm->xRun("C:/Users/xdynamics/Documents/xdynamics", xUtilityFunctions::xstring(xModel::name));
+//				}*/
+//				//xdm.xRunResultWorld(argv[2]);
+//			}
+//			return 0;
+//		}
+//// 		delete xds;
+//// 		return 0;
+//	}
+//	else
+//	{
+//// 		std::wstring check_command = argv[1];
+//// 		if (check_command == L"-result")
+//// 		{
+////			xResultManager xrm;
+////// 			if (argc > 2)
+////// 			{
+////				std::wstring check_model = L"one_pendulum";// argv[2];
+////				xrm.xRun(xModel::path.toStdWString(), check_model);
+//// 			}
+//// 			else
 //// 			{
-//				std::wstring check_model = L"one_pendulum";// argv[2];
-//				xrm.xRun(xModel::path.toStdWString(), check_model);
-// 			}
-// 			else
-// 			{
-// 				xrm.xRun(xModel::path.toStdWString(), xModel::name.toStdWString());
-// 			}
-			//xdm.xRunResultWorld(argv[2]);
-		//}
-		//return 0;
-		xdm->OpenModelXLS("C:/xdynamics/resource/sphere_drop.xls");
-		//xdm->OpenModelXLS(L"C:/xDynamics/resource/four_bar3d.xls");
-	}
+//// 				xrm.xRun(xModel::path.toStdWString(), xModel::name.toStdWString());
+//// 			}
+//			//xdm.xRunResultWorld(argv[2]);
+//		//}
+//		//return 0;
+//		xdm->OpenModelXLS("C:/xdynamics/resource/sphere_drop.xls");
+//		//xdm->OpenModelXLS(L"C:/xDynamics/resource/four_bar3d.xls");
+//	}
 	
 // 	xResultManager xrm;
 // 	xrm.xRun(xModel::path, xModel::name);
  	//xIntegratorHHT* xmbs = new xIntegratorHHT;
+	xdm->OpenModelXLS("C:/xdynamics/resource/sphere_drop/sphere_drop.xls");
  	xDynamicsSimulator *xds = new xDynamicsSimulator(xdm);
   	xds->xInitialize();
  	if (!xds->xRunSimulation())

@@ -67,7 +67,7 @@ void xParticleCylinderContact::define(unsigned int idx, unsigned int np)
 	xContact::define(idx, np);
 	hci =
 	{
-		idx,
+		id,
 		(unsigned int)c_ptr->empty_part_type(),
 		c_ptr->cylinder_thickness(),
 		c_ptr->cylinder_length(),
@@ -295,7 +295,7 @@ double xParticleCylinderContact::particle_cylinder_contact_detection(vector3d& p
 		}
 		double gab = 0;
 		u = (_cp - p) / dist;
-		cp = _cp - hci.len_rr.z * u;
+		//cp = _cp - hci.len_rr.z * u;
 		// inner radial contact
 		if (dist < hci.len_rr.z)
 		{
@@ -317,7 +317,7 @@ double xParticleCylinderContact::particle_cylinder_contact_detection(vector3d& p
 			vector3d OtoCp = c_ptr->Position() - _cp;
 			double OtoCp_ = length(OtoCp);
 			u = OtoCp / OtoCp_;
-			cp = _cp - hci.len_rr.z * u;
+			//cp = _cp - hci.len_rr.z * u;
 			return hci.len_rr.x * 0.5 + r - OtoCp_;
 		}
 		vector3d _at = p - cyl_top;
@@ -422,26 +422,30 @@ void xParticleCylinderContact::updateCollisionPair(unsigned int id, double r, ve
 	}
 	else
 	{
-		xPairData *pd = c_pairs.find(id).value();// xcpl.CylinderPair(id);
-		if (pd)
+		xmap<unsigned int, xPairData*>::iterator it = c_pairs.find(id);
+		if (it != c_pairs.end())
 		{
-			bool isc = pd->isc;
-			if (!isc)
+			if (it.value())
 			{
-				delete c_pairs.take(id);
+				xPairData* pd = it.value();
+				bool isc = pd->isc;
+				if (!isc)
+				{
+					delete c_pairs.take(id);
+				}
+				else
+				{
+					vector3d cpt = pos + r * unit;
+					pd->gab = cdist;
+					pd->cpx = cpt.x;
+					pd->cpy = cpt.y;
+					pd->cpz = cpt.z;
+					pd->nx = unit.x;
+					pd->ny = unit.y;
+					pd->nz = unit.z;
+				}
 			}
-			else
-			{
-				vector3d cpt = pos + r * unit;
-				pd->gab = cdist;
-				pd->cpx = cpt.x;
-				pd->cpy = cpt.y;
-				pd->cpz = cpt.z;
-				pd->nx = unit.x;
-				pd->ny = unit.y;
-				pd->nz = unit.z;
-			}
-		}
+		}		
 	}
 	if (isInnerContact)
 	{
@@ -468,9 +472,10 @@ void xParticleCylinderContact::updateCollisionPair(unsigned int id, double r, ve
 		}
 		else
 		{
-			xPairData *pd = c_pairs.find(id + 1000).value();// xcpl.CylinderPair(id + 1000);
-			if (pd)
+			xmap<unsigned int, xPairData*>::iterator it = c_pairs.find(id + 1000);
+			if (it != c_pairs.end())
 			{
+				xPairData* pd = it.value();
 				bool isc = pd->isc;
 				if (!isc)
 				{
@@ -487,7 +492,7 @@ void xParticleCylinderContact::updateCollisionPair(unsigned int id, double r, ve
 					pd->ny = unit.y;
 					pd->nz = unit.z;
 				}
-			}
+			}			
 		}
 	}
 }

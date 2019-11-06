@@ -30,7 +30,7 @@ public:
 	
 	bool checkOverlab(vector3i ctype, vector3d p, vector3d c, vector3d u0, vector3d u1);
 	vector3d particle_polygon_contact_detection(host_triangle_info& hpi, vector3d& p, double r, int& ct);
-	bool updateCollisionPair(unsigned int id, double r, vector3d pos, unsigned int &oid, vector3d& ocpt, vector3d& ounit, vector3i& ctype);
+	bool updateCollisionPair(unsigned int pid, unsigned int tid, double r, vector3d pos, unsigned int &oid, vector3d& ocpt, vector3d& ounit, vector3i& ctype);
 	void particle_triangle_contact_force(xTrianglePairData* d, double r, double m, vector3d& p, vector3d& v, vector3d& o, double &res, vector3d &tmax, vector3d& F, vector3d& M);
 
 	virtual void collision_gpu(
