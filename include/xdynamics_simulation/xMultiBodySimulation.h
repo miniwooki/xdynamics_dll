@@ -26,7 +26,8 @@ public:
 	//void setImplicitTolerance(double _eps);
 	bool SaveStepResult(unsigned int part);
 	void ExportResults(std::fstream& of);
-	void SetZeroBodyForce();
+	void SetZeroAxialBodyForce();
+	void SetZeroAllBodyForce();
 	unsigned int setupByLastSimulationFile(std::string lmr);
 	unsigned int num_generalized_coordinate();
 	unsigned int num_constraint_equations();

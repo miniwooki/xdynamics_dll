@@ -360,7 +360,7 @@ bool xDynamicsSimulator::xRunSimulationThread(double ct, unsigned int cstep)
 			}
 			else
 			{
-				xmbd->SetZeroBodyForce();
+				xmbd->SetZeroAllBodyForce();
 			}
 			if (checkXerror(xdem->OneStepSimulation(ct, cstep)))
 				return false;

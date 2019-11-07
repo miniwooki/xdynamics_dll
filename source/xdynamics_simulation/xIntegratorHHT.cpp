@@ -100,7 +100,7 @@ int xIntegratorHHT::OneStepSimulation(double ct, unsigned int cstep)
 
 void xIntegratorHHT::PredictionStep(double ct, unsigned int cstep)
 {
-	SetZeroBodyForce();
+	SetZeroAxialBodyForce();
 	ConstructForceVector(pre);
 	ConstructContraintJacobian();
 	for (unsigned int i = 0; i < cjaco.NNZ(); i++)
@@ -130,7 +130,7 @@ int xIntegratorHHT::CorrectionStep(double ct, unsigned int cstep)
 	double e_norm = 1;
 	unsigned int odof = xModel::OneDOF();
 	while (1){
-		SetZeroBodyForce();
+		SetZeroAxialBodyForce();
 		niter++;
 		if (niter > 100)
 		{

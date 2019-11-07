@@ -44,12 +44,24 @@ void xMultiBodySimulation::SetDEMSpringDamper(xSpringDamperForce* dem_t)
 	}
 }
 
-void xMultiBodySimulation::SetZeroBodyForce()
+void xMultiBodySimulation::SetZeroAllBodyForce()
 {
 	xmap<xstring, xPointMass*>::iterator it = xmbd->Masses().begin();
 	while (it.has_next())
 	{
 		it.value()->setZeroAllForce();
+		it.next();
+	}
+}
+
+void xMultiBodySimulation::SetZeroAxialBodyForce()
+{
+	xmap<xstring, xPointMass*>::iterator it = xmbd->Masses().begin();
+	while (it.has_next())
+	{
+		it.value()->setAxialForce(0, 0, 0);
+		it.value()->setAxialMoment(0, 0, 0);
+		it.value()->setEulerParameterMoment(0, 0, 0,0);
 		it.next();
 	}
 }

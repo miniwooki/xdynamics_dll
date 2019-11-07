@@ -157,6 +157,7 @@ void xIntegratorRK4::setDICoordinate()
 
 bool xIntegratorRK4::SolveRK4_EOM()
 {
+	SetZeroAxialBodyForce();
 	ConstructMassMatrix(1.0);
 	ConstructContraintJacobian();
 	ConstructForceVector(rhs);
