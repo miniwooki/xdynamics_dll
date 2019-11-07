@@ -2042,6 +2042,8 @@ __global__ void particle_polygonObject_collision_kernel(
 		p_tsd[i] = tsd[sid + i];
 	}
 	unsigned int old_count = pair_count[id];
+	if (old_count > 0)
+		return;
 	//	double cdist = 0.0;
 	double im = mass[id];
 	double3 ipos = make_double3(pos[id].x, pos[id].y, pos[id].z);
@@ -2058,7 +2060,7 @@ __global__ void particle_polygonObject_collision_kernel(
 	double3 sum_moment = make_double3(0, 0, 0);
 	//unsigned int new_count = sid;
 	unsigned int sk = dti[0].tid;
-	unsigned int new_count = sid + sk ? old_count : 0;
+	unsigned int new_count = sid;
 	
 	unsigned int start_index = 0;
 	unsigned int end_index = 0;

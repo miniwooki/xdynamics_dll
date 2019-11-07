@@ -49,12 +49,13 @@
 //#include <QtCore/QString>
 #include <string>
 
-struct global_parameters
+ typedef struct
 {
 	double max_radius;
-};
+}global_parameters;
 
-static global_parameters gps = { -FLT_MAX };
+ static global_parameters gps = { -FLT_MAX };
+//static void SetGlobalRadius(double _mr) { gps.max_radius = _mr; }
 //#include "xstring.h"
 //#include <string>
 

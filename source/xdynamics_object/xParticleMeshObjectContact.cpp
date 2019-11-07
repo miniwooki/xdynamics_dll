@@ -157,10 +157,13 @@ void xParticleMeshObjectContact::define(unsigned int idx, unsigned int np)
 		xDynamicsManager::This()->XResult()->set_p2tri_contact_data((int)MAX_P2MS_COUNT);
 	}
 	
-	gps.max_radius = maxRadii;
+	
+	printf("gps.max_radius : %f\n", gps.max_radius);
 	n_mesh_sphere += po->NumTriangle();
 	update();
 	defined_count++;
+	if (gps.max_radius < maxRadii)
+		gps.max_radius = maxRadii;
 }
 
 void xParticleMeshObjectContact::update()
@@ -178,7 +181,7 @@ void xParticleMeshObjectContact::update()
 			ed.e0, ed.e1, ed.e2, ed.e3
 		};
 		checkXerror(cudaMemcpy(dbi, &bi, sizeof(device_body_info), cudaMemcpyHostToDevice));
-		cu_update_meshObjectData(dvList, dsphere, dlocal, dti, dbi, n_mesh_sphere);
+		cu_update_meshObjectData(dvList, dsphere, dlocal, dti, dbi, po->NumTriangle());
 	}
 }
 
@@ -252,7 +255,7 @@ void xParticleMeshObjectContact::collision_cpu(
 		vector3d v = vel[ci];
 		vector3d o = ToAngularVelocity(ep[ci], ev[ci]);
 		particle_triangle_contact_force(it.value(), r, m, cp, v, o, rres, tmax, force, moment);
-		printf("particle_force_with_mesh : [%e, %e, %e]\n", force.x, force.y, force.z);
+		//printf("particle_force_with_mesh : [%e, %e, %e]\n", force.x, force.y, force.z);
 	}
 	if (!triangle_pair.size())
 	{
