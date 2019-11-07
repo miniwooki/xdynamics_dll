@@ -130,6 +130,7 @@ int xIntegratorHHT::CorrectionStep(double ct, unsigned int cstep)
 	double e_norm = 1;
 	unsigned int odof = xModel::OneDOF();
 	while (1){
+		SetZeroBodyForce();
 		niter++;
 		if (niter > 100)
 		{
@@ -155,7 +156,7 @@ int xIntegratorHHT::CorrectionStep(double ct, unsigned int cstep)
 		}
 		MassJacobian(divalpha * beta * dt * dt);
 		ForceJacobian(gamma * dt, beta * dt * dt);
-		ConstructJacobian(beta * dt * dt);
+		//ConstructJacobian(beta * dt * dt);
 		for (unsigned int i(0); i < cjaco.NNZ(); i++){
 			lhs(cjaco.ridx[i] + mdim, cjaco.cidx[i]) = lhs(cjaco.cidx[i], cjaco.ridx[i] + mdim) = cjaco.value[i];
 		}

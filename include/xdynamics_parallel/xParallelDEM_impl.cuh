@@ -1868,22 +1868,16 @@ __device__ void particle_triangle_contact_force(
 	double3& tma,
 	unsigned int& new_count)
 {
-	device_triangle_info tri = dti[dtci.id];
-	double3 qp = tri.Q - tri.P;
-	double3 rp = tri.R - tri.P;
-	//	double rcon = r - 0.5 * cdist;
-	double3 unit = -cross(qp, rp);
-	//double3 dcpr = cpt - make_double3(icpos.x, icpos.y, icpos.z);
-	//double3 dcpr_j = cpt - make_double3(jcpos.x, jcpos.y, jcpos.z);
-	unit = unit / length(unit);
+	//device_triangle_info tri = dti[dtci.id];
+	//double3 qp = tri.Q - tri.P;
+	//double3 rp = tri.R - tri.P;
+	double3 rp = dtci.cpt - ipos;//-cross(qp, rp);
+	///unit = unit / length(unit);
 	double2 sd = make_double2(0.0, 0.0);
-	//unsigned int pidx = tri.id;
-	//device_contact_property cmp = cp[pidx];
-	//device_body_info db = dbi[pidx];
-	//device_mesh_mass_info pmi = dpmi[pidx];
-	//double3 cpt = closestPtPointTriangle(dpi[dtci.id], ipos, r, t);
 	double3 po2cp = dtci.cpt - dbi->pos;// pmi.origin;
-	double cdist = r - length(ipos - dtci.cpt);
+	double dist = length(rp);
+	double3 unit = rp / dist;
+	double cdist = r - dist;//r - length(ipos - dtci.cpt);
 	double coh_s = 0;
 	if (cp->coh)
 		coh_s = limit_cohesion_depth(r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh);
@@ -2063,7 +2057,8 @@ __global__ void particle_polygonObject_collision_kernel(
 	double3 sum_force = make_double3(0, 0, 0);
 	double3 sum_moment = make_double3(0, 0, 0);
 	//unsigned int new_count = sid;
-	unsigned int new_count = sid + old_count;
+	unsigned int sk = dti[0].tid;
+	unsigned int new_count = sid + sk ? old_count : 0;
 	
 	unsigned int start_index = 0;
 	unsigned int end_index = 0;
@@ -2075,7 +2070,7 @@ __global__ void particle_polygonObject_collision_kernel(
 	unsigned int ncl = 0;
 	unsigned int ncp = 0;
 	double coh_s = 0;
-	unsigned int sk = dti[0].tid;
+	
 	double3 previous_line_cpt = make_double3(0.0, 0.0, 0.0);
 	double3 previous_point_cpt = make_double3(0.0, 0.0, 0.0);
 	for (int z = -1; z <= 1; z++) {
@@ -2194,8 +2189,8 @@ __global__ void particle_polygonObject_collision_kernel(
 
 	force[id] += sum_force;
 	moment[id] += sum_moment;
-	if (length(sum_force))
-		printf("particle_force_with_mesh : [%d, %d, %d]-[%e, %e, %e]\n",nct, ncl, ncp, sum_force.x, sum_force.y, sum_force.z);
+	//if (length(sum_force))
+		//printf("particle_force_with_mesh : [%d, %d, %d]-[%e, %e, %e]\n",nct, ncl, ncp, sum_force.x, sum_force.y, sum_force.z);
 	///*if (new_count - sid > MAX_P2MS_COUNT)
 	//	printf("The total of contact with triangle */is over(%d)\n.", new_count - sid);
 	pair_count[id] = new_count - sid;

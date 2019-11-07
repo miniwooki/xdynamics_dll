@@ -357,22 +357,29 @@ void xXLSReader::ReadMass(xMultiBodyModel* xmbd, vector2i rc)
 		{
 			if (IsEmptyCell(rc.x, rc.y)) break;
 			std::string name = ReadStr(rc.x, rc.y++);
-			xObject *obj = xObjectManager::XOM()->XObject(name);							
-			xPointMassData xpmd = ReadPointMassData(name, rc.x, rc.y);
-			if (!IsEmptyCell(rc.x, rc.y))
+			if (xUtilityFunctions::ExistFile(name.c_str()))
 			{
-				if (obj)
-				{
-					xPointMass* _xpm = dynamic_cast<xPointMass*>(obj);
-					_xpm->setPosition(xpmd.px, xpmd.py, xpmd.pz);
-				}				
-				rc.x++;
-				continue;
+				xmbd->CreatePointMassesFromFile(name);			
 			}				
-			xPointMass* xpm = NULL;
-			if (obj) obj->setDynamicsBody(true);
-			xpm = xmbd->CreatePointMass(name);
-			xpm->SetDataFromStructure(xmbd->NumMass(), xpmd);
+			else
+			{
+				xObject *obj = xObjectManager::XOM()->XObject(name);
+				xPointMassData xpmd = ReadPointMassData(name, rc.x, rc.y);
+				if (!IsEmptyCell(rc.x, rc.y))
+				{
+					if (obj)
+					{
+						xPointMass* _xpm = dynamic_cast<xPointMass*>(obj);
+						_xpm->setPosition(xpmd.px, xpmd.py, xpmd.pz);
+					}
+					rc.x++;
+					continue;
+				}
+				xPointMass* xpm = NULL;
+				if (obj) obj->setDynamicsBody(true);
+				xpm = xmbd->CreatePointMass(name);
+				xpm->SetDataFromStructure(xmbd->NumMass(), xpmd);
+			}			
 			rc.x++;
 			rc.y = init_col;
 		}
@@ -385,28 +392,37 @@ void xXLSReader::ReadJoint(xMultiBodyModel* xmbd, vector2i rc)
 	{
 		if (IsEmptyCell(rc.x, rc.y))	break;
 		std::string name = ReadStr(rc.x, rc.y++);
-		xKinematicConstraint::cType type = (xKinematicConstraint::cType)static_cast<int>(ReadNum(rc.x, rc.y++));
-		std::string base = ReadStr(rc.x, rc.y++);
-		std::string action = ReadStr(rc.x, rc.y++);
-		xKinematicConstraint* xkc = xmbd->CreateKinematicConstraint(name, type, base.c_str(), action.c_str());
-		xkc->SetupDataFromStructure(xmbd->XMass(base), xmbd->XMass(action), ReadJointData(name, rc.x, rc.y));
-		if (!IsEmptyCell(rc.x, rc.y))
+		if (xUtilityFunctions::ExistFile(name.c_str()))
 		{
-			int drc[2] = { rc.x, rc.y };// vector2i drc = rc;
-			xstring str = ReadStr(drc[0], drc[1]++);
-			str.split(",", 2, drc);
-			drc[0] -= 1; drc[1] -= 1;
-			if (!IsEmptyCell(drc[0], drc[1]))
+			xmbd->CreateKinematicConstraintsFromFile(name);
+		}
+		else
+		{
+			std::cout << name << std::endl;
+			xKinematicConstraint::cType type = (xKinematicConstraint::cType)static_cast<int>(ReadNum(rc.x, rc.y++));
+			std::string base = ReadStr(rc.x, rc.y++);
+			std::string action = ReadStr(rc.x, rc.y++);
+			xKinematicConstraint* xkc = xmbd->CreateKinematicConstraint(name, type, base.c_str(), action.c_str());
+			xkc->SetupDataFromStructure(xmbd->XMass(base), xmbd->XMass(action), ReadJointData(name, rc.x, rc.y));
+			if (!IsEmptyCell(rc.x, rc.y))
 			{
-				xDrivingConstraint* xdc = NULL;
-				name = ReadStr(drc[0], drc[1]++);
-				xdc = xmbd->CreateDrivingConstraint(name, xkc);
-				double stime = ReadNum(drc[0], drc[1]++);
-				double cvel = ReadNum(drc[0]++, drc[1]++);
-				xdc->setStartTime(stime);
-				xdc->setConstantVelocity(cvel);
+				int drc[2] = { rc.x, rc.y };// vector2i drc = rc;
+				xstring str = ReadStr(drc[0], drc[1]++);
+				str.split(",", 2, drc);
+				drc[0] -= 1; drc[1] -= 1;
+				if (!IsEmptyCell(drc[0], drc[1]))
+				{
+					xDrivingConstraint* xdc = NULL;
+					name = ReadStr(drc[0], drc[1]++);
+					xdc = xmbd->CreateDrivingConstraint(name, xkc);
+					double stime = ReadNum(drc[0], drc[1]++);
+					double cvel = ReadNum(drc[0]++, drc[1]++);
+					xdc->setStartTime(stime);
+					xdc->setConstantVelocity(cvel);
+				}
 			}
 		}
+		
 		rc.x++;
 		rc.y = 0;
 	}

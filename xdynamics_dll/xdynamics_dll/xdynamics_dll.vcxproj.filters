@@ -285,6 +285,9 @@
     <ClCompile Include="..\..\source\xdynamics_object\xRotationSpringDamperForce.cpp">
       <Filter>소스 파일\xdynamics_object\force</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xFixConstraint.cpp">
+      <Filter>소스 파일\xdynamics_object\joint</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\xdynamics_decl.h">
@@ -508,6 +511,9 @@
     </ClInclude>
     <ClInclude Include="..\..\include\xdynamics_object\xRotationSpringDamperForce.h">
       <Filter>헤더 파일\xdynamics_object\force</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_object\xFixConstraint.h">
+      <Filter>헤더 파일\xdynamics_object\joint</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

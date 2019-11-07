@@ -128,6 +128,68 @@ xPointMass* xMultiBodyModel::CreatePointMass(std::string _name)
 	return xpm;
 }
 
+void xMultiBodyModel::CreatePointMassesFromFile(std::string _name)
+{
+	std::fstream sfs;
+	sfs.open(_name, std::ios_base::in);
+	if (sfs.is_open())
+	{
+		while (!sfs.eof())
+		{
+			xPointMassData xpm = { 0, };
+			std::string nm;
+			sfs >> nm >> xpm.mass >> xpm.ixx >> xpm.iyy >> xpm.izz
+				>> xpm.ixy >> xpm.iyz >> xpm.ixz
+				>> xpm.px >> xpm.py >> xpm.pz
+				>> xpm.e0 >> xpm.e1 >> xpm.e2 >> xpm.e3
+				>> xpm.vx >> xpm.vy >> xpm.vz;
+			xPointMass* pm = CreatePointMass(nm);
+			pm->SetDataFromStructure(masses.size(), xpm);
+			
+		}
+	}
+	sfs.close();
+}
+
+void xMultiBodyModel::CreateKinematicConstraintsFromFile(std::string _name)
+{
+	std::fstream sfs;
+	sfs.open(_name, std::ios_base::in);
+	if (sfs.is_open())
+	{
+		while (!sfs.eof())
+		{
+			std::string nm;
+			std::string base;
+			std::string action;
+			int type_id = -1;
+			xKinematicConstraint::cType type;
+			xJointData xjd = { 0, };
+			bool isdriving = false;
+			sfs >> nm >> type_id >> base >> action
+				>> xjd.lx >> xjd.ly >> xjd.lz
+				>> xjd.fix >> xjd.fiy >> xjd.fiz
+				>> xjd.gix >> xjd.giy >> xjd.giz
+				>> xjd.fjx >> xjd.fjy >> xjd.fjz
+				>> xjd.gjx >> xjd.gjy >> xjd.gjz >> isdriving;
+			type = (xKinematicConstraint::cType)type_id;
+			xKinematicConstraint* xkc = CreateKinematicConstraint(nm, type, base, action);
+			xkc->SetupDataFromStructure(XMass(base), XMass(action), xjd);
+			if (isdriving)
+			{
+				std::string d_name;
+				double st;
+				double cv;
+				sfs >> d_name >> st >> cv;
+				xDrivingConstraint* xdc = CreateDrivingConstraint(d_name, xkc);
+				xdc->setStartTime(st);
+				xdc->setConstantVelocity(cv);
+			}
+		}
+	}
+	sfs.close();
+}
+
 xKinematicConstraint* xMultiBodyModel::CreateKinematicConstraint(
 	std::string _name, xKinematicConstraint::cType _type, std::string _i, std::string _j)
 {
@@ -154,6 +216,10 @@ xKinematicConstraint* xMultiBodyModel::CreateKinematicConstraint(
 		xkc = new xUniversalConstraint(_name, _i, _j);
 		xLog::log("Create Universal Joint : " + _name);
 		//std::cout << "Create universal constraint - " << _name.c_str() << ", Num. constraint - " << constraints.size() << std::endl;
+		break;
+	case xKinematicConstraint::FIXED:
+		xkc = new xFixConstraint(_name, _i, _j);
+		xLog::log("Creat Fixed Joint : " + _name);
 		break;
 	}
 	constraints.insert(name, xkc);// = xkc;

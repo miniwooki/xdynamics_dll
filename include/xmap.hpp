@@ -12,7 +12,7 @@ class XDYNAMICS_API xmap
 		T value;
 		xMapNode* right;
 		xMapNode* left;
-		xMapNode(Key k, T v) : key(k), value(v) {}
+		xMapNode(Key k, T v) : key(k), value(v), left(nullptr), right(nullptr) {}
 	};
 	xMapNode* head;
 	xMapNode* tail;
@@ -50,8 +50,8 @@ public:
 		if (head)
 			head->right = n;
 		head = n;
-		head->right = NULL;
-		if (!sz) tail = head;
+		//head->right = NULL;
+		if (!sz) head->left = tail;
 		sz++;
 	}
 	void push_back(Key k, T v)
@@ -75,6 +75,8 @@ public:
 		}
 		else
 		{
+			//xMapNode* tail_rnode = tail.right;
+
 			tail->left = n;
 			n->right = tail;
 			tail = n;
@@ -99,7 +101,7 @@ public:
 		if (!n)
 		{
 			iterator it = begin();
-			if (it == end())
+			if (it == end() || sz == 1)
 			{
 				push_back(k, v);
 			}
@@ -113,26 +115,40 @@ public:
 						break;
 				}
 				xMapNode *cn = it.current_node();
-				if (cn == NULL)
+				if (cn == head)
+				{
+					n->left = head;
+					head->right = n;		
+					head = n;
+				}
+				else if (it == end())
 				{
 					push_back(k, v);
 					delete n;
 					return 0;
 				}
-				xMapNode *pn = cn->right;
-				n->left = cn;
-				n->right = cn->right;
-				cn->right = n;
-				//cn = n;
-				if (pn)
-				{
-					pn->left = n;
-				}
 				else
 				{
-					head = n;
-					tail = cn;
+					xMapNode *cn_rnode = cn->right;
+					n->left = cn;
+					n->right = cn_rnode;
+					cn_rnode->left = n;
+					cn->right = n;
 				}
+				//xMapNode *pn = cn->right;
+				//n->left = cn;
+				//n->right = cn->right;
+				//cn->right = n;
+				////cn = n;
+				//if (pn)
+				//{
+				//	pn->left = n;
+				//}
+				//else
+				//{
+				//	head = n;
+				//	tail = cn;
+				//}
 				sz++;
 				//push_back(k, v);
 			}

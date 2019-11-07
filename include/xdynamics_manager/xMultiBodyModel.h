@@ -8,6 +8,7 @@
 #include "xdynamics_object/xTranslationConstraint.h"
 #include "xdynamics_object/xSphericalConstraint.h"
 #include "xdynamics_object/xUniversalConstraint.h"
+#include "xdynamics_object/xFixConstraint.h"
 #include "xdynamics_object/xDrivingConstraint.h"
 #include "xdynamics_object/xRotationalAxialForce.h"
 #include "xmap.hpp"
@@ -34,6 +35,8 @@ public:
 	xDrivingConstraint* xDriving(std::string& ws);
 
 	xPointMass* CreatePointMass(std::string _name);
+	void CreatePointMassesFromFile(std::string _name);
+	void CreateKinematicConstraintsFromFile(std::string _name);
 	xKinematicConstraint* CreateKinematicConstraint(std::string _name, xKinematicConstraint::cType _type, std::string _i, std::string _j);
 	xForce* CreateForceElement(std::string _name, xForce::fType _type, std::string bn, std::string an);
 	xDrivingConstraint* CreateDrivingConstraint(std::string _name, xKinematicConstraint* _kc);

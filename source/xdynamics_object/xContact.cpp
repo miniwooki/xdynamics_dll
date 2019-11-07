@@ -224,9 +224,11 @@ void xContact::DHSModel(
 		double s_dot = dot(dv, s_hat);
 		ds = ds + xSimulation::dt * (s_dot + dots);
 		dots = s_dot;
+	//	printf("ds-dots : [%e, %e]\n",ds, dots);
 		//double ds = mag_e * xSimulation::dt;
 		double ft1 = c.ks * ds + c.vs * dot(dv, s_hat);
 		double ft2 = c.fric * length(Fn);
+	//	printf("ft1-ft2 : [%e, %e]\n",ft1, ft2);
 		Ft = min(ft1, ft2) * s_hat;
 		//M = cross(cp, Ft);
 	}

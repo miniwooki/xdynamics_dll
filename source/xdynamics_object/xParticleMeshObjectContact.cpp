@@ -252,6 +252,7 @@ void xParticleMeshObjectContact::collision_cpu(
 		vector3d v = vel[ci];
 		vector3d o = ToAngularVelocity(ep[ci], ev[ci]);
 		particle_triangle_contact_force(it.value(), r, m, cp, v, o, rres, tmax, force, moment);
+		printf("particle_force_with_mesh : [%e, %e, %e]\n", force.x, force.y, force.z);
 	}
 	if (!triangle_pair.size())
 	{
@@ -481,7 +482,6 @@ void xParticleMeshObjectContact::particle_triangle_contact_force(
 	vector3d mo = 2.0 * GMatrix(hmmi->EulerParameters()) * hmmi->DEulerParameters();
 	vector3d mv = hmmi->Velocity();
 	//host_mesh_mass_info hmmi = hpmi[j];
-	double rcon = r - 0.5 * d->gab;
 	vector3d u = new_vector3d(d->nx, d->ny, d->nz);
 	//vector3d rc = r * u;
 	vector3d dcpr = new_vector3d(d->cpx, d->cpy, d->cpz) - p;
@@ -496,6 +496,7 @@ void xParticleMeshObjectContact::particle_triangle_contact_force(
 		mpp.Gi, mpp.Gj,
 		restitution, stiffnessRatio, s_friction,
 		friction, rolling_factor, cohesion);
+	printf("rv : [%e, %e, %e]\n", rv.x, rv.y, rv.z);
 	switch (xContact::ContactForceModel())
 	{
 	case DHS: DHSModel(c, d->gab, d->delta_s, d->dot_s, cohesion, rv, u, m_fn, m_ft); break;

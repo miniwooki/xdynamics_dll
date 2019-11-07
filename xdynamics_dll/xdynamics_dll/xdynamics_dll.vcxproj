@@ -198,6 +198,7 @@
     <ClCompile Include="..\..\source\xdynamics_object\xCubicSplineKernel.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xCylinderObject.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xDrivingConstraint.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xFixConstraint.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xForce.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xKernelFunction.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xKinematicConstraint.cpp" />
@@ -284,6 +285,7 @@
     <ClInclude Include="..\..\include\xdynamics_object\xCubicSplineKernel.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xCylinderObject.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xDrivingConstraint.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xFixConstraint.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xForce.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xKernelFunction.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xKinematicConstraint.h" />

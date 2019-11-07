@@ -61,9 +61,11 @@ void xSpringDamperForce::SetupDataFromStructure(xPointMass* ip, xPointMass* jp, 
 	loc_j = new_vector3d(d.spjx, d.spjy, d.spjz);
 	k = d.k;
 	c = d.c;
-	init_l = d.init_l;
+	//init_l = d.init_l;
 	xForce::spi = i_ptr->toLocal(loc_i - i_ptr->Position());
 	xForce::spj = j_ptr->toLocal(loc_j - j_ptr->Position());
+	vector3d dist = jp->Position() + jp->toGlobal(spj) - ip->Position() - ip->toGlobal(spi);
+	init_l = length(dist);
 }
 
 void xSpringDamperForce::SetupDataFromListData(xTSDAData&d, std::string data)
