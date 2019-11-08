@@ -66,11 +66,12 @@ void xContactManager::CreateContactPair(
 			{
 				std::stringstream ss;
 				ss << n << i;
+				xstring _n = ss.str();
 				xPlaneObject* plane = cube->Planes() + i;
 				xParticlePlaneContact *c = new xParticlePlaneContact(ss.str(), particles, plane);
 				c->setContactParameters(d);
-				cpplanes.insert(cpplanes.size(), c);
-				cots.insert(ss.str(), c);
+				cpplanes.insert(_n, c);
+				cots.insert(_n, c);
 			}
 			break;
 		}			
@@ -78,24 +79,27 @@ void xContactManager::CreateContactPair(
 		{
 			xParticlePlaneContact *c = new xParticlePlaneContact(n, o1, o2); _c = c;
 			c->setContactParameters(d);
-			cpplanes.insert(cpplanes.size(), c);
-			cots.insert(n, c);
+			xstring _n = n;
+			cpplanes.insert(_n, c);
+			cots.insert(_n, c);
 			break;
 		}		
 		case PARTICLE_CYLINDER:
 		{
 			xParticleCylinderContact *c = new xParticleCylinderContact(n, o1, o2);
 			c->setContactParameters(d);
-			cpcylinders.insert(cpcylinders.size(), c);
-			cots.insert(n, c);
+			xstring _n = n;
+			cpcylinders.insert(_n, c);
+			cots.insert(_n, c);
 			break;
 		}
 		case PARTICLE_MESH_SHAPE: 
 		{
 			xParticleMeshObjectContact* c = new xParticleMeshObjectContact(n, o1, o2); _c = c;
 			c->setContactParameters(d);
-			cpmeshes.insert(cpmeshes.size(), c);
-			cots.insert(n, c);
+			xstring _n = n;
+			cpmeshes.insert(_n, c);
+			cots.insert(_n, c);
 			break;// cpmesh.insert(c->Name(), dynamic_cast<xParticleMeshObjectContact*>(c)); break;
 		}		
 	}
@@ -137,18 +141,18 @@ void xContactManager::setupParticlesPlanesContact()
 	
 }
 
-xmap<int, xParticleMeshObjectContact*>& xContactManager::PMContacts()
+xmap<xstring, xParticleMeshObjectContact*>& xContactManager::PMContacts()
 {
 	return cpmeshes;
 	// TODO: 여기에 반환 구문을 삽입합니다.
 }
 
-xmap<int, xParticlePlaneContact*>& xContactManager::PPLContacts()
+xmap<xstring, xParticlePlaneContact*>& xContactManager::PPLContacts()
 {
 	return cpplanes;
 }
 
-xmap<int, xParticleCylinderContact*>& xContactManager::PCYLContacts()
+xmap<xstring, xParticleCylinderContact*>& xContactManager::PCYLContacts()
 {
 	return cpcylinders;// TODO: 여기에 반환 구문을 삽입합니다.
 }
@@ -328,9 +332,9 @@ void xContactManager::updateCollisionPair(
 					neach = xci[j].neach;
 		vector3d p = new_vector3d(pos[i].x, pos[i].y, pos[i].z);
 		double r = pos[i].w;
-		for (xmap<int, xParticlePlaneContact*>::iterator it = cpplanes.begin(); it != cpplanes.end(); it.next())
+		for (xmap<xstring, xParticlePlaneContact*>::iterator it = cpplanes.begin(); it != cpplanes.end(); it.next())
 			it.value()->updateCollisionPair(i, r, p);
-		for(xmap<int, xParticleCylinderContact*>::iterator it = cpcylinders.begin(); it != cpcylinders.end(); it.next())
+		for(xmap<xstring, xParticleCylinderContact*>::iterator it = cpcylinders.begin(); it != cpcylinders.end(); it.next())
 			it.value()->updateCollisionPair(i, r, p);
 		vector3i gp = xGridCell::getCellNumber(p.x, p.y, p.z);
 		unsigned int old_id = 0;
@@ -360,7 +364,7 @@ void xContactManager::updateCollisionPair(
 							}
 							else if (k >= np)
 							{
-								for (xmap<int, xParticleMeshObjectContact*>::iterator it = cpmeshes.begin(); it != cpmeshes.end(); it.next())
+								for (xmap<xstring, xParticleMeshObjectContact*>::iterator it = cpmeshes.begin(); it != cpmeshes.end(); it.next())
 								{
 									if(it.value()->check_this_mesh(k-np))
 										it.value()->updateCollisionPair(i, k - np, r, p, old_id, old_cpt, old_unit, ctype);

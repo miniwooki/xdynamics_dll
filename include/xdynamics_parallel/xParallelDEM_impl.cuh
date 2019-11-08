@@ -232,7 +232,7 @@ __global__ void vv_update_velocity_kernel(
 	{
 		printf("[%d] force : [%e, %e, %e], moment : [%e, %e, %e], m_ea : [%e, %e, %e, %e]\n", id, force[id].x, force[id].y, force[id].z, moment[id].x, moment[id].y, moment[id].z, m_ea.x, m_ea.y, m_ea.z, m_ea.w);
 	}*/
-	
+	//printf("[%d] m_force : [%e, %e, %e]\n", id, force[id].x, force[id].y, force[id].z);
 	v += 0.5 * cte.dt * (acc[id] + a);
 	av = av + 0.5 * cte.dt * (ea[id] + m_ea);
 	force[id] = make_double3(0.0, 0.0, 0.0); 
@@ -1909,9 +1909,10 @@ __device__ void particle_triangle_contact_force(
 
 	calculate_previous_rolling_resistance(cp->rfric, r, 0, rc, Fn, Ft, res, tma);
 	double3 m_force = Fn + Ft;
-	//printf("[%d] m_force : [%e, %e, %e]\n", id, m_force.x, m_force.y, m_force.z);
+	
 	sum_force += m_force;
 	sum_moment += cross(rc, m_force);
+	//printf("[%d] m_force : [%e, %e, %e]\n", id, m_force.x, m_force.y, m_force.z);
 	//dbf[id] += -m_force;// +make_double3(1.0, 5.0, 9.0);
 	fx[id] += -m_force.x;
 	fy[id] += -m_force.y;
@@ -2042,8 +2043,8 @@ __global__ void particle_polygonObject_collision_kernel(
 		p_tsd[i] = tsd[sid + i];
 	}
 	unsigned int old_count = pair_count[id];
-	if (old_count > 0)
-		return;
+	//if (old_count > 0)
+		//return;
 	//	double cdist = 0.0;
 	double im = mass[id];
 	double3 ipos = make_double3(pos[id].x, pos[id].y, pos[id].z);
@@ -2091,6 +2092,7 @@ __global__ void particle_polygonObject_collision_kernel(
 							///if (k < bindex || k >= eindex)
 							//	continue;
 							int t = -1;
+						//	printf("TK : %d\n", tk);
 							double3 cpt = closestPtPointTriangle(dti[tk], ipos, ir, t);
 							//device_contact_property cmp = cp;
 							double cdist = ir - length(ipos - cpt);

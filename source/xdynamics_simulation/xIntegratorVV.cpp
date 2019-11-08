@@ -32,7 +32,7 @@ int xIntegratorVV::OneStepSimulation(double ct, unsigned int cstep)
 	if (xcm->PMContacts().size())
 	{
 		unsigned int sid = np;
-		xmap<int, xParticleMeshObjectContact*>::iterator it = xcm->PMContacts().begin();
+		xmap<xstring, xParticleMeshObjectContact*>::iterator it = xcm->PMContacts().begin();
 		while (it.has_next())
 		{
 			double* m_sphere = it.value()->MeshSphere();

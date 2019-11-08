@@ -28,6 +28,7 @@ public:
 	bool operator>(const xstring& _xs);
 	char* text() const;
 	size_t size() const;
+	int hexIndex();
 	void split(const char* c, int n, int* data);
 	void split(const char* c, int n, double* data);
 	void split(const char* c, int n, std::string* data);

@@ -54,36 +54,36 @@ public:
 		if (!sz) head->left = tail;
 		sz++;
 	}
-	void push_back(Key k, T v)
-	{
-		xMapNode *n = new xMapNode(k, v);
-		if (!sz)
-		{
-			head = n;
-			head->right = NULL;
-			tail = NULL;
-			head->left = tail;
-			sz++;
-		}
-		else if (sz == 1)
-		{
-			n->right = head;
-			tail = n;
-			tail->left = NULL;
-			head->left = tail;
-			sz++;
-		}
-		else
-		{
-			//xMapNode* tail_rnode = tail.right;
+	//void push_back(Key k, T v)
+	//{
+	//	xMapNode *n = new xMapNode(k, v);
+	//	if (!sz)
+	//	{
+	//		head = n;
+	//		head->right = NULL;
+	//		tail = NULL;
+	//		head->left = tail;
+	//		sz++;
+	//	}
+	//	else if (sz == 1)
+	//	{
+	//		n->right = head;
+	//		tail = n;
+	//		tail->left = NULL;
+	//		head->left = tail;
+	//		sz++;
+	//	}
+	//	else
+	//	{
+	//		//xMapNode* tail_rnode = tail.right;
 
-			tail->left = n;
-			n->right = tail;
-			tail = n;
-			tail->left = NULL;
-			sz++;
-		}
-	}
+	//		tail->left = n;
+	//		n->right = tail;
+	//		tail = n;
+	//		tail->left = NULL;
+	//		sz++;
+	//	}
+	//}
 
 	T operator[] (Key k)
 	{
@@ -97,18 +97,22 @@ public:
 
 	int insert(Key k, T v)
 	{
-		xMapNode* n = find_node(k);
-		if (!n)
+		if (!sz)
 		{
-			iterator it = begin();
-			if (it == end() || sz == 1)
+			xMapNode *n = new xMapNode(k, v);
+			head = n;
+			head->right = NULL;
+			tail = NULL;
+			head->left = tail;
+			sz++;
+		}
+		else
+		{
+			xMapNode* n = find_node(k);
+			if (!n)
 			{
-				push_back(k, v);
-			}
-			else
-			{
-				n = new xMapNode(k, v);
-				it = begin();
+				xMapNode *n = new xMapNode(k, v);
+				iterator it = begin();
 				for (; it != end(); it.next())
 				{
 					if (it.key() > n->key)
@@ -118,14 +122,26 @@ public:
 				if (cn == head)
 				{
 					n->left = head;
-					head->right = n;		
+					head->right = n;
+					if (!tail)
+						tail = head;
 					head = n;
+
 				}
 				else if (it == end())
 				{
-					push_back(k, v);
-					delete n;
-					return 0;
+					if (!tail)
+					{
+						tail = n;
+						n->right = head;
+						head->left = n;
+					}
+					else
+					{
+						n->right = tail;
+						tail->left = n;
+						tail = n;
+					}					
 				}
 				else
 				{
@@ -135,22 +151,7 @@ public:
 					cn_rnode->left = n;
 					cn->right = n;
 				}
-				//xMapNode *pn = cn->right;
-				//n->left = cn;
-				//n->right = cn->right;
-				//cn->right = n;
-				////cn = n;
-				//if (pn)
-				//{
-				//	pn->left = n;
-				//}
-				//else
-				//{
-				//	head = n;
-				//	tail = cn;
-				//}
 				sz++;
-				//push_back(k, v);
 			}
 			return 0;
 		}

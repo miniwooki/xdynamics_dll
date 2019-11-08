@@ -142,6 +142,13 @@ size_t xstring::size() const
 	return len;
 }
 
+int xstring::hexIndex()
+{
+	int nhex = 0;
+	std::istringstream(wc) >> std::dec >> nhex;
+	return nhex;
+}
+
 void xstring::split(const char* c, int n, int* data)
 {
 	//std::string s = c;

@@ -35,9 +35,9 @@ public:
 	//double* SphereData();
 	//double* HostSphereData();
 	//float* SphereData_f();
-	xmap<int, xParticleMeshObjectContact*>& PMContacts();
-	xmap<int, xParticlePlaneContact*>& PPLContacts();
-	xmap<int, xParticleCylinderContact*>& PCYLContacts();
+	xmap<xstring, xParticleMeshObjectContact*>& PMContacts();
+	xmap<xstring, xParticlePlaneContact*>& PPLContacts();
+	xmap<xstring, xParticleCylinderContact*>& PCYLContacts();
 	void insertContact(xContact* c);
 	xContact* Contact(std::string n);// { return cots[n]; }
 	//QMap<QString, QString>& Logs() { return logs; }
@@ -101,9 +101,9 @@ private:
 	unsigned int n_total_mesh_sphere;
 	xmap<xstring, xContact*> cots;
 	xParticleParticleContact* cpp;
-	xmap<int, xParticlePlaneContact*> cpplanes;
-	xmap<int, xParticleMeshObjectContact*> cpmeshes;
-	xmap<int, xParticleCylinderContact*> cpcylinders;
+	xmap<xstring, xParticlePlaneContact*> cpplanes;
+	xmap<xstring, xParticleMeshObjectContact*> cpmeshes;
+	xmap<xstring, xParticleCylinderContact*> cpcylinders;
 	xContactPairList* xcpl;
 };
 
