@@ -163,8 +163,8 @@ void xParticlePlaneContact::collision_gpu(
 			fm[3] = reduction(xContact::deviceBodyMomentX(), np);
 			fm[4] = reduction(xContact::deviceBodyMomentY(), np);
 			fm[5] = reduction(xContact::deviceBodyMomentZ(), np);
-			pe->addAxialForce(fm[0], fm[1], fm[2]);
-			pe->addAxialMoment(fm[3], fm[4], fm[5]);
+			pe->addContactForce(fm[0], fm[1], fm[2]);
+			pe->addContactMoment(fm[3], fm[4], fm[5]);
 		}
 	}	
 }

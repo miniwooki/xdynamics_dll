@@ -15,7 +15,7 @@ unsigned int* xParticleMeshObjectContact::pair_count_ptri = nullptr;
 unsigned int* xParticleMeshObjectContact::pair_id_ptri = nullptr;
 
 unsigned int xParticleMeshObjectContact::n_mesh_sphere = 0;
-//double xParticleMeshObjectContact::max_sphere_radius = 0;
+double xParticleMeshObjectContact::max_sphere_radius = 0;
 
 xParticleMeshObjectContact::xParticleMeshObjectContact()
 	: xContact()
@@ -162,8 +162,8 @@ void xParticleMeshObjectContact::define(unsigned int idx, unsigned int np)
 	n_mesh_sphere += po->NumTriangle();
 	update();
 	defined_count++;
-	if (gps.max_radius < maxRadii)
-		gps.max_radius = maxRadii;
+	if (max_sphere_radius < maxRadii)
+		max_sphere_radius = maxRadii;
 }
 
 void xParticleMeshObjectContact::update()
@@ -209,8 +209,8 @@ void xParticleMeshObjectContact::collision_gpu(
 	if (xSimulation::Gpu())
 	{
 		double fm[6] = { 0, };
-		if(!cpos) cu_particle_polygonObject_collision(dti, dbi, pos, ep, vel, ev, force, moment, mass, tmax, rres, d_pair_count_ptri, d_pair_id_ptri, d_tsd_ptri, dsphere, sorted_id, cell_start, cell_end, dcp, np);
-		else if (cpos) cu_cluster_meshes_contact(dti, dbi, pos, cpos, ep, vel, ev, force, moment, dcp, mass, tmax, rres, d_pair_count_ptri, d_pair_id_ptri, d_tsd_ptri, sorted_id, cell_start, cell_end, xci, np);
+		if(!cpos) cu_particle_polygonObject_collision(dti, dbi, pos, ep, vel, ev, force, moment, mass, tmax, rres, d_pair_count_ptri, d_pair_id_ptri, d_tsd_ptri, dsphere, sorted_id, cell_start, cell_end, dcp, np, po->NumTriangle());
+		else if (cpos) cu_cluster_meshes_contact(dti, dbi, pos, cpos, ep, vel, ev, force, moment, dcp, mass, tmax, rres, d_pair_count_ptri, d_pair_id_ptri, d_tsd_ptri, sorted_id, cell_start, cell_end, xci, np, po->NumTriangle());
 		if (po->isDynamicsBody())
 		{
 			fm[0] = reduction(xContact::deviceBodyForceX(), np);
@@ -219,8 +219,8 @@ void xParticleMeshObjectContact::collision_gpu(
 			fm[3] = reduction(xContact::deviceBodyMomentX(), np);
 			fm[4] = reduction(xContact::deviceBodyMomentY(), np);
 			fm[5] = reduction(xContact::deviceBodyMomentZ(), np);
-			po->addAxialForce(fm[0], fm[1], fm[2]);
-			po->addAxialMoment(fm[3], fm[4], fm[5]);
+			po->addContactForce(fm[0], fm[1], fm[2]);
+			po->addContactMoment(fm[3], fm[4], fm[5]);
 		}		
 	}
 }
@@ -326,6 +326,11 @@ void xParticleMeshObjectContact::savePartData(unsigned int np)
 unsigned int xParticleMeshObjectContact::GetNumMeshSphere()
 {
 	return n_mesh_sphere;
+}
+
+double xParticleMeshObjectContact::GetMaxSphereRadius()
+{
+	return max_sphere_radius;
 }
 
 void xParticleMeshObjectContact::local_initialize()

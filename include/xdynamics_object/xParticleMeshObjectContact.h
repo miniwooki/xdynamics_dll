@@ -55,11 +55,12 @@ public:
 	//virtual void initialize();
 	static void savePartData(unsigned int np);
 	static unsigned int GetNumMeshSphere();
+	static double GetMaxSphereRadius();
 	//static double GetMaxSphereRadius();
 	static void local_initialize();
 	bool check_this_mesh(unsigned int idx);
 private:
-	//static double max_sphere_radius;
+	static double max_sphere_radius;
 	//static int nmoving;
 	
 	static unsigned int defined_count;

@@ -96,7 +96,7 @@ int main(int argc, char* argv[])
 // 	xResultManager xrm;
 // 	xrm.xRun(xModel::path, xModel::name);
  	//xIntegratorHHT* xmbs = new xIntegratorHHT;
-	xdm->OpenModelXLS("C:/xdynamics/resource/sphere_drop/sphere_drop.xls");
+	xdm->OpenModelXLS("C:/xdynamics/resource/test2/underbody_shock.xls");
  	xDynamicsSimulator *xds = new xDynamicsSimulator(xdm);
   	xds->xInitialize();
  	if (!xds->xRunSimulation())

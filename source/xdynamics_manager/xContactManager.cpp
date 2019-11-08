@@ -106,6 +106,7 @@ void xContactManager::defineContacts(unsigned int np)
 	xParticlePlaneContact::local_initialize();
 	xParticleMeshObjectContact::local_initialize();
 	xParticleCylinderContact::local_initialize();
+	double m_mr = 0.0;
 	for (xmap<xstring, xContact*>::iterator it = cots.begin(); it != cots.end(); it.next())
 	{
 		switch (it.value()->PairType())
@@ -124,47 +125,7 @@ void xContactManager::defineContacts(unsigned int np)
 			break;
 		}
 	}
-
 }
-
-//unsigned int xContactManager::setupParticlesMeshObjectsContact()
-//{
-//	//unsigned int n = 0;
-//	//xmap<int, xContact*>::iterator it = cpmeshes.begin();
-//	//while (it.has_next())
-//	//{
-//	//	dynamic_cast<xParticleMeshObjectContact*>(it.value())->define();
-//	//}
-//	///*for(xmap<int, xContact*>::iterator it = cpmeshes.begin(); it !=cpmeshes.end())
-//	//if (cpmesh.size() && !cpmeshes)
-//	//{
-//	//	cpmeshes = new xParticleMeshObjectsContact;
-//	//	n = cpmeshes->define(cpmesh);
-//	//}*/
-//	//return xParticleMeshObjectContact::GetNumMeshSphere();
-//}
-
-//void xContactManager::setupParticlesCylindersContact()
-//{
-//	//unsigned int n = 0;
-//	//for(xmap<xstring, xContact*>::iterator it = cots.begin(); it != cots.end(); it.next())
-//	//	if (it.value()->PairType() == xContactPairType::PARTICLE_CYLINDER)
-//	//		n++;
-//	//if (!n) return;
-//	//if (n && !cpcylinders)
-//	//	cpcylinders = new xParticleCylindersContact;
-//	//cpcylinders->allocHostMemory(n);
-//	//unsigned int cnt = 0;
-//	//for (xmap<xstring, xContact*>::iterator it = cots.begin(); it != cots.end(); it.next())
-//	//{
-//	//	if (it.value()->PairType() == xContactPairType::PARTICLE_CYLINDER)
-//	//	{
-//	//		cpcylinders->define(cnt, dynamic_cast<xParticleCylinderContact*>(it.value()));
-//	//		cnt++;//	case xContactPairType::PARTICLE_CUBE: cpplane->define(n, dynamic_cast<xParticleCubeContact*>(xc)); n += 6; break;
-//	//	}
-//	//}
-//
-//}
 
 void xContactManager::setNumClusterObject(unsigned int nc)
 {
@@ -173,28 +134,7 @@ void xContactManager::setNumClusterObject(unsigned int nc)
 
 void xContactManager::setupParticlesPlanesContact()
 {
-	/*unsigned int n = 0;
-	for (xmap<xstring, xContact*>::iterator it = cots.begin(); it != cots.end(); it.next())
-	{
-		switch (it.value()->PairType())
-		{
-		case xContactPairType::PARTICLE_PANE: n++; break;
-		case xContactPairType::PARTICLE_CUBE: n += 6; break;
-		}
-	}
-	if (!n)	return;
-	if (n && !cpplane)
-		cpplane = new xParticlePlanesContact;
-	cpplane->allocHostMemory(n);
-	n = 0;
-	for (xmap<xstring, xContact*>::iterator it = cots.begin(); it != cots.end(); it.next())
-	{
-		switch (it.value()->PairType())
-		{
-		case xContactPairType::PARTICLE_PANE: cpplane->define(n, dynamic_cast<xParticlePlaneContact*>(it.value())); n++; break;
-		case xContactPairType::PARTICLE_CUBE: cpplane->define(n, dynamic_cast<xParticleCubeContact*>(it.value())); n += 6; break;
-		}
-	}*/
+	
 }
 
 xmap<int, xParticleMeshObjectContact*>& xContactManager::PMContacts()

@@ -30,6 +30,7 @@ xModel::xModel(const std::string _name)
 		ground = new xPointMass("ground");
 		ground->setXpmIndex(-1);
 	}
+	gps = gps;
 }
 
 xModel::~xModel()

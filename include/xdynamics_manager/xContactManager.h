@@ -43,9 +43,6 @@ public:
 	//QMap<QString, QString>& Logs() { return logs; }
 	xmap<xstring, xContact*>& Contacts();// { return cots; }
 	xParticleParticleContact* ContactParticles();// { return cpp; }
-	//xParticleMeshObjectsContact* ContactParticlesMeshObjects();// { return cpmeshes; }
-	//xParticlePlanesContact* ContactParticlesPlanes();
-	//xParticleCylindersContact* ContactParticlesCylinders();
 
 	bool runCollision(
 		double *pos, double* cpos, double* ep, double *vel,
@@ -93,47 +90,10 @@ private:
 		xClusterInformation* xci,
 		unsigned int np);
 
-	//unsigned int deviceContactCount(
-	//	double *pos, double *ep, double *vel,
-	//	double *omega, double *mass,
-	//	double *force, double *moment,
-	//	unsigned int *sorted_id,
-	//	unsigned int *cell_start,
-	//	unsigned int *cell_end,
-	//	unsigned int np);
-
 	unsigned int ncontact;
 	unsigned int ncobject;
-	//int *d_type_count;
-	//unsigned int *d_old_pair_count;
-	//unsigned int *d_pair_count_pp;
-	////unsigned int *d_pair_count_ppl;
-	////unsigned int *d_pair_count_ptri;
-	////unsigned int *d_pair_count_pcyl;
-	//unsigned int *d_pair_id_pp;
-	////unsigned int *d_pair_id_ppl;
-	////unsigned int *d_pair_id_ptri;
-	////unsigned int *d_pair_id_pcyl;
 
-	//double *d_tsd_pp;
-	////double *d_tsd_ppl;
-	////double *d_tsd_ptri;
-	////double *d_tsd_pcyl;
-
-	//unsigned int* pair_count_pp;
-	////unsigned int* pair_count_ppl;
-	////unsigned int* pair_count_ptri;
-	////unsigned int* pair_count_pcyl;
-	//unsigned int* pair_id_pp;
-	////unsigned int* pair_id_ppl;
-	////unsigned int* pair_id_ptri;
-	////unsigned int* pair_id_pcyl;
-
-	//double* tsd_pp;
-	//double* tsd_ppl;
-	//double* tsd_ptri;
-	//double* tsd_pcyl;
-
+	double max_sphere_radius;
 	double* d_Tmax;
 	double* d_RRes;
 	vector3d* Tmax;
@@ -144,13 +104,7 @@ private:
 	xmap<int, xParticlePlaneContact*> cpplanes;
 	xmap<int, xParticleMeshObjectContact*> cpmeshes;
 	xmap<int, xParticleCylinderContact*> cpcylinders;
-	//QMap<QString, xParticleCylinderContact*> cpcylinder;
 	xContactPairList* xcpl;
-	//QMap<QString, contact_particles_polygonObject*> cppos;
-	//xParticlePlanesContact* cpplane;
-	
-	//xParticleMeshObjectsContact* cpmeshes;
-	//xParticleCylindersContact* cpcylinders;
 };
 
 #endif

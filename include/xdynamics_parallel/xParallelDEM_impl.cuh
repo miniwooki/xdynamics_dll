@@ -1108,7 +1108,7 @@ __global__ void plane_contact_force_kernel(
 		double3 cpt = ipos3 + r * unit;
 		double3 dcpr_j = cpt - dbi->pos;
 		if (cdist > 0) {
-			printf("plane body pos\n");
+			//printf("plane body pos\n");
 			
 			for (unsigned int i = 0; i < 3; i++)
 				if (p_pair_id[i] == k){ sd = p_tsd[i]; break; }
@@ -2027,7 +2027,7 @@ __global__ void particle_polygonObject_collision_kernel(
 	double* mass, double3* tmax, double* rres,
 	unsigned int* pair_count, unsigned int* pair_id, double2* tsd, double4* dsph,
 	unsigned int* sorted_index, unsigned int* cstart, unsigned int* cend,
-	device_contact_property *cp, unsigned int np)
+	device_contact_property *cp, unsigned int np, unsigned int ntriangle)
 {
 	unsigned id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
 	//unsigned int np = _np;
@@ -2085,9 +2085,9 @@ __global__ void particle_polygonObject_collision_kernel(
 					end_index = cend[grid_hash];
 					for (unsigned int j = start_index; j < end_index; j++) {
 						unsigned int tk = sorted_index[j];
-						if (tk >= cte.np)
+						if (tk >= cte.np + sk && tk < cte.np + sk + ntriangle)
 						{
-							tk -= cte.np + sk;							
+							tk -= np + sk;							
 							///if (k < bindex || k >= eindex)
 							//	continue;
 							int t = -1;
@@ -2209,7 +2209,7 @@ __global__ void cluster_meshes_contact_kernel(
 	double3* tmax, double* rres,
 	unsigned int* pair_count, unsigned int* pair_id,
 	double2* tsd, unsigned int* sorted_index, unsigned int* cstart, unsigned int* cend,
-	xClusterInformation* xci, unsigned int np)
+	xClusterInformation* xci, unsigned int np, unsigned int ntriangle)
 {
 	unsigned id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
 	//unsigned int np = _np;
@@ -2281,7 +2281,7 @@ __global__ void cluster_meshes_contact_kernel(
 					end_index = cend[grid_hash];
 					for (unsigned int j = start_index; j < end_index; j++) {
 						unsigned int tk = sorted_index[j];
-						if (tk >= cte.np)
+						if (tk >= cte.np + sk && tk < cte.np + sk + ntriangle)
 						{
 							tk -= cte.np + sk;
 							int t = -1;
