@@ -27,9 +27,11 @@ private:
 signals:
 	void clickedSolveButton(double, unsigned int, double);
 	void clickedStartPointButton();
+	void clickedStopButton();
 
 	private slots:
 	void SolveButton();
+	void StopButton();
 	void StartingPointButton();
 	void CheckStartingPoint(bool);
 	

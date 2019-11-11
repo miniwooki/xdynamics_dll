@@ -51,11 +51,15 @@ bool wsimulation::is_simulationing()
 void wsimulation::set_stop_state()
 {
 	PBSolve->setText("Stop!!!");
+	PBSolve->disconnect();
+	connect(PBSolve, SIGNAL(clicked()), this, SLOT(StopButton()));
 }
 
 void wsimulation::set_start_state()
 {
 	PBSolve->setText("Solve");
+	PBSolve->disconnect();
+	connect(PBSolve, SIGNAL(clicked()), this, SLOT(SolveButton()));
 }
 
 void wsimulation::StartingPointButton()
@@ -76,6 +80,12 @@ void wsimulation::SolveButton()
 	double et = LEEndTime->text().toDouble();
 	is_simulation_ing = true;
 	emit clickedSolveButton(dt, st, et);
+}
+
+void wsimulation::StopButton()
+{
+	is_simulation_ing = false;
+	emit clickedStopButton();
 }
 
 void wsimulation::UpdateInformation()

@@ -104,6 +104,7 @@ void xdynamics_gui::xGetSimulationWidget(wsimulation* w)
 {
 	wsim = w;
 	connect(w, SIGNAL(clickedSolveButton(double, unsigned int, double)), this, SLOT(xRunSimulationThread(double, unsigned int, double)));
+	connect(w, SIGNAL(clickedStopButton()), this, SLOT(xStopSimulationThread()));
 	connect(w, SIGNAL(clickedStartPointButton()), this, SLOT(xSelectStartPoint()));
 }
 
@@ -1012,7 +1013,8 @@ void xdynamics_gui::xReleaseResultCallThread()
 		delete pbar;
 		pbar = NULL;
 	}
-	wsim->set_start_state();
+	if(wsim)
+		wsim->set_start_state();
 }
 
 void xdynamics_gui::xContextMenuProcess(QString nm, contextMenuType vot)

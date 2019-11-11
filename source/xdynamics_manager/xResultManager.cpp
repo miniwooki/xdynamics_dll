@@ -196,7 +196,7 @@ void xResultManager::setup_particle_buffer_color_distribution(xColorControl* xcc
 			xcc->setMinMax(get_min_result_value(cmt), get_max_result_value(cmt));
 		xcc->setLimitArray();
 		unsigned int neach = static_cast<unsigned int>(nparticles / nclusters);
-		for (unsigned int i = 0; i <= ncparts; i++)
+		for (unsigned int i = sframe; i <= cframe; i++)
 		{
 			unsigned int idx = nparticles * i;
 			unsigned int sidx = nclusters * i;

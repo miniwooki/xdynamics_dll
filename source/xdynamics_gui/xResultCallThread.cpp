@@ -87,9 +87,9 @@ void xResultCallThread::run()
 				_cpos = new double[ns * 4];
 		}
 	//	emit result_call_send_progress(10, "");
-		foreach(QString it, flist)
+		for(QList<QString>::iterator it = flist.begin(); it != flist.end(); it++)
 		{
-			QFile fs(it);
+			QFile fs(*it);
 			fs.open(QIODevice::ReadOnly);
 			//fs.open(it.value().toStdString(), std::ios::in | std::ios::binary);
 			fs.read((char*)&ct, sizeof(double));
@@ -100,11 +100,7 @@ void xResultCallThread::run()
 				unsigned int _npt = 0;
 				unsigned int _nct = 0;
 				fs.read((char*)&_npt, sizeof(unsigned int));
-				//qDebug() << "_npt : " << _npt;
 				fs.read((char*)&_nct, sizeof(unsigned int));
-				//qDebug() << "_nct : " << _nct;
-				//qDebug() << "np : " << np;
-				//qDebug() << "ns : " << ns;
 				fs.read((char*)_pos, sizeof(double) * np * 4);
 				fs.read((char*)_vel, sizeof(double) * ns * 3);
 				fs.read((char*)_acc, sizeof(double) * ns * 3);
@@ -123,66 +119,34 @@ void xResultCallThread::run()
 				fs.read((char*)&m_size, sizeof(unsigned int));
 				fs.read((char*)&j_size, sizeof(unsigned int));
 				fs.read((char*)&d_size, sizeof(unsigned int));
-				//qDebug() << "m_size : " << m_size;
-				//qDebug() << "j_size : " << j_size;
-				//qDebug() << "d_size : " << d_size;
-				/*if (pmrs.size() != m_size)
-				{
 
-				}
-				if (kcrs.size() != j_size)
-				{
-
-				}*/
 				xMultiBodyModel* xmbd = xdm->XMBDModel();
 				
 				for (xmap<xstring, xPointMass::pointmass_result*>::iterator it = xrm->get_mass_result_xmap()->begin(); it != xrm->get_mass_result_xmap()->end(); it.next())
 				{
 					struct_pmr pr = { 0, };
 					struct_pmr* _pmr = it.value();// xrm->get_mass_result_ptr(it.key().toStdString());
-					/*if (_pmr == NULL)
-					{
-						emit result_call_send_progress(-1, "!_Body that exists in the current model does not exist in the results.");
-						xdm->release_result_manager();
-						break;
-					}	*/					
+				
 					fs.read((char*)&pr, sizeof(struct_pmr));
 					_pmr[cnt] = pr;
 				}
 				for (xmap<xstring, xKinematicConstraint::kinematicConstraint_result*>::iterator it = xrm->get_joint_result_xmap()->begin(); it != xrm->get_joint_result_xmap()->end(); it.next())
 				{
 					struct_kcr kr = { 0, };
-					struct_kcr* _kcr = it.value();// ->get_joint_result_ptr(it.key().toStdString());
-				/*	if (_kcr == NULL)
-					{
-						emit result_call_send_progress(-1, "!_Joint that exists in the current model does not exist in the results.");
-						xdm->release_result_manager();
-						break;
-					}*/
+					struct_kcr* _kcr = it.value();
 					fs.read((char*)&kr, sizeof(struct_kcr));
 					_kcr[cnt] = kr;
 				}
 				for (xmap<xstring, xDrivingRotationResultData>::iterator it = xrm->get_rotation_driving_result_xmap()->begin(); it != xrm->get_rotation_driving_result_xmap()->end(); it.next())
 				{
-					//struct_kcr kr = { 0, };
-					//struct_kcr* _kcr = xrm->get_joint_result_ptr(it.key().toStdString());
-					/*if (_kcr == NULL)
-					{
-						emit result_call_send_progress(-1, "!_Driving that exists in the current model does not exist in the results.");
-						xdm->release_result_manager();
-						break;
-					}*/
-					//fs.read((char*)&kr, sizeof(struct_kcr));
-					//_kcr[cnt] = kr;
 					xDrivingRotationResultData xdr = { 0, };
 					fs.read((char*)&xdr, sizeof(xDrivingRotationResultData));
 					xrm->save_driving_rotation_result(cnt, it.key().toStdString(), xdr.rev_count, xdr.drev_count, xdr.theta);
-					//qDebug() << "driving : " << cnt << " - " << it.value()->Name().c_str() << " - " << xdr.rev_count << " - " << xdr.drev_count << " - " << xdr.theta;
 				}
 			}
 			xrm->set_current_part_number(cnt);
 			fs.close();
-			emit result_call_send_progress(cnt, "Uploaded : " + it);
+			emit result_call_send_progress(cnt, "Uploaded : " + *it);
 			cnt++;
 		}
 
