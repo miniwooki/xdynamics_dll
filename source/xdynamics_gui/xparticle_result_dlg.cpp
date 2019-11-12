@@ -21,8 +21,8 @@ xparticle_result_dlg::xparticle_result_dlg(QWidget* parent)
 	connect(RB_Time, SIGNAL(clicked()), this, SLOT(enable_time()));
 	//QStringList labels;
 	//TW->setco
-	part_labels << "id" << "PX" << "PY" << "PZ" << "VX" << "VY" << "VZ";
-	time_labels << "time" << "PX" << "PY" << "PZ" << "VX" << "VY" << "VZ";
+	part_labels << "id" << "PX" << "PY" << "PZ" << "VX" << "VY" << "VZ" << "FX" << "FY" << "FZ";
+	time_labels << "time" << "PX" << "PY" << "PZ" << "VX" << "VY" << "VZ" << "FX" << "FY" << "FZ";
 	//TW->setHorizontalHeaderLabels(labels);
 	TW->verticalHeader()->hide();
 	TW->setShowGrid(true);
@@ -74,13 +74,16 @@ void xparticle_result_dlg::setup(xResultManager * _xrm)
 
 void xparticle_result_dlg::click_load()
 {
+	TW->clear();
+	TW->setRowCount(0);
 	unsigned int ns = xrm->get_num_clusters();
 	unsigned int np = xrm->get_num_particles();
 	float *pos = NULL;
 	float *vel = NULL;
-	double *acc = NULL;
+	float *acc = NULL;
 	pos = xrm->get_particle_position_result_ptr();
 	vel = xrm->get_particle_velocity_result_ptr();
+	acc = xrm->get_particle_force_result_ptr();
 	if (RB_Part->isChecked())
 		ltg = PART_BASE;
 	else
@@ -88,7 +91,7 @@ void xparticle_result_dlg::click_load()
 	
 	if (ltg == PART_BASE)
 	{
-		TW->setColumnCount(7);
+		TW->setColumnCount(10);
 		TW->setHorizontalHeaderLabels(part_labels);
 		unsigned int pid = LE_Part->text().toUInt();
 		unsigned int spid = pid * ns * 4;
@@ -97,16 +100,16 @@ void xparticle_result_dlg::click_load()
 		{
 			unsigned int s = spid + i*4;
 			unsigned int v = svid + i*3;
-			append(i, pos[s + 0], pos[s + 1], pos[s + 2], vel[v + 0], vel[v + 1], vel[v + 2]);
+			append(i, pos[s + 0], pos[s + 1], pos[s + 2], vel[v + 0], vel[v + 1], vel[v + 2], acc[v + 0], acc[v + 1], acc[v + 2]);
 		}
 	}
 	else if (ltg == PARTICLE_BASE)
 	{
-		TW->setColumnCount(8);
+		TW->setColumnCount(10);
 		TW->setHorizontalHeaderLabels(part_labels);
 		unsigned int npt = xrm->get_current_part_number();
 		unsigned int tpt = LE_Time->text().toUInt();
-		double* time = xrm->get_times();
+		float* time = xrm->get_times();
 	/*	std::function<void(int&)> spin = [](int &iteration) {
 			con
 		};*/
@@ -114,7 +117,7 @@ void xparticle_result_dlg::click_load()
 		{
 			unsigned int s = tpt * 4 + i * ns * 4;
 			unsigned int v = tpt * 3 + i * ns * 3;
-			append_particle_base(i, time[i], pos[s + 0], pos[s + 1], pos[s + 2], vel[v + 0], vel[v + 1], vel[v + 2]);
+			append_particle_base(i, time[i], pos[s + 0], pos[s + 1], pos[s + 2], vel[v + 0], vel[v + 1], vel[v + 2], acc[v + 0], acc[v + 1], acc[v + 2]);
 		}
 	}
 }
@@ -138,7 +141,7 @@ void xparticle_result_dlg::click_export()
 		QFile qf(fileName);
 		qf.open(QIODevice::WriteOnly);
 		QTextStream qts(&qf);
-		bool ck[7] = { CBPX->isChecked(), CBPY->isChecked(), CBPZ->isChecked(), CBVX->isChecked(), CBVY->isChecked(), CBVZ->isChecked() };
+		bool ck[9] = { CBPX->isChecked(), CBPY->isChecked(), CBPZ->isChecked(), CBVX->isChecked(), CBVY->isChecked(), CBVZ->isChecked(), CBAX->isChecked(), CBAY->isChecked(), CBAZ->isChecked() };
 		if (RB_Part->isChecked())
 		{
 			qts.setFieldAlignment(QTextStream::FieldAlignment::AlignCenter);
@@ -149,11 +152,14 @@ void xparticle_result_dlg::click_export()
 				<< (ck[2] ? part_labels.at(3) : "") << "         "
 				<< (ck[3] ? part_labels.at(4) : "") << "         "
 				<< (ck[4] ? part_labels.at(5) : "") << "         "
-				<< (ck[5] ? part_labels.at(6) : "") << endl;
+				<< (ck[5] ? part_labels.at(6) : "") << "         " 
+				<< (ck[6] ? part_labels.at(7) : "") << "         " 
+				<< (ck[7] ? part_labels.at(8) : "") << "         " 
+				<< (ck[8] ? part_labels.at(9) : "") << endl;
 			for (unsigned int i = 0; i < TW->rowCount(); i++)
 			{
 				qts << QString("%1").arg(TW->item(i, 0)->text().toUInt(), -20);
-				for (unsigned int j = 0; j < 6; j++)
+				for (unsigned int j = 0; j < 9; j++)
 				{
 					qts << (ck[j] ? QString("%1").arg(TW->item(i, j + 1)->text().toDouble(), -20, 'f', 10) : "");
 				}
@@ -169,11 +175,13 @@ void xparticle_result_dlg::click_export()
 				<< (ck[3] ? time_labels.at(4) : "") << "         "
 				<< (ck[4] ? time_labels.at(5) : "") << "         "
 				<< (ck[5] ? time_labels.at(6) : "") << "         "
-				<< (ck[6] ? time_labels.at(7) : "") << endl;
+				<< (ck[6] ? time_labels.at(7) : "") << "         "
+				<< (ck[7] ? time_labels.at(8) : "") << "         "
+				<< (ck[8] ? time_labels.at(9) : "") << endl;
 			for (unsigned int i = 0; i < TW->rowCount(); i++)
 			{
 				qts << QString("%1").arg(TW->item(i, 0)->text().toDouble(), -20, 'f', 10);
-				for (unsigned int j = 0; j < 7; j++)
+				for (unsigned int j = 0; j < 9; j++)
 				{
 					qts << (ck[j] ? QString("%1").arg(TW->item(i, j + 1)->text().toDouble(), -20, 'f', 10) : "");
 				}
@@ -190,7 +198,7 @@ void xparticle_result_dlg::click_exit()
 	this->setResult(QDialog::Rejected);
 }
 
-void xparticle_result_dlg::append(unsigned int id, double px, double py, double pz, double vx, double vy, double vz)
+void xparticle_result_dlg::append(unsigned int id, float px, float py, float pz, float vx, float vy, float vz, float fx, float fy, float fz)
 {
 	unsigned int row = TW->rowCount();
 	QTableWidgetItem *ID = new QTableWidgetItem(QString("%1").arg(id));
@@ -200,6 +208,10 @@ void xparticle_result_dlg::append(unsigned int id, double px, double py, double 
 	QTableWidgetItem *VX = new QTableWidgetItem(QString("%1").arg(vx));
 	QTableWidgetItem *VY = new QTableWidgetItem(QString("%1").arg(vy));
 	QTableWidgetItem *VZ = new QTableWidgetItem(QString("%1").arg(vz));
+	QTableWidgetItem *FX = new QTableWidgetItem(QString("%1").arg(fx));
+	QTableWidgetItem *FY = new QTableWidgetItem(QString("%1").arg(fy));
+	QTableWidgetItem *FZ = new QTableWidgetItem(QString("%1").arg(fz));
+
 	int col = 0;
 	TW->insertRow(row);
 	TW->setItem(row, col++, ID);
@@ -209,9 +221,12 @@ void xparticle_result_dlg::append(unsigned int id, double px, double py, double 
 	TW->setItem(row, col++, VX);
 	TW->setItem(row, col++, VY);
 	TW->setItem(row, col++, VZ);
+	TW->setItem(row, col++, FX);
+	TW->setItem(row, col++, FY);
+	TW->setItem(row, col++, FZ);
 }
 
-void xparticle_result_dlg::append_particle_base(unsigned int i, double t, double px, double py, double pz, double vx, double vy, double vz)
+void xparticle_result_dlg::append_particle_base(unsigned int i, float t, float px, float py, float pz, float vx, float vy, float vz, float fx, float fy, float fz)
 {
 	unsigned int row = TW->rowCount();
 	QTableWidgetItem *T = new QTableWidgetItem(QString("%1").arg(t));
@@ -221,7 +236,11 @@ void xparticle_result_dlg::append_particle_base(unsigned int i, double t, double
 	QTableWidgetItem *VX = new QTableWidgetItem(QString("%1").arg(vx));
 	QTableWidgetItem *VY = new QTableWidgetItem(QString("%1").arg(vy));
 	QTableWidgetItem *VZ = new QTableWidgetItem(QString("%1").arg(vz));
+	QTableWidgetItem *FX = new QTableWidgetItem(QString("%1").arg(fx));
+	QTableWidgetItem *FY = new QTableWidgetItem(QString("%1").arg(fy));
+	QTableWidgetItem *FZ = new QTableWidgetItem(QString("%1").arg(fz));
 	int col = 0;
+
 	TW->insertRow(row);
 	TW->setItem(row, col++, T);
 	TW->setItem(row, col++, PX);
@@ -230,4 +249,7 @@ void xparticle_result_dlg::append_particle_base(unsigned int i, double t, double
 	TW->setItem(row, col++, VX);
 	TW->setItem(row, col++, VY);
 	TW->setItem(row, col++, VZ);
+	TW->setItem(row, col++, FX);
+	TW->setItem(row, col++, FY);
+	TW->setItem(row, col++, FZ);
 }

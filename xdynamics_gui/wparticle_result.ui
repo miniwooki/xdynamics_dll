@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>627</width>
+    <width>763</width>
     <height>538</height>
    </rect>
   </property>
@@ -80,7 +80,7 @@
    </item>
    <item row="2" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item alignment="Qt::AlignHCenter">
+     <item>
       <widget class="QCheckBox" name="CBPX">
        <property name="text">
         <string>PX</string>
@@ -90,7 +90,7 @@
        </property>
       </widget>
      </item>
-     <item alignment="Qt::AlignHCenter">
+     <item>
       <widget class="QCheckBox" name="CBPY">
        <property name="text">
         <string>PY</string>
@@ -100,7 +100,7 @@
        </property>
       </widget>
      </item>
-     <item alignment="Qt::AlignHCenter">
+     <item>
       <widget class="QCheckBox" name="CBPZ">
        <property name="text">
         <string>PZ</string>
@@ -110,7 +110,7 @@
        </property>
       </widget>
      </item>
-     <item alignment="Qt::AlignHCenter">
+     <item>
       <widget class="QCheckBox" name="CBVX">
        <property name="text">
         <string>VX</string>
@@ -120,7 +120,7 @@
        </property>
       </widget>
      </item>
-     <item alignment="Qt::AlignHCenter">
+     <item>
       <widget class="QCheckBox" name="CBVY">
        <property name="text">
         <string>VY</string>
@@ -130,10 +130,40 @@
        </property>
       </widget>
      </item>
-     <item alignment="Qt::AlignHCenter">
+     <item>
       <widget class="QCheckBox" name="CBVZ">
        <property name="text">
         <string>VZ</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="CBAX">
+       <property name="text">
+        <string>FX</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="CBAY">
+       <property name="text">
+        <string>FY</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="CBAZ">
+       <property name="text">
+        <string>FZ</string>
        </property>
        <property name="checked">
         <bool>true</bool>

@@ -12,6 +12,8 @@ xResultManager::xResultManager()
 	, ptrs(NULL)
 	, vtrs(NULL)
 	, ctrs(NULL)
+	, atrs(NULL)
+	, c_particle_mass(NULL)
 	, c_cluster_pos(NULL)
 	, c_particle_pos(NULL)
 	, c_particle_vel(NULL)
@@ -52,6 +54,7 @@ xResultManager::~xResultManager()
 	if (ptrs) delete[] ptrs; ptrs = NULL;
 	if (vtrs) delete[] vtrs; vtrs = NULL;
 	if (ctrs) delete[] ctrs; ctrs = NULL;
+	if (atrs) delete[] atrs; atrs = NULL;
 	if(pmrs.size()) pmrs.delete_all();
 	if(kcrs.size()) kcrs.delete_all();
 }
@@ -130,7 +133,7 @@ unsigned int xResultManager::get_current_part_number()
 	return ncparts;
 }
 
-double * xResultManager::get_times()
+float * xResultManager::get_times()
 {
 	return time;
 }
@@ -328,6 +331,7 @@ bool xResultManager::upload_exist_results(std::string path)
 	unsigned int cnt = 0;
 	double ct = 0;
 	double* _cpos = NULL, *_pos = NULL, *_vel = NULL, *_acc = NULL, *_ep = NULL, *_ev = NULL, *_ea = NULL;
+	double* _mass = nullptr;
 	if (nparticles)
 	{
 		 _pos = new double[nparticles * 4];
@@ -339,6 +343,8 @@ bool xResultManager::upload_exist_results(std::string path)
 		 if (nclusters != nparticles)
 			 _cpos = new double[nclusters * 4];
 	}
+	if (VERSION_NUMBER > 1)
+		_mass = new double[nparticles];
 	for (xlist<xstring>::iterator it = flist.begin(); it != flist.end(); it.next())
 	{
 		fs.open(it.value().toStdString(), std::ios::in | std::ios::binary);
@@ -350,6 +356,8 @@ bool xResultManager::upload_exist_results(std::string path)
 			unsigned int _nct = 0;
 			fs.read((char*)&_npt, sizeof(unsigned int));
 			fs.read((char*)&_nct, sizeof(unsigned int));
+			if (VERSION_NUMBER > 1)
+				fs.read((char*)_mass, sizeof(double) * nparticles);
 			fs.read((char*)_pos, sizeof(double) * nparticles * 4);
 			fs.read((char*)_vel, sizeof(double) * nclusters * 3);			
 			fs.read((char*)_acc, sizeof(double) * nclusters * 3);
@@ -358,7 +366,7 @@ bool xResultManager::upload_exist_results(std::string path)
 			fs.read((char*)_ea, sizeof(double) * nclusters * 4);
 			if(nclusters != nparticles)
 				fs.read((char*)_cpos, sizeof(double) * nclusters * 4);
-			this->save_dem_result(cnt, _cpos, _pos, _vel, _acc, _ep, _ev, _ea, nparticles, nclusters);
+			this->save_dem_result(cnt, _mass, _cpos, _pos, _vel, _acc, _ep, _ev, _ea, nparticles, nclusters);
 		}
 		if (ngeneralized_coordinates)
 		{
@@ -392,6 +400,7 @@ bool xResultManager::upload_exist_results(std::string path)
 		}
 		fs.close();
 	}
+	if (_mass) delete[] _mass;
 	if (_cpos) delete[] _cpos;
 	if (_pos) delete[] _pos;
 	if (_vel) delete[] _vel;
@@ -487,6 +496,11 @@ float * xResultManager::get_particle_velocity_result_ptr()
 	return vtrs;
 }
 
+float* xResultManager::get_particle_force_result_ptr()
+{
+	return atrs;
+}
+
 float * xResultManager::get_cluster_position_result_ptr()
 {
 	return NULL;// c_cluster_pos;
@@ -552,7 +566,7 @@ void xResultManager::set_p2tri_contact_data(int n)
 bool xResultManager::alloc_time_momory(unsigned int npart)
 {
 	if (time) delete[] time; time = NULL;
-	time = new double[npart];
+	time = new float[npart];
 	return true;
 }
 
@@ -565,6 +579,7 @@ bool xResultManager::alloc_dem_result_memory(unsigned int np, unsigned int ns)
 	if (ptrs) delete[] ptrs; ptrs = NULL;
 	if (vtrs) delete[] vtrs; vtrs = NULL;
 	if (ctrs) delete[] ctrs; ctrs = NULL;
+	if (atrs) delete[] atrs; atrs = NULL;
 
 	ptrs = new float[nparts * nparticles * 4]; 
 	for (unsigned int i = 0; i < nparts * nparticles * 4; i++) 
@@ -577,9 +592,12 @@ bool xResultManager::alloc_dem_result_memory(unsigned int np, unsigned int ns)
 	ctrs = new float[nparts * nparticles * 4]; 
 	for (unsigned int i = 0; i < nparts * nparticles * 4; i++)
 		ctrs[i] = 0.f;
+	atrs = new float[nparts * nparticles * 3];
+	for (unsigned int i = 0; i < nparts * nparticles * 3; i++)
+		atrs[i] = 0.f;
 		//memset(ctrs, 0, sizeof(float) * nparts * nclusters * 4);
 	//throw runtime_error("error");
-	allocated_size += nparts * (nparticles * 4 + nclusters * 3 + nparticles * 4) * sizeof(float);
+	allocated_size += nparts * (nparticles * 4 + nclusters * 3 + nparticles * 4 + nparticles * 3) * sizeof(float);
 	//memset(ptrs, 0, allocated_size);
 	return true;
 }
@@ -619,9 +637,10 @@ bool xResultManager::alloc_driving_rotation_result_memory(std::string name)
 }
 
 bool xResultManager::save_dem_result(
-	unsigned int i, double* cpos, double * pos, double * vel, double* acc, 
+	unsigned int i, double *mass, double* cpos, double * pos, double * vel, double* acc, 
 	double* ep, double* ev, double* ea, unsigned int np, unsigned int ns)
 {
+	c_particle_mass = mass;
 	c_particle_pos = pos;
 	c_particle_vel = vel;
 	c_particle_acc = acc;
@@ -692,6 +711,33 @@ bool xResultManager::save_dem_result(
 
 		if (max_particle_velocity_mag < v_mag) max_particle_velocity_mag = v_mag;
 		if (min_particle_velocity_mag > v_mag) min_particle_velocity_mag = v_mag;
+		float mm = 1.f;
+		if (c_particle_mass)
+			mm = c_particle_mass[j];
+		vector3f aa = new_vector3f(0.f, 0.f, 0.f);
+		unsigned int a = j * 3;
+		aa = new_vector3f(
+			static_cast<float>(acc[a + 0]),
+			static_cast<float>(acc[a + 1]),
+			static_cast<float>(acc[a + 2]));
+
+		atrs[v + 0] = mm * aa.x;
+		atrs[v + 1] = mm * aa.y;
+		atrs[v + 2] = mm * aa.z;
+
+		if (max_particle_force[0] < aa.x) max_particle_force[0] = aa.x;// vbuffers[v + vid + 0];
+		if (max_particle_force[1] < aa.y) max_particle_force[1] = aa.y;// vbuffers[v + vid + 1];
+		if (max_particle_force[2] < aa.z) max_particle_force[2] = aa.z;// vbuffers[v + vid + 2];
+
+		if (min_particle_force[0] > aa.x) min_particle_force[0] = aa.x;// vbuffers[v + vid + 0];
+		if (min_particle_force[1] > aa.y) min_particle_force[1] = aa.y;// vbuffers[v + vid + 1];
+		if (min_particle_force[2] > aa.z) min_particle_force[2] = aa.z;// vbuffers[v + vid + 2];
+
+		float f_mag = sqrt(aa.x * aa.x + aa.y * aa.y + aa.z * aa.z);// [v + 0] * vbuffers[v + 0] + vbuffers[v + 1] * vbuffers[v + 1] + vbuffers[v + 2] * vbuffers[v + 2]);
+
+		if (max_particle_force_mag < f_mag) max_particle_force_mag = f_mag;
+		if (min_particle_force_mag > f_mag) min_particle_force_mag = f_mag;
+
 		ctrs[s + 0] = 0.0f;
 		ctrs[s + 1] = 0.0f;
 		ctrs[s + 2] = 1.0f;
@@ -780,7 +826,7 @@ void xResultManager::save_driving_rotation_result(unsigned int i, std::string nm
 
 bool xResultManager::export_step_data_to_file(unsigned int pt, double ct)
 {
-	time[pt] = ct;
+	time[pt] = static_cast<float>(ct);
 	std::string file_name;
 	stringstream ss(file_name);
 	ss << (xModel::path + xModel::name).toStdString() << "/part" << setw(4) << setfill('0') << pt << ".bin";
@@ -794,6 +840,8 @@ bool xResultManager::export_step_data_to_file(unsigned int pt, double ct)
 		{
 			qf.write((char*)&nparticles, sizeof(unsigned int));
 			qf.write((char*)&nclusters, sizeof(unsigned int));
+			if (VERSION_NUMBER > 1)
+				qf.write((char*)c_particle_mass, sizeof(double) * nparticles);
 			qf.write((char*)c_particle_pos, sizeof(double) * nparticles * 4);
 			qf.write((char*)c_particle_vel, sizeof(double) * nclusters * 3);
 			qf.write((char*)c_particle_acc, sizeof(double) * nclusters * 3);
@@ -859,6 +907,7 @@ bool xResultManager::export_step_data_to_file(unsigned int pt, double ct)
 		}
 	}
 	qf.close();
+	c_particle_mass = nullptr;
 	c_cluster_pos = NULL;
 	c_particle_pos = NULL;
 	c_particle_vel = NULL;

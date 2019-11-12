@@ -15,8 +15,8 @@ public:
 	void setup(xResultManager* _xrm);
 //QMap<unsigned int, distribution_data>& get_distribution_result();
 private:
-	void append(unsigned int id, double px, double py, double pz, double vx, double vy, double vz);
-	void append_particle_base(unsigned int i, double t, double px, double py, double pz, double vx, double vy, double vz);
+	void append(unsigned int id, float px, float py, float pz, float vx, float vy, float vz, float fx, float fy, float fz);
+	void append_particle_base(unsigned int i, float t, float px, float py, float pz, float vx, float vy, float vz, float fx, float fy, float fz);
 
 private slots:
 	void click_load();

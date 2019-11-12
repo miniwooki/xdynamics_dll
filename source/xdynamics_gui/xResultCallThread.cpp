@@ -75,6 +75,7 @@ void xResultCallThread::run()
 		unsigned int ns = xrm->get_num_clusters();
 		double ct = 0;
 		double* _cpos = NULL, *_pos = NULL, *_vel = NULL, *_acc = NULL, *_ep = NULL, *_ev = NULL, *_ea = NULL;
+		double* _mass = nullptr;		
 		if (np)
 		{
 			_pos = new double[np * 4];
@@ -86,6 +87,8 @@ void xResultCallThread::run()
 			if (ns != np)
 				_cpos = new double[ns * 4];
 		}
+		if (VERSION_NUMBER > 1)
+			_mass = new double[np];
 	//	emit result_call_send_progress(10, "");
 		for(QList<QString>::iterator it = flist.begin(); it != flist.end(); it++)
 		{
@@ -101,6 +104,8 @@ void xResultCallThread::run()
 				unsigned int _nct = 0;
 				fs.read((char*)&_npt, sizeof(unsigned int));
 				fs.read((char*)&_nct, sizeof(unsigned int));
+				if (VERSION_NUMBER > 1)
+					fs.read((char*)_mass, sizeof(double) * np);
 				fs.read((char*)_pos, sizeof(double) * np * 4);
 				fs.read((char*)_vel, sizeof(double) * ns * 3);
 				fs.read((char*)_acc, sizeof(double) * ns * 3);
@@ -109,7 +114,7 @@ void xResultCallThread::run()
 				fs.read((char*)_ea, sizeof(double) * ns * 4);
 				if (ns != np)
 					fs.read((char*)_cpos, sizeof(double) * ns * 4);
-				xrm->save_dem_result(cnt, _cpos, _pos, _vel, _acc, _ep, _ev, _ea, np, ns);
+				xrm->save_dem_result(cnt, _mass, _cpos, _pos, _vel, _acc, _ep, _ev, _ea, np, ns);
 			}
 			if (xrm->get_num_generalized_coordinates())
 			{
@@ -151,10 +156,11 @@ void xResultCallThread::run()
 		}
 
 		xvAnimationController::allocTimeMemory(xdm->XResult()->get_num_parts());
-		double* _time = xrm->get_times();
+		float* _time = xrm->get_times();
 		for (unsigned int i = 0; i < xrm->get_num_parts(); i++)
-			xvAnimationController::addTime(i, static_cast<float>(_time[i]));
+			xvAnimationController::addTime(i, _time[i]);
 		xvAnimationController::setTotalFrame(is_terminated ? xrm->get_terminated_num_parts() - 1 : xrm->get_num_parts() - 1);
+		if (_mass) delete[] _mass;
 		if (_cpos) delete[] _cpos;
 		if (_pos) delete[] _pos;
 		if (_vel) delete[] _vel;

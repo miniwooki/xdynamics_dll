@@ -289,7 +289,7 @@ bool xDiscreteElementMethodSimulation::SaveStepResult(unsigned int pt)
 		if (np != ns)
 			checkXerror(cudaMemcpy(cpos, dcpos, sizeof(double) * ns * 4, cudaMemcpyDeviceToHost));
 	}
-	return xDynamicsManager::This()->XResult()->save_dem_result(pt, cpos, pos, vel, acc, ep, avel, aacc, np, ns);
+	return xDynamicsManager::This()->XResult()->save_dem_result(pt, mass, cpos, pos, vel, acc, ep, avel, aacc, np, ns);
  	/*std::string fname;
 	stringstream ss(fname);
 	ss << (xModel::path + xModel::name).toStdString() << "/part" << setw(4) << setfill('0') << pt << ".bin";

@@ -30,7 +30,7 @@ public:
 	unsigned int get_terminated_num_parts();
 	unsigned int get_current_part_number();
 	
-	double* get_times();
+	float* get_times();
 	//void set_num_particles(unsigned int np);
 	//void set_num_masses_and_joint(unsigned int nm, unsigned int nj);
 	//bool initialize();
@@ -45,6 +45,7 @@ public:
 	xlist<unsigned int>* get_distribution_id_list();
 	float* get_particle_position_result_ptr();
 	float* get_particle_velocity_result_ptr();
+	float* get_particle_force_result_ptr();
 	float* get_cluster_position_result_ptr();
 	float* get_particle_color_result_ptr();
 	void set_gpu_process_device(bool b);
@@ -61,7 +62,7 @@ public:
 	bool alloc_mass_result_memory(std::string name);
 	bool alloc_joint_result_memory(std::string name);
 	bool alloc_driving_rotation_result_memory(std::string name);
-	bool save_dem_result(unsigned int i, double* cpos, double* pos, double* vel, double* acc, double* ep, double* ev, double* ea, unsigned int np, unsigned int ns);
+	bool save_dem_result(unsigned int i, double* mass, double* cpos, double* pos, double* vel, double* acc, double* ep, double* ev, double* ea, unsigned int np, unsigned int ns);
 	bool save_mass_result(unsigned int i, xPointMass* pm);
 	bool save_joint_result(unsigned int i, std::string nm, struct_kcr _kcr);
 	bool save_generalized_coordinate_result(double *q, double *qd, double *q_1, double *rhs);
@@ -110,20 +111,26 @@ private:
 	xmap<xstring, xDrivingRotationResultData> xdrr;
 	xlist<xstring> flist;
 	xlist<unsigned int> dist_id;
-	double* time;
+	float* time;
 	float* ptrs;
 	float* vtrs;
 	float* ctrs;
+	float* atrs;
 
 	float max_particle_position[3];
 	float min_particle_position[3];
 	float max_particle_velocity[3];
 	float min_particle_velocity[3];
+	float max_particle_force[3];
+	float min_particle_force[3];
 	float max_particle_position_mag;
 	float min_particle_position_mag;
 	float max_particle_velocity_mag;
 	float min_particle_velocity_mag;
+	float max_particle_force_mag;
+	float min_particle_force_mag;
 
+	double *c_particle_mass;
 	double *c_cluster_pos;
 	double *c_particle_pos;
 	double *c_particle_vel;

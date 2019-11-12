@@ -163,7 +163,7 @@ void xChartWindow::joint_plot()
 	double min_v = FLT_MAX;
 	QString ytitle;
 	xKinematicConstraint::kinematicConstraint_result* pmr = tree->JointResults(select_item_name);
-	double *time = tree->result_manager_ptr()->get_times();
+	float *time = tree->result_manager_ptr()->get_times();
 	unsigned int npt = series->get_num_point();
 	for(unsigned int i = npt; i < tree->result_manager_ptr()->get_num_parts(); i++)
 	{
@@ -224,7 +224,7 @@ void xChartWindow::body_plot()
  	double min_v = FLT_MAX;
  	QString ytitle;
 	xPointMass::pointmass_result* pmr = tree->MassResults(select_item_name);
-	double *time = tree->result_manager_ptr()->get_times();
+	float *time = tree->result_manager_ptr()->get_times();
 	unsigned int npt = series->get_num_point();
 	for (unsigned int i = series->get_num_point(); i < tree->result_manager_ptr()->get_current_part_number(); i++)
 	{

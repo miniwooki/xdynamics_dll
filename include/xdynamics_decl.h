@@ -15,7 +15,7 @@
 
 #define XDYNAMICS_APIENTRY XDYNAMICS_CALLING
 
-#define VERSION_NUMBER 1
+#define VERSION_NUMBER 2
 
 #include <iostream>
 #include <windows.h>
