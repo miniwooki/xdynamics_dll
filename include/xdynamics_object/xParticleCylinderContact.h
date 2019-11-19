@@ -71,7 +71,7 @@ private:
 	host_cylinder_info hci;
 
 	device_cylinder_info* dci;
-	device_body_info* dbi;
+	double* dbi;
 	//device_body_force* dbf;
 
 	xCylinderObject::empty_part empty_cylinder_part;

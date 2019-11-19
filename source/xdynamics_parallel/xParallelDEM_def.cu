@@ -208,7 +208,7 @@ void cu_cube_contact_force(
 
 void cu_cylinder_contact_force(
 	device_cylinder_info* cyl, 
-	device_body_info* bi, device_contact_property *cp,
+	double* bi, device_contact_property *cp,
 	double* pos, double* ep, double* vel, double* ev,
 	double* force, double* moment,
 	double* mass, double* tmax, double* rres,
@@ -393,7 +393,7 @@ void cu_cluster_plane_contact(
 }
 
 void cu_cluster_cylinder_contact(
-	device_cylinder_info* cyl, device_body_info* bi,
+	device_cylinder_info* cyl, double* bi,
 	xClusterInformation* xci, device_contact_property *cp,
 	double* pos, double* cpos, double* ep, double* vel, double* ev,
 	double* force, double* moment, double* mass,

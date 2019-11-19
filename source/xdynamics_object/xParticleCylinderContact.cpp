@@ -92,8 +92,8 @@ void xParticleCylinderContact::define(unsigned int idx, unsigned int np)
 		}
 		
 		checkXerror(cudaMalloc((void**)&dci, sizeof(device_cylinder_info)));
-		checkXerror(cudaMalloc((void**)&dbi, sizeof(device_body_info)));
-		checkXerror(cudaMemset(dbi, 0, sizeof(device_body_info)));
+		checkXerror(cudaMalloc((void**)&dbi, DEVICE_BODY_MEM_SIZE));
+		checkXerror(cudaMemset(dbi, 0, DEVICE_BODY_MEM_SIZE));
 		checkXerror(cudaMemcpy(dci, &hci, sizeof(device_cylinder_info), cudaMemcpyHostToDevice));
 		xDynamicsManager::This()->XResult()->set_p2cyl_contact_data((int)MAX_P2CY_COUNT);
 		update();
@@ -123,14 +123,14 @@ void xParticleCylinderContact::update()
 			//xCylinderObject *c = dynamic_cast<xParticleCylinderContact*>(xc)->CylinderObject();
 		euler_parameters ep = c_ptr->EulerParameters();
 		euler_parameters ed = c_ptr->DEulerParameters();
-		host_body_info hbi = {
+		device_body_info hbi = {
 			c_ptr->Mass(),
 			c_ptr->Position().x, c_ptr->Position().y, c_ptr->Position().z,
 			c_ptr->Velocity().x, c_ptr->Velocity().y, c_ptr->Velocity().z,
 			ep.e0, ep.e1, ep.e2, ep.e3,
 			ed.e0, ed.e1, ed.e2, ed.e3
 		};
-		
+		size_t sz = sizeof(device_body_info);
 		//checkCudaErrors(cudaMemset(db_force, 0, sizeof(double3) * ncylinders));
 		//checkCudaErrors(cudaMemset(db_moment, 0, sizeof(double3) * ncylinders));
 		checkXerror(cudaMemcpy(dbi, &hbi, sizeof(device_body_info), cudaMemcpyHostToDevice));

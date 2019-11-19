@@ -15,6 +15,7 @@ typedef unsigned int uint;
 #define MAX_P2MS_COUNT 5
 #define MAX_P2CY_COUNT 3
 #define CUDA_THREADS_PER_BLOCK 128
+#define DEVICE_BODY_MEM_SIZE 120
 //__constant__ device_parameters cte;
 //double3 toDouble3(VEC3D& v3) { return double3(v3.x, v3.y, v3.z); }
 //inline double3 change_cuda_double3(VEC3D& v3) { return make_double3(v3.x, v3.y, v3.z); }
@@ -180,13 +181,23 @@ struct device_mesh_mass_info
 	double3 moment;
 };
 
-struct device_body_info
+struct __declspec(align(16)) device_body_info
 {
 	double mass;
-	double3 pos;
-	double3 vel;
-	double4 ep;
-	double4 ed;
+	double px;
+	double py;
+	double pz;
+	double vx;
+	double vy;
+	double vz;
+	double e0;
+	double e1;
+	double e2;
+	double e3;
+	double ed0;
+	double ed1;
+	double ed2;
+	double ed3;
 };
 
 struct device_body_force
@@ -312,7 +323,7 @@ void XDYNAMICS_API cu_particle_polygonObject_collision(
 
 // Function for contact between particle and cylinder
 void XDYNAMICS_API cu_cylinder_contact_force(
-	device_cylinder_info* cyl, device_body_info* bi, 
+	device_cylinder_info* cyl, double* bi, 
 	device_contact_property *cp,
 	double* pos, double* ep, double* vel, double* omega,
 	double* force, double* moment, double* mass,
@@ -351,7 +362,7 @@ void XDYNAMICS_API cu_cluster_plane_contact(
 	unsigned int np);
 
 void XDYNAMICS_API cu_cluster_cylinder_contact(
-	device_cylinder_info* cyl, device_body_info* bi, xClusterInformation* xci, 
+	device_cylinder_info* cyl, double* bi, xClusterInformation* xci, 
 	device_contact_property *cp,
 	double* pos, double* cpos, double* ep, double* vel, double* omega,
 	double* force, double* moment, double* mass,

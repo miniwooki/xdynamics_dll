@@ -1,13 +1,13 @@
 /********************************************************************************
-** Form generated from reading UI file 'wparticle_resultYHBuMb.ui'
+** Form generated from reading UI file 'wparticle_result.ui'
 **
 ** Created by: Qt User Interface Compiler version 5.12.3
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef WPARTICLE_RESULTYHBUMB_H
-#define WPARTICLE_RESULTYHBUMB_H
+#ifndef UI_WPARTICLE_RESULT_H
+#define UI_WPARTICLE_RESULT_H
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
@@ -216,4 +216,4 @@ namespace Ui {
 
 QT_END_NAMESPACE
 
-#endif // WPARTICLE_RESULTYHBUMB_H
+#endif // UI_WPARTICLE_RESULT_H

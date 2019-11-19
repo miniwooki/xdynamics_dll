@@ -43,6 +43,9 @@ public:
     QCheckBox *CBVX;
     QCheckBox *CBVY;
     QCheckBox *CBVZ;
+    QCheckBox *CBAX;
+    QCheckBox *CBAY;
+    QCheckBox *CBAZ;
     QHBoxLayout *horizontalLayout;
     QPushButton *PB_LoadTable;
     QPushButton *PB_Export;
@@ -52,7 +55,7 @@ public:
     {
         if (ParticleResultDialog->objectName().isEmpty())
             ParticleResultDialog->setObjectName(QString::fromUtf8("ParticleResultDialog"));
-        ParticleResultDialog->resize(627, 538);
+        ParticleResultDialog->resize(763, 538);
         gridLayout = new QGridLayout(ParticleResultDialog);
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         TW = new QTableWidget(ParticleResultDialog);
@@ -105,37 +108,55 @@ public:
         CBPX->setObjectName(QString::fromUtf8("CBPX"));
         CBPX->setChecked(true);
 
-        horizontalLayout_2->addWidget(CBPX, 0, Qt::AlignHCenter);
+        horizontalLayout_2->addWidget(CBPX);
 
         CBPY = new QCheckBox(ParticleResultDialog);
         CBPY->setObjectName(QString::fromUtf8("CBPY"));
         CBPY->setChecked(true);
 
-        horizontalLayout_2->addWidget(CBPY, 0, Qt::AlignHCenter);
+        horizontalLayout_2->addWidget(CBPY);
 
         CBPZ = new QCheckBox(ParticleResultDialog);
         CBPZ->setObjectName(QString::fromUtf8("CBPZ"));
         CBPZ->setChecked(true);
 
-        horizontalLayout_2->addWidget(CBPZ, 0, Qt::AlignHCenter);
+        horizontalLayout_2->addWidget(CBPZ);
 
         CBVX = new QCheckBox(ParticleResultDialog);
         CBVX->setObjectName(QString::fromUtf8("CBVX"));
         CBVX->setChecked(true);
 
-        horizontalLayout_2->addWidget(CBVX, 0, Qt::AlignHCenter);
+        horizontalLayout_2->addWidget(CBVX);
 
         CBVY = new QCheckBox(ParticleResultDialog);
         CBVY->setObjectName(QString::fromUtf8("CBVY"));
         CBVY->setChecked(true);
 
-        horizontalLayout_2->addWidget(CBVY, 0, Qt::AlignHCenter);
+        horizontalLayout_2->addWidget(CBVY);
 
         CBVZ = new QCheckBox(ParticleResultDialog);
         CBVZ->setObjectName(QString::fromUtf8("CBVZ"));
         CBVZ->setChecked(true);
 
-        horizontalLayout_2->addWidget(CBVZ, 0, Qt::AlignHCenter);
+        horizontalLayout_2->addWidget(CBVZ);
+
+        CBAX = new QCheckBox(ParticleResultDialog);
+        CBAX->setObjectName(QString::fromUtf8("CBAX"));
+        CBAX->setChecked(true);
+
+        horizontalLayout_2->addWidget(CBAX);
+
+        CBAY = new QCheckBox(ParticleResultDialog);
+        CBAY->setObjectName(QString::fromUtf8("CBAY"));
+        CBAY->setChecked(true);
+
+        horizontalLayout_2->addWidget(CBAY);
+
+        CBAZ = new QCheckBox(ParticleResultDialog);
+        CBAZ->setObjectName(QString::fromUtf8("CBAZ"));
+        CBAZ->setChecked(true);
+
+        horizontalLayout_2->addWidget(CBAZ);
 
 
         gridLayout->addLayout(horizontalLayout_2, 2, 0, 1, 1);
@@ -179,6 +200,9 @@ public:
         CBVX->setText(QApplication::translate("ParticleResultDialog", "VX", nullptr));
         CBVY->setText(QApplication::translate("ParticleResultDialog", "VY", nullptr));
         CBVZ->setText(QApplication::translate("ParticleResultDialog", "VZ", nullptr));
+        CBAX->setText(QApplication::translate("ParticleResultDialog", "FX", nullptr));
+        CBAY->setText(QApplication::translate("ParticleResultDialog", "FY", nullptr));
+        CBAZ->setText(QApplication::translate("ParticleResultDialog", "FZ", nullptr));
         PB_LoadTable->setText(QApplication::translate("ParticleResultDialog", "Load table", nullptr));
         PB_Export->setText(QApplication::translate("ParticleResultDialog", "Export", nullptr));
         PB_Exit->setText(QApplication::translate("ParticleResultDialog", "Exit", nullptr));
