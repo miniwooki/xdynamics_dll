@@ -905,7 +905,7 @@ __device__ double particle_plane_contact_detection(
 }
 
 __global__ void cluster_plane_contact_kernel(
-	device_plane_info *plane, device_body_info* dbi,
+	device_plane_info *plane, double* dbi,
 	double* fx, double* fy, double* fz, double* mx, double* my, double* mz,
 	double4* pos, double4* cpos, double4 *ep, double3* vel, double4* ev,
 	double3* force, double3* moment,
@@ -968,7 +968,7 @@ __global__ void cluster_plane_contact_kernel(
 	double3 wp = make_double3(dot(dp, plane->u1), dot(dp, plane->u2), dot(dp, plane->uw));
 	double3 m_force = make_double3(0, 0, 0);
 	double3 cpt = ipos3 + r * unit;
-	double3 dcpr_j = cpt - make_double3(dbi->px, dbi->py, dbi->pz);
+	double3 dcpr_j = cpt - make_double3(dbi[PX], dbi[PY], dbi[PZ]);
 	double coh_s = 0;
 	double cdist = particle_plane_contact_detection(plane, ipos3, wp, unit, r);
 	double2 sd = make_double2(0.0, 0.0);
@@ -982,10 +982,10 @@ __global__ void cluster_plane_contact_kernel(
 		double3 cpt = ipos3 + r * unit;
 		double3 dcpr = cpt - make_double3(icpos.x, icpos.y, icpos.z);
 		//double3 rc = r * unit;
-		double3 oj = toAngularVelocity(make_double4(dbi->e0, dbi->e1, dbi->e2, dbi->e3), make_double4(dbi->ed0, dbi->ed1, dbi->ed2, dbi->ed3));
-		double3 dv = make_double3(dbi->vx, dbi->vy, dbi->vz) + cross(oj, dcpr_j) - (ivel + cross(iomega, dcpr));
+		double3 oj = toAngularVelocity(make_double4(dbi[E0], dbi[E1], dbi[E2], dbi[E3]), make_double4(dbi[ED0], dbi[ED1], dbi[ED2], dbi[ED3]));
+		double3 dv = make_double3(dbi[VX], dbi[VY], dbi[VZ]) + cross(oj, dcpr_j) - (ivel + cross(iomega, dcpr));
 		device_force_constant c = getConstant(
-			r, 0.0, m, dbi->mass, cp->Ei, cp->Ej,
+			r, 0.0, m, dbi[MM], cp->Ei, cp->Ej,
 			cp->pri, cp->prj, cp->Gi, cp->Gj,
 			cp->rest, cp->s_fric, cp->fric, cp->rfric, cp->sratio);
 		switch (cte.contact_model)
@@ -1048,7 +1048,7 @@ __global__ void cluster_plane_contact_kernel(
 }
 
 __global__ void plane_contact_force_kernel(
-	device_plane_info *plane, device_body_info* dbi, device_contact_property *cp,
+	device_plane_info *plane, double* dbi, device_contact_property *cp,
 	double* fx, double* fy, double* fz, double* mx, double* my, double* mz,
 	double4* pos, double4 *ep, double3* vel, double4* ev,
 	double3* force, double3* moment, double* mass,
@@ -1106,15 +1106,15 @@ __global__ void plane_contact_force_kernel(
 		double2 sd = make_double2(0.0, 0.0);
 		double3 m_force = make_double3(0, 0, 0);
 		double3 cpt = ipos3 + r * unit;
-		double3 dcpr_j = cpt - make_double3(dbi->px, dbi->py, dbi->pz);
+		double3 dcpr_j = cpt - make_double3(dbi[PX], dbi[PY], dbi[PZ]);
 		if (cdist > 0) {
 			//printf("plane body pos\n");
 			
 			for (unsigned int i = 0; i < 3; i++)
 				if (p_pair_id[i] == k){ sd = p_tsd[i]; break; }
 			double3 dcpr = cpt - ipos3;	
-			double3 oj = toAngularVelocity(make_double4(dbi->e0, dbi->e1, dbi->e2, dbi->e3), make_double4(dbi->ed0, dbi->ed1, dbi->ed2, dbi->ed3));
-			double3 dv = make_double3(dbi->vx, dbi->vy, dbi->vz) + cross(oj, dcpr_j) - (ivel + cross(iomega, dcpr));
+			double3 oj = toAngularVelocity(make_double4(dbi[E0], dbi[E1], dbi[E2], dbi[E3]), make_double4(dbi[ED0], dbi[ED1], dbi[ED2], dbi[ED3]));
+			double3 dv = make_double3(dbi[VX], dbi[VY], dbi[VZ]) + cross(oj, dcpr_j) - (ivel + cross(iomega, dcpr));
 			//printf("body_vel : [%f, %f, %f]\n", bi.vel.x, bi.vel.y, bi.vel.z);
 			device_force_constant c = getConstant(r, 0.0, m, 0.0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->Gi, cp->Gj, cp->rest, cp->fric, cp->s_fric, cp->rfric, cp->sratio);
 			switch (cte.contact_model)
@@ -1211,7 +1211,7 @@ __device__ double3 toGlobal(double3& A_1, double3& A_2, double3& A_3, double3& v
 __device__ void particle_cylinder_contact_force(
 	device_cylinder_info* dci,
 	device_contact_property* cp,
-	device_body_info* dbi,
+	double* dbi,
 	double* fx,
 	double* fy,
 	double* fz,
@@ -1242,15 +1242,15 @@ __device__ void particle_cylinder_contact_force(
 {
 	double2 sd = make_double2(0.0, 0.0);
 	//device_body_info dbi = dpmi[dci->mid];
-	double3 po2cp = cpt - make_double3(dbi->px, dbi->py, dbi->pz);
+	double3 po2cp = cpt - make_double3(dbi[PX], dbi[PY], dbi[PZ]);
 
 	double3 Fn = make_double3(0.0, 0.0, 0.0);
 	double3 Ft = make_double3(0, 0, 0);
-	double3 omega = toAngularVelocity(make_double4(dbi->e0, dbi->e1, dbi->e2, dbi->e3), make_double4(dbi->ed0, dbi->ed1, dbi->ed2, dbi->ed3));
+	double3 omega = toAngularVelocity(make_double4(dbi[E0], dbi[E1], dbi[E2], dbi[E3]), make_double4(dbi[ED0], dbi[ED1], dbi[ED2], dbi[ED3]));
 	for (unsigned int i = 0; i < MAX_P2CY_COUNT; i++)
 		if (p_pair_id[i] == pid) { sd = p_tsd[i]; break; }
 	double3 rc = cpt - ipos;// r * unit;
-	double3 dv = make_double3(dbi->vx, dbi->vy, dbi->vz) + cross(omega, po2cp) - (ivel + cross(iomega, rc));
+	double3 dv = make_double3(dbi[VX], dbi[VY], dbi[VZ]) + cross(omega, po2cp) - (ivel + cross(iomega, rc));
 
 	device_force_constant c = getConstant(r, 0, m, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->Gi, cp->Gj, cp->rest, cp->fric, cp->s_fric, cp->rfric, cp->sratio);
 	//printf("%f, %f, %f, %f\n", c.kn, c.ks, c.vn, c.vs);
@@ -1296,9 +1296,9 @@ __device__ double particle_cylinder_contact_detection(
 {
 	double dist = -1.0;
 	double3 cp = make_double3(0.0, 0.0, 0.0);
-	double3 cyl_pos = make_double3(bi[1], bi[2], bi[3]);// c_ptr->Position();
+	double3 cyl_pos = make_double3(bi[PX], bi[PY], bi[PZ]);// c_ptr->Position();
 	//printf("cylinder_position : [%f, %f, %f]\n", cyl_pos.x, cyl_pos.y, cyl_pos.z);
-	double4 cyl_ep = make_double4(bi[7], bi[8], bi[9], bi[10]);// c_ptr->EulerParameters();
+	double4 cyl_ep = make_double4(bi[E0], bi[E1], bi[E2], bi[E3]);// c_ptr->EulerParameters();
 	//printf("cylinder_ep : [%f, %f, %f, %f]\n", cyl_ep.x, cyl_ep.y, cyl_ep.z, cyl_ep.w);
 	double3 cyl_base = cyl_pos + toGlobal(cy->pbase, cyl_ep);
 	double3 cyl_top = cyl_pos + toGlobal(cy->ptop, cyl_ep);// cinfo.ptop);
@@ -1384,13 +1384,13 @@ __device__ double particle_cylinder_contact_detection(
 
 __device__ double particle_cylinder_inner_base_or_top_contact_detection(
 	device_cylinder_info* cy, 
-	device_body_info* dbi,
+	double* dbi,
 	double3& p, double3 & u, double3 & cp, unsigned int empty, double r)
 {
 	//isInnerContact = false;
 	double dist = -1.0;
-	double3 cyl_pos = make_double3(dbi->px, dbi->py, dbi->pz);// c_ptr;// ->Position();
-	double4 cyl_ep = make_double4(dbi->e0, dbi->e1, dbi->e2, dbi->e3);// .c_ptr->EulerParameters();
+	double3 cyl_pos = make_double3(dbi[PX], dbi[PY], dbi[PZ]);// c_ptr;// ->Position();
+	double4 cyl_ep = make_double4(dbi[E0], dbi[E1], dbi[E2], dbi[E3]);// .c_ptr->EulerParameters();
 	double3 cyl_base = cyl_pos + toGlobal(cy->pbase, cyl_ep);
 	double3 cyl_top = cyl_pos + toGlobal(cy->ptop, cyl_ep);
 	double3 ab = cyl_top - cyl_base;
@@ -1509,7 +1509,7 @@ __global__ void cluster_cylinder_contact_force_kernel(
 		fx[id] += -m_force.x;
 		fy[id] += -m_force.y;
 		fz[id] += -m_force.z;
-		double3 m_moment = -cross(cpt - make_double3(bi->px, bi->py, bi->pz), m_force);
+		double3 m_moment = -cross(cpt - make_double3(bi[PX], bi[PY], bi[PZ]), m_force);
 		mx[id] += m_moment.x;// -cross(cpt - dbi.pos, m_force);
 		my[id] += m_moment.y;
 		mz[id] += m_moment.z;
@@ -1541,7 +1541,7 @@ __global__ void cluster_cylinder_contact_force_kernel(
 			fy[id] += -m_force.y;
 			fz[id] += -m_force.z;
 			//dbm[id] += -cross(cpt - dbi.pos, m_force);
-			double3 m_moment = -cross(cpt - make_double3(bi->px, bi->py, bi->pz), m_force);
+			double3 m_moment = -cross(cpt - make_double3(bi[PX], bi[PY], bi[PZ]), m_force);
 			mx[id] += m_moment.x;// -cross(cpt - dbi.pos, m_force);
 			my[id] += m_moment.y;
 			mz[id] += m_moment.z;
@@ -1559,7 +1559,7 @@ __global__ void cluster_cylinder_contact_force_kernel(
 }
 
 __global__ void cylinder_contact_force_kernel(
-	device_cylinder_info *cy, device_body_info* bi,
+	device_cylinder_info *cy, double* bi,
 	double *fx, double* fy, double* fz, double* mx, double* my, double* mz,
 	double4* pos, double4 *ep, double3* vel, double4* ev,
 	double3* force, double3* moment, device_contact_property *cp,
@@ -1640,7 +1640,7 @@ __global__ void cylinder_contact_force_kernel(
 		fy[id] += -m_force.y;
 		fz[id] += -m_force.z;
 		//dbm[id] += -cross(cpt - dbi.pos, m_force);
-		double3 m_moment = -cross(cpt - make_double3(bi->px, bi->py, bi->pz), m_force);
+		double3 m_moment = -cross(cpt - make_double3(bi[PX], bi[PY], bi[PZ]), m_force);
 		mx[id] += m_moment.x;
 		my[id] += m_moment.y;
 		mz[id] += m_moment.z;
@@ -1675,7 +1675,7 @@ __global__ void cylinder_contact_force_kernel(
 			fy[id] += -m_force.y;
 			fz[id] += -m_force.z;
 		/*	dbm[id] += -cross(cpt - dbi.pos, m_force);*/
-			double3 m_moment = -cross(cpt - make_double3(bi->px, bi->py, bi->pz), m_force);
+			double3 m_moment = -cross(cpt - make_double3(bi[PX], bi[PY], bi[PZ]), m_force);
 			mx[id] += m_moment.x;
 			my[id] += m_moment.y;
 			mz[id] += m_moment.z;
@@ -1846,7 +1846,7 @@ __device__ void particle_triangle_contact_force(
 	unsigned int id,
 	device_triangle_info* dti,
 	device_contact_property *cp,
-	device_body_info* dbi,
+	double* dbi,
 	double* fx,
 	double* fy, 
 	double* fz,
@@ -1875,7 +1875,7 @@ __device__ void particle_triangle_contact_force(
 	double3 rp = dtci.cpt - ipos;//-cross(qp, rp);
 	///unit = unit / length(unit);
 	double2 sd = make_double2(0.0, 0.0);
-	double3 po2cp = dtci.cpt - make_double3(dbi->px, dbi->py, dbi->pz);// pmi.origin;
+	double3 po2cp = dtci.cpt - make_double3(dbi[PX], dbi[PY], dbi[PZ]);// pmi.origin;
 	double dist = length(rp);
 	double3 unit = rp / dist;
 	double cdist = r - dist;//r - length(ipos - dtci.cpt);
@@ -1895,12 +1895,12 @@ __device__ void particle_triangle_contact_force(
 	
 	double3 Fn = make_double3(0.0, 0.0, 0.0);
 	double3 Ft = make_double3(0, 0, 0);
-	double3 jomega = toAngularVelocity(make_double4(dbi->e0, dbi->e1, dbi->e2, dbi->e3), make_double4(dbi->ed0, dbi->ed1, dbi->ed2, dbi->ed3));
+	double3 jomega = toAngularVelocity(make_double4(dbi[E0], dbi[E1], dbi[E2], dbi[E3]), make_double4(dbi[ED0], dbi[ED1], dbi[ED2], dbi[ED3]));
 	for (unsigned int i = 0; i < MAX_P2MS_COUNT; i++)
 		if (p_pair_id[i] == dtci.id){ sd = p_tsd[i]; break; }
 	double3 rc = dtci.cpt - ipos;
-	double3 dv = make_double3(dbi->vx, dbi->vy, dbi->vz) + cross(jomega, po2cp) - (ivel + cross(iomega, rc));
-	device_force_constant c = getConstant(r, 0, m, dbi->mass, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->Gi, cp->Gj, cp->rest, cp->fric, cp->s_fric, cp->rfric, cp->sratio);
+	double3 dv = make_double3(dbi[VX], dbi[VY], dbi[VZ]) + cross(jomega, po2cp) - (ivel + cross(iomega, rc));
+	device_force_constant c = getConstant(r, 0, m, dbi[MM], cp->Ei, cp->Ej, cp->pri, cp->prj, cp->Gi, cp->Gj, cp->rest, cp->fric, cp->s_fric, cp->rfric, cp->sratio);
 	switch (cte.contact_model)
 	{
 	case 0: DHSModel(c, r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh, cdist, iomega, sd.x, sd.y, dv, unit, Ft, Fn); break;
@@ -1935,7 +1935,7 @@ __device__ void cluster_triangle_contact_force(
 	unsigned int id,
 	device_triangle_info* dpi,
 	device_contact_property *cp,
-	device_body_info* dbi,
+	double* dbi,
 	double* fx,
 	double* fy,
 	double* fz,
@@ -1968,7 +1968,7 @@ __device__ void cluster_triangle_contact_force(
 	//device_contact_property cp = cp[pidx];
 	//device_body_info db = dbi[pidx];// device_mesh_mass_info pmi = dpmi[pidx];
 	//double3 cpt = closestPtPointTriangle(dpi[k], ipos, r, t);
-	double3 po2cp = dtci.cpt - make_double3(dbi->px, dbi->py, dbi->pz);// pmi.origin;
+	double3 po2cp = dtci.cpt - make_double3(dbi[PX], dbi[PY], dbi[PZ]);// pmi.origin;
 	double cdist = r - length(ipos - dtci.cpt);
 	double coh_s = 0.0;
 	if (cp->coh)
@@ -1995,10 +1995,10 @@ __device__ void cluster_triangle_contact_force(
 	for (unsigned int i = 0; i < MAX_P2MS_COUNT; i++)
 		if (p_pair_id[i] == dtci.id) { sd = p_tsd[i]; break; }
 	//double3 rc = r * unit;
-	double3 jomega = toAngularVelocity(make_double4(dbi->e0, dbi->e1, dbi->e2, dbi->e3), make_double4(dbi->ed0, dbi->ed1, dbi->ed2, dbi->ed3));
+	double3 jomega = toAngularVelocity(make_double4(dbi[E0], dbi[E1], dbi[E2], dbi[E3]), make_double4(dbi[ED0], dbi[ED1], dbi[ED2], dbi[ED3]));
 	//printf("jomega : [%e, %e, %e]\n", jomega.x, jomega.y, jomega.z);
-	double3 dv = make_double3(dbi->vx, dbi->vy, dbi->vz) + cross(jomega, po2cp) - (ivel + cross(iomega, dcpr));
-	device_force_constant c = getConstant(r, 0, m, dbi->mass, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->Gi, cp->Gj, cp->rest, cp->fric, cp->s_fric, cp->rfric, cp->sratio);
+	double3 dv = make_double3(dbi[VX], dbi[VY], dbi[VZ]) + cross(jomega, po2cp) - (ivel + cross(iomega, dcpr));
+	device_force_constant c = getConstant(r, 0, m, dbi[MM], cp->Ei, cp->Ej, cp->pri, cp->prj, cp->Gi, cp->Gj, cp->rest, cp->fric, cp->s_fric, cp->rfric, cp->sratio);
 	
 	switch (cte.contact_model)
 	{
@@ -2023,7 +2023,7 @@ __device__ void cluster_triangle_contact_force(
 }
 
 __global__ void particle_polygonObject_collision_kernel(
-	device_triangle_info* dti, device_body_info* dbi, 
+	device_triangle_info* dti, double* dbi, 
 	double* fx, double* fy, double* fz, double* mx, double* my, double* mz,
 	double4 *pos, double4 *ep, double3 *vel, double4 *ev, double3 *force, double3 *moment,
 	double* mass, double3* tmax, double* rres,
@@ -2204,7 +2204,7 @@ __global__ void particle_polygonObject_collision_kernel(
 }
 
 __global__ void cluster_meshes_contact_kernel(
-	device_triangle_info *dti, device_body_info* dbi,
+	device_triangle_info *dti, double* dbi,
 	double* fx, double* fy, double* fz, double* mx, double* my, double* mz,// double3* dbf, double3* dbm,
 	double4* pos, double4* cpos, double4 *ep, double3* vel, double4* ev,
 	double3* force, double3* moment,
@@ -2637,7 +2637,7 @@ __global__ void decide_cluster_rolling_friction_moment_kernel(
 
 
 __global__ void updateMeshObjectData_kernel(
-	device_body_info *dbi, double* vList,
+	double *dbi, double* vList,
 	double4* sphere, double3* dlocal, device_triangle_info* dpi, unsigned int ntriangle)
 {
 	unsigned id = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
@@ -2647,8 +2647,8 @@ __global__ void updateMeshObjectData_kernel(
 	int s = id * 9;
 	//int mid = dpi[id].id;
 //	printf("idx(%d) : mid = %d\n", id, mid);
-	double3 pos = make_double3(dbi->px, dbi->py, dbi->pz);// dpmi[mid].origin;
-	double4 ep = make_double4(dbi->e0, dbi->e1, dbi->e2, dbi->e3);// mep[mid];// dpmi[mid].ep;
+	double3 pos = make_double3(dbi[PX], dbi[PY], dbi[PZ]);// dpmi[mid].origin;
+	double4 ep = make_double4(dbi[E0], dbi[E1], dbi[E2], dbi[E3]);// mep[mid];// dpmi[mid].ep;
 	double4 sph = sphere[id];
 	double3 P = make_double3(vList[s + 0], vList[s + 1], vList[s + 2]);
 	double3 Q = make_double3(vList[s + 3], vList[s + 4], vList[s + 5]);

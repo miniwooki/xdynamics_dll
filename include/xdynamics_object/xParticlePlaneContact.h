@@ -79,7 +79,7 @@ private:
 	//host_body_info hbi;
 
 	device_plane_info* dpi;
-	device_body_info* dbi;
+	double* dbi;
 	//device_body_force* dbf;
 
  	xParticleObject* p;

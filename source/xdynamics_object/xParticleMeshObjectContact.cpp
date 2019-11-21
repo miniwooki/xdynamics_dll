@@ -172,7 +172,7 @@ void xParticleMeshObjectContact::update()
 	{
 		euler_parameters ep = po->EulerParameters();
 		euler_parameters ed = po->DEulerParameters();
-		device_body_info bi = 
+		double bi[15] = 
 		{
 			po->Mass(),
 			po->Position().x, po->Position().y, po->Position().z,
@@ -180,7 +180,7 @@ void xParticleMeshObjectContact::update()
 			ep.e0, ep.e1, ep.e2, ep.e3,
 			ed.e0, ed.e1, ed.e2, ed.e3
 		};
-		checkXerror(cudaMemcpy(dbi, &bi, sizeof(device_body_info), cudaMemcpyHostToDevice));
+		checkXerror(cudaMemcpy(dbi, bi, DEVICE_BODY_MEM_SIZE, cudaMemcpyHostToDevice));
 		cu_update_meshObjectData(dvList, dsphere, dlocal, dti, dbi, po->NumTriangle());
 	}
 }

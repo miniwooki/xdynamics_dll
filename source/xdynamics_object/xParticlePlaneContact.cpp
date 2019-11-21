@@ -79,7 +79,7 @@ void xParticlePlaneContact::define(unsigned int idx, unsigned int np)
 			allocated_static = true;
 		}
 		checkXerror(cudaMalloc((void**)&dpi, sizeof(device_plane_info)));		
-		checkXerror(cudaMalloc((void**)&dbi, sizeof(device_body_info)));
+		checkXerror(cudaMalloc((void**)&dbi, DEVICE_BODY_MEM_SIZE));
 		//checkXerror(cudaMemcpy(dpi, &hpi, sizeof(device_plane_info), cudaMemcpyHostToDevice));
 		xDynamicsManager::This()->XResult()->set_p2pl_contact_data((int)MAX_P2PL_COUNT);
 		
@@ -115,7 +115,7 @@ void xParticlePlaneContact::update()
 		unsigned int mcnt = 0;
 		euler_parameters ep = pe->EulerParameters();
 		euler_parameters ed = pe->DEulerParameters();
-		host_body_info hbi = {
+		double hbi[15] = {
 			pe->Mass(),
 			pe->Position().x, pe->Position().y, pe->Position().z,
 			pe->Velocity().x, pe->Velocity().y, pe->Velocity().z,
@@ -124,7 +124,7 @@ void xParticlePlaneContact::update()
 		};
 		//}
 		checkXerror(cudaMemcpy(dpi, &hpi, sizeof(device_plane_info), cudaMemcpyHostToDevice));
-		checkXerror(cudaMemcpy(dbi, &hbi, sizeof(device_body_info), cudaMemcpyHostToDevice));
+		checkXerror(cudaMemcpy(dbi, &hbi, DEVICE_BODY_MEM_SIZE, cudaMemcpyHostToDevice));
 	}
 
 }

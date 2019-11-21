@@ -16,6 +16,8 @@ typedef unsigned int uint;
 #define MAX_P2CY_COUNT 3
 #define CUDA_THREADS_PER_BLOCK 128
 #define DEVICE_BODY_MEM_SIZE 120
+
+enum {MM = 0, PX, PY, PZ, VX, VY, VZ, E0, E1, E2, E3, ED0, ED1, ED2, ED3};
 //__constant__ device_parameters cte;
 //double3 toDouble3(VEC3D& v3) { return double3(v3.x, v3.y, v3.z); }
 //inline double3 change_cuda_double3(VEC3D& v3) { return make_double3(v3.x, v3.y, v3.z); }
@@ -298,7 +300,7 @@ void XDYNAMICS_API cu_calculate_p2p(
 
 // Function for contact between particle and plane
 void XDYNAMICS_API cu_plane_contact_force(
-	device_plane_info* plan, device_body_info* dbi, device_contact_property *cp,
+	device_plane_info* plan, double* dbi, device_contact_property *cp,
 	double* pos, double* ep, double* vel, double* omega,
 	double* force, double* moment, double* mass,
 	double* tmax, double* rres,
@@ -313,7 +315,7 @@ void XDYNAMICS_API cu_cube_contact_force(
 
 // Function for contact between particle and polygonObject
 void XDYNAMICS_API cu_particle_polygonObject_collision(
-	device_triangle_info* dpi, device_body_info* dbi,
+	device_triangle_info* dpi, double* dbi,
 	double* pos, double* ep, double* vel, double* omega,
 	double* force, double* moment, double* mass,
 	double* tmax, double* rres,
@@ -343,7 +345,7 @@ void XDYNAMICS_API cu_decide_rolling_friction_moment(
 double XDYNAMICS_API reduction(double* in, unsigned int np);
 void XDYNAMICS_API cu_update_meshObjectData(
 	double *vList, double* sph, double* dlocal, device_triangle_info* poly,
-	device_body_info* dbi, unsigned int np);
+	double* dbi, unsigned int np);
 
 void XDYNAMICS_API cu_clusters_contact(
 	double* pos, double* cpos, double* ep, double* vel,
@@ -354,7 +356,7 @@ void XDYNAMICS_API cu_clusters_contact(
 	unsigned int* cend, device_contact_property* cp, xClusterInformation* xci, unsigned int np);
 
 void XDYNAMICS_API cu_cluster_plane_contact(
-	device_plane_info* plan, device_body_info* dbi, device_contact_property *cp,
+	device_plane_info* plan, double* dbi, device_contact_property *cp,
 	double* pos, double* cpos, double* ep, double* vel, double* omega,
 	double* force, double* moment, double* mass,
 	double* tmax, double* rres,
@@ -371,7 +373,7 @@ void XDYNAMICS_API cu_cluster_cylinder_contact(
 	unsigned int np);
 
 void XDYNAMICS_API cu_cluster_meshes_contact(
-	device_triangle_info *dpi, device_body_info* dbi,
+	device_triangle_info *dpi, double* dbi,
 	double* pos, double* cpos, double *ep, double* vel, double* ev,
 	double* force, double* moment,
 	device_contact_property *cp, double* mass,

@@ -123,7 +123,7 @@ void xParticleCylinderContact::update()
 			//xCylinderObject *c = dynamic_cast<xParticleCylinderContact*>(xc)->CylinderObject();
 		euler_parameters ep = c_ptr->EulerParameters();
 		euler_parameters ed = c_ptr->DEulerParameters();
-		device_body_info hbi = {
+		double hbi[15] = {
 			c_ptr->Mass(),
 			c_ptr->Position().x, c_ptr->Position().y, c_ptr->Position().z,
 			c_ptr->Velocity().x, c_ptr->Velocity().y, c_ptr->Velocity().z,
@@ -133,7 +133,7 @@ void xParticleCylinderContact::update()
 		size_t sz = sizeof(device_body_info);
 		//checkCudaErrors(cudaMemset(db_force, 0, sizeof(double3) * ncylinders));
 		//checkCudaErrors(cudaMemset(db_moment, 0, sizeof(double3) * ncylinders));
-		checkXerror(cudaMemcpy(dbi, &hbi, sizeof(device_body_info), cudaMemcpyHostToDevice));
+		checkXerror(cudaMemcpy(dbi, hbi, DEVICE_BODY_MEM_SIZE, cudaMemcpyHostToDevice));
 	}
 }
 
@@ -172,7 +172,7 @@ void xParticleCylinderContact::collision_gpu(
 	if (xSimulation::Gpu())
 	{
 		double fm[6] = { 0, };
-		if(!cpos) cu_cylinder_contact_force(dci, dbi, dcp, pos, ep, vel, ev, force, moment, mass,	tmax, rres, d_pair_count_pcyl, d_pair_id_pcyl, d_tsd_pcyl, np);
+		if(!cpos) cu_cylinder_contact_force(dci, dbi, dcp, pos, ep, vel, ev, force, moment, mass, tmax, rres, d_pair_count_pcyl, d_pair_id_pcyl, d_tsd_pcyl, np);
 		else if (cpos) cu_cluster_cylinder_contact(dci, dbi, xci, dcp, pos, cpos, ep, vel, ev, force, moment, mass, tmax, rres, d_pair_count_pcyl, d_pair_id_pcyl, d_tsd_pcyl, np);
 
 		if (c_ptr->isDynamicsBody())

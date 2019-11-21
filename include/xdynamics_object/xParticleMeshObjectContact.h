@@ -83,7 +83,7 @@ private:
 	static unsigned int *d_pair_id_ptri;
 	host_triangle_info* hti;
 	device_triangle_info* dti;
-	device_body_info *dbi;
+	double *dbi;
 
 	// host particle-triangle contact parameters
 	static double* tsd_ptri;

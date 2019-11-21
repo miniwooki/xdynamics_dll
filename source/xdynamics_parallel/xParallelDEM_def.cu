@@ -143,7 +143,7 @@ void cu_calculate_p2p(
 }
 
 void cu_plane_contact_force(
-	 device_plane_info* plan, device_body_info* dbi,
+	 device_plane_info* plan, double* dbi,
 	device_contact_property *cp, double* pos, double* ep, double* vel, double* ev,
 	double* force, double* moment, double* mass,
 	double* tmax, double* rres,
@@ -236,7 +236,7 @@ void cu_cylinder_contact_force(
 }
 
 void cu_particle_polygonObject_collision(
-	device_triangle_info* dpi, device_body_info* dbi,
+	device_triangle_info* dpi, double* dbi,
 	double* pos, double* ep, double* vel, double* ev,
 	double* force, double* moment, double* mass,
 	double* tmax, double* rres,
@@ -318,7 +318,7 @@ double reduction(double* in, unsigned int np)
 
 void cu_update_meshObjectData(
 	double *vList, double* sph, double* dlocal, device_triangle_info* poly,
-	device_body_info* dbi, unsigned int ntriangle)
+	double* dbi, unsigned int ntriangle)
 {
 	computeGridSize(ntriangle, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
 	updateMeshObjectData_kernel << <numBlocks, numThreads >> > (
@@ -349,7 +349,7 @@ void cu_clusters_contact(
 }
 
 void cu_cluster_plane_contact(
-	device_plane_info* plan, device_body_info* dbi,
+	device_plane_info* plan, double* dbi,
 	device_contact_property *cp,
 	double* pos, double* cpos, double* ep, double* vel, double* ev,
 	double* force, double* moment, double* mass,
@@ -421,7 +421,7 @@ void cu_cluster_cylinder_contact(
 
 void cu_cluster_meshes_contact(
 	device_triangle_info * dpi, 
-	device_body_info * dbi,
+	double * dbi,
 	double * pos,
 	double * cpos,
 	double * ep,
