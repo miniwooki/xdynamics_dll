@@ -133,7 +133,7 @@ void xParticleCylinderContact::update()
 		size_t sz = sizeof(device_body_info);
 		//checkCudaErrors(cudaMemset(db_force, 0, sizeof(double3) * ncylinders));
 		//checkCudaErrors(cudaMemset(db_moment, 0, sizeof(double3) * ncylinders));
-		checkXerror(cudaMemcpy(dbi, hbi, DEVICE_BODY_MEM_SIZE, cudaMemcpyHostToDevice));
+		checkXerror(cudaMemcpy(dbi, hbi, sizeof(double) * 15, cudaMemcpyHostToDevice));
 	}
 }
 

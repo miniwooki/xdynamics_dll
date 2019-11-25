@@ -28,6 +28,7 @@ private:
 // 	float p0[3];
 // 	float p1[3];
 	xCylinderObjectData data;
+	vector3d eangle;
 };
 
 #endif

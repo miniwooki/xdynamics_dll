@@ -141,9 +141,6 @@
     <ClCompile Include="..\..\source\xdynamics_algebra\xAlgebraMath.cpp">
       <Filter>소스 파일\xdynamics_algebra</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\xXLSReader.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\xObjectManager.cpp">
       <Filter>소스 파일\xdynamics_manager</Filter>
     </ClCompile>
@@ -287,6 +284,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\xdynamics_object\xFixConstraint.cpp">
       <Filter>소스 파일\xdynamics_object\joint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xXLSReader.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

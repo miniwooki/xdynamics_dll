@@ -68,12 +68,41 @@ double xCylinderObject::cylinder_bottom_radius() { return len_rr.z; }
 
 double xCylinderObject::cylinder_bottom_radius() const { return len_rr.z; }
 
+void xCylinderObject::updateData()
+{
+	//matrix33d A = GlobalTransformationMatrix(e);
+	pbase = toLocal(pbase);
+	ptop = toLocal(ptop);
+}
+
 void xCylinderObject::SetupDataFromStructure(xCylinderObjectData& d)
 {
 	len_rr = new_vector3d(d.length, d.r_top, d.r_bottom);
 	pbase = new_vector3d(d.p0x, d.p0y, d.p0z);
 	ptop = new_vector3d(d.p1x, d.p1y, d.p1z);
+
+	//vector3d to = ptop - pbase;
+	//double _len = length(to);
+	//double h_len = _len * 0.5;
+	//vector3d u = to / length(to);
+	///*vector3d _e = sin(M_PI * 0.5) * u;
+	//double e0 = 1 - dot(_e, _e);
+	//euler_parameters e = { e0, _e.x, _e.y, _e.z };
+	//matrix33d A = GlobalTransformationMatrix(e);*/
+	//vector3d pu = new_vector3d(-u.y, u.z, u.x);
+	//vector3d qu = cross(u, pu);
+
+	//matrix33d A = { u.x, pu.x, qu.x, u.y, pu.y, qu.y, u.z, pu.z, qu.z };
+
+	//double trA = A.a00 + A.a11 + A.a22;
+	//double e0 = sqrt((trA + 1) / 4.0);
+	//double e1 = sqrt((2.0 * A.a00 - trA + 1) / 4.0);
+	//double e2 = sqrt((2.0 * A.a11 - trA + 1) / 4.0);
+	//double e3 = sqrt((2.0 * A.a22 - trA + 1) / 4.0);
+
 	xPointMass::pos = 0.5 * (pbase + ptop);
+	//xPointMass::ep = new_euler_parameters(e0, e1, e2, e3);
+	//setupTransformationMatrix();
 	pbase = xPointMass::toLocal(pbase - xPointMass::pos);
 	ptop = xPointMass::toLocal(ptop - xPointMass::pos);
 	empty = (empty_part)d.empty;

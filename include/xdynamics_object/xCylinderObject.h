@@ -35,6 +35,7 @@ public:
 	double cylinder_top_radius() const;
 	double cylinder_bottom_radius();
 	double cylinder_bottom_radius() const;
+	void updateData();
 
 	void SetupDataFromStructure(xCylinderObjectData& d);
 

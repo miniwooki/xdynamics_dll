@@ -36,11 +36,13 @@ void xvCylinder::draw(GLenum eMode)
 		bool isplaymode = (xvAnimationController::Play() || xvAnimationController::getFrame()) && xvObject::pmrs;
 		if (isplaymode && xvObject::pmrs)
 		{
+			euler_parameters _e = xvObject::pmrs[0].ep - new_euler_parameters(1.0, 0.0, 0.0, 0.0);
 			double t = 180 / M_PI;
 			unsigned int idx = xvAnimationController::getFrame();
 			xPointMass::pointmass_result pmr = xvObject::pmrs[idx];
 			glTranslated(pmr.pos.x, pmr.pos.y, pmr.pos.z);
-			vector3d euler = EulerParameterToEulerAngle(pmr.ep);
+			euler_parameters ne = pmr.ep - _e;
+			vector3d euler = EulerParameterToEulerAngle(pmr.ep - _e);
 			glRotated(t*euler.x, 0, 0, 1);
 			glRotated(t*euler.y, 1, 0, 0);
 			glRotated(t*euler.z, 0, 0, 1);
@@ -101,6 +103,14 @@ bool xvCylinder::define()
 		matrix33d A = { u.x, pu.x, qu.x, u.y, pu.y, qu.y, u.z, pu.z, qu.z };
 		double radius = data.r_top + t;
 
+		double trA = A.a00 + A.a11 + A.a22;
+		double e0 = sqrt((trA + 1) / 4.0);
+		double e1 = sqrt((2.0 * A.a00 - trA + 1) / 4.0);
+		double e2 = sqrt((2.0 * A.a11 - trA + 1) / 4.0);
+		double e3 = sqrt((2.0 * A.a22 - trA + 1) / 4.0);
+
+		euler_parameters _ep = new_euler_parameters(e0, e1, e2, e3);
+		eangle = EulerParameterToEulerAngle(_ep);
 		
 		glBegin(GL_TRIANGLE_FAN);
 		{

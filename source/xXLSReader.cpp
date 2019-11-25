@@ -371,14 +371,23 @@ void xXLSReader::ReadMass(xMultiBodyModel* xmbd, vector2i rc)
 					{
 						xPointMass* _xpm = dynamic_cast<xPointMass*>(obj);
 						_xpm->setPosition(xpmd.px, xpmd.py, xpmd.pz);
+						
 					}
 					rc.x++;
 					continue;
 				}
 				xPointMass* xpm = NULL;
-				if (obj) obj->setDynamicsBody(true);
+			
 				xpm = xmbd->CreatePointMass(name);
 				xpm->SetDataFromStructure(xmbd->NumMass(), xpmd);
+ 				if (obj)
+ 				{
+ 					obj->setDynamicsBody(true);
+ 					if (obj->Shape() == CYLINDER_SHAPE)
+ 					{
+ 						dynamic_cast<xCylinderObject*>(obj)->updateData();
+ 					}
+ 				}
 			}			
 			rc.x++;
 			rc.y = init_col;

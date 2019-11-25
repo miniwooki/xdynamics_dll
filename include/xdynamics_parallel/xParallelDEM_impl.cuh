@@ -1299,12 +1299,15 @@ __device__ double particle_cylinder_contact_detection(
 	double3 cyl_pos = make_double3(bi[PX], bi[PY], bi[PZ]);// c_ptr->Position();
 	//printf("cylinder_position : [%f, %f, %f]\n", cyl_pos.x, cyl_pos.y, cyl_pos.z);
 	double4 cyl_ep = make_double4(bi[E0], bi[E1], bi[E2], bi[E3]);// c_ptr->EulerParameters();
-	//printf("cylinder_ep : [%f, %f, %f, %f]\n", cyl_ep.x, cyl_ep.y, cyl_ep.z, cyl_ep.w);
+	//printf("cylinder_ep : [%f, %f, %f, %f]\n", bi[E0], bi[E1], bi[E2], bi[E3]);
 	double3 cyl_base = cyl_pos + toGlobal(cy->pbase, cyl_ep);
+	//printf("cylinder_base_position : [%f, %f, %f]\n", cyl_base.x, cyl_base.y, cyl_base.z);
 	double3 cyl_top = cyl_pos + toGlobal(cy->ptop, cyl_ep);// cinfo.ptop);
+	//printf("cylinder_top_position : [%f, %f, %f]\n", cyl_top.x, cyl_top.y, cyl_top.z);
 	double3 ab = cyl_top - cyl_base;// make_double3(cy->ptop.x - cy->pbase.x, cy->ptop.y - cy->pbase.y, cy->ptop.z - cy->pbase.z);
 	//double3 p = make_double3(pt.x, pt.y, pt.z);
 	double t = dot(p - cyl_base, ab) / dot(ab, ab);
+	//printf("t : %f\n", t);
 	double3 _cp = make_double3(0.0, 0.0, 0.0);
 	if (t >= 0 && t <= 1) {
 		_cp = cyl_base + t * ab;
@@ -1343,6 +1346,7 @@ __device__ double particle_cylinder_contact_detection(
 		double3 A_2 = makeTFM_2(cy->ep);
 		double3 A_3 = makeTFM_3(cy->ep);*/
 		double3 _at = p - cyl_top;
+		//printf("_at : [%e, %e, %e]\n", _at.x, _at.y, _at.z);
 		double3 at = toLocal(_at, cyl_ep);
 		//double r = length(at);
 		cp = cyl_top;
@@ -1369,11 +1373,12 @@ __device__ double particle_cylinder_contact_detection(
 			_cp.z = -_cp.z;
 		}
 		_cp.y = 0.;
+		//printf("_contact_point : [%e, %e, %e] - dist : %e\n", _cp.x, _cp.y, _cp.z);
 		cp = cp + toGlobal(_cp, cyl_ep);
 		
 		double3 disVec = cp - p;
 		dist = length(disVec);
-		printf("contact_point : [%e, %e, %e] - dist : %e\n", cp.x, cp.y, cp.z, dist);
+		//printf("contact_point : [%e, %e, %e] - dist : %e\n", cp.x, cp.y, cp.z, dist);
 		u = disVec / dist;
 		if (dist < r) {
 			return r - dist;

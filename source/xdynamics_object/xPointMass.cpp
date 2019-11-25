@@ -428,6 +428,7 @@ void xPointMass::SetDataFromStructure(int id, xPointMassData& d)
 	setPosition(d.px, d.py, d.pz);
 	setEulerParameters(d.e0, d.e1, d.e2, d.e3);
 	setVelocity(d.vx, d.vy, d.vz);
+	setupTransformationMatrix();
 }
 
 void xPointMass::ImportInitialData()
