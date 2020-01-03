@@ -662,7 +662,7 @@ bool xResultManager::save_dem_result(
 	for (unsigned int j = 0; j < np; j++)
 	{
 		unsigned int s = j * 4;
-
+		//unsigned int cid = j / neach;
 		vector4f p = new_vector4f(
 			static_cast<float>(pos[s + 0]),
 			static_cast<float>(pos[s + 1]),
@@ -674,6 +674,11 @@ bool xResultManager::save_dem_result(
 		ptrs[s + 1] = p.y;// static_cast<float>(_pos[s + 1]);
 		ptrs[s + 2] = p.z;// static_cast<float>(_pos[s + 2]);
 		ptrs[s + 3] = p.w;// static_cast<float>(_pos[s + 3]);
+
+		ctrs[s + 0] = 0.0f;
+		ctrs[s + 1] = 0.0f;
+		ctrs[s + 2] = 1.0f;
+		ctrs[s + 3] = 1.0f;
 		if (max_particle_position[0] < p.x) max_particle_position[0] = p.x;// buffers[s + 0];
 		if (max_particle_position[1] < p.y) max_particle_position[1] = p.y;// buffers[s + 1];
 		if (max_particle_position[2] < p.z) max_particle_position[2] = p.z;// buffers[s + 2];
@@ -684,17 +689,18 @@ bool xResultManager::save_dem_result(
 		float p_mag = sqrt(p.x * p.x + p.y * p.y + p.z * p.z);
 		if (max_particle_position_mag < p_mag) max_particle_position_mag = p_mag;
 		if (min_particle_position_mag > p_mag) min_particle_position_mag = p_mag;
+	}
+	for(unsigned int j = 0; j < ns; j++){
 		vector3f vv = new_vector3f(0, 0, 0);
 		unsigned int v = j * 3;
-		if (np != ns)
-			v = (j / neach) * 3;
+		//if (np != ns)
+			//v = cid * 3;
 		vv = new_vector3f(
 			static_cast<float>(vel[v + 0]),
 			static_cast<float>(vel[v + 1]),
 			static_cast<float>(vel[v + 2]));
 
 		v += vid;
-
 		vtrs[v + 0] = vv.x;// static_cast<float>(_vel[v + 0]);
 		vtrs[v + 1] = vv.y;// static_cast<float>(_vel[v + 1]);
 		vtrs[v + 2] = vv.z;// static_cast<float>(_vel[v + 2]);
@@ -737,11 +743,6 @@ bool xResultManager::save_dem_result(
 
 		if (max_particle_force_mag < f_mag) max_particle_force_mag = f_mag;
 		if (min_particle_force_mag > f_mag) min_particle_force_mag = f_mag;
-
-		ctrs[s + 0] = 0.0f;
-		ctrs[s + 1] = 0.0f;
-		ctrs[s + 2] = 1.0f;
-		ctrs[s + 3] = 1.0f;
 	}
 	return true;
 }

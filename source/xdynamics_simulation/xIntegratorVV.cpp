@@ -42,7 +42,7 @@ int xIntegratorVV::OneStepSimulation(double ct, unsigned int cstep)
 			it.next();
 		}
 	}
-	dtor->rearrange_cell();
+	//dtor->rearrange_cell();
 //	std::cout << "after detection " << std::endl;
 	if (xcm)
 	{
