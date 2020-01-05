@@ -50,7 +50,7 @@ int xDiscreteElementMethodSimulation::Initialize(
 	xcm = _xcm;
 	if (xcm)
 	{
-		xcm->defineContacts(ns);
+		xcm->defineContacts(np);
 		//nPolySphere = xcm->setupParticlesMeshObjectsContact();
 		//xcm->setupParticlesPlanesContact();
 		//xcm->setupParticlesCylindersContact();
@@ -290,32 +290,6 @@ bool xDiscreteElementMethodSimulation::SaveStepResult(unsigned int pt)
 			checkXerror(cudaMemcpy(cpos, dcpos, sizeof(double) * ns * 4, cudaMemcpyDeviceToHost));
 	}
 	return xDynamicsManager::This()->XResult()->save_dem_result(pt, mass, cpos, pos, vel, acc, ep, avel, aacc, np, ns);
- 	/*std::string fname;
-	stringstream ss(fname);
-	ss << (xModel::path + xModel::name).toStdString() << "/part" << setw(4) << setfill('0') << pt << ".bin";
-	std::fstream qf(fname);
-	qf.open(fname, std::ios::binary | std::ios::out);
-	if (qf.is_open())
-	{
-		qf.write((char*)&ct, sizeof(double));
-		qf.write((char*)&np, sizeof(unsigned int));
-		qf.write((char*)&ns, sizeof(unsigned int));
-		qf.write((char*)pos, sizeof(double) * np * 4);
-		qf.write((char*)vel, sizeof(double) * ns * 3);
-		qf.write((char*)ep, sizeof(double) * ns * 4);
-		qf.write((char*)avel, sizeof(double) * ns * 4);
-		if((np != ns) && cpos) 
-			qf.write((char*)cpos, sizeof(double) * ns * 4);
-	}
-	qf.close();
-	qf.open(xModel::makeFilePath(xModel::getModelName() + ".ldr"), std::ios::binary);
-	unsigned int fsize = fname.size();
-	qf.write((char*)&pt, sizeof(unsigned int));
-	qf.write((char*)&ct, sizeof(double));
-	qf.write((char*)&fsize, sizeof(unsigned int));
-	qf.write(fname.c_str(), sizeof(char) * fsize);
-	qf.close();
-	partList.push_back(fname);*/
 }
 
 void xDiscreteElementMethodSimulation::ExportResults(std::fstream& of)

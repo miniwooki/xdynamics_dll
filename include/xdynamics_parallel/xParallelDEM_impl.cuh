@@ -596,6 +596,7 @@ __global__ void calcluate_clusters_contact_kernel(
 		seach += xc.neach;
 		sbegin += xc.count * xc.neach;
 	}
+	//printf("%d", neach);
 	unsigned int old_count = pair_count[id];
 	unsigned int cid = (id / neach);
 	double4 icpos = cpos[cid];
@@ -918,10 +919,10 @@ __global__ void cluster_plane_contact_kernel(
 
 	if (id >= np)
 		return;
-	unsigned int p_pair_id[3];
+	unsigned int p_pair_id[MAX_P2PL_COUNT];
 	double2 p_tsd[3];
-	unsigned int sid = id * 3;
-	for (unsigned int i = 0; i < 3; i++)
+	unsigned int sid = id * MAX_P2PL_COUNT;
+	for (unsigned int i = 0; i < MAX_P2PL_COUNT; i++)
 	{
 		p_pair_id[i] = pair_id[sid + i];
 		p_tsd[i] = tsd[sid + i];
@@ -976,7 +977,7 @@ __global__ void cluster_plane_contact_kernel(
 		coh_s = limit_cohesion_depth(r, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh);
 	if (cdist > 0) {
 
-		for (unsigned int i = 0; i < 3; i++)
+		for (unsigned int i = 0; i < MAX_P2PL_COUNT; i++)
 			if (p_pair_id[i] == k) { sd = p_tsd[i];	break; }
 		//double rcon = r - 0.5 * cdist;
 		double3 cpt = ipos3 + r * unit;

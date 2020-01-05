@@ -162,13 +162,12 @@ unsigned int xParticleManager::GetNumCubeParticles(
 	double dx, double dy, double dz, double min_radius, double max_radius)
 {
 	vector3i ndim;
-	if (min_radius == max_radius)
-	{
-		double r = min_radius;
-		double diameter = 2.0 * r;
-		vector3d dimension = new_vector3d(dx, dy, dz);
-		ndim = ToVector3I(dimension / diameter) - new_vector3i(1, 1, 1);
-	}
+
+	double r = min_radius;
+	double diameter = 2.0 * r;
+	vector3d dimension = new_vector3d(dx, dy, dz);
+	ndim = ToVector3I(dimension / diameter) - new_vector3i(1, 1, 1);
+	
 	return ndim.x * ndim.y * ndim.z;
 }
 
@@ -456,45 +455,48 @@ xParticleObject* xParticleManager::CreateCubeParticle(
 	xpo->setMinRadius(d.minr);
 	xpo->setMaxRadius(d.maxr);
 	setCriticalMaterial(xm.density, xm.youngs, xm.poisson);
-	
-	if (d.minr == d.maxr)
-	{
-		double r = d.minr;
-		double diameter = 2.0 * r;
-		vector3d dimension = new_vector3d(d.dx, d.dy, d.dz);
-		vector3ui ndim = new_vector3ui
-			(
-			static_cast<unsigned int>(dimension.x / diameter) - 1,
-			static_cast<unsigned int>(dimension.y / diameter) - 1,
-			static_cast<unsigned int>(dimension.z / diameter) - 1
-			);
-		vector3d plen = diameter * ToVector3D(ndim);// .To<double>();
-		vector3d space = dimension - plen;
-		space.x /= ndim.x + 1;
-		space.y /= ndim.y + 1;
-		space.z /= ndim.z + 1;
-		vector3d gab = new_vector3d(diameter + space.x, diameter + space.y, diameter + space.z);
-		vector3d ran = r * space;
-		unsigned int cnt = 0;
-		for (unsigned int z = 0; z < ndim.z; z++){
-			double _z = d.lz + r + space.z;
-			for (unsigned int y = 0; y < ndim.y; y++){
-				double _y = d.ly + r + space.y;
-				for (unsigned int x = 0; x < ndim.x; x++){
-					double _x = d.lx + r + space.x;
-					vector4d p = new_vector4d
-						(
-						_x + x * gab.x + ran.x * frand(), 
-						_y + y * gab.y + ran.y * frand(), 
-						_z + z * gab.z + ran.z * frand(), r
-						);
-						pos[cnt] = p;
-						//mass[cnt] = 0.0;
-					cnt++;
-				}
+
+	double r = d.maxr;
+	double diameter = 2.0 * r;
+	vector3d dimension = new_vector3d(d.dx, d.dy, d.dz);
+	vector3ui ndim = new_vector3ui
+	(
+		static_cast<unsigned int>(dimension.x / diameter) - 1,
+		static_cast<unsigned int>(dimension.y / diameter) - 1,
+		static_cast<unsigned int>(dimension.z / diameter) - 1
+	);
+	vector3d plen = diameter * ToVector3D(ndim);// .To<double>();
+	vector3d space = dimension - plen;
+	space.x /= ndim.x + 1;
+	space.y /= ndim.y + 1;
+	space.z /= ndim.z + 1;
+	vector3d gab = new_vector3d(diameter + space.x, diameter + space.y, diameter + space.z);
+	vector3d ran = r * space;
+	unsigned int cnt = 0;
+	for (unsigned int z = 0; z < ndim.z; z++) {
+		double _z = d.lz + r + space.z;
+		for (unsigned int y = 0; y < ndim.y; y++) {
+			double _y = d.ly + r + space.y;
+			for (unsigned int x = 0; x < ndim.x; x++) {
+				double _x = d.lx + r + space.x;
+				vector4d p = new_vector4d
+				(
+					_x + x * gab.x + ran.x * frand(),
+					_y + y * gab.y + ran.y * frand(),
+					_z + z * gab.z + ran.z * frand(), r
+				);
+				pos[cnt] = p;
+				//mass[cnt] = 0.0;
+				cnt++;
 			}
 		}
-		if (minimum_radius > d.minr) minimum_radius = d.minr;
+	}
+	if (minimum_radius > d.minr) minimum_radius = d.minr;
+
+	if (d.minr != d.maxr) {
+		for (unsigned int i = 0; i < _np; i++) {
+			pos[i].w = d.minr + (d.maxr - d.minr) * frand();
+		}
 	}
 	//xpo->set
 	SetMassAndInertia(xpo);
@@ -536,10 +538,12 @@ xParticleObject* xParticleManager::CreatePlaneParticle(
 	double cr = 0.0;
 	
 	double space = 1e-6;
+	unsigned int nx = static_cast<unsigned int>(d.dx / (2.0 * d.maxr)) - 1;
+	double space_x = (d.dx - 2.0 * nx * d.maxr) / (nx + 1);
 	std::list<vector4d> plist;
 	unsigned int nz = static_cast<unsigned int>(d.dz / (2.0 * d.maxr)) - 1;
-	double space_z = d.dz - 2.0 * d.maxr * nz;
-	space_z /= nz + 1;
+	double space_z = (d.dz - 2.0 * nz * d.maxr) / (nz + 1);
+	//space_z /= nz + 1;
 	for (unsigned int i = 0; i < d.dy; i++)
 	{
 		bool is_end_dx = false;
@@ -548,15 +552,15 @@ xParticleObject* xParticleManager::CreatePlaneParticle(
 			double pr = 0.0;
 			double x_pos = 0;
 			double gab_z = (2.0 * d.maxr + space_z) * z + space_z;
-			while (1)
+			for(unsigned int x = 0; x < nx; x++)
 			{
-				cr = d.minr + (d.minr != d.maxr ? (d.maxr - d.minr) * frand() : 0.0);
-				x_pos = x_pos + (pr + cr + space);
-				vector3d pp = new_vector3d(0.0, x_pos, gab_z);
-				if (pp.y + cr + space >= d.dx) break;
+				//cr = d.minr + (d.minr != d.maxr ? (d.maxr - d.minr) * frand() : 0.0);
+				x_pos = (2.0 * d.maxr + space_x) * x + space_x;//x_pos + (pr + cr + space);
+				vector3d pp = new_vector3d(0.0, x_pos + d.maxr + space_x, gab_z + d.maxr + space_z);
+				//if (pp.y + cr + space >= d.dx) break;
 				pp = sp + A * pp;
-				plist.push_back(new_vector4d(pp.x, pp.y, pp.z, cr));
-				pr = cr;
+				plist.push_back(new_vector4d(pp.x, pp.y, pp.z, d.maxr));
+				//pr = cr;
 				//cnt++;
 			}
 		}
@@ -567,8 +571,11 @@ xParticleObject* xParticleManager::CreatePlaneParticle(
 		vector4d* pos = xpo->AllocMemory(_np);
 		np += _np;
 		unsigned int cnt = 0;
-		for (std::list<vector4d>::iterator it = plist.begin(); it != plist.end(); it++)
-			pos[cnt++] = *it;
+		for (std::list<vector4d>::iterator it = plist.begin(); it != plist.end(); it++) {
+			pos[cnt] = *it;
+			if(d.minr != d.maxr) 
+				pos[cnt++].w = d.minr + (d.maxr - d.minr) * frand();
+		}			
 	}
 	if (minimum_radius > d.minr) minimum_radius = d.minr;
 	//SetMassAndInertia(xpo);
@@ -740,9 +747,9 @@ xParticleObject * xParticleManager::CreateClusterParticle(
 			for (int z = 0; z < grid.z; z++)
 			{
 				vector3d cp = new_vector3d(
-					loc.x + 1.9 * c_rad * x + x * 1e-6,
-					loc.y + 1.9 * c_rad * y + y * 1e-6,
-					loc.z + 1.9 * c_rad * z + z * 1e-6);
+					loc.x + 2.0 * c_rad * x + x * 1e-6,
+					loc.y + 2.0 * c_rad * y + y * 1e-6,
+					loc.z + 2.0 * c_rad * z + z * 1e-6);
 				//vector3d cp = loc + 2.0 * c_rad * new_vector3i(x, y, z);
 				vector3d rot = new_vector3d(180 * frand(), 180 * frand(), 180 * frand());
 				//vector3d rot = new_vector3d(30,0,0);

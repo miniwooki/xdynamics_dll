@@ -842,7 +842,7 @@ bool xResultManager::export_step_data_to_file(unsigned int pt, double ct)
 			qf.write((char*)&nparticles, sizeof(unsigned int));
 			qf.write((char*)&nclusters, sizeof(unsigned int));
 			if (VERSION_NUMBER > 1)
-				qf.write((char*)c_particle_mass, sizeof(double) * nparticles);
+				qf.write((char*)c_particle_mass, sizeof(double) * nclusters);
 			qf.write((char*)c_particle_pos, sizeof(double) * nparticles * 4);
 			qf.write((char*)c_particle_vel, sizeof(double) * nclusters * 3);
 			qf.write((char*)c_particle_acc, sizeof(double) * nclusters * 3);
