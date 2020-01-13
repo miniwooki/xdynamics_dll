@@ -543,10 +543,18 @@ double xUtilityFunctions::RelativeAngle(int udrl, double theta, unsigned int& n_
 	double b_deg = b * 180 / M_PI;
 	double stheta = 0.0;
 	double p_theta = theta;
-	if ((df <= 0.2 && df > -0.8) && dg > 0) { udrl = UP_RIGHT;  stheta = acos(df); }
-	else if ((df < -0.8 && df >= -1.1 && dg > 0) || (df > -1.1 && df <= -0.2 && dg < 0)) { udrl = UP_LEFT; stheta = M_PI - asin(dg); }
-	else if ((df > -0.2 && df <= 0.8) && dg < 0) { udrl = DOWN_LEFT; stheta = 2.0 * M_PI - acos(df); }
-	else if ((df > 0.8 && df < 1.1 && dg < 0) || (df <= 1.1 && df > 0.2 && dg > 0)) { udrl = DOWN_RIGHT; stheta = 2.0 * M_PI + asin(dg); }
+	if ((df <= 0.2 && df > -0.8) && dg > 0) { 
+		udrl = UP_RIGHT;  stheta = acos(df); 
+	}
+	else if ((df < -0.8 && df >= -1.1 && dg > 0) || (df > -1.1 && df <= -0.2 && dg < 0)) { 
+		udrl = UP_LEFT; stheta = M_PI - asin(dg);
+	}
+	else if ((df > -0.2 && df <= 0.8) && dg < 0) { 
+		udrl = DOWN_LEFT; stheta = 2.0 * M_PI - acos(df); 
+	}
+	else if ((df > 0.8 && df < 1.1 && dg < 0) || (df <= 1.1 && df > 0.2 && dg > 0)) { 
+		udrl = DOWN_RIGHT; stheta = 2.0 * M_PI + asin(dg); 
+	}
 	if (p_theta >= 2.0 * M_PI && stheta < 2.0 * M_PI)
 		n_rev--;
 	if (p_theta > M_PI && p_theta < 2.0 * M_PI && stheta >= 2.0 * M_PI)

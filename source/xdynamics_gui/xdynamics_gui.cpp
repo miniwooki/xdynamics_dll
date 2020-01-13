@@ -245,6 +245,11 @@ bool xdynamics_gui::ReadViewModel(QString path)
 			xTSDAData d = { 0, };
 			qf.read((char*)&d, sizeof(xTSDAData));
 		}
+		else if (vot == xViewObjectType::VRSDA)
+		{
+			xRSDAData d = { 0, };
+			qf.read((char*)&d, sizeof(xRSDAData));
+		}
 		else if (vot == xViewObjectType::VRAXIAL)
 		{
 			xRotationalAxialForceData d = { 0, };

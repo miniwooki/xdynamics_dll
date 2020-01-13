@@ -1,0 +1,22 @@
+Fri Jan 10 17:18:51 2020
+ - Change Directory : C:\Users\PKNU/Documents/xdynamics/Test(1204)/
+Fri Jan 10 17:18:51 2020
+ - Create PointMass : wheel
+Fri Jan 10 17:18:51 2020
+ - Create PointMass : h_body
+Fri Jan 10 17:18:51 2020
+ - Create PointMass : v_body
+Fri Jan 10 17:18:51 2020
+ - Create Translation Joint : v_trans
+Fri Jan 10 17:18:51 2020
+ - Create Translation Joint : h_trans
+Fri Jan 10 17:18:51 2020
+ - Create Driving : h_drive
+Fri Jan 10 17:18:51 2020
+ - Create Revolute Joint : rev
+Fri Jan 10 17:18:51 2020
+ - Create Driving : r_drive
+Fri Jan 10 17:18:56 2020
+ - An uninitialized discrete element method model has been detected.
+Fri Jan 10 17:18:56 2020
+ - The initialization of discrete element method model was succeeded.

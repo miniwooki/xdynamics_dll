@@ -74,7 +74,7 @@ void xRotationSpringDamperForce::SetupDataFromStructure(xPointMass* ip, xPointMa
 	h_j = cross(f_j, g_j);// new_vector3d(d.ujx, d.ujy, d.ujz);
 	k = d.k;
 	c = d.c;
-	init_theta = d.init_l;
+	init_theta = d.init_r;
 	xForce::spi = i_ptr->toLocal(loc - i_ptr->Position());
 	xForce::spj = j_ptr->toLocal(loc - j_ptr->Position());
 }
@@ -93,7 +93,7 @@ void xRotationSpringDamperForce::SetupDataFromListData(xRSDAData&d, std::string 
 	h_j = cross(f_j, g_j);// new_vector3d(d.ujx, d.ujy, d.ujz);
 	k = d.k;
 	c = d.c;
-	init_theta = d.init_l;
+	init_theta = d.init_r;
 	std::fstream fs;
 	fs.open(data, std::ios::in);
 	unsigned int cnt = 0;

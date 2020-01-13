@@ -284,6 +284,31 @@ xTSDAData xXLSReader::ReadTSDAData(std::string& _name, int r, int& c)
 	return d;
 }
 
+xRSDAData xXLSReader::ReadRSDAData(std::string& _name, int r, int& c)
+{
+	xRSDAData d = { 0, };
+	double* ptr = &d.lx;
+	xstring x;
+	x = ReadStr(r, c++); x.split(",", 3, ptr + 0);
+	x = ReadStr(r, c++); x.split(",", 3, ptr + 3);
+	x = ReadStr(r, c++); x.split(",", 3, ptr + 6);
+	x = ReadStr(r, c++); x.split(",", 3, ptr + 9);
+	x = ReadStr(r, c++); x.split(",", 3, ptr + 12);
+	d.k = ReadNum(r, c++);
+	d.c = ReadNum(r, c++);
+	d.init_r = ReadNum(r, c++);
+	if (xve)
+	{
+		int t = VRSDA;
+		xve->Write((char*)&t, sizeof(int));
+		unsigned int ns = static_cast<unsigned int>(_name.size());
+		xve->Write((char*)&ns, sizeof(unsigned int));
+		xve->Write((char*)_name.c_str(), sizeof(char)*ns);
+		xve->Write((char*)&d, sizeof(xRSDAData));
+	}
+	return d;
+}
+
 xRotationalAxialForceData xXLSReader::ReadxRotationalAxialForceData(std::string& _name, int r, int& c)
 {
 	xRotationalAxialForceData d = { 0, };
@@ -465,7 +490,7 @@ void xXLSReader::ReadForce(xMultiBodyModel* xmbd, xDiscreteElementMethodModel* x
 			switch (xf->Type())
 			{
 			case xForce::TSDA: (dynamic_cast<xSpringDamperForce*>(xf))->SetupDataFromStructure(xmbd->XMass(base), xmbd->XMass(action), ReadTSDAData(name, rc.x, rc.y)); break;
-			case xForce::RSDA: break;
+			case xForce::RSDA: (dynamic_cast<xRotationSpringDamperForce*>(xf))->SetupDataFromStructure(xmbd->XMass(base), xmbd->XMass(action), ReadRSDAData(name, rc.x, rc.y)); break;
 			case xForce::RAXIAL: (dynamic_cast<xRotationalAxialForce*>(xf))->SetupDataFromStructure(xmbd->XMass(base), xmbd->XMass(action), ReadxRotationalAxialForceData(name, rc.x, rc.y)); break;
 			}
 		}

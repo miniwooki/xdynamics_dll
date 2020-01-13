@@ -191,6 +191,7 @@ enum xViewObjectType
 	VMESH, 
 	VPARTICLE, 
 	VTSDA,
+	VRSDA,
 	VRAXIAL,
 	VSPHPLANE
 };
@@ -248,7 +249,7 @@ typedef struct{ double Ei, Ej, Pri, Prj, Gi, Gj; }xMaterialPair;
 typedef struct{ double eq_e, eq_r, eq_m, eq_s, coh_r, coh_e, coh_s, kn, vn, ks, vs, s_fric, fric, rfric, amp; }xContactParameters;
 typedef struct { double restitution, s_friction, friction, rolling_friction, cohesion, stiffness_ratio, stiffness_multiplyer; }xContactMaterialParameters;
 typedef struct{ double spix, spiy, spiz, spjx, spjy, spjz, k, c, init_l; }xTSDAData;
-typedef struct { double lx, ly, lz, fix, fiy, fiz, gix, giy, giz, fjx, fjy, fjz, gjx, gjy, gjz, k, c, init_l; }xRSDAData;
+typedef struct { double lx, ly, lz, fix, fiy, fiz, gix, giy, giz, fjx, fjy, fjz, gjx, gjy, gjz, k, c, init_r; }xRSDAData;
 typedef struct{ int correction, dim, type; double factor; }xKernelFunctionData;
 typedef struct{ double p0x, p0y, p0z, p1x, p1y, p1z, nx, ny, nz; }xLineObjectData;
 typedef struct{ double xx, xy, xz, yy, yz, zz; }symatrix;

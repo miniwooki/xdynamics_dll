@@ -77,6 +77,7 @@ private:
 	xContactParameterData ReadContactData(std::string& _name, int r, int& c);
 	xCylinderObjectData ReadCylinderObjectData(std::string& _name, int mat, int r, int& c);
 	xTSDAData ReadTSDAData(std::string& _name, int r, int& c);
+	xRSDAData ReadRSDAData(std::string& _name, int r, int& c);
 	xRotationalAxialForceData ReadxRotationalAxialForceData(std::string& _name, int r, int& c);
 	//xSPHPlaneObjectData ReadSPHPlaneParticleData(std::string& _name, int r, int& c);
 	//B xls;

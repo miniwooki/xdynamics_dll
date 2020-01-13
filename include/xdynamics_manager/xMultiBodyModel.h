@@ -11,6 +11,7 @@
 #include "xdynamics_object/xFixConstraint.h"
 #include "xdynamics_object/xDrivingConstraint.h"
 #include "xdynamics_object/xRotationalAxialForce.h"
+#include "xdynamics_object/xRotationSpringDamperForce.h"
 #include "xmap.hpp"
 
 class XDYNAMICS_API xMultiBodyModel 
