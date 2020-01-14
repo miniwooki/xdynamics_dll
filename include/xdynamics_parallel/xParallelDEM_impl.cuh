@@ -930,6 +930,7 @@ __global__ void cluster_plane_contact_kernel(
 	unsigned int neach = 0;
 	unsigned int seach = 0;
 	unsigned int sbegin = 0;
+//	printf("%d\n", cte.nClusterObject);
 	for (unsigned int i = 0; i < cte.nClusterObject; i++)
 	{
 		xClusterInformation xc = xci[i];
@@ -2290,15 +2291,15 @@ __global__ void cluster_meshes_contact_kernel(
 					end_index = cend[grid_hash];
 					for (unsigned int j = start_index; j < end_index; j++) {
 						unsigned int tk = sorted_index[j];
-						if (tk >= cte.np + sk && tk < cte.np + sk + ntriangle)
+						if (tk >= np + sk && tk < np + sk + ntriangle)
 						{
-							tk -= cte.np + sk;
+							tk -= np + sk;
 							int t = -1;
 							double3 cpt = closestPtPointTriangle(dti[tk], ipos, ir, t);
-							device_contact_property cmp = cp[dti[tk].id];
+							//device_contact_property cmp = cp[dti[tk].id];
 							double cdist = ir - length(ipos - cpt);
-							if (cmp.coh)
-								coh_s = limit_cohesion_depth(ir, 0, cmp.Ei, cmp.Ej, cmp.pri, cmp.prj, cmp.coh);
+							if (cp->coh)
+								coh_s = limit_cohesion_depth(ir, 0, cp->Ei, cp->Ej, cp->pri, cp->prj, cp->coh);
 							if (cdist > 0)
 							{
 								if (t == 1)

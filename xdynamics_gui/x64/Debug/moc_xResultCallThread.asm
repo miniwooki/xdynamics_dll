@@ -6,12 +6,12 @@ INCLUDELIB MSVCRTD
 INCLUDELIB OLDNAMES
 
 CONST	SEGMENT
-$SG139394 DB	'c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h', 00H
+$SG139395 DB	'c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h', 00H
 	ORG $+12
-$SG139395 DB	'qRegisterNormalizedMetaType was called with a not normal'
+$SG139396 DB	'qRegisterNormalizedMetaType was called with a not normal'
 	DB	'ized type name, please call qRegisterMetaType instead.', 00H
 	ORG $+1
-$SG139396 DB	'qRegisterNormalizedMetaType', 00H
+$SG139397 DB	'qRegisterNormalizedMetaType', 00H
 	ORG $+4
 ?qt_meta_stringdata_xResultCallThread@@3Uqt_meta_stringdata_xResultCallThread_t@@B DD 0ffffffffH ; qt_meta_stringdata_xResultCallThread
 	DD	011H
@@ -129,19 +129,19 @@ $SG139396 DB	'qRegisterNormalizedMetaType', 00H
 	DD	02H
 	DD	00H
 	ORG $+4
-$SG138672 DB	'c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h', 00H
+$SG138673 DB	'c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h', 00H
 	ORG $+12
-$SG138673 DB	'qRegisterNormalizedMetaType was called with a not normal'
+$SG138674 DB	'qRegisterNormalizedMetaType was called with a not normal'
 	DB	'ized type name, please call qRegisterMetaType instead.', 00H
 	ORG $+1
-$SG138674 DB	'qRegisterNormalizedMetaType', 00H
+$SG138675 DB	'qRegisterNormalizedMetaType', 00H
 	ORG $+4
-$SG139033 DB	'c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h', 00H
+$SG139034 DB	'c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h', 00H
 	ORG $+12
-$SG139034 DB	'qRegisterNormalizedMetaType was called with a not normal'
+$SG139035 DB	'qRegisterNormalizedMetaType was called with a not normal'
 	DB	'ized type name, please call qRegisterMetaType instead.', 00H
 	ORG $+1
-$SG139035 DB	'qRegisterNormalizedMetaType', 00H
+$SG139036 DB	'qRegisterNormalizedMetaType', 00H
 CONST	ENDS
 PUBLIC	?__empty_global_delete@@YAXPEAX@Z		; __empty_global_delete
 PUBLIC	?__empty_global_delete@@YAXPEAX_K@Z		; __empty_global_delete
@@ -613,7 +613,7 @@ _TEXT	ENDS
 _TEXT	SEGMENT
 this$ = 8
 ??C?$QScopedPointer@VQObjectData@@U?$QScopedPointerDeleter@VQObjectData@@@@@@QEBAPEAVQObjectData@@XZ PROC ; QScopedPointer<QObjectData,QScopedPointerDeleter<QObjectData> >::operator->, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qscopedpointer.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qscopedpointer.h
 ; Line 117
 	mov	QWORD PTR [rsp+8], rcx
 ; Line 118

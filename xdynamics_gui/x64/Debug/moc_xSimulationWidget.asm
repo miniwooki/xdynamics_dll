@@ -6,82 +6,85 @@ INCLUDELIB MSVCRTD
 INCLUDELIB OLDNAMES
 
 CONST	SEGMENT
-$SG139587 DB	'Ui::wsimulation', 00H
-$SG151025 DB	'c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h', 00H
+$SG139602 DB	'Ui::wsimulation', 00H
+$SG151043 DB	'c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h', 00H
 	ORG $+12
-$SG151026 DB	'qRegisterNormalizedMetaType was called with a not normal'
+$SG151044 DB	'qRegisterNormalizedMetaType was called with a not normal'
 	DB	'ized type name, please call qRegisterMetaType instead.', 00H
 	ORG $+1
-$SG151027 DB	'qRegisterNormalizedMetaType', 00H
+$SG151045 DB	'qRegisterNormalizedMetaType', 00H
 	ORG $+4
-$SG154026 DB	'c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h', 00H
+$SG154044 DB	'c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h', 00H
 	ORG $+12
-$SG154027 DB	'qRegisterNormalizedMetaType was called with a not normal'
+$SG154045 DB	'qRegisterNormalizedMetaType was called with a not normal'
 	DB	'ized type name, please call qRegisterMetaType instead.', 00H
 	ORG $+1
-$SG154028 DB	'qRegisterNormalizedMetaType', 00H
+$SG154046 DB	'qRegisterNormalizedMetaType', 00H
 	ORG $+4
-$SG154387 DB	'c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h', 00H
+$SG154405 DB	'c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h', 00H
 	ORG $+12
-$SG154388 DB	'qRegisterNormalizedMetaType was called with a not normal'
+$SG154406 DB	'qRegisterNormalizedMetaType was called with a not normal'
 	DB	'ized type name, please call qRegisterMetaType instead.', 00H
 	ORG $+1
-$SG154389 DB	'qRegisterNormalizedMetaType', 00H
+$SG154407 DB	'qRegisterNormalizedMetaType', 00H
 	ORG $+4
-$SG154748 DB	'c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h', 00H
+$SG154766 DB	'c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h', 00H
 	ORG $+12
-$SG154749 DB	'qRegisterNormalizedMetaType was called with a not normal'
+$SG154767 DB	'qRegisterNormalizedMetaType was called with a not normal'
 	DB	'ized type name, please call qRegisterMetaType instead.', 00H
 	ORG $+1
-$SG154750 DB	'qRegisterNormalizedMetaType', 00H
-	ORG $+4
-$SG155602 DB	'c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h', 00H
-	ORG $+12
-$SG155603 DB	'qRegisterNormalizedMetaType was called with a not normal'
-	DB	'ized type name, please call qRegisterMetaType instead.', 00H
-	ORG $+1
-$SG155604 DB	'qRegisterNormalizedMetaType', 00H
+$SG154768 DB	'qRegisterNormalizedMetaType', 00H
 	ORG $+4
 ?qt_meta_stringdata_wsimulation@@3Uqt_meta_stringdata_wsimulation_t@@B DD 0ffffffffH ; qt_meta_stringdata_wsimulation
 	DD	0bH
 	DD	00H
 	ORG $+4
-	DQ	00000000000000c0H
+	DQ	00000000000000f0H
 	DD	0ffffffffH
 	DD	012H
 	DD	00H
 	ORG $+4
-	DQ	00000000000000b4H
+	DQ	00000000000000e4H
 	DD	0ffffffffH
 	DD	00H
 	DD	00H
 	ORG $+4
-	DQ	00000000000000afH
+	DQ	00000000000000dfH
 	DD	0ffffffffH
 	DD	017H
 	DD	00H
 	ORG $+4
-	DQ	0000000000000098H
+	DQ	00000000000000c8H
 	DD	0ffffffffH
 	DD	011H
 	DD	00H
 	ORG $+4
-	DQ	0000000000000098H
+	DQ	00000000000000c8H
+	DD	0ffffffffH
+	DD	011H
+	DD	00H
+	ORG $+4
+	DQ	00000000000000c2H
 	DD	0ffffffffH
 	DD	0bH
 	DD	00H
 	ORG $+4
-	DQ	0000000000000092H
+	DQ	00000000000000bcH
+	DD	0ffffffffH
+	DD	0aH
+	DD	00H
+	ORG $+4
+	DQ	00000000000000b0H
 	DD	0ffffffffH
 	DD	013H
 	DD	00H
 	ORG $+4
-	DQ	0000000000000086H
+	DQ	00000000000000a3H
 	DD	0ffffffffH
 	DD	012H
 	DD	00H
 	ORG $+4
-	DQ	0000000000000082H
+	DQ	000000000000009fH
 	DB	077H
 	DB	073H
 	DB	069H
@@ -138,6 +141,24 @@ $SG155604 DB	'qRegisterNormalizedMetaType', 00H
 	DB	06fH
 	DB	06eH
 	DB	00H
+	DB	063H
+	DB	06cH
+	DB	069H
+	DB	063H
+	DB	06bH
+	DB	065H
+	DB	064H
+	DB	053H
+	DB	074H
+	DB	06fH
+	DB	070H
+	DB	042H
+	DB	075H
+	DB	074H
+	DB	074H
+	DB	06fH
+	DB	06eH
+	DB	00H
 	DB	055H
 	DB	070H
 	DB	064H
@@ -161,6 +182,17 @@ $SG155604 DB	'qRegisterNormalizedMetaType', 00H
 	DB	06cH
 	DB	076H
 	DB	065H
+	DB	042H
+	DB	075H
+	DB	074H
+	DB	074H
+	DB	06fH
+	DB	06eH
+	DB	00H
+	DB	053H
+	DB	074H
+	DB	06fH
+	DB	070H
 	DB	042H
 	DB	075H
 	DB	074H
@@ -207,12 +239,19 @@ $SG155604 DB	'qRegisterNormalizedMetaType', 00H
 	DB	06eH
 	DB	074H
 	DB	00H
-	ORG $+3
+	ORG $+6
+$SG155620 DB	'c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h', 00H
+	ORG $+12
+$SG155621 DB	'qRegisterNormalizedMetaType was called with a not normal'
+	DB	'ized type name, please call qRegisterMetaType instead.', 00H
+	ORG $+1
+$SG155622 DB	'qRegisterNormalizedMetaType', 00H
+	ORG $+4
 ?qt_meta_data_wsimulation@@3QBIB DD 08H			; qt_meta_data_wsimulation
 	DD	00H
 	DD	00H
 	DD	00H
-	DD	06H
+	DD	08H
 	DD	0eH
 	DD	00H
 	DD	00H
@@ -221,35 +260,45 @@ $SG155604 DB	'qRegisterNormalizedMetaType', 00H
 	DD	00H
 	DD	00H
 	DD	00H
-	DD	02H
+	DD	03H
 	DD	01H
 	DD	03H
-	DD	02cH
+	DD	036H
 	DD	02H
 	DD	06H
 	DD	03H
 	DD	00H
-	DD	033H
+	DD	03dH
 	DD	02H
 	DD	06H
 	DD	04H
 	DD	00H
-	DD	034H
+	DD	03eH
 	DD	02H
-	DD	0aH
+	DD	06H
 	DD	05H
 	DD	00H
-	DD	035H
+	DD	03fH
 	DD	02H
-	DD	08H
+	DD	0aH
 	DD	06H
 	DD	00H
-	DD	036H
+	DD	040H
 	DD	02H
 	DD	08H
 	DD	07H
+	DD	00H
+	DD	041H
+	DD	02H
+	DD	08H
+	DD	08H
+	DD	00H
+	DD	042H
+	DD	02H
+	DD	08H
+	DD	09H
 	DD	01H
-	DD	037H
+	DD	043H
 	DD	02H
 	DD	08H
 	DD	02bH
@@ -259,6 +308,8 @@ $SG155604 DB	'qRegisterNormalizedMetaType', 00H
 	DD	02H
 	DD	02H
 	DD	02H
+	DD	02bH
+	DD	02bH
 	DD	02bH
 	DD	02bH
 	DD	02bH
@@ -277,6 +328,7 @@ PUBLIC	?qt_metacall@wsimulation@@UEAAHW4Call@QMetaObject@@HPEAPEAX@Z ; wsimulati
 PUBLIC	?qt_static_metacall@wsimulation@@CAXPEAVQObject@@W4Call@QMetaObject@@HPEAPEAX@Z ; wsimulation::qt_static_metacall
 PUBLIC	?clickedSolveButton@wsimulation@@QEAAXNIN@Z	; wsimulation::clickedSolveButton
 PUBLIC	?clickedStartPointButton@wsimulation@@QEAAXXZ	; wsimulation::clickedStartPointButton
+PUBLIC	?clickedStopButton@wsimulation@@QEAAXXZ		; wsimulation::clickedStopButton
 PUBLIC	?staticMetaObject@wsimulation@@2UQMetaObject@@B	; wsimulation::staticMetaObject
 EXTRN	strcmp:PROC
 EXTRN	__imp_?activate@QMetaObject@@SAXPEAVQObject@@PEBU1@HPEAPEAX@Z:PROC
@@ -285,6 +337,7 @@ EXTRN	__imp_?qt_metacast@QWidget@@UEAAPEAXPEBD@Z:PROC
 EXTRN	__imp_?qt_metacall@QWidget@@UEAAHW4Call@QMetaObject@@HPEAPEAX@Z:PROC
 EXTRN	?UpdateInformation@wsimulation@@QEAAXXZ:PROC	; wsimulation::UpdateInformation
 EXTRN	?SolveButton@wsimulation@@AEAAXXZ:PROC		; wsimulation::SolveButton
+EXTRN	?StopButton@wsimulation@@AEAAXXZ:PROC		; wsimulation::StopButton
 EXTRN	?StartingPointButton@wsimulation@@AEAAXXZ:PROC	; wsimulation::StartingPointButton
 EXTRN	?CheckStartingPoint@wsimulation@@AEAAX_N@Z:PROC	; wsimulation::CheckStartingPoint
 EXTRN	__GSHandlerCheck:PROC
@@ -306,8 +359,8 @@ $pdata$?qt_metacast@wsimulation@@UEAAPEAXPEBD@Z DD imagerel $LN8
 $pdata$?qt_metacall@wsimulation@@UEAAHW4Call@QMetaObject@@HPEAPEAX@Z DD imagerel $LN9
 	DD	imagerel $LN9+174
 	DD	imagerel $unwind$?qt_metacall@wsimulation@@UEAAHW4Call@QMetaObject@@HPEAPEAX@Z
-$pdata$?qt_static_metacall@wsimulation@@CAXPEAVQObject@@W4Call@QMetaObject@@HPEAPEAX@Z DD imagerel $LN24
-	DD	imagerel $LN24+628
+$pdata$?qt_static_metacall@wsimulation@@CAXPEAVQObject@@W4Call@QMetaObject@@HPEAPEAX@Z DD imagerel $LN30
+	DD	imagerel $LN30+816
 	DD	imagerel $unwind$?qt_static_metacall@wsimulation@@CAXPEAVQObject@@W4Call@QMetaObject@@HPEAPEAX@Z
 $pdata$?clickedSolveButton@wsimulation@@QEAAXNIN@Z DD imagerel $LN3
 	DD	imagerel $LN3+124
@@ -315,6 +368,9 @@ $pdata$?clickedSolveButton@wsimulation@@QEAAXNIN@Z DD imagerel $LN3
 $pdata$?clickedStartPointButton@wsimulation@@QEAAXXZ DD imagerel $LN3
 	DD	imagerel $LN3+41
 	DD	imagerel $unwind$?clickedStartPointButton@wsimulation@@QEAAXXZ
+$pdata$?clickedStopButton@wsimulation@@QEAAXXZ DD imagerel $LN3
+	DD	imagerel $LN3+41
+	DD	imagerel $unwind$?clickedStopButton@wsimulation@@QEAAXXZ
 pdata	ENDS
 CRT$XCU	SEGMENT
 ??staticMetaObject$initializer$@wsimulation@@2P6AXXZEA@@3P6AXXZEA DQ FLAT:??__E?staticMetaObject@wsimulation@@2UQMetaObject@@B@@YAXXZ ; ??staticMetaObject$initializer$@wsimulation@@2P6AXXZEA@@3P6AXXZEA
@@ -327,12 +383,14 @@ $unwind$?qt_metacast@wsimulation@@UEAAPEAXPEBD@Z DD 010e01H
 $unwind$?qt_metacall@wsimulation@@UEAAHW4Call@QMetaObject@@HPEAPEAX@Z DD 011701H
 	DD	04217H
 $unwind$?qt_static_metacall@wsimulation@@CAXPEAVQObject@@W4Call@QMetaObject@@HPEAPEAX@Z DD 011701H
-	DD	0c217H
+	DD	0e217H
 $unwind$?clickedSolveButton@wsimulation@@QEAAXNIN@Z DD 012919H
 	DD	0a21aH
 	DD	imagerel __GSHandlerCheck
 	DD	040H
 $unwind$?clickedStartPointButton@wsimulation@@QEAAXXZ DD 010901H
+	DD	04209H
+$unwind$?clickedStopButton@wsimulation@@QEAAXXZ DD 010901H
 	DD	04209H
 xdata	ENDS
 ; Function compile flags: /Odtp
@@ -340,21 +398,21 @@ xdata	ENDS
 text$di	SEGMENT
 ??__E?staticMetaObject@wsimulation@@2UQMetaObject@@B@@YAXXZ PROC ; `dynamic initializer for 'wsimulation::staticMetaObject'', COMDAT
 ; File c:\xdynamics\xdynamics_gui\generatedfiles\debug\moc_xsimulationwidget.cpp
-; Line 121
+; Line 136
 	mov	rax, QWORD PTR __imp_?staticMetaObject@QWidget@@2UQMetaObject@@B
 	mov	QWORD PTR ?staticMetaObject@wsimulation@@2UQMetaObject@@B, rax
-; Line 122
+; Line 137
 	lea	rax, OFFSET FLAT:?qt_meta_stringdata_wsimulation@@3Uqt_meta_stringdata_wsimulation_t@@B
 	mov	QWORD PTR ?staticMetaObject@wsimulation@@2UQMetaObject@@B+8, rax
-; Line 123
+; Line 138
 	lea	rax, OFFSET FLAT:?qt_meta_data_wsimulation@@3QBIB
 	mov	QWORD PTR ?staticMetaObject@wsimulation@@2UQMetaObject@@B+16, rax
-; Line 124
+; Line 139
 	lea	rax, OFFSET FLAT:?qt_static_metacall@wsimulation@@CAXPEAVQObject@@W4Call@QMetaObject@@HPEAPEAX@Z ; wsimulation::qt_static_metacall
 	mov	QWORD PTR ?staticMetaObject@wsimulation@@2UQMetaObject@@B+24, rax
-; Line 125
+; Line 140
 	mov	QWORD PTR ?staticMetaObject@wsimulation@@2UQMetaObject@@B+32, 0
-; Line 126
+; Line 141
 	mov	QWORD PTR ?staticMetaObject@wsimulation@@2UQMetaObject@@B+40, 0
 	ret	0
 ??__E?staticMetaObject@wsimulation@@2UQMetaObject@@B@@YAXXZ ENDP ; `dynamic initializer for 'wsimulation::staticMetaObject''
@@ -362,19 +420,39 @@ text$di	ENDS
 ; Function compile flags: /Odtp
 _TEXT	SEGMENT
 this$ = 48
-?clickedStartPointButton@wsimulation@@QEAAXXZ PROC	; wsimulation::clickedStartPointButton
+?clickedStopButton@wsimulation@@QEAAXXZ PROC		; wsimulation::clickedStopButton
 ; File c:\xdynamics\xdynamics_gui\generatedfiles\debug\moc_xsimulationwidget.cpp
-; Line 171
+; Line 192
 $LN3:
 	mov	QWORD PTR [rsp+8], rcx
 	sub	rsp, 40					; 00000028H
-; Line 172
+; Line 193
+	xor	r9d, r9d
+	mov	r8d, 2
+	lea	rdx, OFFSET FLAT:?staticMetaObject@wsimulation@@2UQMetaObject@@B ; wsimulation::staticMetaObject
+	mov	rcx, QWORD PTR this$[rsp]
+	call	QWORD PTR __imp_?activate@QMetaObject@@SAXPEAVQObject@@PEBU1@HPEAPEAX@Z
+; Line 194
+	add	rsp, 40					; 00000028H
+	ret	0
+?clickedStopButton@wsimulation@@QEAAXXZ ENDP		; wsimulation::clickedStopButton
+_TEXT	ENDS
+; Function compile flags: /Odtp
+_TEXT	SEGMENT
+this$ = 48
+?clickedStartPointButton@wsimulation@@QEAAXXZ PROC	; wsimulation::clickedStartPointButton
+; File c:\xdynamics\xdynamics_gui\generatedfiles\debug\moc_xsimulationwidget.cpp
+; Line 186
+$LN3:
+	mov	QWORD PTR [rsp+8], rcx
+	sub	rsp, 40					; 00000028H
+; Line 187
 	xor	r9d, r9d
 	mov	r8d, 1
 	lea	rdx, OFFSET FLAT:?staticMetaObject@wsimulation@@2UQMetaObject@@B ; wsimulation::staticMetaObject
 	mov	rcx, QWORD PTR this$[rsp]
 	call	QWORD PTR __imp_?activate@QMetaObject@@SAXPEAVQObject@@PEBU1@HPEAPEAX@Z
-; Line 173
+; Line 188
 	add	rsp, 40					; 00000028H
 	ret	0
 ?clickedStartPointButton@wsimulation@@QEAAXXZ ENDP	; wsimulation::clickedStartPointButton
@@ -389,7 +467,7 @@ _t2$ = 112
 _t3$ = 120
 ?clickedSolveButton@wsimulation@@QEAAXNIN@Z PROC	; wsimulation::clickedSolveButton
 ; File c:\xdynamics\xdynamics_gui\generatedfiles\debug\moc_xsimulationwidget.cpp
-; Line 164
+; Line 179
 $LN3:
 	movsd	QWORD PTR [rsp+32], xmm3
 	mov	DWORD PTR [rsp+24], r8d
@@ -399,7 +477,7 @@ $LN3:
 	mov	rax, QWORD PTR __security_cookie
 	xor	rax, rsp
 	mov	QWORD PTR __$ArrayPad$[rsp], rax
-; Line 165
+; Line 180
 	mov	QWORD PTR _a$[rsp], 0
 	lea	rax, QWORD PTR _t1$[rsp]
 	mov	QWORD PTR _a$[rsp+8], rax
@@ -407,13 +485,13 @@ $LN3:
 	mov	QWORD PTR _a$[rsp+16], rax
 	lea	rax, QWORD PTR _t3$[rsp]
 	mov	QWORD PTR _a$[rsp+24], rax
-; Line 166
+; Line 181
 	lea	r9, QWORD PTR _a$[rsp]
 	xor	r8d, r8d
 	lea	rdx, OFFSET FLAT:?staticMetaObject@wsimulation@@2UQMetaObject@@B ; wsimulation::staticMetaObject
 	mov	rcx, QWORD PTR this$[rsp]
 	call	QWORD PTR __imp_?activate@QMetaObject@@SAXPEAVQObject@@PEBU1@HPEAPEAX@Z
-; Line 167
+; Line 182
 	mov	rcx, QWORD PTR __$ArrayPad$[rsp]
 	xor	rcx, rsp
 	call	__security_check_cookie
@@ -423,44 +501,46 @@ $LN3:
 _TEXT	ENDS
 ; Function compile flags: /Odtp
 _TEXT	SEGMENT
-tv69 = 32
-tv142 = 36
-tv156 = 40
-_t$1 = 48
+_t$1 = 32
+tv69 = 40
+tv144 = 44
+tv158 = 48
+tv172 = 52
 result$2 = 56
 $T3 = 64
 $T4 = 80
-_o$ = 112
-_c$ = 120
-_id$ = 128
-_a$ = 136
+$T5 = 96
+_o$ = 128
+_c$ = 136
+_id$ = 144
+_a$ = 152
 ?qt_static_metacall@wsimulation@@CAXPEAVQObject@@W4Call@QMetaObject@@HPEAPEAX@Z PROC ; wsimulation::qt_static_metacall
 ; File c:\xdynamics\xdynamics_gui\generatedfiles\debug\moc_xsimulationwidget.cpp
-; Line 88
-$LN24:
+; Line 94
+$LN30:
 	mov	QWORD PTR [rsp+32], r9
 	mov	DWORD PTR [rsp+24], r8d
 	mov	DWORD PTR [rsp+16], edx
 	mov	QWORD PTR [rsp+8], rcx
-	sub	rsp, 104				; 00000068H
-; Line 89
+	sub	rsp, 120				; 00000078H
+; Line 95
 	cmp	DWORD PTR _c$[rsp], 0
 	jne	$LN4@qt_static_
-; Line 90
+; Line 96
 	mov	rax, QWORD PTR _o$[rsp]
 	mov	QWORD PTR _t$1[rsp], rax
-; Line 92
+; Line 98
 	mov	eax, DWORD PTR _id$[rsp]
 	mov	DWORD PTR tv69[rsp], eax
-	cmp	DWORD PTR tv69[rsp], 5
-	ja	$LN12@qt_static_
+	cmp	DWORD PTR tv69[rsp], 7
+	ja	$LN14@qt_static_
 	movsxd	rax, DWORD PTR tv69[rsp]
 	lea	rcx, OFFSET FLAT:__ImageBase
-	mov	eax, DWORD PTR $LN23@qt_static_[rcx+rax*4]
+	mov	eax, DWORD PTR $LN29@qt_static_[rcx+rax*4]
 	add	rax, rcx
 	jmp	rax
 $LN6@qt_static_:
-; Line 93
+; Line 99
 	mov	eax, 8
 	imul	rax, rax, 3
 	mov	rcx, QWORD PTR _a$[rsp]
@@ -481,27 +561,37 @@ $LN6@qt_static_:
 	call	?clickedSolveButton@wsimulation@@QEAAXNIN@Z ; wsimulation::clickedSolveButton
 	jmp	SHORT $LN2@qt_static_
 $LN7@qt_static_:
-; Line 94
+; Line 100
 	mov	rcx, QWORD PTR _t$1[rsp]
 	call	?clickedStartPointButton@wsimulation@@QEAAXXZ ; wsimulation::clickedStartPointButton
 	jmp	SHORT $LN2@qt_static_
 $LN8@qt_static_:
-; Line 95
+; Line 101
+	mov	rcx, QWORD PTR _t$1[rsp]
+	call	?clickedStopButton@wsimulation@@QEAAXXZ	; wsimulation::clickedStopButton
+	jmp	SHORT $LN2@qt_static_
+$LN9@qt_static_:
+; Line 102
 	mov	rcx, QWORD PTR _t$1[rsp]
 	call	?UpdateInformation@wsimulation@@QEAAXXZ	; wsimulation::UpdateInformation
 	jmp	SHORT $LN2@qt_static_
-$LN9@qt_static_:
-; Line 96
+$LN10@qt_static_:
+; Line 103
 	mov	rcx, QWORD PTR _t$1[rsp]
 	call	?SolveButton@wsimulation@@AEAAXXZ	; wsimulation::SolveButton
 	jmp	SHORT $LN2@qt_static_
-$LN10@qt_static_:
-; Line 97
+$LN11@qt_static_:
+; Line 104
+	mov	rcx, QWORD PTR _t$1[rsp]
+	call	?StopButton@wsimulation@@AEAAXXZ	; wsimulation::StopButton
+	jmp	SHORT $LN2@qt_static_
+$LN12@qt_static_:
+; Line 105
 	mov	rcx, QWORD PTR _t$1[rsp]
 	call	?StartingPointButton@wsimulation@@AEAAXXZ ; wsimulation::StartingPointButton
 	jmp	SHORT $LN2@qt_static_
-$LN11@qt_static_:
-; Line 98
+$LN13@qt_static_:
+; Line 106
 	mov	eax, 8
 	imul	rax, rax, 1
 	mov	rcx, QWORD PTR _a$[rsp]
@@ -509,20 +599,20 @@ $LN11@qt_static_:
 	movzx	edx, BYTE PTR [rax]
 	mov	rcx, QWORD PTR _t$1[rsp]
 	call	?CheckStartingPoint@wsimulation@@AEAAX_N@Z ; wsimulation::CheckStartingPoint
-$LN12@qt_static_:
+$LN14@qt_static_:
 $LN2@qt_static_:
-; Line 101
+; Line 109
 	jmp	$LN5@qt_static_
 $LN4@qt_static_:
 	cmp	DWORD PTR _c$[rsp], 10
-	jne	$LN13@qt_static_
-; Line 102
+	jne	$LN15@qt_static_
+; Line 110
 	mov	eax, 8
 	imul	rax, rax, 0
 	mov	rcx, QWORD PTR _a$[rsp]
 	mov	rax, QWORD PTR [rcx+rax]
 	mov	QWORD PTR result$2[rsp], rax
-; Line 105
+; Line 113
 	lea	rax, OFFSET FLAT:?clickedSolveButton@wsimulation@@QEAAXNIN@Z ; wsimulation::clickedSolveButton
 	mov	QWORD PTR $T3[rsp], rax
 	mov	DWORD PTR $T3[rsp+8], 0
@@ -531,44 +621,6 @@ $LN4@qt_static_:
 	mov	rcx, QWORD PTR _a$[rsp]
 	mov	rax, QWORD PTR [rcx+rax]
 	mov	rcx, QWORD PTR $T3[rsp]
-	cmp	QWORD PTR [rax], rcx
-	jne	SHORT $LN18@qt_static_
-	mov	eax, 8
-	imul	rax, rax, 1
-	mov	rcx, QWORD PTR _a$[rsp]
-	mov	rax, QWORD PTR [rcx+rax]
-	cmp	QWORD PTR [rax], 0
-	je	SHORT $LN17@qt_static_
-	mov	eax, 8
-	imul	rax, rax, 1
-	mov	rcx, QWORD PTR _a$[rsp]
-	mov	rax, QWORD PTR [rcx+rax]
-	mov	ecx, DWORD PTR $T3[rsp+8]
-	cmp	DWORD PTR [rax+8], ecx
-	jne	SHORT $LN18@qt_static_
-$LN17@qt_static_:
-	mov	DWORD PTR tv142[rsp], 1
-	jmp	SHORT $LN19@qt_static_
-$LN18@qt_static_:
-	mov	DWORD PTR tv142[rsp], 0
-$LN19@qt_static_:
-	cmp	DWORD PTR tv142[rsp], 0
-	je	SHORT $LN14@qt_static_
-; Line 106
-	mov	rax, QWORD PTR result$2[rsp]
-	mov	DWORD PTR [rax], 0
-; Line 107
-	jmp	$LN1@qt_static_
-$LN14@qt_static_:
-; Line 112
-	lea	rax, OFFSET FLAT:?clickedStartPointButton@wsimulation@@QEAAXXZ ; wsimulation::clickedStartPointButton
-	mov	QWORD PTR $T4[rsp], rax
-	mov	DWORD PTR $T4[rsp+8], 0
-	mov	eax, 8
-	imul	rax, rax, 1
-	mov	rcx, QWORD PTR _a$[rsp]
-	mov	rax, QWORD PTR [rcx+rax]
-	mov	rcx, QWORD PTR $T4[rsp]
 	cmp	QWORD PTR [rax], rcx
 	jne	SHORT $LN21@qt_static_
 	mov	eax, 8
@@ -581,35 +633,113 @@ $LN14@qt_static_:
 	imul	rax, rax, 1
 	mov	rcx, QWORD PTR _a$[rsp]
 	mov	rax, QWORD PTR [rcx+rax]
-	mov	ecx, DWORD PTR $T4[rsp+8]
+	mov	ecx, DWORD PTR $T3[rsp+8]
 	cmp	DWORD PTR [rax+8], ecx
 	jne	SHORT $LN21@qt_static_
 $LN20@qt_static_:
-	mov	DWORD PTR tv156[rsp], 1
+	mov	DWORD PTR tv144[rsp], 1
 	jmp	SHORT $LN22@qt_static_
 $LN21@qt_static_:
-	mov	DWORD PTR tv156[rsp], 0
+	mov	DWORD PTR tv144[rsp], 0
 $LN22@qt_static_:
-	cmp	DWORD PTR tv156[rsp], 0
-	je	SHORT $LN15@qt_static_
-; Line 113
+	cmp	DWORD PTR tv144[rsp], 0
+	je	SHORT $LN16@qt_static_
+; Line 114
+	mov	rax, QWORD PTR result$2[rsp]
+	mov	DWORD PTR [rax], 0
+; Line 115
+	jmp	$LN1@qt_static_
+$LN16@qt_static_:
+; Line 120
+	lea	rax, OFFSET FLAT:?clickedStartPointButton@wsimulation@@QEAAXXZ ; wsimulation::clickedStartPointButton
+	mov	QWORD PTR $T4[rsp], rax
+	mov	DWORD PTR $T4[rsp+8], 0
+	mov	eax, 8
+	imul	rax, rax, 1
+	mov	rcx, QWORD PTR _a$[rsp]
+	mov	rax, QWORD PTR [rcx+rax]
+	mov	rcx, QWORD PTR $T4[rsp]
+	cmp	QWORD PTR [rax], rcx
+	jne	SHORT $LN24@qt_static_
+	mov	eax, 8
+	imul	rax, rax, 1
+	mov	rcx, QWORD PTR _a$[rsp]
+	mov	rax, QWORD PTR [rcx+rax]
+	cmp	QWORD PTR [rax], 0
+	je	SHORT $LN23@qt_static_
+	mov	eax, 8
+	imul	rax, rax, 1
+	mov	rcx, QWORD PTR _a$[rsp]
+	mov	rax, QWORD PTR [rcx+rax]
+	mov	ecx, DWORD PTR $T4[rsp+8]
+	cmp	DWORD PTR [rax+8], ecx
+	jne	SHORT $LN24@qt_static_
+$LN23@qt_static_:
+	mov	DWORD PTR tv158[rsp], 1
+	jmp	SHORT $LN25@qt_static_
+$LN24@qt_static_:
+	mov	DWORD PTR tv158[rsp], 0
+$LN25@qt_static_:
+	cmp	DWORD PTR tv158[rsp], 0
+	je	SHORT $LN17@qt_static_
+; Line 121
 	mov	rax, QWORD PTR result$2[rsp]
 	mov	DWORD PTR [rax], 1
+; Line 122
+	jmp	$LN1@qt_static_
+$LN17@qt_static_:
+; Line 127
+	lea	rax, OFFSET FLAT:?clickedStopButton@wsimulation@@QEAAXXZ ; wsimulation::clickedStopButton
+	mov	QWORD PTR $T5[rsp], rax
+	mov	DWORD PTR $T5[rsp+8], 0
+	mov	eax, 8
+	imul	rax, rax, 1
+	mov	rcx, QWORD PTR _a$[rsp]
+	mov	rax, QWORD PTR [rcx+rax]
+	mov	rcx, QWORD PTR $T5[rsp]
+	cmp	QWORD PTR [rax], rcx
+	jne	SHORT $LN27@qt_static_
+	mov	eax, 8
+	imul	rax, rax, 1
+	mov	rcx, QWORD PTR _a$[rsp]
+	mov	rax, QWORD PTR [rcx+rax]
+	cmp	QWORD PTR [rax], 0
+	je	SHORT $LN26@qt_static_
+	mov	eax, 8
+	imul	rax, rax, 1
+	mov	rcx, QWORD PTR _a$[rsp]
+	mov	rax, QWORD PTR [rcx+rax]
+	mov	ecx, DWORD PTR $T5[rsp+8]
+	cmp	DWORD PTR [rax+8], ecx
+	jne	SHORT $LN27@qt_static_
+$LN26@qt_static_:
+	mov	DWORD PTR tv172[rsp], 1
+	jmp	SHORT $LN28@qt_static_
+$LN27@qt_static_:
+	mov	DWORD PTR tv172[rsp], 0
+$LN28@qt_static_:
+	cmp	DWORD PTR tv172[rsp], 0
+	je	SHORT $LN18@qt_static_
+; Line 128
+	mov	rax, QWORD PTR result$2[rsp]
+	mov	DWORD PTR [rax], 2
+$LN18@qt_static_:
 $LN15@qt_static_:
-$LN13@qt_static_:
 $LN5@qt_static_:
 $LN1@qt_static_:
-; Line 118
-	add	rsp, 104				; 00000068H
+; Line 133
+	add	rsp, 120				; 00000078H
 	ret	0
-	npad	3
-$LN23@qt_static_:
+	npad	1
+$LN29@qt_static_:
 	DD	$LN6@qt_static_
 	DD	$LN7@qt_static_
 	DD	$LN8@qt_static_
 	DD	$LN9@qt_static_
 	DD	$LN10@qt_static_
 	DD	$LN11@qt_static_
+	DD	$LN12@qt_static_
+	DD	$LN13@qt_static_
 ?qt_static_metacall@wsimulation@@CAXPEAVQObject@@W4Call@QMetaObject@@HPEAPEAX@Z ENDP ; wsimulation::qt_static_metacall
 _TEXT	ENDS
 ; Function compile flags: /Odtp
@@ -620,69 +750,69 @@ _id$ = 64
 _a$ = 72
 ?qt_metacall@wsimulation@@UEAAHW4Call@QMetaObject@@HPEAPEAX@Z PROC ; wsimulation::qt_metacall
 ; File c:\xdynamics\xdynamics_gui\generatedfiles\debug\moc_xsimulationwidget.cpp
-; Line 146
+; Line 161
 $LN9:
 	mov	QWORD PTR [rsp+32], r9
 	mov	DWORD PTR [rsp+24], r8d
 	mov	DWORD PTR [rsp+16], edx
 	mov	QWORD PTR [rsp+8], rcx
 	sub	rsp, 40					; 00000028H
-; Line 147
+; Line 162
 	mov	r9, QWORD PTR _a$[rsp]
 	mov	r8d, DWORD PTR _id$[rsp]
 	mov	edx, DWORD PTR _c$[rsp]
 	mov	rcx, QWORD PTR this$[rsp]
 	call	QWORD PTR __imp_?qt_metacall@QWidget@@UEAAHW4Call@QMetaObject@@HPEAPEAX@Z
 	mov	DWORD PTR _id$[rsp], eax
-; Line 148
+; Line 163
 	cmp	DWORD PTR _id$[rsp], 0
 	jge	SHORT $LN2@qt_metacal
-; Line 149
+; Line 164
 	mov	eax, DWORD PTR _id$[rsp]
 	jmp	SHORT $LN1@qt_metacal
 $LN2@qt_metacal:
-; Line 150
+; Line 165
 	cmp	DWORD PTR _c$[rsp], 0
 	jne	SHORT $LN3@qt_metacal
-; Line 151
-	cmp	DWORD PTR _id$[rsp], 6
+; Line 166
+	cmp	DWORD PTR _id$[rsp], 8
 	jge	SHORT $LN5@qt_metacal
-; Line 152
+; Line 167
 	mov	r9, QWORD PTR _a$[rsp]
 	mov	r8d, DWORD PTR _id$[rsp]
 	mov	edx, DWORD PTR _c$[rsp]
 	mov	rcx, QWORD PTR this$[rsp]
 	call	?qt_static_metacall@wsimulation@@CAXPEAVQObject@@W4Call@QMetaObject@@HPEAPEAX@Z ; wsimulation::qt_static_metacall
 $LN5@qt_metacal:
-; Line 153
+; Line 168
 	mov	eax, DWORD PTR _id$[rsp]
-	sub	eax, 6
+	sub	eax, 8
 	mov	DWORD PTR _id$[rsp], eax
 	jmp	SHORT $LN4@qt_metacal
 $LN3@qt_metacal:
-; Line 154
+; Line 169
 	cmp	DWORD PTR _c$[rsp], 12
 	jne	SHORT $LN6@qt_metacal
-; Line 155
-	cmp	DWORD PTR _id$[rsp], 6
+; Line 170
+	cmp	DWORD PTR _id$[rsp], 8
 	jge	SHORT $LN7@qt_metacal
-; Line 156
+; Line 171
 	mov	eax, 8
 	imul	rax, rax, 0
 	mov	rcx, QWORD PTR _a$[rsp]
 	mov	rax, QWORD PTR [rcx+rax]
 	mov	DWORD PTR [rax], -1
 $LN7@qt_metacal:
-; Line 157
+; Line 172
 	mov	eax, DWORD PTR _id$[rsp]
-	sub	eax, 6
+	sub	eax, 8
 	mov	DWORD PTR _id$[rsp], eax
 $LN6@qt_metacal:
 $LN4@qt_metacal:
-; Line 159
+; Line 174
 	mov	eax, DWORD PTR _id$[rsp]
 $LN1@qt_metacal:
-; Line 160
+; Line 175
 	add	rsp, 40					; 00000028H
 	ret	0
 ?qt_metacall@wsimulation@@UEAAHW4Call@QMetaObject@@HPEAPEAX@Z ENDP ; wsimulation::qt_metacall
@@ -694,34 +824,34 @@ this$ = 64
 _clname$ = 72
 ?qt_metacast@wsimulation@@UEAAPEAXPEBD@Z PROC		; wsimulation::qt_metacast
 ; File c:\xdynamics\xdynamics_gui\generatedfiles\debug\moc_xsimulationwidget.cpp
-; Line 136
+; Line 151
 $LN8:
 	mov	QWORD PTR [rsp+16], rdx
 	mov	QWORD PTR [rsp+8], rcx
 	sub	rsp, 56					; 00000038H
-; Line 137
+; Line 152
 	cmp	QWORD PTR _clname$[rsp], 0
 	jne	SHORT $LN2@qt_metacas
 	xor	eax, eax
 	jmp	SHORT $LN1@qt_metacas
 $LN2@qt_metacas:
-; Line 138
-	lea	rdx, OFFSET FLAT:?qt_meta_stringdata_wsimulation@@3Uqt_meta_stringdata_wsimulation_t@@B+192
+; Line 153
+	lea	rdx, OFFSET FLAT:?qt_meta_stringdata_wsimulation@@3Uqt_meta_stringdata_wsimulation_t@@B+240
 	mov	rcx, QWORD PTR _clname$[rsp]
 	call	strcmp
 	test	eax, eax
 	jne	SHORT $LN3@qt_metacas
-; Line 139
+; Line 154
 	mov	rax, QWORD PTR this$[rsp]
 	jmp	SHORT $LN1@qt_metacas
 $LN3@qt_metacas:
-; Line 140
-	lea	rdx, OFFSET FLAT:$SG139587
+; Line 155
+	lea	rdx, OFFSET FLAT:$SG139602
 	mov	rcx, QWORD PTR _clname$[rsp]
 	call	strcmp
 	test	eax, eax
 	jne	SHORT $LN4@qt_metacas
-; Line 141
+; Line 156
 	cmp	QWORD PTR this$[rsp], 0
 	je	SHORT $LN6@qt_metacas
 	mov	rax, QWORD PTR this$[rsp]
@@ -734,12 +864,12 @@ $LN7@qt_metacas:
 	mov	rax, QWORD PTR tv77[rsp]
 	jmp	SHORT $LN1@qt_metacas
 $LN4@qt_metacas:
-; Line 142
+; Line 157
 	mov	rdx, QWORD PTR _clname$[rsp]
 	mov	rcx, QWORD PTR this$[rsp]
 	call	QWORD PTR __imp_?qt_metacast@QWidget@@UEAAPEAXPEBD@Z
 $LN1@qt_metacas:
-; Line 143
+; Line 158
 	add	rsp, 56					; 00000038H
 	ret	0
 ?qt_metacast@wsimulation@@UEAAPEAXPEBD@Z ENDP		; wsimulation::qt_metacast
@@ -750,11 +880,11 @@ tv82 = 32
 this$ = 64
 ?metaObject@wsimulation@@UEBAPEBUQMetaObject@@XZ PROC	; wsimulation::metaObject
 ; File c:\xdynamics\xdynamics_gui\generatedfiles\debug\moc_xsimulationwidget.cpp
-; Line 131
+; Line 146
 $LN5:
 	mov	QWORD PTR [rsp+8], rcx
 	sub	rsp, 56					; 00000038H
-; Line 132
+; Line 147
 	mov	rax, QWORD PTR this$[rsp]
 	add	rax, 8
 	mov	rcx, rax
@@ -774,7 +904,7 @@ $LN3@metaObject:
 	mov	QWORD PTR tv82[rsp], rax
 $LN4@metaObject:
 	mov	rax, QWORD PTR tv82[rsp]
-; Line 133
+; Line 148
 	add	rsp, 56					; 00000038H
 	ret	0
 ?metaObject@wsimulation@@UEBAPEBUQMetaObject@@XZ ENDP	; wsimulation::metaObject
@@ -784,7 +914,7 @@ _TEXT	ENDS
 _TEXT	SEGMENT
 this$ = 8
 ??C?$QScopedPointer@VQObjectData@@U?$QScopedPointerDeleter@VQObjectData@@@@@@QEBAPEAVQObjectData@@XZ PROC ; QScopedPointer<QObjectData,QScopedPointerDeleter<QObjectData> >::operator->, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qscopedpointer.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qscopedpointer.h
 ; Line 117
 	mov	QWORD PTR [rsp+8], rcx
 ; Line 118
@@ -801,7 +931,7 @@ __formal$ = 8
 __formal$ = 16
 ?__empty_global_delete@@YAXPEAX_K@Z PROC		; __empty_global_delete, COMDAT
 ; File c:\xdynamics\xdynamics_gui\generatedfiles\debug\moc_xsimulationwidget.cpp
-; Line 176
+; Line 197
 	mov	QWORD PTR [rsp+16], rdx
 	mov	QWORD PTR [rsp+8], rcx
 	ret	0
@@ -813,7 +943,7 @@ _TEXT	SEGMENT
 __formal$ = 8
 ?__empty_global_delete@@YAXPEAX@Z PROC			; __empty_global_delete, COMDAT
 ; File c:\xdynamics\xdynamics_gui\generatedfiles\debug\moc_xsimulationwidget.cpp
-; Line 176
+; Line 197
 	mov	QWORD PTR [rsp+8], rcx
 	ret	0
 ?__empty_global_delete@@YAXPEAX@Z ENDP			; __empty_global_delete

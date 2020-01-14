@@ -6,33 +6,33 @@ INCLUDELIB MSVCRTD
 INCLUDELIB OLDNAMES
 
 CONST	SEGMENT
-$SG147816 DB	'c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h', 00H
+$SG147817 DB	'c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h', 00H
 	ORG $+12
-$SG147817 DB	'qRegisterNormalizedMetaType was called with a not normal'
+$SG147818 DB	'qRegisterNormalizedMetaType was called with a not normal'
 	DB	'ized type name, please call qRegisterMetaType instead.', 00H
 	ORG $+1
-$SG147818 DB	'qRegisterNormalizedMetaType', 00H
+$SG147819 DB	'qRegisterNormalizedMetaType', 00H
 	ORG $+4
-$SG150744 DB	'c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h', 00H
+$SG150745 DB	'c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h', 00H
 	ORG $+12
-$SG150745 DB	'qRegisterNormalizedMetaType was called with a not normal'
+$SG150746 DB	'qRegisterNormalizedMetaType was called with a not normal'
 	DB	'ized type name, please call qRegisterMetaType instead.', 00H
 	ORG $+1
-$SG150746 DB	'qRegisterNormalizedMetaType', 00H
+$SG150747 DB	'qRegisterNormalizedMetaType', 00H
 	ORG $+4
-$SG151105 DB	'c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h', 00H
+$SG151106 DB	'c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h', 00H
 	ORG $+12
-$SG151106 DB	'qRegisterNormalizedMetaType was called with a not normal'
+$SG151107 DB	'qRegisterNormalizedMetaType was called with a not normal'
 	DB	'ized type name, please call qRegisterMetaType instead.', 00H
 	ORG $+1
-$SG151107 DB	'qRegisterNormalizedMetaType', 00H
+$SG151108 DB	'qRegisterNormalizedMetaType', 00H
 	ORG $+4
-$SG151466 DB	'c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h', 00H
+$SG151467 DB	'c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h', 00H
 	ORG $+12
-$SG151467 DB	'qRegisterNormalizedMetaType was called with a not normal'
+$SG151468 DB	'qRegisterNormalizedMetaType was called with a not normal'
 	DB	'ized type name, please call qRegisterMetaType instead.', 00H
 	ORG $+1
-$SG151468 DB	'qRegisterNormalizedMetaType', 00H
+$SG151469 DB	'qRegisterNormalizedMetaType', 00H
 	ORG $+4
 ?qt_meta_stringdata_xProgressDialog@@3Uqt_meta_stringdata_xProgressDialog_t@@B DD 0ffffffffH ; qt_meta_stringdata_xProgressDialog
 	DD	0fH
@@ -256,7 +256,7 @@ _TEXT	ENDS
 _TEXT	SEGMENT
 this$ = 8
 ??C?$QScopedPointer@VQObjectData@@U?$QScopedPointerDeleter@VQObjectData@@@@@@QEBAPEAVQObjectData@@XZ PROC ; QScopedPointer<QObjectData,QScopedPointerDeleter<QObjectData> >::operator->, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qscopedpointer.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qscopedpointer.h
 ; Line 117
 	mov	QWORD PTR [rsp+8], rcx
 ; Line 118

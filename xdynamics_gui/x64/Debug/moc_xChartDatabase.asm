@@ -6,47 +6,47 @@ INCLUDELIB MSVCRTD
 INCLUDELIB OLDNAMES
 
 CONST	SEGMENT
-$SG254423 DB	'c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h', 00H
+$SG254426 DB	'c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h', 00H
 	ORG $+12
-$SG254424 DB	'qRegisterNormalizedMetaType was called with a not normal'
+$SG254427 DB	'qRegisterNormalizedMetaType was called with a not normal'
 	DB	'ized type name, please call qRegisterMetaType instead.', 00H
 	ORG $+1
-$SG254425 DB	'qRegisterNormalizedMetaType', 00H
+$SG254428 DB	'qRegisterNormalizedMetaType', 00H
 	ORG $+4
-$SG254792 DB	'c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h', 00H
+$SG254795 DB	'c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h', 00H
 	ORG $+12
-$SG254793 DB	'qRegisterNormalizedMetaType was called with a not normal'
+$SG254796 DB	'qRegisterNormalizedMetaType was called with a not normal'
 	DB	'ized type name, please call qRegisterMetaType instead.', 00H
 	ORG $+1
-$SG254794 DB	'qRegisterNormalizedMetaType', 00H
+$SG254797 DB	'qRegisterNormalizedMetaType', 00H
 	ORG $+4
-$SG255161 DB	'c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h', 00H
+$SG255164 DB	'c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h', 00H
 	ORG $+12
-$SG255162 DB	'qRegisterNormalizedMetaType was called with a not normal'
+$SG255165 DB	'qRegisterNormalizedMetaType was called with a not normal'
 	DB	'ized type name, please call qRegisterMetaType instead.', 00H
 	ORG $+1
-$SG255163 DB	'qRegisterNormalizedMetaType', 00H
+$SG255166 DB	'qRegisterNormalizedMetaType', 00H
 	ORG $+4
-$SG249502 DB	'c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h', 00H
+$SG249505 DB	'c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h', 00H
 	ORG $+12
-$SG249503 DB	'qRegisterNormalizedMetaType was called with a not normal'
+$SG249506 DB	'qRegisterNormalizedMetaType was called with a not normal'
 	DB	'ized type name, please call qRegisterMetaType instead.', 00H
 	ORG $+1
-$SG249504 DB	'qRegisterNormalizedMetaType', 00H
+$SG249507 DB	'qRegisterNormalizedMetaType', 00H
 	ORG $+4
-$SG252834 DB	'c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h', 00H
+$SG252837 DB	'c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h', 00H
 	ORG $+12
-$SG252835 DB	'qRegisterNormalizedMetaType was called with a not normal'
+$SG252838 DB	'qRegisterNormalizedMetaType was called with a not normal'
 	DB	'ized type name, please call qRegisterMetaType instead.', 00H
 	ORG $+1
-$SG252836 DB	'qRegisterNormalizedMetaType', 00H
+$SG252839 DB	'qRegisterNormalizedMetaType', 00H
 	ORG $+4
-$SG253203 DB	'c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h', 00H
+$SG253206 DB	'c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h', 00H
 	ORG $+12
-$SG253204 DB	'qRegisterNormalizedMetaType was called with a not normal'
+$SG253207 DB	'qRegisterNormalizedMetaType was called with a not normal'
 	DB	'ized type name, please call qRegisterMetaType instead.', 00H
 	ORG $+1
-$SG253205 DB	'qRegisterNormalizedMetaType', 00H
+$SG253208 DB	'qRegisterNormalizedMetaType', 00H
 	ORG $+4
 ?qt_meta_stringdata_xChartDatabase@@3Uqt_meta_stringdata_xChartDatabase_t@@B DD 0ffffffffH ; qt_meta_stringdata_xChartDatabase
 	DD	0eH
@@ -253,12 +253,12 @@ $SG253205 DB	'qRegisterNormalizedMetaType', 00H
 	DD	02H
 	DD	00H
 	ORG $+4
-$SG253572 DB	'c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h', 00H
+$SG253575 DB	'c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h', 00H
 	ORG $+4
-$SG253573 DB	'qRegisterNormalizedMetaType was called with a not normal'
+$SG253576 DB	'qRegisterNormalizedMetaType was called with a not normal'
 	DB	'ized type name, please call qRegisterMetaType instead.', 00H
 	ORG $+1
-$SG253574 DB	'qRegisterNormalizedMetaType', 00H
+$SG253577 DB	'qRegisterNormalizedMetaType', 00H
 CONST	ENDS
 PUBLIC	?__empty_global_delete@@YAXPEAX@Z		; __empty_global_delete
 PUBLIC	?__empty_global_delete@@YAXPEAX_K@Z		; __empty_global_delete
@@ -1101,7 +1101,7 @@ xdata	ENDS
 _TEXT	SEGMENT
 _q_value$ = 48
 ??$load@H@?$QAtomicOps@H@@SAHAEBU?$atomic@H@std@@@Z PROC ; QAtomicOps<int>::load<int>, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qatomic_cxx11.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qatomic_cxx11.h
 ; Line 226
 $LN3:
 	mov	QWORD PTR [rsp+8], rcx
@@ -1121,7 +1121,7 @@ _TEXT	SEGMENT
 tv71 = 32
 _q_value$ = 64
 ??$ref@H@?$QAtomicOps@H@@SA_NAEAU?$atomic@H@std@@@Z PROC ; QAtomicOps<int>::ref<int>, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qatomic_cxx11.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qatomic_cxx11.h
 ; Line 264
 $LN5:
 	mov	QWORD PTR [rsp+8], rcx
@@ -1148,7 +1148,7 @@ _TEXT	SEGMENT
 tv71 = 32
 _q_value$ = 64
 ??$deref@H@?$QAtomicOps@H@@SA_NAEAU?$atomic@H@std@@@Z PROC ; QAtomicOps<int>::deref<int>, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qatomic_cxx11.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qatomic_cxx11.h
 ; Line 270
 $LN5:
 	mov	QWORD PTR [rsp+8], rcx
@@ -1710,7 +1710,7 @@ _TEXT	ENDS
 _TEXT	SEGMENT
 this$ = 8
 ??C?$QScopedPointer@VQObjectData@@U?$QScopedPointerDeleter@VQObjectData@@@@@@QEBAPEAVQObjectData@@XZ PROC ; QScopedPointer<QObjectData,QScopedPointerDeleter<QObjectData> >::operator->, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qscopedpointer.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qscopedpointer.h
 ; Line 117
 	mov	QWORD PTR [rsp+8], rcx
 ; Line 118
@@ -1762,7 +1762,7 @@ this$ = 80
 from$ = 88
 to$ = 96
 ?node_destruct@?$QList@VQString@@@@AEAAXPEAUNode@1@0@Z PROC ; QList<QString>::node_destruct, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qlist.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qlist.h
 ; Line 495
 $LN12:
 	mov	QWORD PTR [rsp+24], r8
@@ -1845,7 +1845,7 @@ from$ = 168
 to$ = 176
 src$ = 184
 ?node_copy@?$QList@VQString@@@@AEAAXPEAUNode@1@00@Z PROC ; QList<QString>::node_copy, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qlist.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qlist.h
 ; Line 460
 $LN33:
 	mov	QWORD PTR [rsp+32], r9
@@ -2222,7 +2222,7 @@ _TEXT	SEGMENT
 this$ = 48
 data$ = 56
 ?dealloc@?$QList@VQString@@@@AEAAXPEAUData@QListData@@@Z PROC ; QList<QString>::dealloc, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qlist.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qlist.h
 ; Line 867
 $LN3:
 	mov	QWORD PTR [rsp+16], rdx
@@ -2255,7 +2255,7 @@ _TEXT	SEGMENT
 $T1 = 32
 this$ = 64
 ??1?$QList@VQString@@@@QEAA@XZ PROC			; QList<QString>::~QList<QString>, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qlist.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qlist.h
 ; Line 828
 $LN4:
 	mov	QWORD PTR [rsp+8], rcx
@@ -2294,7 +2294,7 @@ $T1 = 48
 this$ = 80
 l$ = 88
 ??0?$QList@VQString@@@@QEAA@AEBV0@@Z PROC		; QList<QString>::QList<QString>, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qlist.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qlist.h
 ; Line 811
 $LN12:
 	mov	QWORD PTR [rsp+16], rdx
@@ -2454,7 +2454,7 @@ text$x	ENDS
 _TEXT	SEGMENT
 this$ = 8
 ??1?$QListSpecialMethods@VQString@@@@IEAA@XZ PROC	; QListSpecialMethods<QString>::~QListSpecialMethods<QString>, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qstringlist.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qstringlist.h
 ; Line 69
 	mov	QWORD PTR [rsp+8], rcx
 	ret	0
@@ -2491,7 +2491,7 @@ _TEXT	SEGMENT
 count$ = 32
 this$ = 64
 ?deref@RefCount@QtPrivate@@QEAA_NXZ PROC		; QtPrivate::RefCount::deref, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qrefcount.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qrefcount.h
 ; Line 65
 $LN5:
 	mov	QWORD PTR [rsp+8], rcx
@@ -2531,7 +2531,7 @@ _TEXT	SEGMENT
 count$ = 32
 this$ = 64
 ?ref@RefCount@QtPrivate@@QEAA_NXZ PROC			; QtPrivate::RefCount::ref, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qrefcount.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qrefcount.h
 ; Line 54
 $LN5:
 	mov	QWORD PTR [rsp+8], rcx
@@ -2569,7 +2569,7 @@ _TEXT	ENDS
 _TEXT	SEGMENT
 this$ = 48
 ?deref@?$QBasicAtomicInteger@H@@QEAA_NXZ PROC		; QBasicAtomicInteger<int>::deref, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qbasicatomic.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qbasicatomic.h
 ; Line 115
 $LN3:
 	mov	QWORD PTR [rsp+8], rcx
@@ -2587,7 +2587,7 @@ _TEXT	SEGMENT
 $T1 = 32
 this$ = 64
 ?ref@?$QBasicAtomicInteger@H@@QEAA_NXZ PROC		; QBasicAtomicInteger<int>::ref, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qbasicatomic.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qbasicatomic.h
 ; Line 114
 $LN3:
 	mov	QWORD PTR [rsp+8], rcx
@@ -2606,7 +2606,7 @@ _TEXT	ENDS
 _TEXT	SEGMENT
 this$ = 48
 ?load@?$QBasicAtomicInteger@H@@QEBAHXZ PROC		; QBasicAtomicInteger<int>::load, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qbasicatomic.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qbasicatomic.h
 ; Line 103
 $LN3:
 	mov	QWORD PTR [rsp+8], rcx

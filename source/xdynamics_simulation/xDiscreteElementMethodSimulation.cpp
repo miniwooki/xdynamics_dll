@@ -208,6 +208,7 @@ int xDiscreteElementMethodSimulation::Initialize(
 		dp.ncell = dtor->nCell();
 		dp.nTsdaConnection = nTsdaConnection;
 		dp.nTsdaConnectionList = nTsdaConnectionList;
+		dp.nTsdaConnectionBodyData = nTsdaConnectionBodyData;
 		dp.grid_size.x = xGridCell::gs.x;
 		dp.grid_size.y = xGridCell::gs.y;
 		dp.grid_size.z = xGridCell::gs.z;

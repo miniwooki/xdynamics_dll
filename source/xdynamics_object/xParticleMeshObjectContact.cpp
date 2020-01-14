@@ -158,7 +158,7 @@ void xParticleMeshObjectContact::define(unsigned int idx, unsigned int np)
 	}
 	
 	
-	printf("gps.max_radius : %f\n", gps.max_radius);
+	//printf("gps.max_radius : %f\n", gps.max_radius);
 	n_mesh_sphere += po->NumTriangle();
 	update();
 	defined_count++;

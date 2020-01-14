@@ -6,68 +6,68 @@ INCLUDELIB MSVCRTD
 INCLUDELIB OLDNAMES
 
 CONST	SEGMENT
-$SG172348 DB	'c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h', 00H
+$SG172351 DB	'c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h', 00H
 	ORG $+12
-$SG172349 DB	'qRegisterNormalizedMetaType was called with a not normal'
+$SG172352 DB	'qRegisterNormalizedMetaType was called with a not normal'
 	DB	'ized type name, please call qRegisterMetaType instead.', 00H
 	ORG $+1
-$SG172350 DB	'qRegisterNormalizedMetaType', 00H
+$SG172353 DB	'qRegisterNormalizedMetaType', 00H
 	ORG $+4
-$SG172709 DB	'c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h', 00H
+$SG172712 DB	'c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h', 00H
 	ORG $+12
-$SG172710 DB	'qRegisterNormalizedMetaType was called with a not normal'
+$SG172713 DB	'qRegisterNormalizedMetaType was called with a not normal'
 	DB	'ized type name, please call qRegisterMetaType instead.', 00H
 	ORG $+1
-$SG172711 DB	'qRegisterNormalizedMetaType', 00H
+$SG172714 DB	'qRegisterNormalizedMetaType', 00H
 	ORG $+4
-$SG173070 DB	'c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h', 00H
+$SG173073 DB	'c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h', 00H
 	ORG $+12
-$SG173071 DB	'qRegisterNormalizedMetaType was called with a not normal'
+$SG173074 DB	'qRegisterNormalizedMetaType was called with a not normal'
 	DB	'ized type name, please call qRegisterMetaType instead.', 00H
 	ORG $+1
-$SG173072 DB	'qRegisterNormalizedMetaType', 00H
+$SG173075 DB	'qRegisterNormalizedMetaType', 00H
 	ORG $+4
-$SG173480 DB	'c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h', 00H
+$SG173483 DB	'c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h', 00H
 	ORG $+12
-$SG173481 DB	'qRegisterNormalizedMetaType was called with a not normal'
+$SG173484 DB	'qRegisterNormalizedMetaType was called with a not normal'
 	DB	'ized type name, please call qRegisterMetaType instead.', 00H
 	ORG $+1
-$SG173482 DB	'qRegisterNormalizedMetaType', 00H
+$SG173485 DB	'qRegisterNormalizedMetaType', 00H
 	ORG $+4
-$SG175589 DB	'c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h', 00H
+$SG175592 DB	'c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h', 00H
 	ORG $+12
-$SG175590 DB	'qRegisterNormalizedMetaType was called with a not normal'
+$SG175593 DB	'qRegisterNormalizedMetaType was called with a not normal'
 	DB	'ized type name, please call qRegisterMetaType instead.', 00H
 	ORG $+1
-$SG175591 DB	'qRegisterNormalizedMetaType', 00H
+$SG175594 DB	'qRegisterNormalizedMetaType', 00H
 	ORG $+4
-$SG167636 DB	'c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h', 00H
+$SG167639 DB	'c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h', 00H
 	ORG $+12
-$SG167637 DB	'qRegisterNormalizedMetaType was called with a not normal'
+$SG167640 DB	'qRegisterNormalizedMetaType was called with a not normal'
 	DB	'ized type name, please call qRegisterMetaType instead.', 00H
 	ORG $+1
-$SG167638 DB	'qRegisterNormalizedMetaType', 00H
+$SG167641 DB	'qRegisterNormalizedMetaType', 00H
 	ORG $+4
-$SG175906 DB	'c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h', 00H
+$SG175909 DB	'c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h', 00H
 	ORG $+12
-$SG175907 DB	'qRegisterNormalizedMetaType was called with a not normal'
+$SG175910 DB	'qRegisterNormalizedMetaType was called with a not normal'
 	DB	'ized type name, please call qRegisterMetaType instead.', 00H
 	ORG $+1
-$SG175908 DB	'qRegisterNormalizedMetaType', 00H
+$SG175911 DB	'qRegisterNormalizedMetaType', 00H
 	ORG $+4
-$SG176223 DB	'c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h', 00H
+$SG176226 DB	'c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h', 00H
 	ORG $+12
-$SG176224 DB	'qRegisterNormalizedMetaType was called with a not normal'
+$SG176227 DB	'qRegisterNormalizedMetaType was called with a not normal'
 	DB	'ized type name, please call qRegisterMetaType instead.', 00H
 	ORG $+1
-$SG176225 DB	'qRegisterNormalizedMetaType', 00H
+$SG176228 DB	'qRegisterNormalizedMetaType', 00H
 	ORG $+4
-$SG170783 DB	'c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h', 00H
+$SG170786 DB	'c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h', 00H
 	ORG $+12
-$SG170784 DB	'qRegisterNormalizedMetaType was called with a not normal'
+$SG170787 DB	'qRegisterNormalizedMetaType was called with a not normal'
 	DB	'ized type name, please call qRegisterMetaType instead.', 00H
 	ORG $+1
-$SG170785 DB	'qRegisterNormalizedMetaType', 00H
+$SG170788 DB	'qRegisterNormalizedMetaType', 00H
 	ORG $+4
 ?qt_meta_stringdata_wview@@3Uqt_meta_stringdata_wview_t@@B DD 0ffffffffH ; qt_meta_stringdata_wview
 	DD	05H
@@ -246,14 +246,14 @@ $SG170785 DB	'qRegisterNormalizedMetaType', 00H
 	DD	02H
 	DD	00H
 	ORG $+4
-$SG171144 DB	'c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h', 00H
+$SG171147 DB	'c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h', 00H
 	ORG $+4
-$SG171145 DB	'qRegisterNormalizedMetaType was called with a not normal'
+$SG171148 DB	'qRegisterNormalizedMetaType was called with a not normal'
 	DB	'ized type name, please call qRegisterMetaType instead.', 00H
 	ORG $+1
-$SG171146 DB	'qRegisterNormalizedMetaType', 00H
+$SG171149 DB	'qRegisterNormalizedMetaType', 00H
 	ORG $+4
-$SG154955 DB	'Ui::wview', 00H
+$SG154958 DB	'Ui::wview', 00H
 	ORG $+6
 ?qt_meta_stringdata_xModelNavigator@@3Uqt_meta_stringdata_xModelNavigator_t@@B DD 0ffffffffH ; qt_meta_stringdata_xModelNavigator
 	DD	0fH
@@ -484,12 +484,12 @@ $SG154955 DB	'Ui::wview', 00H
 	DB	02aH
 	DB	00H
 	ORG $+3
-$SG171505 DB	'c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h', 00H
+$SG171508 DB	'c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h', 00H
 	ORG $+4
-$SG171506 DB	'qRegisterNormalizedMetaType was called with a not normal'
+$SG171509 DB	'qRegisterNormalizedMetaType was called with a not normal'
 	DB	'ized type name, please call qRegisterMetaType instead.', 00H
 	ORG $+1
-$SG171507 DB	'qRegisterNormalizedMetaType', 00H
+$SG171510 DB	'qRegisterNormalizedMetaType', 00H
 	ORG $+4
 ?qt_meta_data_xModelNavigator@@3QBIB DD 08H		; qt_meta_data_xModelNavigator
 	DD	00H
@@ -1427,7 +1427,7 @@ CRT$XCU	ENDS
 _TEXT	SEGMENT
 __formal$ = 8
 ?registerConverter@?$MetaTypeSmartPointerHelper@PEAVwsimulation@@X@QtPrivate@@SA_NH@Z PROC ; QtPrivate::MetaTypeSmartPointerHelper<wsimulation *,void>::registerConverter, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 1635
 	mov	DWORD PTR [rsp+8], ecx
 	xor	al, al
@@ -1439,7 +1439,7 @@ _TEXT	ENDS
 _TEXT	SEGMENT
 __formal$ = 8
 ?registerConverter@?$IsPair@PEAVwsimulation@@@QtPrivate@@SA_NH@Z PROC ; QtPrivate::IsPair<wsimulation *>::registerConverter, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 1620
 	mov	DWORD PTR [rsp+8], ecx
 ; Line 1621
@@ -1453,7 +1453,7 @@ _TEXT	ENDS
 _TEXT	SEGMENT
 __formal$ = 8
 ?registerConverter@?$AssociativeContainerConverterHelper@PEAVwsimulation@@$0A@@QtPrivate@@SA_NH@Z PROC ; QtPrivate::AssociativeContainerConverterHelper<wsimulation *,0>::registerConverter, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 1567
 	mov	DWORD PTR [rsp+8], ecx
 ; Line 1568
@@ -1467,7 +1467,7 @@ _TEXT	ENDS
 _TEXT	SEGMENT
 __formal$ = 8
 ?registerConverter@?$SequentialContainerConverterHelper@PEAVwsimulation@@$0A@@QtPrivate@@SA_NH@Z PROC ; QtPrivate::SequentialContainerConverterHelper<wsimulation *,0>::registerConverter, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 1544
 	mov	DWORD PTR [rsp+8], ecx
 ; Line 1545
@@ -1480,7 +1480,7 @@ _TEXT	ENDS
 ;	COMDAT ?value@?$MetaObjectForType@PEAVwsimulation@@X@QtPrivate@@SAPEBUQMetaObject@@XZ
 _TEXT	SEGMENT
 ?value@?$MetaObjectForType@PEAVwsimulation@@X@QtPrivate@@SAPEBUQMetaObject@@XZ PROC ; QtPrivate::MetaObjectForType<wsimulation *,void>::value, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 1476
 	lea	rax, OFFSET FLAT:?staticMetaObject@wsimulation@@2UQMetaObject@@B ; wsimulation::staticMetaObject
 	ret	0
@@ -1494,7 +1494,7 @@ $T2 = 40
 where$ = 64
 t$ = 72
 ?Construct@?$QMetaTypeFunctionHelper@PEAVwsimulation@@$00@QtMetaTypePrivate@@SAPEAXPEAXPEBX@Z PROC ; QtMetaTypePrivate::QMetaTypeFunctionHelper<wsimulation *,1>::Construct, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 802
 $LN4:
 	mov	QWORD PTR [rsp+16], rdx
@@ -1532,7 +1532,7 @@ _TEXT	ENDS
 _TEXT	SEGMENT
 t$ = 8
 ?Destruct@?$QMetaTypeFunctionHelper@PEAVwsimulation@@$00@QtMetaTypePrivate@@SAXPEAX@Z PROC ; QtMetaTypePrivate::QMetaTypeFunctionHelper<wsimulation *,1>::Destruct, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 796
 	mov	QWORD PTR [rsp+8], rcx
 ; Line 799
@@ -1543,7 +1543,7 @@ _TEXT	ENDS
 ;	COMDAT ?qt_metatype_id@?$QMetaTypeIdHelper@PEAVwsimulation@@$00@QtPrivate@@SAHXZ
 _TEXT	SEGMENT
 ?qt_metatype_id@?$QMetaTypeIdHelper@PEAVwsimulation@@$00@QtPrivate@@SAHXZ PROC ; QtPrivate::QMetaTypeIdHelper<wsimulation *,1>::qt_metatype_id, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 1675
 $LN3:
 	sub	rsp, 40					; 00000028H
@@ -1557,7 +1557,7 @@ _TEXT	ENDS
 _TEXT	SEGMENT
 __formal$ = 8
 ?registerConverter@?$MetaTypeSmartPointerHelper@PEAVwpointmass@@X@QtPrivate@@SA_NH@Z PROC ; QtPrivate::MetaTypeSmartPointerHelper<wpointmass *,void>::registerConverter, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 1635
 	mov	DWORD PTR [rsp+8], ecx
 	xor	al, al
@@ -1569,7 +1569,7 @@ _TEXT	ENDS
 _TEXT	SEGMENT
 __formal$ = 8
 ?registerConverter@?$IsPair@PEAVwpointmass@@@QtPrivate@@SA_NH@Z PROC ; QtPrivate::IsPair<wpointmass *>::registerConverter, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 1620
 	mov	DWORD PTR [rsp+8], ecx
 ; Line 1621
@@ -1583,7 +1583,7 @@ _TEXT	ENDS
 _TEXT	SEGMENT
 __formal$ = 8
 ?registerConverter@?$AssociativeContainerConverterHelper@PEAVwpointmass@@$0A@@QtPrivate@@SA_NH@Z PROC ; QtPrivate::AssociativeContainerConverterHelper<wpointmass *,0>::registerConverter, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 1567
 	mov	DWORD PTR [rsp+8], ecx
 ; Line 1568
@@ -1597,7 +1597,7 @@ _TEXT	ENDS
 _TEXT	SEGMENT
 __formal$ = 8
 ?registerConverter@?$SequentialContainerConverterHelper@PEAVwpointmass@@$0A@@QtPrivate@@SA_NH@Z PROC ; QtPrivate::SequentialContainerConverterHelper<wpointmass *,0>::registerConverter, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 1544
 	mov	DWORD PTR [rsp+8], ecx
 ; Line 1545
@@ -1610,7 +1610,7 @@ _TEXT	ENDS
 ;	COMDAT ?value@?$MetaObjectForType@PEAVwpointmass@@X@QtPrivate@@SAPEBUQMetaObject@@XZ
 _TEXT	SEGMENT
 ?value@?$MetaObjectForType@PEAVwpointmass@@X@QtPrivate@@SAPEBUQMetaObject@@XZ PROC ; QtPrivate::MetaObjectForType<wpointmass *,void>::value, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 1476
 	lea	rax, OFFSET FLAT:?staticMetaObject@wpointmass@@2UQMetaObject@@B ; wpointmass::staticMetaObject
 	ret	0
@@ -1624,7 +1624,7 @@ $T2 = 40
 where$ = 64
 t$ = 72
 ?Construct@?$QMetaTypeFunctionHelper@PEAVwpointmass@@$00@QtMetaTypePrivate@@SAPEAXPEAXPEBX@Z PROC ; QtMetaTypePrivate::QMetaTypeFunctionHelper<wpointmass *,1>::Construct, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 802
 $LN4:
 	mov	QWORD PTR [rsp+16], rdx
@@ -1662,7 +1662,7 @@ _TEXT	ENDS
 _TEXT	SEGMENT
 t$ = 8
 ?Destruct@?$QMetaTypeFunctionHelper@PEAVwpointmass@@$00@QtMetaTypePrivate@@SAXPEAX@Z PROC ; QtMetaTypePrivate::QMetaTypeFunctionHelper<wpointmass *,1>::Destruct, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 796
 	mov	QWORD PTR [rsp+8], rcx
 ; Line 799
@@ -1673,7 +1673,7 @@ _TEXT	ENDS
 ;	COMDAT ?qt_metatype_id@?$QMetaTypeIdHelper@PEAVwpointmass@@$00@QtPrivate@@SAHXZ
 _TEXT	SEGMENT
 ?qt_metatype_id@?$QMetaTypeIdHelper@PEAVwpointmass@@$00@QtPrivate@@SAHXZ PROC ; QtPrivate::QMetaTypeIdHelper<wpointmass *,1>::qt_metatype_id, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 1675
 $LN3:
 	sub	rsp, 40					; 00000028H
@@ -1687,7 +1687,7 @@ _TEXT	ENDS
 _TEXT	SEGMENT
 __formal$ = 8
 ?registerConverter@?$MetaTypeSmartPointerHelper@PEAVwresult@@X@QtPrivate@@SA_NH@Z PROC ; QtPrivate::MetaTypeSmartPointerHelper<wresult *,void>::registerConverter, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 1635
 	mov	DWORD PTR [rsp+8], ecx
 	xor	al, al
@@ -1699,7 +1699,7 @@ _TEXT	ENDS
 _TEXT	SEGMENT
 __formal$ = 8
 ?registerConverter@?$IsPair@PEAVwresult@@@QtPrivate@@SA_NH@Z PROC ; QtPrivate::IsPair<wresult *>::registerConverter, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 1620
 	mov	DWORD PTR [rsp+8], ecx
 ; Line 1621
@@ -1713,7 +1713,7 @@ _TEXT	ENDS
 _TEXT	SEGMENT
 __formal$ = 8
 ?registerConverter@?$AssociativeContainerConverterHelper@PEAVwresult@@$0A@@QtPrivate@@SA_NH@Z PROC ; QtPrivate::AssociativeContainerConverterHelper<wresult *,0>::registerConverter, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 1567
 	mov	DWORD PTR [rsp+8], ecx
 ; Line 1568
@@ -1727,7 +1727,7 @@ _TEXT	ENDS
 _TEXT	SEGMENT
 __formal$ = 8
 ?registerConverter@?$SequentialContainerConverterHelper@PEAVwresult@@$0A@@QtPrivate@@SA_NH@Z PROC ; QtPrivate::SequentialContainerConverterHelper<wresult *,0>::registerConverter, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 1544
 	mov	DWORD PTR [rsp+8], ecx
 ; Line 1545
@@ -1740,7 +1740,7 @@ _TEXT	ENDS
 ;	COMDAT ?value@?$MetaObjectForType@PEAVwresult@@X@QtPrivate@@SAPEBUQMetaObject@@XZ
 _TEXT	SEGMENT
 ?value@?$MetaObjectForType@PEAVwresult@@X@QtPrivate@@SAPEBUQMetaObject@@XZ PROC ; QtPrivate::MetaObjectForType<wresult *,void>::value, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 1476
 	lea	rax, OFFSET FLAT:?staticMetaObject@wresult@@2UQMetaObject@@B ; wresult::staticMetaObject
 	ret	0
@@ -1754,7 +1754,7 @@ $T2 = 40
 where$ = 64
 t$ = 72
 ?Construct@?$QMetaTypeFunctionHelper@PEAVwresult@@$00@QtMetaTypePrivate@@SAPEAXPEAXPEBX@Z PROC ; QtMetaTypePrivate::QMetaTypeFunctionHelper<wresult *,1>::Construct, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 802
 $LN4:
 	mov	QWORD PTR [rsp+16], rdx
@@ -1792,7 +1792,7 @@ _TEXT	ENDS
 _TEXT	SEGMENT
 t$ = 8
 ?Destruct@?$QMetaTypeFunctionHelper@PEAVwresult@@$00@QtMetaTypePrivate@@SAXPEAX@Z PROC ; QtMetaTypePrivate::QMetaTypeFunctionHelper<wresult *,1>::Destruct, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 796
 	mov	QWORD PTR [rsp+8], rcx
 ; Line 799
@@ -1803,7 +1803,7 @@ _TEXT	ENDS
 ;	COMDAT ?qt_metatype_id@?$QMetaTypeIdHelper@PEAVwresult@@$00@QtPrivate@@SAHXZ
 _TEXT	SEGMENT
 ?qt_metatype_id@?$QMetaTypeIdHelper@PEAVwresult@@$00@QtPrivate@@SAHXZ PROC ; QtPrivate::QMetaTypeIdHelper<wresult *,1>::qt_metatype_id, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 1675
 $LN3:
 	sub	rsp, 40					; 00000028H
@@ -1827,7 +1827,7 @@ normalizedTypeName$ = 112
 dummy$ = 120
 defined$ = 128
 ??$qRegisterNormalizedMetaType@PEAVwsimulation@@@@YAHAEBVQByteArray@@PEAPEAVwsimulation@@W4DefinedType@?$MetaTypeDefinedHelper@PEAVwsimulation@@$00@QtPrivate@@@Z PROC ; qRegisterNormalizedMetaType<wsimulation *>, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 1734
 $LN11:
 	mov	DWORD PTR [rsp+24], r8d
@@ -1850,9 +1850,9 @@ $LN11:
 	jmp	SHORT $LN7@qRegisterN
 $LN6@qRegisterN:
 	mov	r9d, 1736				; 000006c8H
-	lea	r8, OFFSET FLAT:$SG176223
-	lea	rdx, OFFSET FLAT:$SG176224
-	lea	rcx, OFFSET FLAT:$SG176225
+	lea	r8, OFFSET FLAT:$SG176226
+	lea	rdx, OFFSET FLAT:$SG176227
+	lea	rcx, OFFSET FLAT:$SG176228
 	call	QWORD PTR __imp_?qt_assert_x@@YAXPEBD00H@Z
 $LN7@qRegisterN:
 	lea	rcx, QWORD PTR $T2[rsp]
@@ -1944,7 +1944,7 @@ normalizedTypeName$ = 112
 dummy$ = 120
 defined$ = 128
 ??$qRegisterNormalizedMetaType@PEAVwpointmass@@@@YAHAEBVQByteArray@@PEAPEAVwpointmass@@W4DefinedType@?$MetaTypeDefinedHelper@PEAVwpointmass@@$00@QtPrivate@@@Z PROC ; qRegisterNormalizedMetaType<wpointmass *>, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 1734
 $LN11:
 	mov	DWORD PTR [rsp+24], r8d
@@ -1967,9 +1967,9 @@ $LN11:
 	jmp	SHORT $LN7@qRegisterN
 $LN6@qRegisterN:
 	mov	r9d, 1736				; 000006c8H
-	lea	r8, OFFSET FLAT:$SG175906
-	lea	rdx, OFFSET FLAT:$SG175907
-	lea	rcx, OFFSET FLAT:$SG175908
+	lea	r8, OFFSET FLAT:$SG175909
+	lea	rdx, OFFSET FLAT:$SG175910
+	lea	rcx, OFFSET FLAT:$SG175911
 	call	QWORD PTR __imp_?qt_assert_x@@YAXPEBD00H@Z
 $LN7@qRegisterN:
 	lea	rcx, QWORD PTR $T2[rsp]
@@ -2061,7 +2061,7 @@ normalizedTypeName$ = 112
 dummy$ = 120
 defined$ = 128
 ??$qRegisterNormalizedMetaType@PEAVwresult@@@@YAHAEBVQByteArray@@PEAPEAVwresult@@W4DefinedType@?$MetaTypeDefinedHelper@PEAVwresult@@$00@QtPrivate@@@Z PROC ; qRegisterNormalizedMetaType<wresult *>, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 1734
 $LN11:
 	mov	DWORD PTR [rsp+24], r8d
@@ -2084,9 +2084,9 @@ $LN11:
 	jmp	SHORT $LN7@qRegisterN
 $LN6@qRegisterN:
 	mov	r9d, 1736				; 000006c8H
-	lea	r8, OFFSET FLAT:$SG175589
-	lea	rdx, OFFSET FLAT:$SG175590
-	lea	rcx, OFFSET FLAT:$SG175591
+	lea	r8, OFFSET FLAT:$SG175592
+	lea	rdx, OFFSET FLAT:$SG175593
+	lea	rcx, OFFSET FLAT:$SG175594
 	call	QWORD PTR __imp_?qt_assert_x@@YAXPEBD00H@Z
 $LN7@qRegisterN:
 	lea	rcx, QWORD PTR $T2[rsp]
@@ -2167,7 +2167,7 @@ _TEXT	ENDS
 ;	COMDAT ?qt_metatype_id@?$QMetaTypeId2@PEAVwresult@@@@SAHXZ
 _TEXT	SEGMENT
 ?qt_metatype_id@?$QMetaTypeId2@PEAVwresult@@@@SAHXZ PROC ; QMetaTypeId2<wresult *>::qt_metatype_id, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 1662
 $LN3:
 	sub	rsp, 40					; 00000028H
@@ -2186,7 +2186,7 @@ typeName$ = 48
 cName$ = 56
 $T3 = 64
 ?qt_metatype_id@?$QMetaTypeIdQObject@PEAVwresult@@$07@@SAHXZ PROC ; QMetaTypeIdQObject<wresult *,8>::qt_metatype_id, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 1828
 $LN6:
 	sub	rsp, 88					; 00000058H
@@ -2307,7 +2307,7 @@ text$x	ENDS
 ;	COMDAT ?qt_metatype_id@?$QMetaTypeId2@PEAVwpointmass@@@@SAHXZ
 _TEXT	SEGMENT
 ?qt_metatype_id@?$QMetaTypeId2@PEAVwpointmass@@@@SAHXZ PROC ; QMetaTypeId2<wpointmass *>::qt_metatype_id, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 1662
 $LN3:
 	sub	rsp, 40					; 00000028H
@@ -2326,7 +2326,7 @@ typeName$ = 48
 cName$ = 56
 $T3 = 64
 ?qt_metatype_id@?$QMetaTypeIdQObject@PEAVwpointmass@@$07@@SAHXZ PROC ; QMetaTypeIdQObject<wpointmass *,8>::qt_metatype_id, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 1828
 $LN6:
 	sub	rsp, 88					; 00000058H
@@ -2447,7 +2447,7 @@ text$x	ENDS
 ;	COMDAT ?qt_metatype_id@?$QMetaTypeId2@PEAVwsimulation@@@@SAHXZ
 _TEXT	SEGMENT
 ?qt_metatype_id@?$QMetaTypeId2@PEAVwsimulation@@@@SAHXZ PROC ; QMetaTypeId2<wsimulation *>::qt_metatype_id, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 1662
 $LN3:
 	sub	rsp, 40					; 00000028H
@@ -2466,7 +2466,7 @@ typeName$ = 48
 cName$ = 56
 $T3 = 64
 ?qt_metatype_id@?$QMetaTypeIdQObject@PEAVwsimulation@@$07@@SAHXZ PROC ; QMetaTypeIdQObject<wsimulation *,8>::qt_metatype_id, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 1828
 $LN6:
 	sub	rsp, 88					; 00000058H
@@ -2587,7 +2587,7 @@ text$x	ENDS
 ;	COMDAT ??$qMetaTypeId@PEAVwresult@@@@YAHXZ
 _TEXT	SEGMENT
 ??$qMetaTypeId@PEAVwresult@@@@YAHXZ PROC		; qMetaTypeId<wresult *>, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 1796
 $LN3:
 	sub	rsp, 40					; 00000028H
@@ -2602,7 +2602,7 @@ _TEXT	ENDS
 ;	COMDAT ??$qMetaTypeId@PEAVwpointmass@@@@YAHXZ
 _TEXT	SEGMENT
 ??$qMetaTypeId@PEAVwpointmass@@@@YAHXZ PROC		; qMetaTypeId<wpointmass *>, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 1796
 $LN3:
 	sub	rsp, 40					; 00000028H
@@ -2617,7 +2617,7 @@ _TEXT	ENDS
 ;	COMDAT ??$qMetaTypeId@PEAVwsimulation@@@@YAHXZ
 _TEXT	SEGMENT
 ??$qMetaTypeId@PEAVwsimulation@@@@YAHXZ PROC		; qMetaTypeId<wsimulation *>, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 1796
 $LN3:
 	sub	rsp, 40					; 00000028H
@@ -2633,7 +2633,7 @@ _TEXT	ENDS
 _TEXT	SEGMENT
 _q_value$ = 48
 ??$loadAcquire@H@?$QAtomicOps@H@@SAHAEBU?$atomic@H@std@@@Z PROC ; QAtomicOps<int>::loadAcquire<int>, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qatomic_cxx11.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qatomic_cxx11.h
 ; Line 238
 $LN3:
 	mov	QWORD PTR [rsp+8], rcx
@@ -2653,7 +2653,7 @@ _TEXT	SEGMENT
 _q_value$ = 48
 newValue$ = 56
 ??$storeRelease@H@?$QAtomicOps@H@@SAXAEAU?$atomic@H@std@@H@Z PROC ; QAtomicOps<int>::storeRelease<int>, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qatomic_cxx11.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qatomic_cxx11.h
 ; Line 256
 $LN3:
 	mov	DWORD PTR [rsp+16], edx
@@ -2697,7 +2697,7 @@ text$di	ENDS
 ;	COMDAT ??$qRegisterMetaType@PEAVwresult@@@@YAHXZ
 _TEXT	SEGMENT
 ??$qRegisterMetaType@PEAVwresult@@@@YAHXZ PROC		; qRegisterMetaType<wresult *>, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 1803
 $LN3:
 	sub	rsp, 40					; 00000028H
@@ -2712,7 +2712,7 @@ _TEXT	ENDS
 ;	COMDAT ??$qRegisterMetaType@PEAVwpointmass@@@@YAHXZ
 _TEXT	SEGMENT
 ??$qRegisterMetaType@PEAVwpointmass@@@@YAHXZ PROC	; qRegisterMetaType<wpointmass *>, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 1803
 $LN3:
 	sub	rsp, 40					; 00000028H
@@ -2727,7 +2727,7 @@ _TEXT	ENDS
 ;	COMDAT ??$qRegisterMetaType@PEAVwsimulation@@@@YAHXZ
 _TEXT	SEGMENT
 ??$qRegisterMetaType@PEAVwsimulation@@@@YAHXZ PROC	; qRegisterMetaType<wsimulation *>, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qmetatype.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qmetatype.h
 ; Line 1803
 $LN3:
 	sub	rsp, 40					; 00000028H
@@ -3578,7 +3578,7 @@ $LN2@qt_metacas:
 	jmp	SHORT $LN1@qt_metacas
 $LN3@qt_metacas:
 ; Line 115
-	lea	rdx, OFFSET FLAT:$SG154955
+	lea	rdx, OFFSET FLAT:$SG154958
 	mov	rcx, QWORD PTR _clname$[rsp]
 	call	strcmp
 	test	eax, eax
@@ -3646,7 +3646,7 @@ _TEXT	ENDS
 _TEXT	SEGMENT
 this$ = 8
 ??C?$QScopedPointer@VQObjectData@@U?$QScopedPointerDeleter@VQObjectData@@@@@@QEBAPEAVQObjectData@@XZ PROC ; QScopedPointer<QObjectData,QScopedPointerDeleter<QObjectData> >::operator->, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qscopedpointer.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qscopedpointer.h
 ; Line 117
 	mov	QWORD PTR [rsp+8], rcx
 ; Line 118
@@ -3662,7 +3662,7 @@ _TEXT	SEGMENT
 this$ = 8
 other$ = 16
 ??_5?$QFlags@W4TypeFlag@QMetaType@@@@QEAAAEAV0@W4TypeFlag@QMetaType@@@Z PROC ; QFlags<enum QMetaType::TypeFlag>::operator|=, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qflags.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qflags.h
 ; Line 133
 	mov	DWORD PTR [rsp+16], edx
 	mov	QWORD PTR [rsp+8], rcx
@@ -3682,7 +3682,7 @@ _TEXT	SEGMENT
 this$ = 48
 flag$ = 56
 ??0?$QFlags@W4TypeFlag@QMetaType@@@@QEAA@VQFlag@@@Z PROC ; QFlags<enum QMetaType::TypeFlag>::QFlags<enum QMetaType::TypeFlag>, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qflags.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qflags.h
 ; Line 122
 $LN3:
 	mov	DWORD PTR [rsp+16], edx
@@ -3708,7 +3708,7 @@ $T1 = 56
 a1$ = 80
 a2$ = 88
 ??8@YA_NAEBVQByteArray@@0@Z PROC			; operator==, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qbytearray.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qbytearray.h
 ; Line 621
 $LN5:
 	mov	QWORD PTR [rsp+16], rdx
@@ -3762,7 +3762,7 @@ _TEXT	SEGMENT
 this$ = 48
 value$ = 56
 ??0?$QBasicAtomicInteger@H@@QEAA@H@Z PROC		; QBasicAtomicInteger<int>::QBasicAtomicInteger<int>, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qbasicatomic.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qbasicatomic.h
 ; Line 221
 $LN3:
 	mov	DWORD PTR [rsp+16], edx
@@ -3783,7 +3783,7 @@ _TEXT	SEGMENT
 this$ = 48
 newValue$ = 56
 ?storeRelease@?$QBasicAtomicInteger@H@@QEAAXH@Z PROC	; QBasicAtomicInteger<int>::storeRelease, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qbasicatomic.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qbasicatomic.h
 ; Line 107
 $LN3:
 	mov	DWORD PTR [rsp+16], edx
@@ -3802,7 +3802,7 @@ _TEXT	ENDS
 _TEXT	SEGMENT
 this$ = 48
 ?loadAcquire@?$QBasicAtomicInteger@H@@QEBAHXZ PROC	; QBasicAtomicInteger<int>::loadAcquire, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qbasicatomic.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qbasicatomic.h
 ; Line 106
 $LN3:
 	mov	QWORD PTR [rsp+8], rcx
@@ -4203,7 +4203,7 @@ _TEXT	ENDS
 _TEXT	SEGMENT
 this$ = 8
 ??BQFlag@@QEBAHXZ PROC					; QFlag::operator int, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qflags.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qflags.h
 ; Line 58
 	mov	QWORD PTR [rsp+8], rcx
 	mov	rax, QWORD PTR this$[rsp]
@@ -4217,7 +4217,7 @@ _TEXT	SEGMENT
 this$ = 8
 value$ = 16
 ??0QFlag@@QEAA@H@Z PROC					; QFlag::QFlag, COMDAT
-; File c:\qt\5.12.3\msvc2017_64\include\qtcore\qflags.h
+; File c:\qt\5.12.6\msvc2017_64\include\qtcore\qflags.h
 ; Line 57
 	mov	DWORD PTR [rsp+16], edx
 	mov	QWORD PTR [rsp+8], rcx
