@@ -168,36 +168,20 @@ __global__ void vv_update_position_cluster_kernel(
 		seach += xc.neach;
 		sbegin += xc.count * xc.neach;
 	}
-	//unsigned int cid = id / neach;
 	double4 cp = cpos[id];
-//	double4 cep = ep[id];
 	double4 w = ev[id];
 	double4 wd = ea[id];
 	double3 old_p = make_double3(cp.x, cp.y, cp.z);
 	double3 new_p = old_p + cte.dt * vel[id] + cte.half2dt * acc[id];
 	cpos[id] = make_double4(new_p.x, new_p.y, new_p.z, cp.w);
-	/*double4 ev = make_double4(
-		-cep.y * w.x - cep.z * w.y - cep.w * w.z,
-		cep.x * w.x + cep.w * w.y - cep.z * w.z,
-		-cep.w * w.x + cep.x * w.y + cep.y * w.z,
-		cep.z * w.x - cep.y * w.y + cep.x * w.z
-	);
-	double4 Lpwd = make_double4(
-		-cep.y * wd.x - cep.z * wd.y - cep.w * wd.z,
-		cep.x * wd.x + cep.w * wd.y - cep.z * wd.z,
-		-cep.w * wd.x + cep.x * wd.y + cep.y * wd.z,
-		cep.z * wd.x - cep.y * wd.y + cep.x * wd.z
-	);
-	double4 ea = 0.5 * Lpwd - 0.25 * dot(w, w) * cep;*/
+
 	double4 new_ep = ep[id] + cte.dt * w + cte.half2dt * wd;
 	new_ep = normalize(new_ep);
 	ep[id] = new_ep;
-	//printf("po : %.16f, %.16f, %.16f\n", new_p.x, new_p.y, new_p.z);
-	//printf("ep : %.16f, %.16f, %.16f, %.16f\n", new_ep.x, new_ep.y, new_ep.z, new_ep.w);
+
 	unsigned int sid = sbegin + id * neach;
 	for (unsigned int j = 0; j < neach; j++)
 	{
-		//unsigned int cid = id * 3;
 		double3 m_pos = new_p + toGlobal(rloc[seach + j], new_ep);
 		pos[sid + j] = make_double4(m_pos.x, m_pos.y, m_pos.z, pos[sid + j].w);
 	}
@@ -220,20 +204,12 @@ __global__ void vv_update_velocity_kernel(
 		return;
 	double m = mass[id];
 	double3 v = vel[id];
-	//double3 L = acc[id];
 	double4 e = ep[id];
 	double4 av = ev[id];
-	//double3 aa = alpha[id];
 	double3 a = (1.0 / m) * (force[id] + m * cte.gravity);
-	double3 J = iner[id];// make_double3(0, 0, 0);
+	double3 J = iner[id];
 	double3 n_prime = toLocal(moment[id], e);
 	double4 m_ea = calculate_uceom(J, e, av, n_prime);
-	/*if (id == 0)
-	{
-		printf("[%d] force : [%e, %e, %e], moment : [%e, %e, %e], m_ea : [%e, %e, %e, %e]\n", id, force[id].x, force[id].y, force[id].z, moment[id].x, moment[id].y, moment[id].z, m_ea.x, m_ea.y, m_ea.z, m_ea.w);
-	}*/
-	//printf("[%d] m_force : [%e, %e, %e]\n", id, force[id].x, force[id].y, force[id].z);
-	v += 0.5 * cte.dt * (acc[id] + a);
 	av = av + 0.5 * cte.dt * (ea[id] + m_ea);
 	force[id] = make_double3(0.0, 0.0, 0.0); 
 	moment[id] = make_double3(0.0, 0.0, 0.0);
@@ -241,7 +217,6 @@ __global__ void vv_update_velocity_kernel(
 	ev[id] = av;
 	acc[id] = a;
 	ea[id] = m_ea;
-	//printf("[%d] velocity : [%e, %e, %e], ang. velocity : [%e, %e, %e]\n", id, v.x, v.y, v.z, av.x, av.y, av.z);
 }
 
 __global__ void vv_update_cluster_velocity_kernel(
@@ -276,7 +251,6 @@ __global__ void vv_update_cluster_velocity_kernel(
 		seach += xc.neach;
 		sbegin += xc.count * xc.neach;
 	}
-	//double4 cp = cpos[id];
 	double m = mass[id];
 	double3 v = vel[id];
 	double3 a = acc[id];
@@ -284,14 +258,11 @@ __global__ void vv_update_cluster_velocity_kernel(
 	double4 aa = ea[id];
 	double4 e = ep[id];
 	double inv_m = 1.0 / m;
-	//double3 in = (1.0 / iner[id]) * moment[id];
 	double3 in = iner[id];
 	double3 F = make_double3(0, 0, 0);
 	double3 T = make_double3(0, 0, 0);
 	unsigned int sid = sbegin + id * neach;
-	for (unsigned int j = 0; j < neach; j++)
-	{
-		//double3 _F = ;
+	for (unsigned int j = 0; j < neach; j++){
 		F += force[sid + j];
 		T += moment[sid + j];
 		force[sid + j] = make_double3(0, 0, 0);
@@ -322,8 +293,6 @@ __global__ void calculateHashAndIndex_kernel(
 
 	int3 gridPos = calcGridPos(make_double3(p.x, p.y, p.z));
 	unsigned _hash = calcGridHash(gridPos);
-	//if(_hash >= cte.ncell)
-	//printf("%d hash number : %d\n",sid + id, _hash);
 	hash[sid + id] = _hash;
 	index[sid + id] = sid + id;
 }
@@ -351,10 +320,7 @@ __global__ void reorderDataAndFindCellStart_kernel(
 {
 	extern __shared__ uint sharedHash[];	//blockSize + 1 elements
 	unsigned id = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
-
 	unsigned _hash;
-
-	//unsigned int tnp = ;// cte.np + cte.nsphere;
 
 	if (id < np)
 	{
@@ -412,53 +378,9 @@ __device__ device_force_constant getConstant(
 	dfc.mu = fric;
 	dfc.mu_s = s_fric;
 	dfc.ms = rfric;
-	//printf("eq_m = %e\n", dfc.eq_m);
-	//printf("eq_r = %e\n", dfc.eq_r);
-	//printf("kn = %e\n", dfc.kn);
-	//printf("vn = %e\n", dfc.vn);
-	//printf("ks = %e\n", dfc.ks);
-	//printf("vs = %e\n", dfc.vs);
-	//printf("mu = %e\n", dfc.mu);
-	//printf("mu_s = %e\n", dfc.mu_s);
-	//printf("ms = %e\n", dfc.ms);
-	//switch (tcm)
-	//{
-	//case 0: {
-	//	double Geq = (iG * jG) / (iG*(2 - jp) + jG * (2 - ip));
-	//	double ln_e = log(rest);
-	//	double xi = ln_e / sqrt(ln_e * ln_e + M_PI * M_PI);
-	//	dfc.kn = (4.0 / 3.0) * Eeq * sqrt(Req);
-	//	dfc.vn = -2.0 * sqrt(5.0 / 6.0) * xi * sqrt(dfc.kn * Meq);
-	//	dfc.ks = 8.0 * Geq * sqrt(Req);
-	//	dfc.vs = -2.0 * sqrt(5.0 / 6.0) * xi * sqrt(dfc.ks * Meq);
-	//	dfc.mu = fric;
-	//	dfc.mu_s = s_fric;
-	//	dfc.ms = rfric;
-	//	break;
-	//}
-	//case 1: {
-	//	//printf("rest : %f, Meq : %f", rest, Meq);
-	//	double beta = (M_PI / log(rest));
-	//	dfc.kn = (4.0 / 3.0) * Eeq * sqrt(Req);
-	//	dfc.vn = sqrt((4.0 * Meq * dfc.kn) / (1.0 + beta * beta));
-	//	dfc.ks = dfc.kn * sratio;
-	//	dfc.vs = dfc.vn * sratio;
-	//	dfc.mu = fric;
-	//	dfc.mu_s = s_fric;
-	//	dfc.ms = rfric;
-	//	break;
-	//}
-	//}
-
-	// 	dfc.kn = /*(16.f / 15.f)*sqrt(er) * eym * pow((T)((15.f * em * 1.0f) / (16.f * sqrt(er) * eym)), (T)0.2f);*/ (4.0f / 3.0f)*sqrt(er)*eym;
-	// 	dfc.vn = sqrt((4.0f*em * dfc.kn) / (1 + beta * beta));
-	// 	dfc.ks = dfc.kn * ratio;
-	// 	dfc.vs = dfc.vn * ratio;
-	// 	dfc.mu = fric;
 	return dfc;
 }
 
-// ref. Three-dimensional discrete element modelling (DEM) of tillage: Accounting for soil cohesion and adhesion
 __device__ double cohesionForce(
 	double ri,
 	double rj,
@@ -471,8 +393,8 @@ __device__ double cohesionForce(
 {
 	double cf = 0.0;
 	if (coh) {
-		double Req = rj ? (ri * rj) / (ri + rj) : ri/*(ri * ri) / (ri + ri)*/;
-		double Eeq = 1.0 / (((1.0 - pri * pri) / Ei) + ((1.0 - prj * prj) / Ej));// (Ei * Ej) / (Ei*(1.0 - prj * prj) + Ej * (1.0 - pri * pri));
+		double Req = rj ? (ri * rj) / (ri + rj) : ri;
+		double Eeq = 1.0 / (((1.0 - pri * pri) / Ei) + ((1.0 - prj * prj) / Ej));
 		double c0 = 3.0 * coh * M_PI * Req;
 		double eq = 2.0 * c0 * Fn + c0 * c0;
 		if (eq <= 0)
@@ -508,14 +430,9 @@ __device__ void HMCModel(
 	double cdist, double3 iomega, double& _ds, double& dots,
 	double3 dv, double3 unit, double3& Ft, double3& Fn)
 {
-	// 	if (coh && cdist < 1.0E-8)
-	// 		return;
-
 	double fsn = -c.kn * pow(cdist, 1.5);
 	double fdn = c.vn * dot(dv, unit);
 	double fca = -cohesionForce(ir, jr, Ei, Ej, pri, prj, coh, fsn + fdn);
-	// 	if ((fsn + fca + fdn) < 0 && ir)
-	// 		return;
 	Fn = (fsn + fca + fdn) * unit;
 	double3 e = dv - dot(dv, unit) * unit;
 	double mag_e = length(e);
@@ -533,7 +450,7 @@ __device__ void HMCModel(
 __device__ void DHSModel(
 	device_force_constant c, double ir, double jr, double Ei, double Ej, double pri, double prj, double coh,
 	double cdist, double3 iomega, double& _ds, double& dots,
-	double3 dv, double3 unit, double3& Ft, double3& Fn/*, double3& M*/)
+	double3 dv, double3 unit, double3& Ft, double3& Fn)
 {
 	double fsn = -c.kn * pow(cdist, 1.5);
 	double fdn = c.vn * dot(dv, unit);
@@ -684,9 +601,6 @@ __global__ void calcluate_clusters_contact_kernel(
 	}
 	force[id] += sumF;
 	moment[id] += sumM;
-	/*if (new_count - sid > MAX_P2P_COUNT)
-		printf("The total of contact with other particle is over(%d)\n.", new_count - sid);*/
-
 	pair_count[id] = new_count - sid;
 	tmax[id] += tma;
 	rres[id] += res;
@@ -803,10 +717,7 @@ __global__ void calculate_p2p_kernel(
 			}
 		}
 	}
-	//printf("[%d]particle forces : [%e, %e, %e]\n", id, sumF.x, sumF.y, sumF.z);
-	//printf("[%d]particle moment : [%e, %e, %e]\n", id, sumM.x, sumM.y, sumM.z);
 	force[id] += sumF;
-
 	moment[id] += sumM;
 	//printf("new_count, sid - %d, %d", new_count - sid);
 	if (new_count - sid > MAX_P2P_COUNT)
@@ -826,12 +737,6 @@ __device__ double particle_plane_contact_detection(
 	double sqb = wp.y * wp.y;
 	double sqc = wp.z * wp.z;
 	double sqr = r * r;
-
-	//double h = 0;
-	//if (abs(wp.z) < 1.5 * r && (wp.x > 0 && wp.x < pe->l1) && (wp.y > 0 && wp.y < pe->l2)) {
-		
-///	}
-
 	if (wp.x < 0 && wp.y < 0 && (sqa + sqb + sqc) < sqr) {
 		double3 Xsw = xp - pe->xw;
 		double h = length(Xsw);// .length();
@@ -1000,14 +905,6 @@ __global__ void cluster_plane_contact_kernel(
 		m_force = Fn + Ft;
 		sumF += m_force;
 		sumM += cross(dcpr, m_force);
-		//printf("po : %.16f, %.16f, %.16f\n", ipos3.x, ipos3.y, ipos3.z);
-		//printf("dv : %.16f, %.16f, %.16f\n", dv.x, dv.y, dv.z);
-		//printf("w : %.16f, %.16f, %.16f\n", iomega.x, iomega.y, iomega.z);
-		//printf("dc : %.16f, %.16f, %.16f\n", dcpr.x, dcpr.y, dcpr.z);
-		//printf("ev : %.16f, %.16f, %.16f, %.16f\n", ev[cid].x, ev[cid].y, ev[cid].z, ev[cid].w);
-		/*printf("Fn : %.16f, %.16f, %.16f\n", Fn.x, Fn.y, Fn.z);
-		printf("Ft : %.16f, %.16f, %.16f\n", Ft.x, Ft.y, Ft.z);*/
-		//dbf[id] += -m_force;
 		fx[id] += -m_force.x;
 		fy[id] += -m_force.y;
 		fz[id] += -m_force.z;
@@ -1039,9 +936,6 @@ __global__ void cluster_plane_contact_kernel(
 		pair_id[new_count] = k;
 		new_count++;
 	}
-//	}
-
-	//printf("dbf[%d] : [%e, %e, %e]\n", id, dbf[id].x, dbf[id].y, dbf[id].z);
 	force[id] += sumF;
 	moment[id] += sumM;
 	pair_count[id] = new_count - id * 3;

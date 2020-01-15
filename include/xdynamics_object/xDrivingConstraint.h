@@ -62,8 +62,8 @@ private:
 	//QString name;
 
 	//unsigned int n;
-	unsigned int n_rev;
-	unsigned int dn_rev;
+	int n_rev;
+	int dn_rev;
 	unsigned int srow;
 	//unsigned int nr_part;
 	xKinematicConstraint* kconst;

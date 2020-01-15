@@ -533,7 +533,7 @@ void xUtilityFunctions::DeleteFileByEXT(std::string path, std::string ext)
 	//}
 }
 
-double xUtilityFunctions::RelativeAngle(int udrl, double theta, unsigned int& n_rev, vector3d& gi, vector3d& fi, vector3d& fj)
+double xUtilityFunctions::RelativeAngle(int udrl, double theta, int& n_rev, vector3d& gi, vector3d& fi, vector3d& fj)
 {
 	double df = dot(fi, fj);
 	double dg = dot(gi, fj);
@@ -555,6 +555,9 @@ double xUtilityFunctions::RelativeAngle(int udrl, double theta, unsigned int& n_
 	else if ((df > 0.8 && df < 1.1 && dg < 0) || (df <= 1.1 && df > 0.2 && dg > 0)) { 
 		udrl = DOWN_RIGHT; stheta = 2.0 * M_PI + asin(dg); 
 	}
+
+	if (p_theta >= 0.0 && stheta > 1.5 * M_PI)
+		n_rev--;
 	if (p_theta >= 2.0 * M_PI && stheta < 2.0 * M_PI)
 		n_rev--;
 	if (p_theta > M_PI && p_theta < 2.0 * M_PI && stheta >= 2.0 * M_PI)
