@@ -2358,8 +2358,8 @@ __global__ void cluster_meshes_contact_kernel(
 				cpoint[k], 2, id, dti, cp, dbi, 
 				fx, fy, fz, mx, my, mz,
 				ipos, icpos, ivel, iomega, old_count, p_pair_id, p_tsd, pair_id, tsd, ir, im, sum_force, sum_moment, res, tma, new_count);
-	for (unsigned int i = 0; i < 5; i++)
-		tsd[sid + i] = make_double2(0, 0);
+	/*for (unsigned int i = 0; i < 5; i++)
+		tsd[sid + i] = make_double2(0, 0);*/
 	force[id] += sum_force;
 	moment[id] += sum_moment;
 	///*if (new_count - sid > MAX_P2MS_COUNT)
