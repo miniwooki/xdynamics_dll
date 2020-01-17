@@ -64,7 +64,7 @@ private:
 	double *free_angle;
 
 	int udrl;
-	unsigned int n_rev;
+	int n_rev;
 	double theta;
 	double dtheta;
 	double n;
