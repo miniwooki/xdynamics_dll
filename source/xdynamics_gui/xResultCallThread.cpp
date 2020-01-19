@@ -88,7 +88,7 @@ void xResultCallThread::run()
 				_cpos = new double[ns * 4];
 		}
 		if (VERSION_NUMBER > 1)
-			_mass = new double[ns];
+			_mass = new double[np];
 	//	emit result_call_send_progress(10, "");
 		for(QList<QString>::iterator it = flist.begin(); it != flist.end(); it++)
 		{
@@ -105,7 +105,7 @@ void xResultCallThread::run()
 				fs.read((char*)&_npt, sizeof(unsigned int));
 				fs.read((char*)&_nct, sizeof(unsigned int));
 				if (VERSION_NUMBER > 1)
-					fs.read((char*)_mass, sizeof(double) * ns);
+					fs.read((char*)_mass, sizeof(double) * np);
 				fs.read((char*)_pos, sizeof(double) * np * 4);
 				fs.read((char*)_vel, sizeof(double) * ns * 3);
 				fs.read((char*)_acc, sizeof(double) * ns * 3);

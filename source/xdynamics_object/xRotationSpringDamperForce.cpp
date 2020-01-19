@@ -343,10 +343,20 @@ void xRotationSpringDamperForce::xCalculateForce(const xVectorD& q, const xVecto
 	vector3d fi = Ai * f_i;
 	vector3d fj = Aj * f_j;
 	int _udrl = udrl;
-	theta = xUtilityFunctions::RelativeAngle(udrl, theta, n_rev, gi, fi, fj);
-	dtheta = dot(fj, BMatrix(ei, f_i) * edi) + dot(fi, BMatrix(ej, f_j) * edj);// xUtilityFunctions::DerivativeRelariveAngle(xSimulation::ctime, _udrl, d)
-	dtheta = -asin(dtheta);
-	n = k * (theta + 2 * n_rev * M_PI) + c * dtheta;
+	bool isSin;
+	theta = xUtilityFunctions::RelativeAngle(udrl, theta, n_rev, gi, fi, fj, isSin);
+	double _theta = theta + 2 * n_rev * M_PI;
+	double dsin = sin(_theta);
+	double dcos = cos(_theta);
+	if (isSin) {
+		dtheta = dot(fj, BMatrix(ei, g_i) * edi) + dot(gi, BMatrix(ej, f_j) * edj) / dcos;
+	}
+	else {
+		dtheta = dot(fj, BMatrix(ei, f_i) * edi) + dot(fi, BMatrix(ej, f_j) * edj) / dsin;
+	}
+	// xUtilityFunctions::DerivativeRelariveAngle(xSimulation::ctime, _udrl, d)	
+	//dtheta = dtheta / (isSin ? dcos : dsin);
+	n = k * _theta + c * dtheta;
 	QRi = 2.0 * n * (Gi * h_i);
 	QRj = -2.0 * n * (Gj * h_j);
 

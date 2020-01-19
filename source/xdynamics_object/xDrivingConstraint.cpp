@@ -270,7 +270,8 @@ void xDrivingConstraint::ConstraintJacobian(xSparseD& lhs, xVectorD& q, xVectorD
  		vector3d fi = Ai * kconst->Fi();
  		vector3d fj = Aj * kconst->Fj();
  		vector3d gi = Ai * kconst->Gi();
-		theta = xUtilityFunctions::RelativeAngle(udrl, theta, n_rev, gi, fi, fj);
+		bool isSin;
+		theta = xUtilityFunctions::RelativeAngle(udrl, theta, n_rev, gi, fi, fj, isSin);
 	//	std::cout << "driving angle : " << theta << std::endl;
 		vector4d D1 = kconst->relative_rotation_constraintJacobian_e_i(theta, ei, ej, fj);
 		vector4d D2 = kconst->relative_rotation_constraintJacobian_e_j(theta, ei, ej, fi, gi);
@@ -309,6 +310,7 @@ void xDrivingConstraint::DerivateJacobian(xMatrixD& lhs, xVectorD& q, xVectorD& 
 		vector4d eq_j = kconst->relative_rotation_constraintJacobian_e_j(theta0, ei, ej, Fi, Gi);
 		for (int i = 0; i < 8; i++)
 		{
+			bool isSin;
 			euler_parameters e[2] = { ei, ej };
 			//euler_parameters ej = ej0;
 			*((&e[0].e0) + i) = q0[i];
@@ -318,7 +320,7 @@ void xDrivingConstraint::DerivateJacobian(xMatrixD& lhs, xVectorD& q, xVectorD& 
 			Fi = Ai * kconst->Fi();
 			Fj = Aj * kconst->Fj();
 			Gi = Ai * kconst->Gi();
-			double th = xUtilityFunctions::RelativeAngle(d_udrl, theta, dn_rev, Gi, Fi, Fj);
+			double th = xUtilityFunctions::RelativeAngle(d_udrl, theta, dn_rev, Gi, Fi, Fj, isSin);
 			eqi[i] = kconst->relative_rotation_constraintJacobian_e_i(th, e[0], e[1], Fj);
 			eqj[i] = kconst->relative_rotation_constraintJacobian_e_j(th, e[0], e[1], Fi, Gi);
 		}

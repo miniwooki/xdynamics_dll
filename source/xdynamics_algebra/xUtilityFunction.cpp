@@ -533,7 +533,7 @@ void xUtilityFunctions::DeleteFileByEXT(std::string path, std::string ext)
 	//}
 }
 
-double xUtilityFunctions::RelativeAngle(int udrl, double theta, int& n_rev, vector3d& gi, vector3d& fi, vector3d& fj)
+double xUtilityFunctions::RelativeAngle(int udrl, double theta, int& n_rev, vector3d& gi, vector3d& fi, vector3d& fj, bool& isSin)
 {
 	double df = dot(fi, fj);
 	double dg = dot(gi, fj);
@@ -543,26 +543,31 @@ double xUtilityFunctions::RelativeAngle(int udrl, double theta, int& n_rev, vect
 	double b_deg = b * 180 / M_PI;
 	double stheta = 0.0;
 	double p_theta = theta;
-	if ((df <= 0.2 && df > -0.8) && dg > 0) { 
-		udrl = UP_RIGHT;  stheta = acos(df); 
+
+	if ((df <= 0.2 && df > -0.8) && dg > 0) {
+		udrl = UP_RIGHT;  stheta = acos(df);
+		isSin = false;
 	}
-	else if ((df < -0.8 && df >= -1.1 && dg > 0) || (df > -1.1 && df <= -0.2 && dg < 0)) { 
+	else if ((df < -0.8 && df >= -1.1 && dg > 0) || (df > -1.1 && df <= -0.2 && dg < 0)) {
 		udrl = UP_LEFT; stheta = M_PI - asin(dg);
+		isSin = true;
 	}
-	else if ((df > -0.2 && df <= 0.8) && dg < 0) { 
-		udrl = DOWN_LEFT; stheta = 2.0 * M_PI - acos(df); 
+	else if ((df > -0.2 && df <= 0.8) && dg < 0) {
+		udrl = DOWN_LEFT; stheta = 2.0 * M_PI - acos(df);
+		isSin = false;
 	}
-	else if ((df > 0.8 && df < 1.1 && dg < 0) || (df <= 1.1 && df > 0.2 && dg > 0)) { 
-		udrl = DOWN_RIGHT; stheta = 2.0 * M_PI + asin(dg); 
+	else if ((df > 0.8 && df < 1.1 && dg < 0) || (df <= 1.1 && df > 0.2 && dg > 0)) {
+		udrl = DOWN_RIGHT; stheta = 2.0 * M_PI + asin(dg);
+		isSin = true;
 	}
 
-	if (p_theta >= 0.0 && stheta > 1.5 * M_PI)
+	if ((p_theta < M_PI_2 && p_theta >= 0.0) && (stheta < 2.0 * M_PI && stheta > 1.5 * M_PI))
 		n_rev--;
-	if (p_theta >= 2.0 * M_PI && stheta < 2.0 * M_PI)
+	else if (p_theta >= 2.0 * M_PI && stheta < 2.0 * M_PI)
 		n_rev--;
-	if (p_theta > M_PI && p_theta < 2.0 * M_PI && stheta >= 2.0 * M_PI)
+	else if (p_theta > M_PI && p_theta < 2.0 * M_PI && stheta >= 2.0 * M_PI)
 		n_rev++;
-
+	
 	if (stheta >= 2.0 * M_PI)
 		stheta -= 2.0 * M_PI;
 	//std::cout << "stheta : " << stheta << std::endl;

@@ -155,7 +155,7 @@ int xIntegratorHHT::CorrectionStep(double ct, unsigned int cstep)
 			}
 		}
 		MassJacobian(divalpha * beta * dt * dt);
-		ForceJacobian(gamma * dt, beta * dt * dt);
+		//ForceJacobian(gamma * dt, beta * dt * dt);
 		//ConstructJacobian(beta * dt * dt);
 		for (unsigned int i(0); i < cjaco.NNZ(); i++){
 			lhs(cjaco.ridx[i] + mdim, cjaco.cidx[i]) = lhs(cjaco.cidx[i], cjaco.ridx[i] + mdim) = cjaco.value[i];

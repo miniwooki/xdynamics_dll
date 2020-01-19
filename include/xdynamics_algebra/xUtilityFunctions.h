@@ -40,7 +40,7 @@ public:
 	static vector4d FitSphereToTriangle(vector3d& P, vector3d& Q, vector3d& R, double ft);
 	static double FitClusterRadius(vector4d *cpos, unsigned int n);
 	static double CriticalTimeStep(double min_rad, double rho, double E, double p);
-	static double RelativeAngle(int udrl, double theta, int& n_rev, vector3d& gi, vector3d& fi, vector3d& fj);
+	static double RelativeAngle(int udrl, double theta, int& n_rev, vector3d& gi, vector3d& fi, vector3d& fj, bool &isSin);
 };
 
 #endif
