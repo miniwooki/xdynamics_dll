@@ -279,14 +279,14 @@
     <ClCompile Include="..\..\extern\ExcelFormat\BasicExcel.cpp">
       <Filter>소스 파일\extern</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\xdynamics_object\xRotationSpringDamperForce.cpp">
-      <Filter>소스 파일\xdynamics_object\force</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\xdynamics_object\xFixConstraint.cpp">
       <Filter>소스 파일\xdynamics_object\joint</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\xXLSReader.cpp">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xRotationSpringDamperForce.cpp">
+      <Filter>소스 파일\xdynamics_object\force</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

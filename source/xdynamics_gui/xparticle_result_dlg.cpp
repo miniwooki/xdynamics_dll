@@ -26,6 +26,7 @@ xparticle_result_dlg::xparticle_result_dlg(QWidget* parent)
 	//TW->setHorizontalHeaderLabels(labels);
 	TW->verticalHeader()->hide();
 	TW->setShowGrid(true);
+	TW->setSortingEnabled(true);
 }
 
 xparticle_result_dlg::~xparticle_result_dlg()
