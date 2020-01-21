@@ -1860,11 +1860,11 @@ __device__ void cluster_triangle_contact_force(
 	double3& tma,
 	unsigned int& new_count)
 {
-	device_triangle_info tri = dpi[dtci.id];// unsigned int pidx = dpi[k].id;
-	double3 qp = tri.Q - tri.P;
-	double3 rp = tri.R - tri.P;
+	//device_triangle_info tri = dpi[dtci.id];// unsigned int pidx = dpi[k].id;
+	//double3 qp = tri.Q - tri.P;
+	//double3 rp = tri.R - tri.P;
 	//	double rcon = r - 0.5 * cdist;
-	double3 unit = -cross(qp, rp);
+	double3 unit = dtci.cpt - ipos;//-cross(qp, rp);
 	//unsigned int pidx = dpi[dtci.id].id;
 	//device_contact_property cp = cp[pidx];
 	//device_body_info db = dbi[pidx];// device_mesh_mass_info pmi = dpmi[pidx];
