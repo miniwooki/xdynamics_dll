@@ -29,7 +29,7 @@ class xdynamics_gui : public QMainWindow
 
 public:
 	enum { NEW = 0, OPEN, SAVE };
-	enum { CUBE = 3, CYLINDER, CHART, UPLOAD_RESULT, PASSING_DISTRIBUTION, CONVERT_MESH_TO_SPHERE };
+	enum { CUBE = 3, CYLINDER, CHART, UPLOAD_RESULT, PASSING_DISTRIBUTION, CONVERT_MESH_TO_SPHERE, GENERATE_CLUSTER_DISTRIBUTION };
 	
 	xdynamics_gui(int _argc, char** _argv, QWidget *parent = Q_NULLPTR);
 	~xdynamics_gui();
@@ -69,6 +69,7 @@ private slots:
 	void xSetupParticleBufferColorDistribution(int);
 	void xSelectStartPoint();
 	void xPassDistribution();// click_passing_distribution
+	void xGenerateClusterDistribution();
 	
 private:
 	void setupMeshSphere();

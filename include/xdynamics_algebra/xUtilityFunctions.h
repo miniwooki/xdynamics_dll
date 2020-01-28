@@ -38,7 +38,7 @@ public:
 	static double SignedVolumeOfTriangle(vector3d& v1, vector3d& v2, vector3d& v3);
 	static vector3d CenterOfTriangle(vector3d& P, vector3d& Q, vector3d& R);
 	static vector4d FitSphereToTriangle(vector3d& P, vector3d& Q, vector3d& R, double ft);
-	static double FitClusterRadius(vector4d *cpos, unsigned int n);
+	static double FitClusterRadius(vector4d *cpos, unsigned int n, double specificRadius);
 	static double CriticalTimeStep(double min_rad, double rho, double E, double p);
 	static double RelativeAngle(int udrl, double theta, int& n_rev, vector3d& gi, vector3d& fi, vector3d& fj, bool &isSin);
 };

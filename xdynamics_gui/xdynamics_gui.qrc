@@ -18,5 +18,7 @@
         <file>Resources/icon/plot.png</file>
         <file>Resources/icon/upload_result.png</file>
         <file>Resources/icon/chart_passing.png</file>
+        <file>Resources/icon/gen_cluster.png</file>
+        <file>Resources/mesh/largesphere.obj</file>
     </qresource>
 </RCC>

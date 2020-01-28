@@ -1,4 +1,6 @@
+
 #include "xdynamics_gui.h"
+
 #include "xdynamics_manager/xDynamicsManager.h"
 #include "xModelNavigator.h"
 #include "xSimulationThread.h"
@@ -15,6 +17,7 @@
 #include <QtCore/QMimeData>
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QShortcut>
+#include "gen_cluster_dlg.h"
 //#include <QtWidgets/QListWidget>
 
 xdynamics_gui* xgui;
@@ -663,6 +666,13 @@ void xdynamics_gui::setupObjectOperations()
 	a->setStatusTip(tr("Distribution of particles passing area"));
 	connect(a, SIGNAL(triggered()), this, SLOT(xPassDistribution()));
 	myObjectActions.insert(PASSING_DISTRIBUTION, a);
+	
+	a = new QAction(QIcon(":/Resources/icon/gen_cluster.png"), tr("&Generating clutser"), this);
+	a->setStatusTip(tr("Generating cluster distribution"));
+	connect(a, SIGNAL(triggered()), this, SLOT(xGenerateClusterDistribution()));
+	myObjectActions.insert(GENERATE_CLUSTER_DISTRIBUTION, a);
+
+
 // 	a = new QAction(QIcon(":/Resources/icon/save.png"), tr("&Save"), this);
 // 	a->setStatusTip(tr("Save project"));
 // 	connect(a, SIGNAL(triggered()), this, SLOT(xSave()));
@@ -874,6 +884,15 @@ void xdynamics_gui::xPassDistribution()
 		}
 	}
 	
+}
+
+void xdynamics_gui::xGenerateClusterDistribution()
+{
+	gen_cluster_dlg dlg(this);
+	int ret = dlg.exec();
+	if (ret) {
+
+	}
 }
 
 void xdynamics_gui::xEditCommandLine()

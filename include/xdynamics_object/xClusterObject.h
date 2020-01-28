@@ -28,14 +28,21 @@ public:
 	xClusterObject(std::string name);
 	virtual ~xClusterObject();
 
-	void setClusterSet(unsigned int num, double rad, vector3d* d);
+	void setClusterSet(unsigned int num, double min_rad, double max_rad, vector3d* d, bool isEachCluster);
 	unsigned int NumElement();
-	double ElementRadius();
+	double ElementMinimumRadius();
+	double ElementMaximumRadius();
 	vector3d* RelativeLocation();
+	bool IsRandomRadiusEachCluster();
+	bool IsRandomRadius();
 
 private:
+	bool is_random_radius;
+	bool is_each_cluster;
 	unsigned int nelement;
-	double radius;
+	double min_radius;
+	double max_radius;
+	//double radius;
 	vector3d *relative_loc;
 };
 

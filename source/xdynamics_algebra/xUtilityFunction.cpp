@@ -433,7 +433,7 @@ vector4d xUtilityFunctions::FitSphereToTriangle(vector3d& P, vector3d& Q, vector
 	return new_vector4d(Csph.x, Csph.y, Csph.z, r);
 }
 
-double xUtilityFunctions::FitClusterRadius(vector4d * cpos, unsigned int n)
+double xUtilityFunctions::FitClusterRadius(vector4d * cpos, unsigned int n, double specificRadius)
 {
 	unsigned int cnt = 0;
 	double maximum = -FLT_MAX;
@@ -450,7 +450,7 @@ double xUtilityFunctions::FitClusterRadius(vector4d * cpos, unsigned int n)
 			cpj = cpos[i];
 			cj = new_vector3d(cpj.x, cpj.y, cpj.z);
 			double len_c = length(cj - ci);
-			double dij = length((cj - ci) + cpj.w * ((cj - ci) / len_c) + cpi.w * ((cj - ci) / len_c));
+			double dij = length((cj - ci) + specificRadius * ((cj - ci) / len_c) + specificRadius * ((cj - ci) / len_c));
 			if (dij > maximum)
 			{
 				maximum = dij;
@@ -464,8 +464,8 @@ double xUtilityFunctions::FitClusterRadius(vector4d * cpos, unsigned int n)
 	cpj = cpos[m_j];
 	ci = new_vector3d(cpi.x, cpi.y, cpi.z);
 	cj = new_vector3d(cpj.x, cpj.y, cpj.z);
-	vector3d Pi = ci + cpi.w * ((ci - cj) / length(ci - cj));
-	vector3d Pj = cj + cpj.w * ((cj - ci) / length(cj - ci));
+	vector3d Pi = ci + specificRadius * ((ci - cj) / length(ci - cj));
+	vector3d Pj = cj + specificRadius * ((cj - ci) / length(cj - ci));
 	vector3d Ca = 0.5 * (Pi + Pj);
 	double Ra = 0.5 * length(Pi - Pj);
 	vector3d Cb = new_vector3d(0, 0, 0);

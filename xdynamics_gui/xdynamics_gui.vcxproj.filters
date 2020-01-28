@@ -159,6 +159,9 @@
     <ClCompile Include="..\source\xdynamics_gui\xProgressDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\gen_cluster_dlg.cpp">
+      <Filter>Source Files\dialog</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="..\include\xdynamics_gui\xGLWidget.h">
@@ -221,6 +224,9 @@
     <QtMoc Include="..\include\xdynamics_gui\xProgressDialog.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="..\include\xdynamics_gui\gen_cluster_dlg.h">
+      <Filter>Header Files\dialog</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="xdynamics_gui.ui">
@@ -251,6 +257,9 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="wparticle_result.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="gen_cluster_dialog.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>

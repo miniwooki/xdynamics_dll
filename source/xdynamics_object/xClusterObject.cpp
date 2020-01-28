@@ -25,7 +25,8 @@
 //
 xClusterObject::xClusterObject()
 	: nelement(0)
-	, radius(0)
+	, min_radius(0)
+	, max_radius(0)
 	, relative_loc(NULL)
 {
 }
@@ -33,7 +34,8 @@ xClusterObject::xClusterObject()
 xClusterObject::xClusterObject(std::string name)
 	: xObject(name, CLUSTER_SHAPE)
 	, nelement(0)
-	, radius(0)
+	, min_radius(0)
+	, max_radius(0)
 	, relative_loc(NULL)
 {
 }
@@ -43,10 +45,12 @@ xClusterObject::~xClusterObject()
 	if (relative_loc) delete[] relative_loc; relative_loc = NULL;
 }
 
-void xClusterObject::setClusterSet(unsigned int num, double rad, vector3d * d)
+void xClusterObject::setClusterSet(unsigned int num, double min_rad, double max_rad, vector3d * d, bool isEachCluster)
 {
+	is_each_cluster = isEachCluster;
 	nelement = num;
-	radius = rad;
+	min_radius = min_rad;
+	max_radius = max_rad;
 	relative_loc = new vector3d[num];
 	memcpy(relative_loc, d, sizeof(vector3d) * num);
 }
@@ -56,12 +60,27 @@ unsigned int xClusterObject::NumElement()
 	return nelement;
 }
 
-double xClusterObject::ElementRadius()
+double xClusterObject::ElementMinimumRadius()
 {
-	return radius;
+	return min_radius;
+}
+
+double xClusterObject::ElementMaximumRadius()
+{
+	return max_radius;
 }
 
 vector3d * xClusterObject::RelativeLocation()
 {
 	return relative_loc;
+}
+
+bool xClusterObject::IsRandomRadiusEachCluster()
+{
+	return is_each_cluster;
+}
+
+bool xClusterObject::IsRandomRadius()
+{
+	return min_radius == max_radius;
 }

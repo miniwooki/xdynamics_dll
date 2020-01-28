@@ -735,7 +735,9 @@ void xXLSReader::ReadShapeObject(xObjectManager* xom, vector2i rc)
 			{
 				xClusterObject* xcs = xom->CreateClusterShapeObject(name, material);
 				unsigned int num = ReadNum(rc.x, rc.y++);
+				//double min_rad = ReadNum(rc.x, rc.y++);
 				double rad = ReadNum(rc.x, rc.y++);
+				//unsigned int isEachCluster = ReadNum(rc.x, rc.y++);
 				xstring sdata;
 				int loc[2] = { 0, };
 				sdata = ReadStr(rc.x, rc.y++); sdata.split(",", 2, loc);
@@ -748,7 +750,7 @@ void xXLSReader::ReadShapeObject(xObjectManager* xom, vector2i rc)
 					sdata.split(",", 3, v);
 					d[i] = new_vector3d(v[0], v[1], v[2]);
 				}
-				xcs->setClusterSet(num, rad, d);
+				xcs->setClusterSet(num, rad, rad, d, 0);
 				delete[] d;
 			}
 			else if (form == xShapeType::MESH_SHAPE)

@@ -709,7 +709,8 @@ xParticleObject * xParticleManager::CreateClusterParticle(
 	unsigned int _np = grid.x * grid.y * grid.z;
 	unsigned int neach = xo->NumElement();
 	unsigned int rnp = _np * neach;
-	double rad = xo->ElementRadius();
+	double min_rad = xo->ElementMinimumRadius();
+	double max_rad = xo->ElementMaximumRadius();
 	xstring name = n;
 	xMaterial xm = GetMaterialConstant(mt);
 	xParticleObject* xpo = new xParticleObject(n);
@@ -720,8 +721,8 @@ xParticleObject * xParticleManager::CreateClusterParticle(
 	xpo->setDensity(xm.density);
 	xpo->setYoungs(xm.youngs);
 	xpo->setPoisson(xm.poisson);
-	xpo->setMinRadius(rad);
-	xpo->setMaxRadius(rad);
+	xpo->setMinRadius(min_rad);
+	xpo->setMaxRadius(max_rad);
 	xpo->setEachCount(neach);
 	setCriticalMaterial(xm.density, xm.youngs, xm.poisson);
 	vector4d* pos = xpo->AllocMemory(rnp);
@@ -739,7 +740,8 @@ xParticleObject * xParticleManager::CreateClusterParticle(
 	xpo->setRelativeLocation(xo->RelativeLocation());
 	double c_rad = 0.0;
 	unsigned int cnt = 0;
-	
+	double rad = max_rad;
+	double dr = max_rad - min_rad;
 	for (int x = 0; x < grid.x; x++)
 	{
 		for (int y = 0; y < grid.y; y++)
@@ -755,19 +757,23 @@ xParticleObject * xParticleManager::CreateClusterParticle(
 				//vector3d rot = new_vector3d(30,0,0);
 				euler_parameters m_ep = EulerAngleToEulerParameters(rot);
 				matrix33d A = GlobalTransformationMatrix(m_ep);
+			/*	if (xo->IsRandomRadiusEachCluster()) {
+					rad = dr * frand();
+				}*/
 				for (unsigned int j = 0; j < neach; j++)
 				{
+				/*	if (!xo->IsRandomRadiusEachCluster()) {
+						rad = dr * frand();
+					}*/
 					vector3d m_pos = cp + A * rloc[j];
 					pos[cnt * neach + j] = new_vector4d(m_pos.x, m_pos.y, m_pos.z, rad);
 				}
 				cpos[cnt] = new_vector4d(cp.x, cp.y, cp.z, rad);
 				ep[cnt] = m_ep;
 				norm = length(new_vector4d(m_ep.e0, m_ep.e1, m_ep.e2, m_ep.e3));
-				if (!c_rad)
-				{
-					c_rad = xUtilityFunctions::FitClusterRadius(pos, neach);
+				if (!c_rad)	{
+					c_rad = xUtilityFunctions::FitClusterRadius(pos, neach, 0.5 * (max_rad + min_rad));
 				}
-				//cpos[cnt].w = c_rad;
 				cnt++;
 			}
 		}
