@@ -1,6 +1,6 @@
 #pragma once
-#include <QtDataVisualization/q3dscatter.h>
-#include <QtDataVisualization/qscatterdataproxy.h>
+#include <q3dscatter.h>
+#include <qscatterdataproxy.h>
 #include <QDialog>
 #include "ui_gen_cluster_dialog.h"
 
@@ -13,7 +13,11 @@ public:
 	explicit ScatterDataModifier(Q3DScatter *scatter);
 	~ScatterDataModifier();
 
-	void addParticle(int i, double x, double y, double z, double r);
+	void setScale(double scale);
+	void setRadius(int i, double radius, double scale);
+	void removeLastParticle();
+	void setPosition(int i, double x, double y, double z);
+	void addParticle(int i, double x, double y, double z, double r, double scale);
 
 public Q_SLOTS:
 	//void setFieldLines(int lines);
@@ -25,8 +29,7 @@ public Q_SLOTS:
 private:
 	Q3DScatter *m_graph;
 	QMap<int, QCustom3DItem*> m_particles;
-	QVector3D minAxis;
-	QVector3D maxAxis;
+	double maxRadius;
 };
 
 class gen_cluster_dlg : public QDialog, private Ui::GenClusterDialog
@@ -40,9 +43,13 @@ private slots:
 	void clickAdd();
 	void clickApply();
 	void clickCancel();
+	void clickCell(int, int);
+	void changeItem(QTableWidgetItem*);
 	void increaseRows(int);
+	void changeScale(double);
 
 private:
+	int rc[2];
 	Q3DScatter* graph;
 	ScatterDataModifier* modifier;
 	QMap<QPair<int, int>, QTableWidgetItem*> tableItems;
