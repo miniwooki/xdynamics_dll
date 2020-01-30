@@ -98,15 +98,12 @@
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QDoubleSpinBox" name="SB_Scale">
+        <widget class="QSpinBox" name="SB_Scale">
+         <property name="minimum">
+          <number>1</number>
+         </property>
          <property name="maximum">
-          <double>1.000000000000000</double>
-         </property>
-         <property name="singleStep">
-          <double>0.010000000000000</double>
-         </property>
-         <property name="value">
-          <double>0.500000000000000</double>
+          <number>100</number>
          </property>
         </widget>
        </item>

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'gen_cluster_dialog.ui'
 **
-** Created by: Qt User Interface Compiler version 5.12.6
+** Created by: Qt User Interface Compiler version 5.12.3
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -12,7 +12,6 @@
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDialog>
-#include <QtWidgets/QDoubleSpinBox>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHBoxLayout>
@@ -40,7 +39,7 @@ public:
     QSpinBox *SB_Rows;
     QLabel *LNumbers;
     QSpinBox *SB_Numbers;
-    QDoubleSpinBox *SB_Scale;
+    QSpinBox *SB_Scale;
     QHBoxLayout *horizontalLayout;
     QPushButton *PB_Add;
     QPushButton *PB_Gen;
@@ -102,11 +101,10 @@ public:
 
         gridLayout->addWidget(SB_Numbers, 2, 1, 1, 1);
 
-        SB_Scale = new QDoubleSpinBox(GenClusterDialog);
+        SB_Scale = new QSpinBox(GenClusterDialog);
         SB_Scale->setObjectName(QString::fromUtf8("SB_Scale"));
-        SB_Scale->setMaximum(1.000000000000000);
-        SB_Scale->setSingleStep(0.010000000000000);
-        SB_Scale->setValue(0.500000000000000);
+        SB_Scale->setMinimum(1);
+        SB_Scale->setMaximum(100);
 
         gridLayout->addWidget(SB_Scale, 0, 1, 1, 1);
 

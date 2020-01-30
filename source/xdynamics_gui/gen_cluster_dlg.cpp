@@ -7,6 +7,7 @@
 #include <QtDataVisualization/q3dtheme.h>
 #include <QtDataVisualization/QCustom3DItem>
 
+#define SCALE_FACTOR 0.115
 
 ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
 	: m_graph(scatter)
@@ -15,6 +16,10 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
 	m_graph->setShadowQuality(QAbstract3DGraph::ShadowQualityNone);
 	m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetFront);
 	maxRadius = -FLT_MAX;
+	m_graph->axisX()->setTitle("X");
+	m_graph->axisX()->setTitle("Y");
+	m_graph->axisX()->setTitle("Z");
+	m_graph->activeTheme()->setLabelBackgroundEnabled(false);
 	//minAxis = QVector3D(FLT_MAX, FLT_MAX, FLT_MAX);
 	//maxAxis = QVector3D(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 }
@@ -29,10 +34,17 @@ void ScatterDataModifier::setScale(double scale)
 {
 	if (!m_particles.size())
 		return;
+	int i = 0;
 	foreach(QCustom3DItem* item, m_particles) {
-		item->setScaling(QVector3D(0.12*scale, 0.12*scale, 0.12*scale));
+		//double ratio = m_radius[i++] / maxRadius;
+		double s = SCALE_FACTOR * scale * m_radius[i++];
+		item->setScaling(QVector3D(s, s, s));
+		//item->setPosition(scale * item->position());
 	}
-	
+	double div = 1.0 / scale;
+	m_graph->axisX()->setRange(-1 * div, 1 * div);// minAxis.x(), maxAxis.x());
+	m_graph->axisY()->setRange(-1 * div, 1 * div);// minAxis.y(), maxAxis.y());
+	m_graph->axisZ()->setRange(-1 * div, 1 * div);// minAxis.z(), maxAxis.z());
 }
 
 void ScatterDataModifier::setRadius(int i, double radius, double scale)
@@ -41,9 +53,12 @@ void ScatterDataModifier::setRadius(int i, double radius, double scale)
 		return;
 	if (m_particles.find(i) == m_particles.end())
 		return;
-	double ratio = radius / maxRadius;
-	double s = 0.12 * scale * ratio;
+	//double ratio = radius / maxRadius;
+	double s = SCALE_FACTOR * scale * radius;
 	m_particles[i]->setScaling(QVector3D(s, s, s));
+	/*if (radius > maxRadius)
+		maxRadius = radius;*/
+	m_radius[i] = radius;
 }
 
 void ScatterDataModifier::removeLastParticle()
@@ -51,10 +66,11 @@ void ScatterDataModifier::removeLastParticle()
 	int id = m_particles.size() - 1;
 	QCustom3DItem* item = m_particles.take(id);
 	m_graph->removeCustomItem(item);
+	m_radius.take(id);
 	//delete item;
 }
 
-void ScatterDataModifier::setPosition(int i, double x, double y, double z)
+void ScatterDataModifier::setPosition(int i, double x, double y, double z, double scale)
 {
 	if (!m_particles.size())
 		return;
@@ -66,7 +82,8 @@ void ScatterDataModifier::setPosition(int i, double x, double y, double z)
 void ScatterDataModifier::addParticle(int i, double x, double y, double z, double r, double scale)
 {
 	QCustom3DItem* pt = new QCustom3DItem;
-	pt->setScaling(QVector3D(0.12*r, 0.12*r, 0.12*r));
+	double s = SCALE_FACTOR * r * scale;
+	pt->setScaling(QVector3D(s,s,s));
 	pt->setMeshFile(QStringLiteral(":/Resources/mesh/largesphere.obj"));
 	QImage color = QImage(2, 2, QImage::Format_RGB32);
 	color.fill(QColor(0xff, 0xbb, 0x00));
@@ -79,11 +96,13 @@ void ScatterDataModifier::addParticle(int i, double x, double y, double z, doubl
 	//if (maxAxis.x() < x + r) maxAxis.setX(x + r);
 	//if (maxAxis.y() < y + r) maxAxis.setY(y + r);
 	//if (maxAxis.z() < z + r) maxAxis.setZ(z + r);
-	m_graph->axisX()->setRange(-1, 1);// minAxis.x(), maxAxis.x());
-	m_graph->axisY()->setRange(-1, 1);// minAxis.y(), maxAxis.y());
-	m_graph->axisZ()->setRange(-1, 1);// minAxis.z(), maxAxis.z());
+	double div = 1.0 / scale;
+	m_graph->axisX()->setRange(-1 * div, 1 * div);// minAxis.x(), maxAxis.x());
+	m_graph->axisY()->setRange(-1 * div, 1 * div);// minAxis.y(), maxAxis.y());
+	m_graph->axisZ()->setRange(-1 * div, 1 * div);// minAxis.z(), maxAxis.z());
 	if (maxRadius < r)
 		maxRadius = r;
+	m_radius[i] = r;
 
 }
 
@@ -116,7 +135,7 @@ gen_cluster_dlg::gen_cluster_dlg(QWidget* parent)
 	graph->axisZ()->setSegmentCount(10);
 	modifier = new ScatterDataModifier(graph);
 	connect(SB_Rows, SIGNAL(valueChanged(int)), this, SLOT(increaseRows(int)));
-	connect(SB_Scale, SIGNAL(valueChanged(double)), this, SLOT(changeScale(double)));
+	connect(SB_Scale, SIGNAL(valueChanged(int)), this, SLOT(changeScale(int)));
 	connect(InputTable, &QTableWidget::cellClicked, this, &gen_cluster_dlg::clickCell);
 	connect(InputTable, &QTableWidget::itemChanged, this, &gen_cluster_dlg::changeItem);
 	rc[0] = -1;
@@ -166,7 +185,7 @@ void gen_cluster_dlg::increaseRows(int nrow)
 	
 }
 
-void gen_cluster_dlg::changeScale(double scale)
+void gen_cluster_dlg::changeScale(int scale)
 {
 	modifier->setScale(scale);
 }
@@ -194,9 +213,9 @@ void gen_cluster_dlg::changeItem(QTableWidgetItem* item)
 		return;
 	if (rc[1] < 3) {
 		switch (rc[1]) {
-		case 0: modifier->setPosition(rc[0], item->text().toDouble(), InputTable->item(rc[0], 1)->text().toDouble(), InputTable->item(rc[0], 2)->text().toDouble());
-		case 1: modifier->setPosition(rc[0], InputTable->item(rc[0], 0)->text().toDouble(), item->text().toDouble(), InputTable->item(rc[0], 2)->text().toDouble());
-		case 2: modifier->setPosition(rc[0], InputTable->item(rc[0], 0)->text().toDouble(), InputTable->item(rc[0], 1)->text().toDouble(), item->text().toDouble());
+		case 0: modifier->setPosition(rc[0], item->text().toDouble(), InputTable->item(rc[0], 1)->text().toDouble(), InputTable->item(rc[0], 2)->text().toDouble(), SB_Scale->value()); break;
+		case 1: modifier->setPosition(rc[0], InputTable->item(rc[0], 0)->text().toDouble(), item->text().toDouble(), InputTable->item(rc[0], 2)->text().toDouble(), SB_Scale->value()); break;
+		case 2: modifier->setPosition(rc[0], InputTable->item(rc[0], 0)->text().toDouble(), InputTable->item(rc[0], 1)->text().toDouble(), item->text().toDouble(), SB_Scale->value()); break;
 		}
 	}
 	else {

@@ -149,7 +149,7 @@ static const uint qt_meta_data_gen_cluster_dlg[] = {
     QMetaType::Void, QMetaType::Int, QMetaType::Int,    2,    2,
     QMetaType::Void, 0x80000000 | 7,    2,
     QMetaType::Void, QMetaType::Int,    2,
-    QMetaType::Void, QMetaType::Double,    2,
+    QMetaType::Void, QMetaType::Int,    2,
 
        0        // eod
 };
@@ -166,7 +166,7 @@ void gen_cluster_dlg::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int 
         case 3: _t->clickCell((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
         case 4: _t->changeItem((*reinterpret_cast< QTableWidgetItem*(*)>(_a[1]))); break;
         case 5: _t->increaseRows((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 6: _t->changeScale((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 6: _t->changeScale((*reinterpret_cast< int(*)>(_a[1]))); break;
         default: ;
         }
     }

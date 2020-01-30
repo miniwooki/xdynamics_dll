@@ -16,7 +16,7 @@ public:
 	void setScale(double scale);
 	void setRadius(int i, double radius, double scale);
 	void removeLastParticle();
-	void setPosition(int i, double x, double y, double z);
+	void setPosition(int i, double x, double y, double z, double scale);
 	void addParticle(int i, double x, double y, double z, double r, double scale);
 
 public Q_SLOTS:
@@ -29,6 +29,7 @@ public Q_SLOTS:
 private:
 	Q3DScatter *m_graph;
 	QMap<int, QCustom3DItem*> m_particles;
+	QMap<int, double> m_radius;
 	double maxRadius;
 };
 
@@ -46,7 +47,7 @@ private slots:
 	void clickCell(int, int);
 	void changeItem(QTableWidgetItem*);
 	void increaseRows(int);
-	void changeScale(double);
+	void changeScale(int);
 
 private:
 	int rc[2];
