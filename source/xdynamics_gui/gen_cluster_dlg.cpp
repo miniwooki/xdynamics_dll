@@ -66,7 +66,7 @@ void ScatterDataModifier::setPosition(int i, double x, double y, double z)
 void ScatterDataModifier::addParticle(int i, double x, double y, double z, double r, double scale)
 {
 	QCustom3DItem* pt = new QCustom3DItem;
-	pt->setScaling(QVector3D(0.12*scale, 0.12*scale, 0.12*scale));
+	pt->setScaling(QVector3D(0.12*r, 0.12*r, 0.12*r));
 	pt->setMeshFile(QStringLiteral(":/Resources/mesh/largesphere.obj"));
 	QImage color = QImage(2, 2, QImage::Format_RGB32);
 	color.fill(QColor(0xff, 0xbb, 0x00));
