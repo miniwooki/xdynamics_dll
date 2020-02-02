@@ -2,6 +2,7 @@
 #include "xvShader.h"
 #include "../xTypes.h"
 #include "xdynamics_algebra/xAlgebraMath.h"
+#include "xdynamics_object/xParticleObject.h"
 //#include "colors.h"
 //#include "msgBox.h"
 //#include "model.h"
@@ -192,6 +193,33 @@ void xvParticle::bind_result_buffers(float * pos_buffer, float * vel_buffer, flo
 	pbuffers = pos_buffer;
 	vbuffers = vel_buffer;
 	cbuffers = color_buffer;
+}
+
+bool xvParticle::defineFromParticleObject(xParticleObject* pobj)
+{
+	resizePositionMemory(np, np + pobj->NumParticle());
+	vector4d *d_pos = pobj->Position();
+	for (unsigned int i = 0; i < pobj->NumParticle(); i++) {
+		pos[(np + i) * 4 + 0] = (float)d_pos[i].x;
+		pos[(np + i) * 4 + 1] = (float)d_pos[i].y;
+		pos[(np + i) * 4 + 2] = (float)d_pos[i].z;
+		pos[(np + i) * 4 + 3] = (float)d_pos[i].w;
+	}
+	if (color) {
+		delete[]color;
+		color = nullptr;
+	}
+	QString name = QString::fromStdString(pobj->Name());
+	pgds[name].name = name;
+	pgds[name].mat = NO_MATERIAL;
+	pgds[name].np = pobj->NumParticle();
+	pgds[name].cnp = pobj->NumCluster();
+	pgds[name].min_rad = pobj->MinRadius();
+	pgds[name].max_rad = pobj->MaxRadius();
+	np = np + pobj->NumParticle();
+	color = new float[np * 4];
+	
+	return _define();
 }
 
 bool xvParticle::defineFromViewFile(QString path)
@@ -644,6 +672,17 @@ double xvParticle::MinRadiusOfGroupData(QString& n)
 double xvParticle::MaxnRadiusOfGroupData(QString& n)
 {
 	return pgds[n].max_rad;
+}
+
+void xvParticle::ChangeColor(unsigned int id, QColor c, QColor& pcolor)
+{
+	unsigned int cid = id * 4;
+	pcolor.setRedF(color[cid + 0]);
+	pcolor.setGreenF(color[cid + 1]);
+	pcolor.setBlueF(color[cid + 2]);
+	color[cid + 0] = c.redF();
+	color[cid + 1] = c.greenF();
+	color[cid + 2] = c.blueF();
 }
 
 bool xvParticle::defineFromRelativePosition(vector3d & p, euler_parameters & ep)

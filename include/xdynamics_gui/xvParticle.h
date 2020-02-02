@@ -8,11 +8,11 @@
 #include <QMap>
 #include <QFile>
 
-
-
+class xParticleObject;
 
 class xvParticle : public xvGlew
 {
+public:
 	struct particleGroupData
 	{
 		QString name;
@@ -23,7 +23,6 @@ class xvParticle : public xvGlew
 		double min_rad;
 		double max_rad;
 	};
-public:
 	xvParticle();
 	~xvParticle();
 
@@ -33,6 +32,7 @@ public:
 	bool defineFromViewFile(QString path);
 	bool defineFromListFile(QString path);
 	bool defineFromRelativePosition(vector3d& p, euler_parameters& ep);
+	bool defineFromParticleObject(xParticleObject* pobj);
 	void setRelativePosition(unsigned int sz, double* d, double* r);
 
 	void setParticlePosition(double* p, unsigned int n);
@@ -50,6 +50,7 @@ public:
 	double MinRadiusOfGroupData(QString& n);
 	double MaxnRadiusOfGroupData(QString& n);
 	QMap<QString, particleGroupData>& ParticleGroupData() { return pgds; }
+	void ChangeColor(unsigned int id, QColor rgb, QColor& pcolor);
 
 	bool hasRelativePosition() { return r_pos != NULL; }
 	float* ColorBuffers();

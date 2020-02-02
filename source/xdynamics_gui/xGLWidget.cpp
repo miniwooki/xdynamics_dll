@@ -1079,9 +1079,9 @@ void xGLWidget::releaseSelectedObjects()
 
 xvObject* xGLWidget::Object(QString nm)
 {
-	QStringList l = v_objs.keys();
-	QStringList::const_iterator it = qFind(l, nm);
-	if (it == l.end())
+	/*QStringList l = v_objs.keys();
+	QStringList::const_iterator it = qFind(l, nm);*/
+	if(v_objs.find(nm) == v_objs.end())
 		return NULL;
 	return v_objs[nm];
 }

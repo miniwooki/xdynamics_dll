@@ -20,5 +20,6 @@
         <file>Resources/icon/chart_passing.png</file>
         <file>Resources/icon/gen_cluster.png</file>
         <file>Resources/mesh/largesphere.obj</file>
+        <file>Resources/icon/collision_check.png</file>
     </qresource>
 </RCC>

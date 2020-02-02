@@ -11,6 +11,7 @@ public:
 	virtual ~xNeiborhoodCell();
 
 	virtual void detection(double *pos, unsigned int np, unsigned int sid);
+	void detectionCpu(double* pos, unsigned int np, unsigned int sid);
 
 private:
 	void _detection(vector4d* pos, unsigned int np, unsigned int sid);

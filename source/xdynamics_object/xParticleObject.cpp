@@ -1,3 +1,5 @@
+#include "..\..\include\xdynamics_object\xParticleObject.h"
+#include "..\..\include\xdynamics_object\xParticleObject.h"
 #include "xdynamics_object/xParticleObject.h"
 
 unsigned int xParticleObject::xpo_count = 0;
@@ -53,7 +55,7 @@ void xParticleObject::setStartIndex(unsigned int _sid)
 
 void xParticleObject::setClusterStartIndex(unsigned int _csid)
 {
-	csid = csid;
+	csid = _csid;
 }
 
 void xParticleObject::setEachCount(unsigned int ec)
@@ -235,7 +237,7 @@ vector4d * xParticleObject::EulerParameters() const
 	return ep;
 }
 
-vector3d * xParticleObject::RelativeLocation() const
+vector4d * xParticleObject::RelativeLocation() const
 {
 	return relative_loc;
 }
@@ -248,6 +250,16 @@ double* xParticleObject::Mass() const
 vector3d* xParticleObject::Inertia() const
 {
 	return inertia;
+}
+
+void xParticleObject::setParticleShapeName(xstring s)
+{
+	particleShapeName = s;
+}
+
+std::string xParticleObject::ParticleShapeName()
+{
+	return particleShapeName.toStdString();
 }
 
 unsigned int xParticleObject::create_sph_particles(double ps, unsigned int nlayers, vector3d* p, xMaterialType* t)
@@ -270,7 +282,7 @@ void xParticleObject::setShapeForm(xShapeType xst)
 	form = xst;
 }
 
-void xParticleObject::setRelativeLocation(vector3d * rl)
+void xParticleObject::setRelativeLocation(vector4d * rl)
 {
 	relative_loc = rl;
 }

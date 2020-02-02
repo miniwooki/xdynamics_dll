@@ -6,6 +6,7 @@
 #include <thrust/execution_policy.h>
 #include <list>
 #include <sstream>
+#include <cmath>
 #include "xdynamics_manager/xDynamicsManager.h"
 //#include "xdynamics_parallel/xParallelDEM_decl.cuh"
 //#include <QtCore/QDebug>
@@ -310,6 +311,72 @@ void xContactManager::set_from_part_result(std::fstream & fs)
 	{
 
 	}
+}
+
+std::map<pair<unsigned int, unsigned int>, xPairData> xContactManager::CalculateCollisionPair(
+	vector4d * pos,
+	unsigned int * sorted_id,
+	unsigned int * cell_start,
+	unsigned int * cell_end,
+	xClusterInformation * xci,
+	unsigned int ncobject,
+	unsigned int np)
+{
+	std::map<pair<unsigned int, unsigned int>, xPairData> pairs;
+	for (unsigned int i = 0; i < np; i++) {
+		unsigned int count = 0;
+		unsigned int neach = 1;
+		unsigned int kcount = 0;
+		unsigned int nth = 0;
+		unsigned int begin = 0;
+		if (ncobject) {
+			for (unsigned int j = 0; j < ncobject; j++) {
+				if (i >= xci[j].sid && i < xci[j].sid + xci[j].count * xci[j].neach){
+					neach = xci[j].neach;
+					begin = xci[j].sid;
+					nth = i % neach;
+				}
+			}				
+		}
+		vector3d posi = new_vector3d(pos[i].x, pos[i].y, pos[i].z);
+		double ri = pos[i].w;
+		vector3i gp = xGridCell::getCellNumber(posi.x, posi.y, posi.z);
+		for (int z = -1; z <= 1; z++) {
+			for (int y = -1; y <= 1; y++) {
+				for (int x = -1; x <= 1; x++) {
+					vector3i neigh = new_vector3i(gp.x + x, gp.y + y, gp.z + z);
+					unsigned int hash = xGridCell::getHash(neigh);
+					unsigned int sid = cell_start[hash];
+					if (sid != 0xffffffff) {
+						unsigned int eid = cell_end[hash];
+						for (unsigned int j = sid; j < eid; j++) {
+							unsigned int k = sorted_id[j];
+							bool isOwner = (k >= (i - nth) && k < (i - nth) + neach);
+							if (isOwner)
+								continue;
+							/*unsigned int di = neach == 1 ? 2 : (i >= k ? i - k : k - i);*/
+							vector3d posj = new_vector3d(pos[k].x, pos[k].y, pos[k].z);
+							double rj = pos[k].w;
+							vector3d rp = posj - posi;
+							double dist = length(rp);
+							double cdist = (ri + rj) - dist;
+							//double rcon = pos[i].w - cdist;
+							unsigned int rid = 0;
+							vector3d u = rp / dist;
+							pair<unsigned int, unsigned int> key(min(i, k), max(i, k));
+							if (cdist > 0)
+							{
+								vector3d cpt = posi + ri * u;
+								xPairData pd = { PARTICLES, true, 0, 0, 0, 0, cpt.x, cpt.y, cpt.z, cdist, u.x, u.y, u.z };
+								pairs[key] = pd;// xcpl.insertParticleContactPair(pd);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return pairs;
 }
 
 void xContactManager::updateCollisionPair(

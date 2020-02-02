@@ -15,6 +15,8 @@
 
 class QScrollArea;
 class xvObject;
+class xObject;
+class wgenclusters;
 //class xDynamicManager;
 
 class wcube : public QWidget, public Ui::wcube
@@ -82,7 +84,8 @@ class xModelNavigator : public QDockWidget
 
 public:
 	//enum tMotherRoot { OBJECT_ROOT = 0, RESULT_ROOT, SIMULATION_ROOT };
-	enum tWidget{ NO_WIDGET = 0, CUBE_WIDGET, PLANE_WIDGET, SIMULATION_WIDGET, POINTMASS_WIDGET, PARTICLE_WIDGET, RESULT_WIDGET };
+	enum tWidget{ NO_WIDGET = 0, CUBE_WIDGET, PLANE_WIDGET, SIMULATION_WIDGET, POINTMASS_WIDGET, PARTICLE_WIDGET, RESULT_WIDGET, GENCLUSTER_WIDGET
+	};
 	enum tRoot { OBJECT_ROOT = 0, RESULT_ROOT, SIMULATION_ROOT, SHAPE_ROOT, MASS_ROOT, PARTICLE_ROOT, PART_ROOT };
 
 	xModelNavigator();
@@ -90,6 +93,7 @@ public:
 	~xModelNavigator();
 	static xModelNavigator* NAVIGATOR();
 	void addChild(tRoot, QString _nm);
+	void addChild(tRoot, QString _nm, xObject* obj);
 	void addChilds(tRoot, QStringList& qsl);
 	QTreeWidgetItem* getRootItem(tRoot tr);
 	void ClearTreeObject();
@@ -100,6 +104,7 @@ signals:
 	void definedSimulationWidget(wsimulation*);
 	void definedPointMassWidget(wpointmass*);
 	void definedResultWidget(wresult*);
+	void definedGenerateClustersWidget(wgenclusters*);
 	void InitializeWidgetStatement();
 
 private slots:
@@ -115,6 +120,7 @@ private:
 	//void CallView();
 	void CallResultPart();
 	void CallSimulation();
+	void CallGenerateClusterParticles(xObject*);
 	void CallViewWidget(xvObject* xo);
 
 	tWidget cwidget;
@@ -126,6 +132,8 @@ private:
 	QMap<tRoot, QTreeWidgetItem*> mom_roots;
 	QMap<tRoot, QTreeWidgetItem*> roots;
 	QMap<QString, int> idx_child;
+
+	QMap<QString, xObject*> objects;
 };
 
 //struct xCubeObjectData;

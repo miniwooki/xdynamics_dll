@@ -12,6 +12,7 @@
 #include "xdynamics_object/xClusterObject.h"
 
 #include "xmap.hpp"
+#include <map>
 
 class xParticleManager;
 
@@ -25,6 +26,8 @@ public:
 	static xObjectManager* XOM();
 	xObject* XObject(std::string& ws);
 	xmap<xstring, xObject*>& XObjects();
+	map<std::string, xObject*> XObjectsToSTD();
+	map<std::string, xClusterObject*> XClusterObjects();
 	
 	xPointMass* setMovingConstantMovingVelocity(std::string _name, double* v);
 	void UpdateMovingObjects(double ct);

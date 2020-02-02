@@ -16,7 +16,7 @@ public:
 	void setMinRadius(double _mr);
 	void setMaxRadius(double _mr);
 	void setShapeForm(xShapeType xst);
-	void setRelativeLocation(vector3d* rl);
+	void setRelativeLocation(vector4d* rl);
 	void setMassIndex(unsigned _mid);
 	void resizeParticles(unsigned int new_np);
 	vector4d* AllocMemory(unsigned int _np);
@@ -38,10 +38,11 @@ public:
 	vector4d* Position() const;
 	vector4d* ClusterPosition() const;
 	vector4d* EulerParameters() const;
-	vector3d* RelativeLocation() const;
+	vector4d* RelativeLocation() const;
 	double* Mass() const;
 	vector3d* Inertia() const;
-
+	void setParticleShapeName(xstring s);
+	std::string ParticleShapeName();
 	virtual unsigned int create_sph_particles(double ps, unsigned int nlayers, vector3d* p = NULL, xMaterialType* t = NULL);
 	//virtual QVector<xCorner> get_sph_boundary_corners();
 // 	static unsigned int calculateNumCubeParticles(double dx, double dy, double dz, double min_radius, double max_radius);
@@ -57,6 +58,7 @@ public:
 private:
 	static unsigned int xpo_count;
 	xShapeType form;
+	xstring particleShapeName;
 	unsigned int sid;
 	unsigned int csid;
 	unsigned int mid;
@@ -71,7 +73,7 @@ private:
 	vector4d* ep;
 	double* mass;
 	vector3d* inertia;
-	vector3d *relative_loc;
+	vector4d *relative_loc;
 };
 
 #endif

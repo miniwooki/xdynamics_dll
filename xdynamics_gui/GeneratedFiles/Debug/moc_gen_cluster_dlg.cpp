@@ -91,8 +91,8 @@ int ScatterDataModifier::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     return _id;
 }
 struct qt_meta_stringdata_gen_cluster_dlg_t {
-    QByteArrayData data[10];
-    char stringdata0[113];
+    QByteArrayData data[18];
+    char stringdata0[186];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -102,21 +102,31 @@ struct qt_meta_stringdata_gen_cluster_dlg_t {
 static const qt_meta_stringdata_gen_cluster_dlg_t qt_meta_stringdata_gen_cluster_dlg = {
     {
 QT_MOC_LITERAL(0, 0, 15), // "gen_cluster_dlg"
-QT_MOC_LITERAL(1, 16, 8), // "clickAdd"
+QT_MOC_LITERAL(1, 16, 8), // "clickNew"
 QT_MOC_LITERAL(2, 25, 0), // ""
-QT_MOC_LITERAL(3, 26, 10), // "clickApply"
-QT_MOC_LITERAL(4, 37, 11), // "clickCancel"
-QT_MOC_LITERAL(5, 49, 9), // "clickCell"
-QT_MOC_LITERAL(6, 59, 10), // "changeItem"
-QT_MOC_LITERAL(7, 70, 17), // "QTableWidgetItem*"
-QT_MOC_LITERAL(8, 88, 12), // "increaseRows"
-QT_MOC_LITERAL(9, 101, 11) // "changeScale"
+QT_MOC_LITERAL(3, 26, 8), // "clickAdd"
+QT_MOC_LITERAL(4, 35, 8), // "clickGen"
+QT_MOC_LITERAL(5, 44, 11), // "clickCancel"
+QT_MOC_LITERAL(6, 56, 9), // "clickCell"
+QT_MOC_LITERAL(7, 66, 11), // "clickUpdate"
+QT_MOC_LITERAL(8, 78, 10), // "changeItem"
+QT_MOC_LITERAL(9, 89, 17), // "QTableWidgetItem*"
+QT_MOC_LITERAL(10, 107, 10), // "changeCell"
+QT_MOC_LITERAL(11, 118, 1), // "r"
+QT_MOC_LITERAL(12, 120, 1), // "c"
+QT_MOC_LITERAL(13, 122, 12), // "increaseRows"
+QT_MOC_LITERAL(14, 135, 11), // "changeScale"
+QT_MOC_LITERAL(15, 147, 16), // "clickClusterItem"
+QT_MOC_LITERAL(16, 164, 16), // "QListWidgetItem*"
+QT_MOC_LITERAL(17, 181, 4) // "item"
 
     },
-    "gen_cluster_dlg\0clickAdd\0\0clickApply\0"
-    "clickCancel\0clickCell\0changeItem\0"
-    "QTableWidgetItem*\0increaseRows\0"
-    "changeScale"
+    "gen_cluster_dlg\0clickNew\0\0clickAdd\0"
+    "clickGen\0clickCancel\0clickCell\0"
+    "clickUpdate\0changeItem\0QTableWidgetItem*\0"
+    "changeCell\0r\0c\0increaseRows\0changeScale\0"
+    "clickClusterItem\0QListWidgetItem*\0"
+    "item"
 };
 #undef QT_MOC_LITERAL
 
@@ -126,7 +136,7 @@ static const uint qt_meta_data_gen_cluster_dlg[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-       7,   14, // methods
+      11,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -134,22 +144,30 @@ static const uint qt_meta_data_gen_cluster_dlg[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,   49,    2, 0x08 /* Private */,
-       3,    0,   50,    2, 0x08 /* Private */,
-       4,    0,   51,    2, 0x08 /* Private */,
-       5,    2,   52,    2, 0x08 /* Private */,
-       6,    1,   57,    2, 0x08 /* Private */,
-       8,    1,   60,    2, 0x08 /* Private */,
-       9,    1,   63,    2, 0x08 /* Private */,
+       1,    0,   69,    2, 0x08 /* Private */,
+       3,    0,   70,    2, 0x08 /* Private */,
+       4,    0,   71,    2, 0x08 /* Private */,
+       5,    0,   72,    2, 0x08 /* Private */,
+       6,    2,   73,    2, 0x08 /* Private */,
+       7,    0,   78,    2, 0x08 /* Private */,
+       8,    1,   79,    2, 0x08 /* Private */,
+      10,    2,   82,    2, 0x08 /* Private */,
+      13,    1,   87,    2, 0x08 /* Private */,
+      14,    1,   90,    2, 0x08 /* Private */,
+      15,    1,   93,    2, 0x08 /* Private */,
 
  // slots: parameters
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
+    QMetaType::Void,
     QMetaType::Void, QMetaType::Int, QMetaType::Int,    2,    2,
-    QMetaType::Void, 0x80000000 | 7,    2,
+    QMetaType::Void,
+    QMetaType::Void, 0x80000000 | 9,    2,
+    QMetaType::Void, QMetaType::Int, QMetaType::Int,   11,   12,
     QMetaType::Void, QMetaType::Int,    2,
     QMetaType::Void, QMetaType::Int,    2,
+    QMetaType::Void, 0x80000000 | 16,   17,
 
        0        // eod
 };
@@ -160,13 +178,17 @@ void gen_cluster_dlg::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int 
         auto *_t = static_cast<gen_cluster_dlg *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
-        case 0: _t->clickAdd(); break;
-        case 1: _t->clickApply(); break;
-        case 2: _t->clickCancel(); break;
-        case 3: _t->clickCell((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
-        case 4: _t->changeItem((*reinterpret_cast< QTableWidgetItem*(*)>(_a[1]))); break;
-        case 5: _t->increaseRows((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 6: _t->changeScale((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 0: _t->clickNew(); break;
+        case 1: _t->clickAdd(); break;
+        case 2: _t->clickGen(); break;
+        case 3: _t->clickCancel(); break;
+        case 4: _t->clickCell((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 5: _t->clickUpdate(); break;
+        case 6: _t->changeItem((*reinterpret_cast< QTableWidgetItem*(*)>(_a[1]))); break;
+        case 7: _t->changeCell((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 8: _t->increaseRows((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 9: _t->changeScale((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 10: _t->clickClusterItem((*reinterpret_cast< QListWidgetItem*(*)>(_a[1]))); break;
         default: ;
         }
     }
@@ -201,13 +223,13 @@ int gen_cluster_dlg::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 7)
+        if (_id < 11)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 7;
+        _id -= 11;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 7)
+        if (_id < 11)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 7;
+        _id -= 11;
     }
     return _id;
 }

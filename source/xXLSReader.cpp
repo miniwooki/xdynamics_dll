@@ -741,14 +741,14 @@ void xXLSReader::ReadShapeObject(xObjectManager* xom, vector2i rc)
 				xstring sdata;
 				int loc[2] = { 0, };
 				sdata = ReadStr(rc.x, rc.y++); sdata.split(",", 2, loc);
-				vector3d *d = new vector3d[num];
+				vector4d *d = new vector4d[num];
 				loc[0] -= 1; loc[1] -= 1;
 				for (unsigned int i = 0; i < num; i++)
 				{
 					double v[3] = { 0, };
 					sdata = ReadStr(loc[0], loc[1]++);
 					sdata.split(",", 3, v);
-					d[i] = new_vector3d(v[0], v[1], v[2]);
+					d[i] = new_vector4d(v[0], v[1], v[2], rad);
 				}
 				xcs->setClusterSet(num, rad, rad, d, 0);
 				delete[] d;

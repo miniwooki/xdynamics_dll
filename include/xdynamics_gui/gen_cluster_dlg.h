@@ -6,6 +6,8 @@
 
 using namespace QtDataVisualization;
 
+class xClusterObject;
+
 class ScatterDataModifier : public QObject
 {
 	Q_OBJECT
@@ -18,13 +20,11 @@ public:
 	void removeLastParticle();
 	void setPosition(int i, double x, double y, double z, double scale);
 	void addParticle(int i, double x, double y, double z, double r, double scale);
+	void reset();
+	unsigned int particleCount();
 
-public Q_SLOTS:
-	//void setFieldLines(int lines);
-	//void setArrowsPerLine(int arrows);
-	//void toggleRotation();
-	//void triggerRotation();
-	//void toggleSun();
+private slots:
+	
 
 private:
 	Q3DScatter *m_graph;
@@ -33,25 +33,48 @@ private:
 	double maxRadius;
 };
 
+
+
 class gen_cluster_dlg : public QDialog, private Ui::GenClusterDialog
 {
+	typedef QMap<QPair<int, int>, QTableWidgetItem*> MapTableItems;
 	Q_OBJECT
 public:
 	gen_cluster_dlg(QWidget* parent = nullptr);
 	~gen_cluster_dlg();
 
+	void prepareShow();
+	QMap<QString, QPair<QString, xClusterObject*>> clusters;
+
 private slots:
+	void clickNew();
 	void clickAdd();
-	void clickApply();
+	void clickGen();
 	void clickCancel();
 	void clickCell(int, int);
+	void clickUpdate();
 	void changeItem(QTableWidgetItem*);
+	void changeCell(int r, int c);
 	void increaseRows(int);
 	void changeScale(int);
+	void clickClusterItem(QListWidgetItem* item);
 
 private:
+	void setRowData(int i, QTableWidgetItem** items);
+	void deleteCurrentTableItems();
+	void loadExistLocalPosition(QString name);
+	void checkNeedAdd();
+
+private:
+	//bool isExistInList;
 	int rc[2];
+	bool isClickedCell;
+	bool isNewCluster;
+	bool isChangeCluster;
+	QListWidgetItem* current_list;
 	Q3DScatter* graph;
 	ScatterDataModifier* modifier;
 	QMap<QPair<int, int>, QTableWidgetItem*> tableItems;
+	QMap<QString, MapTableItems> tables;
+
 };

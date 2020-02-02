@@ -162,6 +162,18 @@
     <ClCompile Include="..\source\xdynamics_gui\gen_cluster_dlg.cpp">
       <Filter>Source Files\dialog</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_xGenerateClusterWidget.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_xSimulationWidget.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xGenerateClusterWidget.cpp">
+      <Filter>Source Files\widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\xdynamics_gui\xCheckCollisionDialog.cpp">
+      <Filter>Source Files\dialog</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="..\include\xdynamics_gui\xGLWidget.h">
@@ -227,6 +239,12 @@
     <QtMoc Include="..\include\xdynamics_gui\gen_cluster_dlg.h">
       <Filter>Header Files\dialog</Filter>
     </QtMoc>
+    <QtMoc Include="..\include\xdynamics_gui\xGenerateClusterWidget.h">
+      <Filter>Header Files\widget</Filter>
+    </QtMoc>
+    <QtMoc Include="..\include\xdynamics_gui\xCheckCollisionDialog.h">
+      <Filter>Header Files\dialog</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="xdynamics_gui.ui">
@@ -260,6 +278,12 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="gen_cluster_dialog.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="wgenclusters.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="check_collision_dialog.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>

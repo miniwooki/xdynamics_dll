@@ -6,6 +6,8 @@
 #include "xvCube.h"
 #include "xvPlane.h"
 #include "xdynamics_simulation/xSimulation.h"
+#include "xGenerateClusterWidget.h"
+#include "xdynamics_object/xClusterObject.h"
 //#include "ui_wcube.h"
 #include <QMenu>
 #include <QFrame>
@@ -82,6 +84,7 @@ xModelNavigator::xModelNavigator(QWidget* parent)
 xModelNavigator::~xModelNavigator()
 {
 	qDeleteAll(roots);
+	//qDeleteAll(objects);
 	if (vtree) delete vtree; vtree = NULL;
 	if (plate_layout) delete plate_layout; plate_layout = NULL;
 	if (plate_frame) delete plate_frame; plate_frame = NULL;
@@ -132,6 +135,20 @@ void xModelNavigator::addChild(tRoot tr, QString _nm)
 	parent->addChild(child);		
 	parent->setExpanded(true);
 	idx_child[_nm] = parent->indexOfChild(child);
+}
+
+void xModelNavigator::addChild(tRoot tr, QString _nm, xObject * obj)
+{
+	QTreeWidgetItem* parent = getRootItem(tr);
+	if (!parent) return;
+	///QString t = parent->text(1);
+	QTreeWidgetItem* child = new QTreeWidgetItem();
+	child->setText(0, _nm);
+	//child->setData(0, (int)tr, v);
+	parent->addChild(child);
+	parent->setExpanded(true);
+	idx_child[_nm] = parent->indexOfChild(child);
+	objects[_nm] = obj;
 }
 
 void xModelNavigator::addChilds(tRoot tr, QStringList& qsl)
@@ -214,43 +231,52 @@ void xModelNavigator::CallShape(QString& n)
 {
 	xvObject* xo = xGLWidget::GLObject()->Object(n);
 	//QFrame* frame = new QFrame(plate);
-	if (xo->ObjectType() == xvObject::V_CUBE)
-	{
-		xCubeObjectData d = { 0, };
-		d = dynamic_cast<xvCube*>(xo)->CubeData();
-		////if (!wc)
-		wcube *wc = new wcube(plate);
-		wc->LEName->setText(n);
-		wc->setMinimumWidth(230);
-		wc->LEP1X->setText(QString("%1").arg(d.p0x)); wc->LEP1Y->setText(QString("%1").arg(d.p0y)); wc->LEP1Z->setText(QString("%1").arg(d.p0z));
-		wc->LEP2X->setText(QString("%1").arg(d.p1x)); wc->LEP2Y->setText(QString("%1").arg(d.p1y)); wc->LEP2Z->setText(QString("%1").arg(d.p1z));
-		wc->LESZX->setText(QString("%1").arg(d.p1x - d.p0x));
-		wc->LESZY->setText(QString("%1").arg(d.p1y - d.p0y));
-		wc->LESZZ->setText(QString("%1").arg(d.p1z - d.p0z));
-		plate_layout->addWidget(wc);
-		cwidget = CUBE_WIDGET;
+	if (!xo) {
+		xObject* o = objects[n];
+		if (o->Shape() == CLUSTER_SHAPE) {
+			CallGenerateClusterParticles(o);
+		}
 	}
-	else if (xo->ObjectType() == xvObject::V_PLANE)
-	{
-		xPlaneObjectData d = { 0, };
-		d = dynamic_cast<xvPlane*>(xo)->PlaneData();
-// 		if (wp)
-// 			delete wp;
-		wplane *wp = new wplane(plate);
-		wp->LEName->setText(n);
-		wp->setMinimumWidth(250);
-		vector3d p0 = new_vector3d(d.p0x, d.p0y, d.p0z);
-		vector3d p1 = new_vector3d(d.p1x, d.p1y, d.p1z);
-		vector3d p3 = new_vector3d(d.p3x, d.p3y, d.p3z);
-		vector3d dir = cross(p1 - p0, p3 - p0);
-		dir = dir / length(dir);
-		wp->LEP1X->setText(QString("%1").arg(d.p0x)); wp->LEP1Y->setText(QString("%1").arg(d.p0y)); wp->LEP1Z->setText(QString("%1").arg(d.p0z));
-		wp->LEP2X->setText(QString("%1").arg(d.p2x)); wp->LEP2Y->setText(QString("%1").arg(d.p2y)); wp->LEP2Z->setText(QString("%1").arg(d.p2z));
-		wp->LEDIRX->setText(QString("%1").arg(dir.x)); wp->LEDIRY->setText(QString("%1").arg(dir.y)); wp->LEDIRZ->setText(QString("%1").arg(dir.z));
-		plate_layout->addWidget(wp);
-		cwidget = PLANE_WIDGET;
+	else {
+		if (xo->ObjectType() == xvObject::V_CUBE)
+		{
+			xCubeObjectData d = { 0, };
+			d = dynamic_cast<xvCube*>(xo)->CubeData();
+			////if (!wc)
+			wcube *wc = new wcube(plate);
+			wc->LEName->setText(n);
+			wc->setMinimumWidth(230);
+			wc->LEP1X->setText(QString("%1").arg(d.p0x)); wc->LEP1Y->setText(QString("%1").arg(d.p0y)); wc->LEP1Z->setText(QString("%1").arg(d.p0z));
+			wc->LEP2X->setText(QString("%1").arg(d.p1x)); wc->LEP2Y->setText(QString("%1").arg(d.p1y)); wc->LEP2Z->setText(QString("%1").arg(d.p1z));
+			wc->LESZX->setText(QString("%1").arg(d.p1x - d.p0x));
+			wc->LESZY->setText(QString("%1").arg(d.p1y - d.p0y));
+			wc->LESZZ->setText(QString("%1").arg(d.p1z - d.p0z));
+			plate_layout->addWidget(wc);
+			cwidget = CUBE_WIDGET;
+		}
+		else if (xo->ObjectType() == xvObject::V_PLANE)
+		{
+			xPlaneObjectData d = { 0, };
+			d = dynamic_cast<xvPlane*>(xo)->PlaneData();
+			// 		if (wp)
+			// 			delete wp;
+			wplane *wp = new wplane(plate);
+			wp->LEName->setText(n);
+			wp->setMinimumWidth(250);
+			vector3d p0 = new_vector3d(d.p0x, d.p0y, d.p0z);
+			vector3d p1 = new_vector3d(d.p1x, d.p1y, d.p1z);
+			vector3d p3 = new_vector3d(d.p3x, d.p3y, d.p3z);
+			vector3d dir = cross(p1 - p0, p3 - p0);
+			dir = dir / length(dir);
+			wp->LEP1X->setText(QString("%1").arg(d.p0x)); wp->LEP1Y->setText(QString("%1").arg(d.p0y)); wp->LEP1Z->setText(QString("%1").arg(d.p0z));
+			wp->LEP2X->setText(QString("%1").arg(d.p2x)); wp->LEP2Y->setText(QString("%1").arg(d.p2y)); wp->LEP2Z->setText(QString("%1").arg(d.p2z));
+			wp->LEDIRX->setText(QString("%1").arg(dir.x)); wp->LEDIRY->setText(QString("%1").arg(dir.y)); wp->LEDIRZ->setText(QString("%1").arg(dir.z));
+			plate_layout->addWidget(wp);
+			cwidget = PLANE_WIDGET;
+		}
+		CallViewWidget(xo);
 	}
-	CallViewWidget(xo);
+	
 }
 
 
@@ -324,6 +350,22 @@ void xModelNavigator::CallSimulation()
 	cwidget = SIMULATION_WIDGET;
 
 	emit definedSimulationWidget(xws);
+}
+
+void xModelNavigator::CallGenerateClusterParticles(xObject* o)
+{
+	xClusterObject* cobj = dynamic_cast<xClusterObject*>(o);
+	wgenclusters *w = new wgenclusters(plate);
+	w->LEName->setText(QString::fromStdString(o->Name()));
+	w->setClusterView(cobj->NumElement(), (double*)cobj->RelativeLocation());
+	plate_layout->addWidget(w);
+	plate_layout->setAlignment(Qt::AlignTop);
+	plate_frame->setMaximumWidth(270);
+	plate_frame->setLayout(plate_layout);
+	plate->setWidget(plate_frame);
+	cwidget = GENCLUSTER_WIDGET;
+
+	emit definedGenerateClustersWidget(w);
 }
 
 void xModelNavigator::CallPointMass(QString& n)

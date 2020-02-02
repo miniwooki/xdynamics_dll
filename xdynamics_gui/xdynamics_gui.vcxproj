@@ -157,7 +157,9 @@
     <ClCompile Include="..\source\xdynamics_gui\xChartSpline.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xChartView.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xChartWindow.cpp" />
+    <ClCompile Include="..\source\xdynamics_gui\xCheckCollisionDialog.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xdynamics_gui.cpp" />
+    <ClCompile Include="..\source\xdynamics_gui\xGenerateClusterWidget.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xLineSeries.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xListWidget.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xMessageBox.cpp" />
@@ -185,11 +187,17 @@
     <ClCompile Include="..\source\xdynamics_gui\xvParticle.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xvPlane.cpp" />
     <ClCompile Include="..\source\xdynamics_gui\xvShader.cpp" />
+    <ClCompile Include="GeneratedFiles\Debug\moc_xGenerateClusterWidget.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_xSimulationWidget.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <QtUic Include="check_collision_dialog.ui" />
     <QtUic Include="gen_cluster_dialog.ui" />
     <QtUic Include="wcube.ui" />
+    <QtUic Include="wgenclusters.ui" />
     <QtUic Include="wparticles.ui" />
     <QtUic Include="wparticle_result.ui" />
     <QtUic Include="wplane.ui" />
@@ -218,6 +226,14 @@
       <Define Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ADD_;_WINDOWS;_USE_MATH_DEFINES;UNICODE;_UNICODE;WIN32;WIN64;_DEBUG;QT_CHARTS_LIB;QT_CORE_LIB;QT_GUI_LIB;QT_OPENGL_LIB;QT_WIDGETS_LIB;%(PreprocessorDefinitions)</Define>
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles;.;$(USING_CUDA_SAMPLE_VERSION)\common\inc;.\GeneratedFiles\$(ConfigurationName);$(USING_QT_VERSION)\include\QtCore;$(USING_QT_VERSION)\include\QtGui;$(USING_QT_VERSION)\include\QtANGLE;$(USING_QT_VERSION)\include\QtOpenGL;$(USING_QT_VERSION)\include\QtOpenGLExtensions;$(USING_QT_VERSION)\include\QtWidgets;$(USING_IRRLICHT_VERSION)\include;C:\xdynamics\include\xdynamics_gui;C:\xdynamics\include;$(USING_QT_VERSION)\include\QtCharts;$(USING_QT_VERSION)\include;$(USING_CUDA_VERSION)\include</IncludePath>
       <Define Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_USE_MATH_DEFINES;UNICODE;_UNICODE;WIN32;WIN64;QT_NO_DEBUG;NDEBUG;QT_CHARTS_LIB;QT_CORE_LIB;QT_GUI_LIB;QT_OPENGL_LIB;QT_WIDGETS_LIB;%(PreprocessorDefinitions)</Define>
+    </QtMoc>
+    <QtMoc Include="..\include\xdynamics_gui\xGenerateClusterWidget.h">
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles;.;$(USING_CUDA_SAMPLE_VERSION)\common\inc;.\GeneratedFiles\$(ConfigurationName);$(USING_QT_VERSION)\include\QtCore;$(USING_QT_VERSION)\include\QtGui;$(USING_QT_VERSION)\include\QtANGLE;$(USING_QT_VERSION)\include\QtOpenGL;$(USING_QT_VERSION)\include\QtOpenGLExtensions;$(USING_QT_VERSION)\include\QtWidgets;$(USING_IRRLICHT_VERSION)\include;C:\xdynamics\include\xdynamics_gui;C:\xdynamics\include;$(USING_QT_VERSION)\include;$(USING_CUDA_VERSION)\include;$(USING_QT_VERSION)\include\QtCharts;$(USING_QT_VERSION)\include\QtDataVisualization</IncludePath>
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles;.;$(USING_CUDA_SAMPLE_VERSION)\common\inc;.\GeneratedFiles\$(ConfigurationName);$(USING_QT_VERSION)\include\QtCore;$(USING_QT_VERSION)\include\QtGui;$(USING_QT_VERSION)\include\QtANGLE;$(USING_QT_VERSION)\include\QtOpenGL;$(USING_QT_VERSION)\include\QtOpenGLExtensions;$(USING_QT_VERSION)\include\QtWidgets;$(USING_IRRLICHT_VERSION)\include;C:\xdynamics\include\xdynamics_gui;C:\xdynamics\include;$(USING_QT_VERSION)\include\QtCharts;$(USING_QT_VERSION)\include;$(USING_CUDA_VERSION)\include;$(QTDIR)\include\QtDataVisualization</IncludePath>
+    </QtMoc>
+    <QtMoc Include="..\include\xdynamics_gui\xCheckCollisionDialog.h">
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles;.;$(USING_CUDA_SAMPLE_VERSION)\common\inc;.\GeneratedFiles\$(ConfigurationName);$(USING_QT_VERSION)\include\QtCore;$(USING_QT_VERSION)\include\QtGui;$(USING_QT_VERSION)\include\QtANGLE;$(USING_QT_VERSION)\include\QtOpenGL;$(USING_QT_VERSION)\include\QtOpenGLExtensions;$(USING_QT_VERSION)\include\QtWidgets;$(USING_IRRLICHT_VERSION)\include;C:\xdynamics\include\xdynamics_gui;C:\xdynamics\include;$(USING_QT_VERSION)\include;$(USING_CUDA_VERSION)\include;$(USING_QT_VERSION)\include\QtCharts;$(USING_QT_VERSION)\include\QtDataVisualization</IncludePath>
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles;.;$(USING_CUDA_SAMPLE_VERSION)\common\inc;.\GeneratedFiles\$(ConfigurationName);$(USING_QT_VERSION)\include\QtCore;$(USING_QT_VERSION)\include\QtGui;$(USING_QT_VERSION)\include\QtANGLE;$(USING_QT_VERSION)\include\QtOpenGL;$(USING_QT_VERSION)\include\QtOpenGLExtensions;$(USING_QT_VERSION)\include\QtWidgets;$(USING_IRRLICHT_VERSION)\include;C:\xdynamics\include\xdynamics_gui;C:\xdynamics\include;$(USING_QT_VERSION)\include\QtCharts;$(USING_QT_VERSION)\include;$(USING_CUDA_VERSION)\include;$(QTDIR)\include\QtDataVisualization</IncludePath>
     </QtMoc>
     <ClInclude Include="..\include\xdynamics_gui\xLineSeries.h" />
     <QtMoc Include="..\include\xdynamics_gui\xparticle_result_dlg.h">

@@ -1,32 +1,10 @@
-#include "xdynamics_object\xClusterObject.h"
+#include "xdynamics_object/xClusterObject.h"
 
-//xCluster::xCluster()
-//	: nelement(0)
-//	, start_index(0)
-//	, cm(new_vector3d(0.0, 0.0, 0.0))
-//	, quaternion(new_vector3d(0.0, 0.0, 0.0))
-//	, angle(new_vector3d(0.0, 0.0, 0.0))
-//	, omega(new_vector3d(0.0, 0.0, 0.0))
-//	, relative_loc(NULL)
-//{
-//
-//}
-//
-//xCluster::~xCluster()
-//{
-//	if (relative_loc) delete[] relative_loc; relative_loc = NULL;
-//}
-//
-//void xCluster::setCluster(unsigned int num, vector3d *d)
-//{
-//	relative_loc = new vector3d[num];
-//	memcpy(relative_loc, d, sizeof(vector3d) * num);
-//}
-//
 xClusterObject::xClusterObject()
 	: nelement(0)
 	, min_radius(0)
 	, max_radius(0)
+	, total_clusters(0)
 	, relative_loc(NULL)
 {
 }
@@ -36,23 +14,40 @@ xClusterObject::xClusterObject(std::string name)
 	, nelement(0)
 	, min_radius(0)
 	, max_radius(0)
+	, total_clusters(0)
 	, relative_loc(NULL)
 {
 }
+
+//xClusterObject::xClusterObject(const xClusterObject& cobj)
+//	: xObject(cobj)
+//	, is_random_radius(cobj.IsRandomRadius())
+//	, is_each_cluster(cobj.IsRandomRadiusEachCluster())
+//	, nelement(cobj.NumElement())
+//	, total_clusters(cobj.TotalClusters())
+//	, min_radius(cobj.MinimumRadius())
+//	, max_radius(cobj.MaximumRadius())
+//{
+//	relative_loc = new vector4d[nelement];
+//	vector4d* rloc = cobj.RelativeLocation();
+//	for (unsigned int i = 0; i < nelement; i++) {
+//		relative_loc[i] = rloc[i];
+//	}
+//}
 
 xClusterObject::~xClusterObject()
 {
 	if (relative_loc) delete[] relative_loc; relative_loc = NULL;
 }
 
-void xClusterObject::setClusterSet(unsigned int num, double min_rad, double max_rad, vector3d * d, bool isEachCluster)
+void xClusterObject::setClusterSet(unsigned int num, double min_rad, double max_rad, vector4d * d, bool isEachCluster)
 {
 	is_each_cluster = isEachCluster;
 	nelement = num;
 	min_radius = min_rad;
 	max_radius = max_rad;
-	relative_loc = new vector3d[num];
-	memcpy(relative_loc, d, sizeof(vector3d) * num);
+	relative_loc = new vector4d[num];
+	memcpy(relative_loc, d, sizeof(vector4d) * num);
 }
 
 unsigned int xClusterObject::NumElement()
@@ -70,7 +65,7 @@ double xClusterObject::ElementMaximumRadius()
 	return max_radius;
 }
 
-vector3d * xClusterObject::RelativeLocation()
+vector4d * xClusterObject::RelativeLocation()
 {
 	return relative_loc;
 }
@@ -83,4 +78,49 @@ bool xClusterObject::IsRandomRadiusEachCluster()
 bool xClusterObject::IsRandomRadius()
 {
 	return min_radius == max_radius;
+}
+
+void xClusterObject::SetTotalClusters(unsigned int n)
+{
+	total_clusters = n;
+}
+
+unsigned int xClusterObject::TotalClusters()
+{
+	return total_clusters;
+}
+
+bool xClusterObject::IsRandomRadius() const
+{
+	return is_random_radius;
+}
+
+bool xClusterObject::IsRandomRadiusEachCluster() const
+{
+	return is_each_cluster;
+}
+
+unsigned int xClusterObject::NumElement() const
+{
+	return nelement;
+}
+
+unsigned int xClusterObject::TotalClusters() const
+{
+	return total_clusters;
+}
+
+double xClusterObject::MinimumRadius() const
+{
+	return min_radius;
+}
+
+double xClusterObject::MaximumRadius() const
+{
+	return max_radius;
+}
+
+vector4d * xClusterObject::RelativeLocation() const
+{
+	return relative_loc;
 }

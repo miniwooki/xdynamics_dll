@@ -2,7 +2,6 @@
 #include "xdynamics_gui.h"
 
 #include "xdynamics_manager/xDynamicsManager.h"
-#include "xModelNavigator.h"
 #include "xSimulationThread.h"
 #include "xResultCallThread.h"
 #include "xdynamics_simulation/xSimulation.h"
@@ -17,12 +16,18 @@
 #include <QtCore/QMimeData>
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QShortcut>
+#include "xModelNavigator.h"
 #include "gen_cluster_dlg.h"
+#include "xGenerateClusterWidget.h"
+#include "xdynamics_manager/xParticleMananger.h"
+#include "xdynamics_manager/xObjectManager.h"
+#include "xCheckCollisionDialog.h"
 //#include <QtWidgets/QListWidget>
 
 xdynamics_gui* xgui;
 wsimulation* wsim;
 wresult* wrst = NULL;
+wgenclusters* wgencst = nullptr;
 wpointmass* wpm;
 static xSimulationThread* sThread = NULL;
 static xResultCallThread* rThread = NULL;
@@ -44,6 +49,10 @@ xdynamics_gui::xdynamics_gui(int _argc, char** _argv, QWidget *parent)
 	, xchart(NULL)
 	, xcc(NULL)
 	, myAnimationBar(NULL)
+	, c_checker(nullptr)
+	, pmgr(nullptr)
+	, omgr(nullptr)
+//	, gen_cluster(nullptr)
 	//, simThread(NULL)
 	, isOnViewModel(false)
 {
@@ -69,6 +78,7 @@ xdynamics_gui::xdynamics_gui(int _argc, char** _argv, QWidget *parent)
 	xgl = new xGLWidget(_argc, _argv, NULL);
 	xcw = new xCommandWindow(this);
 	xcomm = new QDockWidget(this);
+	omgr = new xObjectManager;
 	xcomm->setWindowTitle("Command Line");
 	QLineEdit* LE_Comm = new xLineEditWidget;
 	xcomm->setWidget(LE_Comm);
@@ -88,6 +98,7 @@ xdynamics_gui::xdynamics_gui(int _argc, char** _argv, QWidget *parent)
 	xnavi = new xModelNavigator(this);
 	addDockWidget(Qt::LeftDockWidgetArea, xnavi);
 	setAcceptDrops(true);
+	connect(xnavi, SIGNAL(definedGenerateClustersWidget(wgenclusters*)), this, SLOT(xGetGenerateClustersWidget(wgenclusters*)));
 	connect(xnavi, SIGNAL(definedSimulationWidget(wsimulation*)), this, SLOT(xGetSimulationWidget(wsimulation*)));
 	connect(xnavi, SIGNAL(definedPointMassWidget(wpointmass*)), this, SLOT(xGetPointMassWidget(wpointmass*)));
 	connect(xnavi, SIGNAL(definedResultWidget(wresult*)), this, SLOT(xGetResultWidget(wresult*)));
@@ -101,6 +112,12 @@ xdynamics_gui::xdynamics_gui(int _argc, char** _argv, QWidget *parent)
 	desktop_size.setWidth(desktop.right);
 	desktop_size.setHeight(desktop.bottom);
 	xNew();
+}
+
+void xdynamics_gui::xGetGenerateClustersWidget(wgenclusters* w)
+{
+	wgencst = w;
+	connect(w, &wgenclusters::clickedGenerateButton, this, &xdynamics_gui::xGenerateClusterParticles);
 }
 
 void xdynamics_gui::xGetSimulationWidget(wsimulation* w)
@@ -147,6 +164,8 @@ xdynamics_gui::~xdynamics_gui()
 	if (xcl) delete xcl; xcl = NULL;
 	if (xchart) delete xchart; xchart = NULL;
 	if (xcc) delete xcc; xcc = NULL;
+	if (pmgr) delete pmgr; pmgr = nullptr;
+	if (omgr) delete omgr; omgr = nullptr;
 	xvAnimationController::releaseTimeMemory();
 }
 
@@ -672,6 +691,10 @@ void xdynamics_gui::setupObjectOperations()
 	connect(a, SIGNAL(triggered()), this, SLOT(xGenerateClusterDistribution()));
 	myObjectActions.insert(GENERATE_CLUSTER_DISTRIBUTION, a);
 
+	a = new QAction(QIcon(":/Resources/icon/collision_check.png"), tr("&Check Collision"), this);
+	a->setStatusTip(tr("Check collision between particles"));
+	connect(a, SIGNAL(triggered()), this, SLOT(xCheckCollision()));
+	myObjectActions.insert(CHECK_COLLISION, a);
 
 // 	a = new QAction(QIcon(":/Resources/icon/save.png"), tr("&Save"), this);
 // 	a->setStatusTip(tr("Save project"));
@@ -888,10 +911,25 @@ void xdynamics_gui::xPassDistribution()
 
 void xdynamics_gui::xGenerateClusterDistribution()
 {
+	//if (!gen_cluster)
+	//	gen_cluster = new gen_cluster_dlg(this);
+	//gen_cluster->prepareShow();
 	gen_cluster_dlg dlg(this);
 	int ret = dlg.exec();
 	if (ret) {
-
+		QMapIterator<QString, QPair<QString, xClusterObject*>> cluster(dlg.clusters);
+		while (cluster.hasNext()) {
+			cluster.next();
+			QString name = QString::fromStdString(cluster.value().second->Name());
+			xClusterObject* pobj = cluster.value().second;
+			xClusterObject* cobj = omgr->CreateClusterShapeObject(name.toStdString(), NO_MATERIAL);
+			cobj->setClusterSet(
+				pobj->NumElement(),
+				pobj->MinimumRadius(),
+				pobj->MaximumRadius(), 
+				pobj->RelativeLocation(), 0);
+			xnavi->addChild(xModelNavigator::SHAPE_ROOT, name, cobj);		
+		}
 	}
 }
 
@@ -1007,6 +1045,7 @@ void xdynamics_gui::xInitializeWidgetStatement()
 {
 	if (wpm) wpm = NULL;
 	if (wsim) wsim = NULL;
+	//if(gencst) 
 }
 
 void xdynamics_gui::xOnGeometrySelectionOfPointMass()
@@ -1115,3 +1154,44 @@ void xdynamics_gui::xRunSimulationThread(double dt, unsigned int st, double et)
 	sThread->start();
 	wsim->set_stop_state();
 }
+
+void xdynamics_gui::xGenerateClusterParticles(QString name, int* dim, double* loc)
+{
+	if (dim[0] < 1 || dim[1] < 1 || dim[2] < 1)
+	{
+		xcw->write(xCommandWindow::CMD_ERROR, QString::fromLocal8Bit("생성 크기는 적어도 1보다 큰 숫자여야 합니다."));
+	}
+	if (!pmgr)
+		pmgr = new xParticleManager;
+	xClusterObject* cobj = dynamic_cast<xClusterObject*>(omgr->XObject(name.toStdString()));
+	vector3i _dim = { dim[0], dim[1], dim[2] };
+	vector3d _loc = { loc[0], loc[1], loc[2] };
+	xParticleObject* pobj = pmgr->CreateClusterParticle(cobj->Name(), cobj->Material(), _loc, _dim, cobj);
+	if (!xgl->vParticles())
+		xgl->createParticles();
+	if (xgl->vParticles())
+	{
+		xgl->vParticles()->defineFromParticleObject(pobj);
+		//QStringList qsl = xgl->vParticles()->ParticleGroupData().keys();
+		xnavi->addChild(xModelNavigator::PARTICLE_ROOT, name);
+	}
+	//pmgr->CreateClusterParticle()
+}
+
+void xdynamics_gui::xCheckCollision()
+{
+	if (!xgl->vParticles())
+		return;
+	if (!c_checker)
+		c_checker = new xCheckCollisionDialog(this);
+	//connect(c_checker, &xCheckCollisionDialog::highlightSelectedParticle, &xdynamics_gui::xHighlightParticle);
+	c_checker->setup(xgl->vParticles(), pmgr, omgr);
+	c_checker->show();
+	c_checker->raise();
+	c_checker->activateWindow();
+}
+
+//void xdynamics_gui::xHighlightParticle(unsigned int id, QColor color, QColor& pcolor)
+//{
+//	xgl->vParticles()->ChangeColor(id, color, pcolor);
+//}

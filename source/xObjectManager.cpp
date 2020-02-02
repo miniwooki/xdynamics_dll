@@ -44,6 +44,28 @@ xmap<xstring, xObject*>& xObjectManager::XObjects()
 	return objects;
 }
 
+map<std::string, xObject*> xObjectManager::XObjectsToSTD()
+{
+	xmap<xstring, xObject*>::iterator it = objects.begin();
+	map<std::string, xObject*> ret;
+	while (it.has_next()) {
+		ret[it.key().toStdString()] = it.value();
+	}
+	return ret;
+}
+
+map<std::string, xClusterObject*> xObjectManager::XClusterObjects()
+{
+	xmap<xstring, xObject*>::iterator it = objects.begin();
+	map<std::string, xClusterObject*> ret;
+	while (it.has_next()) {
+		if(it.value()->Shape() == CLUSTER_SHAPE)
+			ret[it.key().toStdString()] = dynamic_cast<xClusterObject*>(it.value());
+		it.next();
+	}
+	return ret;
+}
+
 xPointMass * xObjectManager::setMovingConstantMovingVelocity(std::string _name, double* v)
 {
 	xPointMass* xpm = dynamic_cast<xPointMass*>(XObject(_name));

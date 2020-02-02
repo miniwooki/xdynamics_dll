@@ -1,6 +1,7 @@
 #pragma once
 #include "ui_wparticle_result.h"
 #include <QStringList>
+#include <QMap>
 
 class xResultManager;
 
@@ -34,4 +35,6 @@ private:
 	load_target ltg;
 	QStringList part_labels;
 	QStringList time_labels;
+
+	
 };

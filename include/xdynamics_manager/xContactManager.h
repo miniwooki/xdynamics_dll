@@ -8,6 +8,7 @@
 #include "xdynamics_object/xParticleCubeContact.h"
 #include "xdynamics_object/xParticleMeshObjectContact.h"
 #include "xdynamics_object/xParticleCylinderContact.h"
+#include <map>
 //#include "xdynamics_object/xParticleCylindersContact.h"
 
 //#include <QtCore/qlist.h>
@@ -59,11 +60,18 @@ public:
 	void allocPairList(unsigned int np);
 	void SaveStepResult(unsigned int pt, unsigned int np);
 	void set_from_part_result(std::fstream& fs);
-	
+	std::map<pair<unsigned int, unsigned int>, xPairData> CalculateCollisionPair(
+		vector4d* pos,
+		unsigned int* sorted_id,
+		unsigned int* cell_start,
+		unsigned int* cell_end,
+		xClusterInformation* xci,
+		unsigned int ncobject,
+		unsigned int np);
 
 private:
 	void updateCollisionPair(
-		vector4d* pos, 
+		vector4d* pos,
 		unsigned int* sorted_id,
 		unsigned int* cell_start,
 		unsigned int* cell_end,

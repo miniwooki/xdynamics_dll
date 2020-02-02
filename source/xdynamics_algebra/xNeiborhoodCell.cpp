@@ -36,3 +36,8 @@ void xNeiborhoodCell::detection(double *pos, unsigned int np, unsigned int sid)
 	else
 		_detection((vector4d*)pos, np, sid);
 }
+
+void xNeiborhoodCell::detectionCpu(double * pos, unsigned int np, unsigned int sid)
+{
+	_detection((vector4d*)pos, np, sid);
+}
