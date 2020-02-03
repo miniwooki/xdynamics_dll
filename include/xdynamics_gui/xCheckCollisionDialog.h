@@ -29,16 +29,13 @@ private slots:
 	void clickTreeItem(QTreeWidgetItem* item, int column);
 	void highlightSelectedCluster(int row, int column);
 	void selectedItemProcess();
+	void changePosition(QTableWidgetItem* item);
 
 //signals:
 //	void highlightSelectedParticle(unsigned int id, QColor rgb, QColor&);
 
 private:
-	//unsigned int np;
-	//unsigned int ncp;
-	//double* pos;
-	//double* ep;
-	//double* cpos;
+	bool isSetup;
 	bool isChangedSelection;
 	xvParticle* xp;
 	xObjectManager* omgr;

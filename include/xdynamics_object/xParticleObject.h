@@ -26,6 +26,7 @@ public:
 	void CopyPosition(double* _pos);
 	void CopyMassAndInertia(double* _mass, vector3d* _inertia);
 	void CopyClusterPosition(double* _pos, double* _ep);
+	void CopyClusterPosition(unsigned int _sid, double* _pos, double* _ep);
 	unsigned int StartIndex() const;
 	unsigned int StartClusterIndex() const;
 	unsigned int MassIndex() const;

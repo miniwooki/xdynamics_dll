@@ -51,7 +51,7 @@ public:
 	double MaxnRadiusOfGroupData(QString& n);
 	QMap<QString, particleGroupData>& ParticleGroupData() { return pgds; }
 	void ChangeColor(unsigned int id, QColor rgb, QColor& pcolor);
-
+	void ChangePosition(unsigned int id, double x, double y, double z);
 	bool hasRelativePosition() { return r_pos != NULL; }
 	float* ColorBuffers();
 	float* PositionBuffers();

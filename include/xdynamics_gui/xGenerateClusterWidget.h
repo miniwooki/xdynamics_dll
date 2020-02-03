@@ -23,12 +23,13 @@ public:
 	//bool is_simulationing();
 	//void set_stop_state();
 	//void set_start_state();
-
+	void setClusterShapeName(QString name);
+	QString ClusterShapeName();
 	void setClusterView(unsigned int, double*);
 	//void clickedStartPointButton();
 	//void clickedStopButton();
 signals:
-	void clickedGenerateButton(QString, int*, double*);
+	void clickedGenerateButton(QString, QString, int*, double*);
 
 private slots:
 	void generateClusterParticles();
@@ -38,6 +39,7 @@ private slots:
 	//void CheckStartingPoint(bool);
 
 private:
+	QString clusterShapeName;
 	Q3DScatter *graph;
 	ScatterDataModifier *modifier;
 };

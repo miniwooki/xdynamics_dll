@@ -153,6 +153,7 @@ gen_cluster_dlg::gen_cluster_dlg(QWidget* parent)
 	connect(PB_New, &QPushButton::clicked, this, &gen_cluster_dlg::clickNew);
 	connect(PB_Add, &QPushButton::clicked, this, &gen_cluster_dlg::clickAdd);
 	connect(PB_Gen, &QPushButton::clicked, this, &gen_cluster_dlg::clickGen);
+	connect(PB_Cancel, &QPushButton::clicked, this, &gen_cluster_dlg::clickCancel);
 	connect(InputTable, &QTableWidget::itemChanged, this, &gen_cluster_dlg::changeItem);
 	connect(InputTable, &QTableWidget::cellActivated, this, &gen_cluster_dlg::changeCell);
 	rc[0] = -1;
@@ -240,6 +241,10 @@ void gen_cluster_dlg::clickUpdate()
 void gen_cluster_dlg::clickNew()
 {
 	checkNeedAdd();
+	InputTable->setRowCount(0);
+	tableItems.clear();
+	Information->clear();
+	modifier->reset();
 	rc[0] = -1;
 	rc[1] = -1;
 	isNewCluster = true;

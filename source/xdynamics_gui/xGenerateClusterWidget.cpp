@@ -15,6 +15,16 @@ wgenclusters::~wgenclusters()
 	if (modifier) delete modifier; modifier = nullptr;
 }
 
+void wgenclusters::setClusterShapeName(QString name)
+{
+	clusterShapeName = name;
+}
+
+QString wgenclusters::ClusterShapeName()
+{
+	return clusterShapeName;
+}
+
 void wgenclusters::setClusterView(unsigned int n, double* c)
 {
 	graph = new Q3DScatter;
@@ -42,7 +52,7 @@ void wgenclusters::generateClusterParticles()
 	{ DX->text().toInt(), DY->text().toInt(), DZ->text().toInt() };
 	double loc[3] =
 	{ LEX->text().toDouble(), LEY->text().toDouble(), LEZ->text().toDouble() };
-	emit clickedGenerateButton(name, dim, loc);
+	emit clickedGenerateButton(clusterShapeName, name, dim, loc);
 }
 
 void wgenclusters::changeScale(int scale)

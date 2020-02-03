@@ -164,6 +164,12 @@ void xParticleObject::CopyMassAndInertia(double * _mass, vector3d* _inertia)
 	}*/
 }
 
+void xParticleObject::CopyClusterPosition(unsigned int _sid, double* _pos, double *_ep)
+{
+	memcpy(_pos + _sid * 4, cpos, sizeof(vector4d) * cnp);
+	memcpy(_ep + _sid * 4, ep, sizeof(vector4d) * cnp);
+}
+
 void xParticleObject::CopyClusterPosition(double* _pos, double *_ep)
 {
 	memcpy(_pos + csid * 4, cpos, sizeof(vector4d) * cnp);

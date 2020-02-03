@@ -356,7 +356,8 @@ void xModelNavigator::CallGenerateClusterParticles(xObject* o)
 {
 	xClusterObject* cobj = dynamic_cast<xClusterObject*>(o);
 	wgenclusters *w = new wgenclusters(plate);
-	w->LEName->setText(QString::fromStdString(o->Name()));
+	w->LEName->setText("Set" + QString::fromStdString(o->Name()));
+	w->setClusterShapeName(QString::fromStdString(o->Name()));
 	w->setClusterView(cobj->NumElement(), (double*)cobj->RelativeLocation());
 	plate_layout->addWidget(w);
 	plate_layout->setAlignment(Qt::AlignTop);

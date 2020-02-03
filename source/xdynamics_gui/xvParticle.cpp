@@ -685,6 +685,14 @@ void xvParticle::ChangeColor(unsigned int id, QColor c, QColor& pcolor)
 	color[cid + 2] = c.blueF();
 }
 
+void xvParticle::ChangePosition(unsigned int id, double x, double y, double z)
+{
+	unsigned int cid = id * 4;
+	pos[cid + 0] = (float)x;
+	pos[cid + 1] = (float)y;
+	pos[cid + 2] = (float)z;
+}
+
 bool xvParticle::defineFromRelativePosition(vector3d & p, euler_parameters & ep)
 {
 	resizePositionMemory(np, np + r_np);

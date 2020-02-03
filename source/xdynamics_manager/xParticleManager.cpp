@@ -36,7 +36,7 @@ xParticleManager::~xParticleManager()
 {
 	if (r_pos) delete[] r_pos; r_pos = NULL;
 	if (r_vel) delete[] r_vel; r_vel = NULL;
-	xpcos.delete_all();
+	//xpcos.delete_all();
 	/*if (isCluster) delete[] isCluster; isCluster = NULL;
 	if (cluster_index) delete[] cluster_index; cluster_index = NULL;
 	if (cluster_count) delete[] cluster_count; cluster_count = NULL;

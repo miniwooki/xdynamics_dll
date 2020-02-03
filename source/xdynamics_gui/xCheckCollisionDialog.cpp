@@ -9,6 +9,7 @@ xCheckCollisionDialog::xCheckCollisionDialog(QWidget* parent)
 	: QDialog(parent)
 	, xp(nullptr)
 	, pmgr(nullptr)
+	, isSetup(false)
 	, isChangedSelection(false)
 {
 	setupUi(this);
@@ -16,6 +17,7 @@ xCheckCollisionDialog::xCheckCollisionDialog(QWidget* parent)
 	connect(CollisionParticle, &QTreeWidget::itemClicked, this, &xCheckCollisionDialog::clickTreeItem);
 	connect(Information, &QTableWidget::cellClicked, this, &xCheckCollisionDialog::highlightSelectedCluster);
 	connect(Information, &QTableWidget::itemSelectionChanged, this, &xCheckCollisionDialog::selectedItemProcess);
+	connect(Information, &QTableWidget::itemChanged, this, &xCheckCollisionDialog::changePosition);
 }
 
 xCheckCollisionDialog::~xCheckCollisionDialog()
@@ -28,12 +30,38 @@ void xCheckCollisionDialog::selectedItemProcess()
 	isChangedSelection = true;
 }
 
+void xCheckCollisionDialog::changePosition(QTableWidgetItem * item)
+{
+	if (!isSetup)
+		return;
+	if (!Information->rowCount())
+		return;
+	int row = Information->currentRow();
+	int column = Information->currentColumn();
+	xClusterInformation info;
+	foreach(info, cinfos) {
+		if (row >= info.sid && row * info.neach < info.sid + info.count)
+			break;
+	}
+	unsigned int cid = info.sid + row * info.neach;
+	for (unsigned int i = cid; i < cid + info.neach; i++) {
+		QTableWidgetItem* x = Information->item(row, 0);
+		QTableWidgetItem* y = Information->item(row, 1);
+		QTableWidgetItem* z = Information->item(row, 2);
+		xp->ChangePosition(
+			i, 
+			x->text().toDouble(), 
+			y->text().toDouble(), 
+			z->text().toDouble());
+	}
+}
+
 void xCheckCollisionDialog::mouseReleaseEvent(QMouseEvent *event)
 {
-	if (isChangedSelection) {
+	/*if (isChangedSelection) {
 		QList<QTableWidgetItem*> items = Information->selectedItems();
 
-	}
+	}*/
 }
 
 void xCheckCollisionDialog::highlightSelectedCluster(int row, int column)
@@ -170,6 +198,7 @@ void xCheckCollisionDialog::setup(xvParticle* _xp, xParticleManager* _pmgr, xObj
 	if(pos) delete[] pos;
 	if(ep) delete[] ep;
 	if(cpos) delete[] cpos;
+	isSetup = true;
 }
 
 void xCheckCollisionDialog::checkCollision()
@@ -199,9 +228,13 @@ void xCheckCollisionDialog::checkCollision()
 	}
 	xClusterInformation* _cinfos = new xClusterInformation[count];
 	count = 0;
+	unsigned int sid = 0;
 	foreach(QListWidgetItem* item, items) {
 		if (item->checkState() == Qt::Checked) {
-			_cinfos[count++] = cinfos[item->text()];
+			xParticleObject* xpo = pmgr->XParticleObject(item->text().toStdString());
+			_cinfos[count] = cinfos[item->text()];
+			_cinfos[count++].sid = sid;
+			sid += xpo->NumParticle();
 		}
 	}
 	double *pos = new double[np * 4];
@@ -210,10 +243,13 @@ void xCheckCollisionDialog::checkCollision()
 	double *cpos = nullptr;
 	if (ncp)
 		cpos = new double[ncp * 4];
+	sid = 0;
 	foreach(xParticleObject* xpo, pobjects) {
 		xpo->CopyPosition(pos);
-		if (cpos && xpo->ShapeForm() == CLUSTER_SHAPE)
-			xpo->CopyClusterPosition(cpos, ep);
+		if (cpos && xpo->ShapeForm() == CLUSTER_SHAPE) {
+			xpo->CopyClusterPosition(sid, cpos, ep);
+			sid += xpo->NumParticle();
+		}			
 	}
 	double minRadius = FLT_MAX;
 	double maxRadius = -FLT_MAX;

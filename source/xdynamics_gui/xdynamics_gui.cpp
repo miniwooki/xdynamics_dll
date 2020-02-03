@@ -1155,7 +1155,7 @@ void xdynamics_gui::xRunSimulationThread(double dt, unsigned int st, double et)
 	wsim->set_stop_state();
 }
 
-void xdynamics_gui::xGenerateClusterParticles(QString name, int* dim, double* loc)
+void xdynamics_gui::xGenerateClusterParticles(QString clusterName, QString name, int* dim, double* loc)
 {
 	if (dim[0] < 1 || dim[1] < 1 || dim[2] < 1)
 	{
@@ -1163,10 +1163,10 @@ void xdynamics_gui::xGenerateClusterParticles(QString name, int* dim, double* lo
 	}
 	if (!pmgr)
 		pmgr = new xParticleManager;
-	xClusterObject* cobj = dynamic_cast<xClusterObject*>(omgr->XObject(name.toStdString()));
+	xClusterObject* cobj = dynamic_cast<xClusterObject*>(omgr->XObject(clusterName.toStdString()));
 	vector3i _dim = { dim[0], dim[1], dim[2] };
 	vector3d _loc = { loc[0], loc[1], loc[2] };
-	xParticleObject* pobj = pmgr->CreateClusterParticle(cobj->Name(), cobj->Material(), _loc, _dim, cobj);
+	xParticleObject* pobj = pmgr->CreateClusterParticle(name.toStdString(), NO_MATERIAL, _loc, _dim, cobj);
 	if (!xgl->vParticles())
 		xgl->createParticles();
 	if (xgl->vParticles())
