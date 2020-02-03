@@ -32,7 +32,7 @@ void xCheckCollisionDialog::selectedItemProcess()
 
 void xCheckCollisionDialog::changePosition(QTableWidgetItem * item)
 {
-	if (!isSetup)
+	/*if (!isSetup)
 		return;
 	if (!Information->rowCount())
 		return;
@@ -53,7 +53,7 @@ void xCheckCollisionDialog::changePosition(QTableWidgetItem * item)
 			x->text().toDouble(), 
 			y->text().toDouble(), 
 			z->text().toDouble());
-	}
+	}*/
 }
 
 void xCheckCollisionDialog::mouseReleaseEvent(QMouseEvent *event)
@@ -182,19 +182,19 @@ void xCheckCollisionDialog::setup(xvParticle* _xp, xParticleManager* _pmgr, xObj
 	if (ncp)
 		cpos = new double[ncp * 4];
 	pmgr->CopyPosition(pos, cpos, ep, np);
-	QStringList labels = { "X", "Y", "Z" };
-	Information->setColumnCount(3);
-	Information->setHorizontalHeaderLabels(labels);
-	if (cpos) {
-		Information->setRowCount(ncp);
-		for (unsigned int i = 0; i < ncp; i++) {
-			QTableWidgetItem *item = nullptr;
-			Information->setItem(i, 0, new QTableWidgetItem(QString("%1").arg(cpos[i * 4 + 0])));
-			Information->setItem(i, 1, new QTableWidgetItem(QString("%1").arg(cpos[i * 4 + 1])));
-			Information->setItem(i, 2, new QTableWidgetItem(QString("%1").arg(cpos[i * 4 + 2])));
-			//Information->setItem(i, 3, new QTableWidgetItem(QString("%1").arg(cpos[i * 4 + 3])));
-		}
-	}
+	//QStringList labels = { "X", "Y", "Z" };
+	//Information->setColumnCount(3);
+	//Information->setHorizontalHeaderLabels(labels);
+	//if (cpos) {
+	//	Information->setRowCount(ncp);
+	//	for (unsigned int i = 0; i < ncp; i++) {
+	//		QTableWidgetItem *item = nullptr;
+	//		Information->setItem(i, 0, new QTableWidgetItem(QString("%1").arg(cpos[i * 4 + 0])));
+	//		Information->setItem(i, 1, new QTableWidgetItem(QString("%1").arg(cpos[i * 4 + 1])));
+	//		Information->setItem(i, 2, new QTableWidgetItem(QString("%1").arg(cpos[i * 4 + 2])));
+	//		//Information->setItem(i, 3, new QTableWidgetItem(QString("%1").arg(cpos[i * 4 + 3])));
+	//	}
+	//}
 	if(pos) delete[] pos;
 	if(ep) delete[] ep;
 	if(cpos) delete[] cpos;
@@ -203,16 +203,6 @@ void xCheckCollisionDialog::setup(xvParticle* _xp, xParticleManager* _pmgr, xObj
 
 void xCheckCollisionDialog::checkCollision()
 {
-	//map<std::string, xClusterObject*> clusters = omgr->XClusterObjects();
-	//
-	//
-	//for (map<std::string, xClusterObject*>::iterator it = clusters.begin(); it != clusters.end(); it++) {
-	//	QString name = QString::fromStdString(it->second->Name());
-	//	xClusterInformation info = cinfos[name];
-	//	info.neach = it->second->NumElement();
-	//	info.count *= info.neach;
-	//	
-	//}
 	unsigned int count = 0;
 	unsigned int np = 0;
 	unsigned int ncp = 0;
@@ -275,22 +265,23 @@ void xCheckCollisionDialog::checkCollision()
 		_cinfos,
 		count,
 		np);
-	std::map<pair<unsigned int, unsigned int>, xPairData>::iterator it = c_pairs.begin();
-	QString prefix = "Particle ";
-	for (; it != c_pairs.end(); it++) {
-		QString si = prefix + QString("%1").arg(it->first.first);
-		QString sj = prefix + QString("%1").arg(it->first.second);
 
-		if (parents.find(si) == parents.end()) {
-			parents[si] = new QTreeWidgetItem(CollisionParticle);
-			parents[si]->setText(0, si);
-			
-		//	parents[si]->setData(0, 0, QVariant(it->first.first));
+	if (c_pairs.size()) {
+		std::map<pair<unsigned int, unsigned int>, xPairData>::iterator it = c_pairs.begin();
+		QString prefix = "Particle ";
+		for (; it != c_pairs.end(); it++) {
+			QString si = prefix + QString("%1").arg(it->first.first);
+			QString sj = prefix + QString("%1").arg(it->first.second);
+
+			if (parents.find(si) == parents.end()) {
+				parents[si] = new QTreeWidgetItem(CollisionParticle);
+				parents[si]->setText(0, si);
+			}
+			QTreeWidgetItem* child = new QTreeWidgetItem(parents[si]);
+			child->setText(0, sj);
 		}
-		QTreeWidgetItem* child = new QTreeWidgetItem(parents[si]);
-		child->setText(0, sj);
-		//child->setData(0, 0, QVariant(it->first.second));
 	}
+	
 	if (pos) delete[] pos;
 	if (ep) delete[] ep;
 	if (cpos) delete[] cpos;

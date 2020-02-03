@@ -72,22 +72,169 @@
      </column>
     </widget>
    </item>
-   <item row="1" column="2" colspan="3">
+   <item row="1" column="2">
     <widget class="QTableWidget" name="Information"/>
    </item>
-   <item row="2" column="3">
-    <widget class="QPushButton" name="PB_Check">
-     <property name="text">
-      <string>Collision check</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="4">
-    <widget class="QPushButton" name="PB_Exit">
-     <property name="text">
-      <string>Exit</string>
-     </property>
-    </widget>
+   <item row="2" column="0" colspan="3">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="L_Overlap">
+       <property name="text">
+        <string>overlap</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="LE_Overlap"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="PlusX">
+       <property name="minimumSize">
+        <size>
+         <width>50</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>50</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>+X</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="MinusX">
+       <property name="minimumSize">
+        <size>
+         <width>50</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>50</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>-X</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="PlusY">
+       <property name="minimumSize">
+        <size>
+         <width>50</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>50</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>+Y</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="MinusY">
+       <property name="minimumSize">
+        <size>
+         <width>50</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>50</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>-Y</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="PlusZ">
+       <property name="minimumSize">
+        <size>
+         <width>50</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>50</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>+Z</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="MinusZ">
+       <property name="minimumSize">
+        <size>
+         <width>50</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>50</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>-Z</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="ToNormal">
+       <property name="minimumSize">
+        <size>
+         <width>80</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>80</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>To Normal</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="PB_Check">
+       <property name="text">
+        <string>Collision check</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="PB_Exit">
+       <property name="text">
+        <string>Exit</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

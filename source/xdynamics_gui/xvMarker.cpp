@@ -56,8 +56,8 @@ void xvMarker::draw(GLenum eMode)
 		else
 		{
 			glTranslated(pos.x, pos.y, pos.z);
-			glRotated(ang.x, 0, 0, 1);
-			glRotated(ang.y, 1, 0, 0);
+			glRotated(ang.x, 1, 0, 0);
+			glRotated(ang.y, 0, 1, 0);
 			glRotated(ang.z, 0, 0, 1);
 		}
 		if (isSelected)
