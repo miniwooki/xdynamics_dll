@@ -60,14 +60,14 @@ static const uint qt_meta_data_wgenclusters[] = {
        1,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    4,   29,    2, 0x06 /* Public */,
+       1,    5,   29,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       5,    0,   38,    2, 0x08 /* Private */,
-       6,    1,   39,    2, 0x08 /* Private */,
+       5,    0,   40,    2, 0x08 /* Private */,
+       6,    1,   41,    2, 0x08 /* Private */,
 
  // signals: parameters
-    QMetaType::Void, QMetaType::QString, QMetaType::QString, 0x80000000 | 3, 0x80000000 | 4,    2,    2,    2,    2,
+    QMetaType::Void, QMetaType::QString, QMetaType::QString, 0x80000000 | 3, 0x80000000 | 4, QMetaType::Bool,    2,    2,    2,    2,    2,
 
  // slots: parameters
     QMetaType::Void,
@@ -82,7 +82,7 @@ void wgenclusters::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
         auto *_t = static_cast<wgenclusters *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
-        case 0: _t->clickedGenerateButton((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2])),(*reinterpret_cast< int*(*)>(_a[3])),(*reinterpret_cast< double*(*)>(_a[4]))); break;
+        case 0: _t->clickedGenerateButton((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2])),(*reinterpret_cast< int*(*)>(_a[3])),(*reinterpret_cast< double*(*)>(_a[4])),(*reinterpret_cast< bool(*)>(_a[5]))); break;
         case 1: _t->generateClusterParticles(); break;
         case 2: _t->changeScale((*reinterpret_cast< int(*)>(_a[1]))); break;
         default: ;
@@ -90,7 +90,7 @@ void wgenclusters::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
     } else if (_c == QMetaObject::IndexOfMethod) {
         int *result = reinterpret_cast<int *>(_a[0]);
         {
-            using _t = void (wgenclusters::*)(QString , QString , int * , double * );
+            using _t = void (wgenclusters::*)(QString , QString , int * , double * , bool );
             if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&wgenclusters::clickedGenerateButton)) {
                 *result = 0;
                 return;
@@ -142,9 +142,9 @@ int wgenclusters::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 
 // SIGNAL 0
-void wgenclusters::clickedGenerateButton(QString _t1, QString _t2, int * _t3, double * _t4)
+void wgenclusters::clickedGenerateButton(QString _t1, QString _t2, int * _t3, double * _t4, bool _t5)
 {
-    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)), const_cast<void*>(reinterpret_cast<const void*>(&_t3)), const_cast<void*>(reinterpret_cast<const void*>(&_t4)) };
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)), const_cast<void*>(reinterpret_cast<const void*>(&_t3)), const_cast<void*>(reinterpret_cast<const void*>(&_t4)), const_cast<void*>(reinterpret_cast<const void*>(&_t5)) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
 }
 QT_WARNING_POP

@@ -162,11 +162,12 @@ XDYNAMICS_API vector3d cross(const vector3d &v1, const vector3d &v2);
 
 XDYNAMICS_API double length(const vector3i &v);
 XDYNAMICS_API double length(const vector3ui &v);
-XDYNAMICS_API double length(const vector3f &v);
+XDYNAMICS_API float length(const vector3f &v);
 XDYNAMICS_API double length(const vector3d &v);
 XDYNAMICS_API double length(const vector4d& v);
 XDYNAMICS_API double length(const euler_parameters& v);
 
+XDYNAMICS_API vector3f normalize(const vector3f& v);
 XDYNAMICS_API vector3d normalize(const vector3d& v);
 XDYNAMICS_API vector4d normalize(const vector4d& v);
 XDYNAMICS_API euler_parameters normalize(const euler_parameters& v);

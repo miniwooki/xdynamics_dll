@@ -136,8 +136,8 @@ static const uint qt_meta_data_xdynamics_gui[] = {
       33,    0,  211,    2, 0x08 /* Private */,
       34,    0,  212,    2, 0x08 /* Private */,
       35,    0,  213,    2, 0x08 /* Private */,
-      36,    4,  214,    2, 0x08 /* Private */,
-      39,    0,  223,    2, 0x08 /* Private */,
+      36,    5,  214,    2, 0x08 /* Private */,
+      39,    0,  225,    2, 0x08 /* Private */,
 
  // slots: parameters
     QMetaType::Void,
@@ -167,7 +167,7 @@ static const uint qt_meta_data_xdynamics_gui[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::QString, QMetaType::QString, 0x80000000 | 37, 0x80000000 | 38,    2,    2,    2,    2,
+    QMetaType::Void, QMetaType::QString, QMetaType::QString, 0x80000000 | 37, 0x80000000 | 38, QMetaType::Bool,    2,    2,    2,    2,    2,
     QMetaType::Void,
 
        0        // eod
@@ -206,7 +206,7 @@ void xdynamics_gui::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _i
         case 24: _t->xSelectStartPoint(); break;
         case 25: _t->xPassDistribution(); break;
         case 26: _t->xGenerateClusterDistribution(); break;
-        case 27: _t->xGenerateClusterParticles((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2])),(*reinterpret_cast< int*(*)>(_a[3])),(*reinterpret_cast< double*(*)>(_a[4]))); break;
+        case 27: _t->xGenerateClusterParticles((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2])),(*reinterpret_cast< int*(*)>(_a[3])),(*reinterpret_cast< double*(*)>(_a[4])),(*reinterpret_cast< bool(*)>(_a[5]))); break;
         case 28: _t->xCheckCollision(); break;
         default: ;
         }

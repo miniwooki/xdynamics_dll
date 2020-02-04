@@ -48,11 +48,12 @@ void wgenclusters::setClusterView(unsigned int n, double* c)
 void wgenclusters::generateClusterParticles()
 {
 	QString name = LEName->text();
+	bool israndom = CB_GenRandomOrientation->isChecked();
 	int dim[3] =
 	{ DX->text().toInt(), DY->text().toInt(), DZ->text().toInt() };
 	double loc[3] =
 	{ LEX->text().toDouble(), LEY->text().toDouble(), LEZ->text().toDouble() };
-	emit clickedGenerateButton(clusterShapeName, name, dim, loc);
+	emit clickedGenerateButton(clusterShapeName, name, dim, loc, israndom);
 }
 
 void wgenclusters::changeScale(int scale)

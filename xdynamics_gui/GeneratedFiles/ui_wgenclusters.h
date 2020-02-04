@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'wgenclusters.ui'
 **
-** Created by: Qt User Interface Compiler version 5.12.3
+** Created by: Qt User Interface Compiler version 5.12.6
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -11,6 +11,7 @@
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QGroupBox>
@@ -27,6 +28,7 @@ class Ui_wgenclusterparticles
 public:
     QGridLayout *gridLayout;
     QFrame *frame;
+    QGridLayout *gridLayout_4;
     QGridLayout *gridLayout_3;
     QGroupBox *GB_GenerateParameters;
     QGridLayout *gridLayout_2;
@@ -40,10 +42,12 @@ public:
     QLineEdit *DY;
     QLineEdit *DZ;
     QLabel *LLoc;
+    QLineEdit *LEX;
     QLineEdit *LEY;
     QLineEdit *LEZ;
+    QLabel *L_Option;
+    QCheckBox *CB_GenRandomOrientation;
     QPushButton *PB_Gen;
-    QLineEdit *LEX;
     QLabel *LScale;
     QSpinBox *SBScale;
     QPushButton *PBModify;
@@ -53,36 +57,40 @@ public:
     {
         if (wgenclusterparticles->objectName().isEmpty())
             wgenclusterparticles->setObjectName(QString::fromUtf8("wgenclusterparticles"));
-        wgenclusterparticles->resize(264, 404);
+        wgenclusterparticles->resize(235, 440);
         QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(wgenclusterparticles->sizePolicy().hasHeightForWidth());
         wgenclusterparticles->setSizePolicy(sizePolicy);
-        wgenclusterparticles->setMinimumSize(QSize(0, 404));
-        wgenclusterparticles->setMaximumSize(QSize(16777215, 404));
+        wgenclusterparticles->setMinimumSize(QSize(235, 440));
+        wgenclusterparticles->setMaximumSize(QSize(235, 440));
         gridLayout = new QGridLayout(wgenclusterparticles);
         gridLayout->setSpacing(0);
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         gridLayout->setContentsMargins(0, 0, 0, 0);
         frame = new QFrame(wgenclusterparticles);
         frame->setObjectName(QString::fromUtf8("frame"));
+        frame->setMinimumSize(QSize(235, 0));
+        frame->setMaximumSize(QSize(235, 16777215));
         frame->setFrameShape(QFrame::StyledPanel);
         frame->setFrameShadow(QFrame::Raised);
-        gridLayout_3 = new QGridLayout(frame);
+        gridLayout_4 = new QGridLayout(frame);
+        gridLayout_4->setObjectName(QString::fromUtf8("gridLayout_4"));
+        gridLayout_4->setContentsMargins(0, 0, 0, 0);
+        gridLayout_3 = new QGridLayout();
         gridLayout_3->setObjectName(QString::fromUtf8("gridLayout_3"));
-        gridLayout_3->setContentsMargins(0, 0, 0, 0);
         GB_GenerateParameters = new QGroupBox(frame);
         GB_GenerateParameters->setObjectName(QString::fromUtf8("GB_GenerateParameters"));
         sizePolicy.setHeightForWidth(GB_GenerateParameters->sizePolicy().hasHeightForWidth());
         GB_GenerateParameters->setSizePolicy(sizePolicy);
-        GB_GenerateParameters->setMinimumSize(QSize(0, 130));
-        GB_GenerateParameters->setMaximumSize(QSize(16777215, 130));
+        GB_GenerateParameters->setMinimumSize(QSize(0, 150));
+        GB_GenerateParameters->setMaximumSize(QSize(16777215, 150));
         gridLayout_2 = new QGridLayout(GB_GenerateParameters);
         gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
-        gridLayout_2->setHorizontalSpacing(7);
-        gridLayout_2->setVerticalSpacing(3);
-        gridLayout_2->setContentsMargins(5, 3, 5, 7);
+        gridLayout_2->setHorizontalSpacing(3);
+        gridLayout_2->setVerticalSpacing(4);
+        gridLayout_2->setContentsMargins(0, 4, 0, 10);
         LName = new QLabel(GB_GenerateParameters);
         LName->setObjectName(QString::fromUtf8("LName"));
 
@@ -137,6 +145,11 @@ public:
 
         gridLayout_2->addWidget(LLoc, 3, 0, 1, 1);
 
+        LEX = new QLineEdit(GB_GenerateParameters);
+        LEX->setObjectName(QString::fromUtf8("LEX"));
+
+        gridLayout_2->addWidget(LEX, 3, 1, 1, 1);
+
         LEY = new QLineEdit(GB_GenerateParameters);
         LEY->setObjectName(QString::fromUtf8("LEY"));
 
@@ -147,17 +160,23 @@ public:
 
         gridLayout_2->addWidget(LEZ, 3, 3, 1, 1);
 
+        L_Option = new QLabel(GB_GenerateParameters);
+        L_Option->setObjectName(QString::fromUtf8("L_Option"));
+
+        gridLayout_2->addWidget(L_Option, 4, 0, 1, 1);
+
+        CB_GenRandomOrientation = new QCheckBox(GB_GenerateParameters);
+        CB_GenRandomOrientation->setObjectName(QString::fromUtf8("CB_GenRandomOrientation"));
+        CB_GenRandomOrientation->setChecked(true);
+
+        gridLayout_2->addWidget(CB_GenRandomOrientation, 4, 1, 1, 3);
+
         PB_Gen = new QPushButton(GB_GenerateParameters);
         PB_Gen->setObjectName(QString::fromUtf8("PB_Gen"));
         PB_Gen->setMinimumSize(QSize(0, 25));
         PB_Gen->setMaximumSize(QSize(16777215, 25));
 
-        gridLayout_2->addWidget(PB_Gen, 4, 1, 1, 3);
-
-        LEX = new QLineEdit(GB_GenerateParameters);
-        LEX->setObjectName(QString::fromUtf8("LEX"));
-
-        gridLayout_2->addWidget(LEX, 3, 1, 1, 1);
+        gridLayout_2->addWidget(PB_Gen, 5, 1, 1, 3);
 
 
         gridLayout_3->addWidget(GB_GenerateParameters, 0, 0, 1, 3);
@@ -169,7 +188,7 @@ public:
 
         SBScale = new QSpinBox(frame);
         SBScale->setObjectName(QString::fromUtf8("SBScale"));
-        SBScale->setMinimumSize(QSize(124, 0));
+        SBScale->setMinimumSize(QSize(90, 0));
         SBScale->setMaximumSize(QSize(124, 16777215));
         SBScale->setMinimum(1);
         SBScale->setMaximum(100);
@@ -189,6 +208,9 @@ public:
         ViewFrame->setFrameShadow(QFrame::Raised);
 
         gridLayout_3->addWidget(ViewFrame, 2, 0, 1, 3);
+
+
+        gridLayout_4->addLayout(gridLayout_3, 0, 0, 1, 1);
 
 
         gridLayout->addWidget(frame, 0, 0, 1, 1);
@@ -212,10 +234,12 @@ public:
         DY->setText(QApplication::translate("wgenclusterparticles", "1", nullptr));
         DZ->setText(QApplication::translate("wgenclusterparticles", "1", nullptr));
         LLoc->setText(QApplication::translate("wgenclusterparticles", "Loc.", nullptr));
+        LEX->setText(QApplication::translate("wgenclusterparticles", "0.0", nullptr));
         LEY->setText(QApplication::translate("wgenclusterparticles", "0.0", nullptr));
         LEZ->setText(QApplication::translate("wgenclusterparticles", "0.0", nullptr));
+        L_Option->setText(QApplication::translate("wgenclusterparticles", "Option", nullptr));
+        CB_GenRandomOrientation->setText(QApplication::translate("wgenclusterparticles", "Random orientation", nullptr));
         PB_Gen->setText(QApplication::translate("wgenclusterparticles", "Generation", nullptr));
-        LEX->setText(QApplication::translate("wgenclusterparticles", "0.0", nullptr));
         LScale->setText(QApplication::translate("wgenclusterparticles", "Scale", nullptr));
         PBModify->setText(QApplication::translate("wgenclusterparticles", "Modify", nullptr));
     } // retranslateUi

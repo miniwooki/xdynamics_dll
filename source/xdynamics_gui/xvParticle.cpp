@@ -693,6 +693,27 @@ void xvParticle::ChangePosition(unsigned int id, double x, double y, double z)
 	pos[cid + 2] = (float)z;
 }
 
+void xvParticle::MoveParticle(unsigned int id, double x, double y, double z)
+{
+	pos[id * 4 + 0] += (float)x;
+	pos[id * 4 + 1] += (float)y;
+	pos[id * 4 + 2] += (float)z;
+}
+
+vector3f xvParticle::NormalTwoParticles(unsigned int id, unsigned int jd)
+{
+	vector3f ip = new_vector3f(pos[id * 4 + 0], pos[id * 4 + 1], pos[id * 4 + 2]);
+	vector3f jp = new_vector3f(pos[jd * 4 + 0], pos[jd * 4 + 1], pos[jd * 4 + 2]);
+	return normalize(jp - ip);
+}
+
+float xvParticle::DistanceTwoParticlesFromSurface(unsigned int id, unsigned int jd)
+{
+	vector3f ip = new_vector3f(pos[id * 4 + 0], pos[id * 4 + 1], pos[id * 4 + 2]);
+	vector3f jp = new_vector3f(pos[jd * 4 + 0], pos[jd * 4 + 1], pos[jd * 4 + 2]);
+	return pos[id * 4 + 3] + pos[jd * 4 + 3] - length(jp - ip);
+}
+
 bool xvParticle::defineFromRelativePosition(vector3d & p, euler_parameters & ep)
 {
 	resizePositionMemory(np, np + r_np);

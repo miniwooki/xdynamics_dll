@@ -5,19 +5,31 @@
 #include "xdynamics_manager/xParticleMananger.h"
 #include "xvParticle.h"
 
+#include <QTextStream>
+#include <QMessageBox>
+
 xCheckCollisionDialog::xCheckCollisionDialog(QWidget* parent)
 	: QDialog(parent)
 	, xp(nullptr)
 	, pmgr(nullptr)
 	, isSetup(false)
 	, isChangedSelection(false)
+	, selectedCluster(-1)
 {
 	setupUi(this);
 	connect(PB_Check, &QPushButton::clicked, this, &xCheckCollisionDialog::checkCollision);
 	connect(CollisionParticle, &QTreeWidget::itemClicked, this, &xCheckCollisionDialog::clickTreeItem);
-	connect(Information, &QTableWidget::cellClicked, this, &xCheckCollisionDialog::highlightSelectedCluster);
-	connect(Information, &QTableWidget::itemSelectionChanged, this, &xCheckCollisionDialog::selectedItemProcess);
-	connect(Information, &QTableWidget::itemChanged, this, &xCheckCollisionDialog::changePosition);
+	connect(PlusX, &QPushButton::clicked, this, &xCheckCollisionDialog::movePlusX);
+	connect(PlusY, &QPushButton::clicked, this, &xCheckCollisionDialog::movePlusY);
+	connect(PlusZ, &QPushButton::clicked, this, &xCheckCollisionDialog::movePlusZ);
+	connect(MinusX, &QPushButton::clicked, this, &xCheckCollisionDialog::moveMinusX);
+	connect(MinusY, &QPushButton::clicked, this, &xCheckCollisionDialog::moveMinusY);
+	connect(MinusZ, &QPushButton::clicked, this, &xCheckCollisionDialog::moveMinusZ);
+	connect(PlusNormal, &QPushButton::clicked, this, &xCheckCollisionDialog::movePlusNormal);
+	connect(MinusNormal, &QPushButton::clicked, this, &xCheckCollisionDialog::moveMinusNormal);
+	//connect(Information, &QTableWidget::cellClicked, this, &xCheckCollisionDialog::highlightSelectedCluster);
+	//connect(Information, &QTableWidget::itemSelectionChanged, this, &xCheckCollisionDialog::selectedItemProcess);
+	//connect(Information, &QTableWidget::itemChanged, this, &xCheckCollisionDialog::changePosition);
 }
 
 xCheckCollisionDialog::~xCheckCollisionDialog()
@@ -30,8 +42,176 @@ void xCheckCollisionDialog::selectedItemProcess()
 	isChangedSelection = true;
 }
 
-void xCheckCollisionDialog::changePosition(QTableWidgetItem * item)
+void xCheckCollisionDialog::movePlusX()
 {
+	if (!checkTreeItemHasChild(CollisionParticle->currentItem())) {
+		QMessageBox msg;
+		msg.setText(QString::fromLocal8Bit("클러스터를 선택해 주세요."));
+		msg.exec();
+		return;
+	}
+	xClusterInformation info;
+	foreach(info, cinfos) {
+		if (selectedCluster >= info.scid && selectedCluster < info.count / info.neach)
+			break;
+	}
+	double length = LE_MoveLength->text().toDouble();
+	for (int i = 0; i < info.neach; i++) {
+		xp->MoveParticle(info.sid + selectedCluster * info.neach, length, 0, 0);
+	}
+	updateCollision();
+}
+
+void xCheckCollisionDialog::movePlusY()
+{
+	if (!checkTreeItemHasChild(CollisionParticle->currentItem())) {
+		QMessageBox msg;
+		msg.setText(QString::fromLocal8Bit("클러스터를 선택해 주세요."));
+		msg.exec();
+		return;
+	}
+	xClusterInformation info;
+	foreach(info, cinfos) {
+		if (selectedCluster >= info.scid && selectedCluster < info.count / info.neach)
+			break;
+	}
+	double length = LE_MoveLength->text().toDouble();
+	for (int i = 0; i < info.neach; i++) {
+		xp->MoveParticle(info.sid + selectedCluster * info.neach, 0, length, 0);
+	}
+	updateCollision();
+}
+
+void xCheckCollisionDialog::movePlusZ()
+{
+	if (!checkTreeItemHasChild(CollisionParticle->currentItem())) {
+		QMessageBox msg;
+		msg.setText(QString::fromLocal8Bit("클러스터를 선택해 주세요."));
+		msg.exec();
+		return;
+	}
+	xClusterInformation info;
+	foreach(info, cinfos) {
+		if (selectedCluster >= info.scid && selectedCluster < info.count / info.neach)
+			break;
+	}
+	double length = LE_MoveLength->text().toDouble();
+	for (int i = 0; i < info.neach; i++) {
+		xp->MoveParticle(info.sid + selectedCluster * info.neach, 0, 0, length);
+	}
+	updateCollision();
+}
+
+void xCheckCollisionDialog::moveMinusX()
+{
+	if (!checkTreeItemHasChild(CollisionParticle->currentItem())) {
+		QMessageBox msg;
+		msg.setText(QString::fromLocal8Bit("클러스터를 선택해 주세요."));
+		msg.exec();
+		return;
+	}
+	xClusterInformation info;
+	foreach(info, cinfos) {
+		if (selectedCluster >= info.scid && selectedCluster < info.count / info.neach)
+			break;
+	}
+	double length = LE_MoveLength->text().toDouble();
+	for (int i = 0; i < info.neach; i++) {
+		xp->MoveParticle(info.sid + selectedCluster * info.neach, -length, 0, 0);
+	}
+	updateCollision();
+}
+
+void xCheckCollisionDialog::moveMinusY()
+{
+	if (!checkTreeItemHasChild(CollisionParticle->currentItem())) {
+		QMessageBox msg;
+		msg.setText(QString::fromLocal8Bit("클러스터를 선택해 주세요."));
+		msg.exec();
+		return;
+	}
+	xClusterInformation info;
+	foreach(info, cinfos) {
+		if (selectedCluster >= info.scid && selectedCluster < info.count / info.neach)
+			break;
+	}
+	double length = LE_MoveLength->text().toDouble();
+	for (int i = 0; i < info.neach; i++) {
+		xp->MoveParticle(info.sid + selectedCluster * info.neach, 0, -length, 0);
+	}
+	updateCollision();
+}
+
+void xCheckCollisionDialog::moveMinusZ()
+{
+	if (!checkTreeItemHasChild(CollisionParticle->currentItem())) {
+		QMessageBox msg;
+		msg.setText(QString::fromLocal8Bit("클러스터를 선택해 주세요."));
+		msg.exec();
+		return;
+	}
+	xClusterInformation info;
+	foreach(info, cinfos) {
+		if (selectedCluster >= info.scid && selectedCluster < info.count / info.neach)
+			break;
+	}
+	double length = LE_MoveLength->text().toDouble();
+	for (int i = 0; i < info.neach; i++) {
+		xp->MoveParticle(info.sid + selectedCluster * info.neach, 0, 0, -length);
+	}
+	updateCollision();
+}
+
+void xCheckCollisionDialog::movePlusNormal()
+{
+	if (!checkTreeItemHasChild(CollisionParticle->currentItem())) {
+		QMessageBox msg;
+		msg.setText(QString::fromLocal8Bit("클러스터를 선택해 주세요."));
+		msg.exec();
+		return;
+	}
+	xClusterInformation info;
+	foreach(info, cinfos) {
+		if (selectedCluster >= info.scid && selectedCluster < info.count / info.neach)
+			break;
+	}
+	double length = LE_MoveLength->text().toDouble();
+	QStringList normal = LE_Direction->text().split(",");
+	double ux = normal.at(0).toDouble();
+	double uy = normal.at(1).toDouble();
+	double uz = normal.at(2).toDouble();
+	for (int i = 0; i < info.neach; i++) {
+		xp->MoveParticle(info.sid + selectedCluster * info.neach + i, length * ux, length * uy, length * uz);
+	}
+	updateCollision();
+}
+
+void xCheckCollisionDialog::moveMinusNormal()
+{
+	if (!checkTreeItemHasChild(CollisionParticle->currentItem())) {
+		QMessageBox msg;
+		msg.setText(QString::fromLocal8Bit("클러스터를 선택해 주세요."));
+		msg.exec();
+		return;
+	}
+	xClusterInformation info;
+	foreach(info, cinfos) {
+		if (selectedCluster >= info.scid && selectedCluster < info.count / info.neach)
+			break;
+	}
+	double length = LE_MoveLength->text().toDouble();
+	QStringList normal = LE_Direction->text().split(",");
+	double ux = -normal.at(0).toDouble();
+	double uy = -normal.at(1).toDouble();
+	double uz = -normal.at(2).toDouble();
+	for (int i = 0; i < info.neach; i++) {
+		xp->MoveParticle(info.sid + selectedCluster * info.neach + i, length * ux, length * uy, length * uz);
+	}
+	updateCollision();
+}
+
+//void xCheckCollisionDialog::changePosition(QTableWidgetItem * item)
+//{
 	/*if (!isSetup)
 		return;
 	if (!Information->rowCount())
@@ -54,6 +234,56 @@ void xCheckCollisionDialog::changePosition(QTableWidgetItem * item)
 			y->text().toDouble(), 
 			z->text().toDouble());
 	}*/
+//}
+
+bool xCheckCollisionDialog::checkTreeItemHasChild(QTreeWidgetItem* item)
+{
+	return item->childCount();
+}
+
+void xCheckCollisionDialog::updateCollision()
+{
+	QTreeWidgetItem* item = CollisionParticle->currentItem();
+	//QString itext = item->text(0);
+	while (item->childCount()) {
+		item = item->child(0);
+		//itext = item->text(0);
+	}
+	item = item->parent();
+	for (unsigned int i = 0; i < item->childCount(); i++) {
+		QTreeWidgetItem* pair_item = item->child(i);
+		//itext = pair_item->text(0);
+		unsigned int pos = pair_item->text(0).indexOf(" ", 0);
+		unsigned int id = pair_item->text(0).mid(1, pos - 1).toUInt();
+		pos = pair_item->text(0).lastIndexOf("P");
+		unsigned int jd = pair_item->text(0).mid(pos + 1).toUInt();
+		float distance = xp->DistanceTwoParticlesFromSurface(id, jd);
+		if (distance <= 0) {
+			QTreeWidgetItem* parent = pair_item;
+			while (parent->parent()) {
+				parent = parent->parent();
+			}
+			QString ptext = parent->text(0);
+			if (parent->childCount() >= 2) {
+				if (pair_item->parent()->childCount() >= 2)
+					delete pair_item;
+				else
+					delete pair_item->parent();
+				//delete deleteItem;
+			}
+			else {
+				delete parent;
+				return;
+			}
+		}
+		else{
+			collision_info[pair_item->text(0)].overlap = distance;
+			vector3f u = xp->NormalTwoParticles(id, jd);
+			collision_info[pair_item->text(0)].ux = u.x;
+			collision_info[pair_item->text(0)].uy = u.y;
+			collision_info[pair_item->text(0)].uz = u.z;
+		}
+	}
 }
 
 void xCheckCollisionDialog::mouseReleaseEvent(QMouseEvent *event)
@@ -66,15 +296,15 @@ void xCheckCollisionDialog::mouseReleaseEvent(QMouseEvent *event)
 
 void xCheckCollisionDialog::highlightSelectedCluster(int row, int column)
 {
-	if (changedColor.size()) {
-		QMapIterator<unsigned int, QColor> color(changedColor);
-		QColor previous_color;
-		while (color.hasNext()) {
-			color.next();
-			xp->ChangeColor(color.key(), color.value(), previous_color);
-		}
-		changedColor.clear();
-	}
+	//if (changedColor.size()) {
+	//	QMapIterator<unsigned int, QColor> color(changedColor);
+	//	QColor previous_color;
+	//	while (color.hasNext()) {
+	//		color.next();
+	//		xp->ChangeColor(color.key(), color.value(), previous_color);
+	//	}
+	//	changedColor.clear();
+	//}
 	QColor previous_color;
 	xClusterInformation info;
 	foreach(info, cinfos) {
@@ -88,6 +318,12 @@ void xCheckCollisionDialog::highlightSelectedCluster(int row, int column)
 	}
 }
 
+void xCheckCollisionDialog::clickCancel()
+{
+	this->close();
+	this->setResult(QDialog::Rejected);
+}
+
 void xCheckCollisionDialog::clickTreeItem(QTreeWidgetItem * item, int column)
 {
 	if (changedColor.size()) {
@@ -99,27 +335,65 @@ void xCheckCollisionDialog::clickTreeItem(QTreeWidgetItem * item, int column)
 		}
 		changedColor.clear();
 	}
-	if (!item->parent()) {
-		unsigned int id = item->text(0).mid(item->text(0).lastIndexOf("e")+1).toUInt();
-		QColor previous_color;
-		xp->ChangeColor(id, QColor(255, 0, 0), previous_color);
-		changedColor[id] = previous_color;
-		for (unsigned int i = 0; i < item->childCount(); i++) {
-			QTreeWidgetItem* child = item->child(i);
-			unsigned int jd = child->text(0).mid(child->text(0).lastIndexOf("e") + 1).toUInt();
+	
+	QString prefix = item->text(0).mid(0, item->text(0).lastIndexOf(" "));
+	if (prefix == "Cluster") {
+		if (!item->parent()) {
+			unsigned int id = item->text(0).mid(item->text(0).lastIndexOf(" ")).toUInt();
+			//QColor previous_color;
+			highlightSelectedCluster(id, 0);
+			selectedCluster = id;
+			//xp->ChangeColor(id, QColor(255, 0, 0), previous_color);
+			//changedColor[id] = previous_color;
+			//for (unsigned int i = 0; i < item->childCount(); i++) {
+			//	QTreeWidgetItem* child = item->child(i);
+			//	unsigned int jd = child->text(0).mid(child->text(0).lastIndexOf(" ")).toUInt();
+			//	highlightSelectedCluster(jd, 0);
+			//	/*xp->ChangeColor(jd, QColor(0, 255, 0), previous_color);
+			//	changedColor[jd] = previous_color;*/
+			//}
+		}
+		else if (item->parent() && item->childCount()) {
+			unsigned int id = item->text(0).mid(item->text(0).lastIndexOf(" ")).toUInt();
+			highlightSelectedCluster(id, 0);
+			selectedCluster = id;
+			//QColor previous_color;
+			//xp->ChangeColor(id, QColor(255, 0, 0), previous_color);
+			//changedColor[id] = previous_color;
+			//QTreeWidgetItem* parent = item->parent();
+			//unsigned int jd = parent->text(0).mid(parent->text(0).lastIndexOf(" ") + 1).toUInt();
+			//highlightSelectedCluster(jd, 0);
+			/*xp->ChangeColor(jd, QColor(0, 255, 0), previous_color);
+			changedColor[jd] = previous_color;*/
+		}		
+	}
+	else
+	{
+	    if (item->parent() && !item->childCount()) {
+			LE_Overlap->clear();
+			LE_Direction->clear();
+			LE_MoveLength->clear();
+			unsigned int pos = item->text(0).indexOf(" ", 0);
+			unsigned int id = item->text(0).mid(1, pos - 1).toUInt();
+			pos = item->text(0).lastIndexOf("P");
+			unsigned int jd = item->text(0).mid(pos + 1).toUInt();
+			QColor previous_color;
+			xp->ChangeColor(id, QColor(255, 0, 0), previous_color);
+			changedColor[id] = previous_color;
 			xp->ChangeColor(jd, QColor(0, 255, 0), previous_color);
 			changedColor[jd] = previous_color;
+			if (collision_info.find(item->text(0)) != collision_info.end()) {
+				xCollisionPair pair = collision_info[item->text(0)];
+				LE_Overlap->setText(QString("%1").arg(pair.overlap));
+				QString normal;
+				QTextStream stream(&normal);
+				stream.setRealNumberPrecision(4);
+				stream << pair.ux << ", " << pair.uy << ", " << pair.uz;
+				LE_Direction->setText(normal);
+				LE_MoveLength->setText(QString("%1").arg((1.0 + 1e-6) * pair.overlap));
+			}
+			selectedCluster = -1;
 		}
-	}
-	else if (item->parent()) {
-		unsigned int id = item->text(0).mid(item->text(0).lastIndexOf("e") + 1).toUInt();
-		QColor previous_color;
-		xp->ChangeColor(id, QColor(255, 0, 0), previous_color);
-		changedColor[id] = previous_color;
-		QTreeWidgetItem* parent = item->parent();
-		unsigned int jd = parent->text(0).mid(parent->text(0).lastIndexOf("e") + 1).toUInt();
-		xp->ChangeColor(jd, QColor(0, 255, 0), previous_color);
-		changedColor[jd] = previous_color;
 	}
 }
 
@@ -149,6 +423,7 @@ void xCheckCollisionDialog::setup(xvParticle* _xp, xParticleManager* _pmgr, xObj
 			QString cName = QString::fromStdString(xpo->ParticleShapeName());
 			cinfo.count = xpo->NumCluster();
 			cinfo.sid = np;
+			cinfo.scid = ncp;
 			cinfos[poName] = cinfo;
 			cpo_pair[cName] = poName;
 
@@ -203,6 +478,7 @@ void xCheckCollisionDialog::setup(xvParticle* _xp, xParticleManager* _pmgr, xObj
 
 void xCheckCollisionDialog::checkCollision()
 {
+	collision_info.clear();  
 	unsigned int count = 0;
 	unsigned int np = 0;
 	unsigned int ncp = 0;
@@ -268,20 +544,55 @@ void xCheckCollisionDialog::checkCollision()
 
 	if (c_pairs.size()) {
 		std::map<pair<unsigned int, unsigned int>, xPairData>::iterator it = c_pairs.begin();
-		QString prefix = "Particle ";
+		QString prefix = "Cluster ";
 		for (; it != c_pairs.end(); it++) {
-			QString si = prefix + QString("%1").arg(it->first.first);
-			QString sj = prefix + QString("%1").arg(it->first.second);
-
-			if (parents.find(si) == parents.end()) {
-				parents[si] = new QTreeWidgetItem(CollisionParticle);
-				parents[si]->setText(0, si);
+			unsigned int id = it->first.first;
+			unsigned int jd = it->first.second;
+			
+			xClusterInformation info;
+			for (unsigned int i = 0; i < count; i++) {
+				if (id >= _cinfos[i].sid && id * _cinfos[i].neach < _cinfos[i].sid + _cinfos[i].count) {
+					info = _cinfos[i];
+					break;
+				}					
 			}
-			QTreeWidgetItem* child = new QTreeWidgetItem(parents[si]);
-			child->setText(0, sj);
+			xClusterInformation jnfo;
+			for (unsigned int i = 0; i < count; i++) {
+				if (jd >= _cinfos[i].sid && jd * _cinfos[i].neach < _cinfos[i].sid + _cinfos[i].count) {
+					jnfo = _cinfos[i];
+					break;
+				}
+			}
+			unsigned int cid = (info.sid + id) / info.neach;
+			QString si = prefix + QString("%1").arg(info.scid + cid);			
+			if (iclusters.find(si) == iclusters.end()) {
+				iclusters[si] = new QTreeWidgetItem(CollisionParticle);
+				iclusters[si]->setText(0, si);
+			}
+			unsigned int cjd = (jnfo.sid + jd) / info.neach;
+			QString sj = prefix + QString("%1").arg(jnfo.scid + cjd);
+			if (jclusters.find(sj) == jclusters.end()) {
+				jclusters[sj] = new QTreeWidgetItem(iclusters[si]);
+				jclusters[sj]->setText(0, sj);
+			}		
+			QString cpair = "P" + QString("%1").arg(id) + " - " + "P" + QString("%1").arg(jd);
+			QTreeWidgetItem* pair_item = new QTreeWidgetItem(jclusters[sj]);
+			pair_item->setText(0, cpair);
+			collision_info[cpair] =
+			{
+				it->second.gab,
+				it->second.nx,
+				it->second.ny,
+				it->second.nz
+			};
 		}
 	}
-	
+	else {
+		QMessageBox msg;
+		msg.setText(QString::fromLocal8Bit("충돌이 일어난 클러스터가 존재하지 않습니다."));
+		msg.exec();
+	}
+	if (_cinfos) delete[] _cinfos;
 	if (pos) delete[] pos;
 	if (ep) delete[] ep;
 	if (cpos) delete[] cpos;

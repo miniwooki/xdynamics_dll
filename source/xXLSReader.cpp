@@ -567,9 +567,10 @@ void xXLSReader::ReadDEMParticle(xDiscreteElementMethodModel* xdem, xObjectManag
 				x.split(",", 3, &loc.x);
 				x = ReadStr(rc.x, rc.y++);
 				x.split(",", 3, &grid.x);
+				xstring israndom = ReadStr(rc.x, rc.y++);
 				/*xUtilityFunctions::xsplit(ReadStr(rc.x, rc.y++), ",", 3, &loc.x);
 				xUtilityFunctions::xsplit(ReadStr(rc.x, rc.y++), ",", 3, &grid.x);*/
-				xdem->XParticleManager()->CreateClusterParticle(name.c_str(), xo->Material(), loc, grid, dynamic_cast<xClusterObject*>(xo));
+				xdem->XParticleManager()->CreateClusterParticle(name.c_str(), xo->Material(), loc, grid, dynamic_cast<xClusterObject*>(xo), israndom == "true" ? true : false);
 			}
 			else if (form == NO_SHAPE_AND_MASS)
 			{

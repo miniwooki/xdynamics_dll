@@ -148,7 +148,7 @@ void xSpringDamperForce::SetupDataFromListData(xTSDAData&d, std::string data)
 					cnt = bc_list.size();
 				}
 				cnt = 0;
-				nBodyConnectionData = bc_list.size();
+				nBodyConnectionData = (unsigned int)bc_list.size();
 				if (nBodyConnectionData)
 				{
 					connection_body_data = new xSpringDamperBodyConnectionData[nBodyConnectionData];
@@ -193,14 +193,14 @@ void xSpringDamperForce::SetupDataFromListData(xTSDAData&d, std::string data)
 		//foreach(xSpringDamperConnectionData c, clist)
 			connection_data[ct++] = *c;
 	}
-	nkcvalue = cvalue.size();
-	nsdci = xsdcis.size();
+	nkcvalue = (unsigned int)cvalue.size();
+	nsdci = (unsigned int)xsdcis.size();
 	nConnection = cnt;
 }
 
 void xSpringDamperForce::ConvertGlobalToLocalOfBodyConnectionPosition(unsigned int i, xPointMass* pm)
 {
-	unsigned int sid = connection_body_info[i].sid;
+	size_t sid = connection_body_info[i].sid;
 	xSpringDamperBodyConnectionData *d = NULL;
 	for (unsigned int i = 0; i < connection_body_info[i].nconnection; i++)
 	{
@@ -403,7 +403,7 @@ void xSpringDamperForce::xCalculateForceForDEM(
 		euler_parameters ei = e[mid];// pm->EulerParameters();
 		euler_parameters edi = ed[mid];// pm->DEulerParameters();
 		matrix33d Ai = GlobalTransformationMatrix(ei);
-		unsigned int sid = connection_body_info[i].sid;
+		size_t sid = connection_body_info[i].sid;
 		xSpringDamperBodyConnectionData d = { 0, };
 		//vector4d* dem_pos = (vector4d*)pos;
 		//vector3d* dem_vel = (vector3d*)vel;
@@ -449,7 +449,7 @@ void xSpringDamperForce::xCalculateForceFromDEM(
 	euler_parameters ei = pm->EulerParameters();
 	euler_parameters edi = pm->DEulerParameters();
 	matrix33d Ai = GlobalTransformationMatrix(ei);
-	unsigned int sid = connection_body_info[i].sid;
+	size_t sid = connection_body_info[i].sid;
 	xSpringDamperBodyConnectionData d = { 0, };
 	vector4d* dem_pos = (vector4d*)pos;
 	vector3d* dem_vel = (vector3d*)vel;

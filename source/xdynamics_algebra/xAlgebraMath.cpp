@@ -574,10 +574,15 @@ vector3d cross(const vector3d &v1, const vector3d &v2) { return vector3d{ v1.y*v
 // Define length product
 double length(const vector3i &v) { return sqrt(dot(v, v)); }
 double length(const vector3ui &v) { return sqrt(dot(v, v)); }
-double length(const vector3f &v) { return sqrt(dot(v, v)); }
+float length(const vector3f &v) { return sqrt(dot(v, v)); }
 double length(const vector3d &v) { return sqrt(dot(v, v)); }
 double length(const vector4d &v){ return sqrt(dot(v, v)); }
 double length(const euler_parameters & v){ return sqrt(dot(v,v)); }
+
+vector3f normalize(const vector3f& v)
+{
+	return v / length(v);
+}
 
 vector3d normalize(const vector3d& v)
 {

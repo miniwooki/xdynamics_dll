@@ -52,6 +52,9 @@ public:
 	QMap<QString, particleGroupData>& ParticleGroupData() { return pgds; }
 	void ChangeColor(unsigned int id, QColor rgb, QColor& pcolor);
 	void ChangePosition(unsigned int id, double x, double y, double z);
+	void MoveParticle(unsigned int id, double x, double y, double z);
+	vector3f NormalTwoParticles(unsigned int id, unsigned int jd);
+	float DistanceTwoParticlesFromSurface(unsigned int id, unsigned int jd);
 	bool hasRelativePosition() { return r_pos != NULL; }
 	float* ColorBuffers();
 	float* PositionBuffers();

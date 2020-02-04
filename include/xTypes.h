@@ -257,7 +257,7 @@ typedef struct{ double s0, s1, s2, s3, s4, s5; }double6;
 typedef struct{	bool enable; double alpha, start_point, length; }xWaveDampingData;
 typedef struct{ double diameter, sx, sy, sz, dx, dy, dz, minr, maxr; }xCircleParticleData;
 typedef struct{ unsigned int sid, count, neach, nstep; }xParticleCreateCondition;
-typedef struct { unsigned int sid, count, neach; }xClusterInformation;
+typedef struct { unsigned int sid, scid, count, neach; }xClusterInformation;
 typedef struct { unsigned int id, sid, ntsda; }xSpringDamperConnectionInformation;
 typedef struct { unsigned int jd, kc_id; double init_l; }xSpringDamperConnectionData;
 typedef struct { double k, c; }xSpringDamperCoefficient;

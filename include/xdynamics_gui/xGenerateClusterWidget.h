@@ -29,7 +29,7 @@ public:
 	//void clickedStartPointButton();
 	//void clickedStopButton();
 signals:
-	void clickedGenerateButton(QString, QString, int*, double*);
+	void clickedGenerateButton(QString, QString, int*, double*, bool);
 
 private slots:
 	void generateClusterParticles();

@@ -68,6 +68,7 @@ private:
 private:
 	//bool isExistInList;
 	int rc[2];
+	//bool isGenRandomOrientation;
 	bool isClickedCell;
 	bool isNewCluster;
 	bool isChangeCluster;

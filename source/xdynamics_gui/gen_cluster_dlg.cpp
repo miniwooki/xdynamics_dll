@@ -122,6 +122,7 @@ gen_cluster_dlg::gen_cluster_dlg(QWidget* parent)
 	, isNewCluster(false)
 	, isClickedCell(false)
 	, current_list(nullptr)
+	//, isGenRandomOrientation(true)
 {
 	setupUi(this);
 	SB_Rows->setValue(0);
@@ -132,7 +133,7 @@ gen_cluster_dlg::gen_cluster_dlg(QWidget* parent)
 	QWidget *container = QWidget::createWindowContainer(graph);
 	QHBoxLayout *hLayout = new QHBoxLayout(View3D);
 	hLayout->addWidget(container, 1);
-
+	//CB_GenRandomOrientation->setChecked(isGenRandomOrientation);
 	//View3D->createWindowContainer(graph);
 	if (!graph->hasContext()) {
 		QMessageBox msgBox;
@@ -241,6 +242,8 @@ void gen_cluster_dlg::clickUpdate()
 void gen_cluster_dlg::clickNew()
 {
 	checkNeedAdd();
+	if (!isChangeCluster && isNewCluster)
+		return;
 	InputTable->setRowCount(0);
 	tableItems.clear();
 	Information->clear();
@@ -451,6 +454,7 @@ void gen_cluster_dlg::clickAdd()
 
 void gen_cluster_dlg::clickGen()
 {
+	//isGenRandomOrientation = CB_GenRandomOrientation->isChecked();
 	this->close();
 	this->setResult(QDialog::Accepted);
 }

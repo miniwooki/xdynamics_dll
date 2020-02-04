@@ -76,7 +76,7 @@ private slots:
 	void xSelectStartPoint();
 	void xPassDistribution();// click_passing_distribution
 	void xGenerateClusterDistribution();
-	void xGenerateClusterParticles(QString, QString, int*, double*);
+	void xGenerateClusterParticles(QString, QString, int*, double*, bool);
 	void xCheckCollision();
 	//void xHighlightParticle(unsigned int, QColor, QColor&);
 	

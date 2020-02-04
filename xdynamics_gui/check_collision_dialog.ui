@@ -6,14 +6,38 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>763</width>
-    <height>401</height>
+    <width>525</width>
+    <height>433</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>525</width>
+    <height>433</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>525</width>
+    <height>433</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Check Collision Dialog</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
+  <layout class="QGridLayout" name="gridLayout_2">
+   <property name="leftMargin">
+    <number>5</number>
+   </property>
+   <property name="topMargin">
+    <number>5</number>
+   </property>
+   <property name="rightMargin">
+    <number>5</number>
+   </property>
+   <property name="bottomMargin">
+    <number>5</number>
+   </property>
    <item row="0" column="0">
     <widget class="QLabel" name="L_ParticleList">
      <property name="text">
@@ -25,13 +49,6 @@
     <widget class="QLabel" name="L_CollisionParticles">
      <property name="text">
       <string>Collision particles</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="2">
-    <widget class="QLabel" name="L_Information">
-     <property name="text">
-      <string>Information of Clusters</string>
      </property>
     </widget>
    </item>
@@ -73,162 +90,252 @@
     </widget>
    </item>
    <item row="1" column="2">
-    <widget class="QTableWidget" name="Information"/>
-   </item>
-   <item row="2" column="0" colspan="3">
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0" colspan="2">
       <widget class="QLabel" name="L_Overlap">
        <property name="text">
-        <string>overlap</string>
+        <string>Collision overlap</string>
        </property>
       </widget>
      </item>
-     <item>
+     <item row="1" column="0" colspan="2">
       <widget class="QLineEdit" name="LE_Overlap"/>
      </item>
-     <item>
-      <widget class="QPushButton" name="PlusX">
-       <property name="minimumSize">
-        <size>
-         <width>50</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>50</width>
-         <height>16777215</height>
-        </size>
-       </property>
+     <item row="2" column="0" colspan="2">
+      <widget class="QLabel" name="L_Direction">
        <property name="text">
-        <string>+X</string>
+        <string>Collision direction</string>
        </property>
       </widget>
      </item>
-     <item>
+     <item row="3" column="0" colspan="2">
+      <widget class="QLineEdit" name="LE_Direction"/>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="L_MoveLength">
+       <property name="text">
+        <string>Move length</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0" colspan="2">
+      <widget class="QLineEdit" name="LE_MoveLength"/>
+     </item>
+     <item row="6" column="0">
       <widget class="QPushButton" name="MinusX">
        <property name="minimumSize">
         <size>
-         <width>50</width>
-         <height>0</height>
+         <width>70</width>
+         <height>50</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>50</width>
-         <height>16777215</height>
+         <width>70</width>
+         <height>50</height>
         </size>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
        </property>
        <property name="text">
         <string>-X</string>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QPushButton" name="PlusY">
+     <item row="6" column="1">
+      <widget class="QPushButton" name="PlusX">
        <property name="minimumSize">
         <size>
-         <width>50</width>
-         <height>0</height>
+         <width>70</width>
+         <height>50</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>50</width>
-         <height>16777215</height>
+         <width>70</width>
+         <height>50</height>
         </size>
        </property>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
        <property name="text">
-        <string>+Y</string>
+        <string>+X</string>
        </property>
       </widget>
      </item>
-     <item>
+     <item row="7" column="0">
       <widget class="QPushButton" name="MinusY">
        <property name="minimumSize">
         <size>
-         <width>50</width>
-         <height>0</height>
+         <width>70</width>
+         <height>50</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>50</width>
-         <height>16777215</height>
+         <width>70</width>
+         <height>50</height>
         </size>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
        </property>
        <property name="text">
         <string>-Y</string>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QPushButton" name="PlusZ">
+     <item row="7" column="1">
+      <widget class="QPushButton" name="PlusY">
        <property name="minimumSize">
         <size>
-         <width>50</width>
-         <height>0</height>
+         <width>70</width>
+         <height>50</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>50</width>
-         <height>16777215</height>
+         <width>70</width>
+         <height>50</height>
         </size>
        </property>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
        <property name="text">
-        <string>+Z</string>
+        <string>+Y</string>
        </property>
       </widget>
      </item>
-     <item>
+     <item row="8" column="0">
       <widget class="QPushButton" name="MinusZ">
        <property name="minimumSize">
         <size>
-         <width>50</width>
-         <height>0</height>
+         <width>70</width>
+         <height>50</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>50</width>
-         <height>16777215</height>
+         <width>70</width>
+         <height>50</height>
         </size>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
        </property>
        <property name="text">
         <string>-Z</string>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QPushButton" name="ToNormal">
+     <item row="8" column="1">
+      <widget class="QPushButton" name="PlusZ">
        <property name="minimumSize">
         <size>
-         <width>80</width>
-         <height>0</height>
+         <width>70</width>
+         <height>50</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>80</width>
-         <height>16777215</height>
+         <width>70</width>
+         <height>50</height>
         </size>
        </property>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
        <property name="text">
-        <string>To Normal</string>
+        <string>+Z</string>
        </property>
       </widget>
      </item>
-     <item>
+     <item row="9" column="0">
+      <widget class="QPushButton" name="MinusNormal">
+       <property name="minimumSize">
+        <size>
+         <width>70</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>70</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>- Normal</string>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="1">
+      <widget class="QPushButton" name="PlusNormal">
+       <property name="minimumSize">
+        <size>
+         <width>70</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>70</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>+ Normal</string>
+       </property>
+      </widget>
+     </item>
+     <item row="10" column="0" colspan="2">
       <widget class="QPushButton" name="PB_Check">
+       <property name="minimumSize">
+        <size>
+         <width>148</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>148</width>
+         <height>30</height>
+        </size>
+       </property>
        <property name="text">
         <string>Collision check</string>
        </property>
       </widget>
      </item>
-     <item>
+     <item row="11" column="0" colspan="2">
       <widget class="QPushButton" name="PB_Exit">
+       <property name="minimumSize">
+        <size>
+         <width>148</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>148</width>
+         <height>30</height>
+        </size>
+       </property>
        <property name="text">
         <string>Exit</string>
        </property>

@@ -31,6 +31,8 @@ class Ui_GenClusterDialog
 {
 public:
     QGridLayout *gridLayout_2;
+    QListWidget *ClusterList;
+    QTextEdit *Information;
     QFrame *View3D;
     QVBoxLayout *verticalLayout_2;
     QTableWidget *InputTable;
@@ -49,8 +51,6 @@ public:
     QPushButton *PB_Add;
     QPushButton *PB_Gen;
     QPushButton *PB_Cancel;
-    QListWidget *ClusterList;
-    QTextEdit *Information;
 
     void setupUi(QDialog *GenClusterDialog)
     {
@@ -61,6 +61,20 @@ public:
         GenClusterDialog->setMaximumSize(QSize(944, 16777215));
         gridLayout_2 = new QGridLayout(GenClusterDialog);
         gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
+        ClusterList = new QListWidget(GenClusterDialog);
+        ClusterList->setObjectName(QString::fromUtf8("ClusterList"));
+        ClusterList->setMinimumSize(QSize(200, 0));
+        ClusterList->setMaximumSize(QSize(200, 16777215));
+
+        gridLayout_2->addWidget(ClusterList, 1, 0, 1, 1);
+
+        Information = new QTextEdit(GenClusterDialog);
+        Information->setObjectName(QString::fromUtf8("Information"));
+        Information->setMinimumSize(QSize(294, 0));
+        Information->setMaximumSize(QSize(294, 16777215));
+
+        gridLayout_2->addWidget(Information, 1, 1, 1, 1);
+
         View3D = new QFrame(GenClusterDialog);
         View3D->setObjectName(QString::fromUtf8("View3D"));
         View3D->setMinimumSize(QSize(500, 400));
@@ -177,20 +191,6 @@ public:
 
 
         gridLayout_2->addLayout(verticalLayout_2, 0, 2, 2, 1);
-
-        ClusterList = new QListWidget(GenClusterDialog);
-        ClusterList->setObjectName(QString::fromUtf8("ClusterList"));
-        ClusterList->setMinimumSize(QSize(200, 0));
-        ClusterList->setMaximumSize(QSize(200, 16777215));
-
-        gridLayout_2->addWidget(ClusterList, 1, 0, 1, 1);
-
-        Information = new QTextEdit(GenClusterDialog);
-        Information->setObjectName(QString::fromUtf8("Information"));
-        Information->setMinimumSize(QSize(294, 0));
-        Information->setMaximumSize(QSize(294, 16777215));
-
-        gridLayout_2->addWidget(Information, 1, 1, 1, 1);
 
 
         retranslateUi(GenClusterDialog);

@@ -706,7 +706,7 @@ xParticleObject* xParticleManager::CreateMassParticle(
 }
 
 xParticleObject * xParticleManager::CreateClusterParticle(
-	std::string n, xMaterialType mt, vector3d& loc, vector3i& grid, xClusterObject * xo)
+	std::string n, xMaterialType mt, vector3d& loc, vector3i& grid, xClusterObject * xo, bool israndom)
 {
 	unsigned int _np = grid.x * grid.y * grid.z;
 	unsigned int neach = xo->NumElement();
@@ -752,10 +752,12 @@ xParticleObject * xParticleManager::CreateClusterParticle(
 			for (int z = 0; z < grid.z; z++)
 			{
 				vector3d cp = new_vector3d(
-					loc.x + 2.0 * c_rad * x + x * 1e-6,
-					loc.y + 2.0 * c_rad * y + y * 1e-6,
-					loc.z + 2.0 * c_rad * z + z * 1e-6);
-				vector3d rot = new_vector3d(180 * frand(), 180 * frand(), 180 * frand());
+					loc.x + 2.1 * c_rad * x + x * 1e-6,
+					loc.y + 2.1 * c_rad * y + y * 1e-6,
+					loc.z + 2.1 * c_rad * z + z * 1e-6);
+				vector3d rot = new_vector3d(0, 0, 0);
+				if(israndom)
+					rot = new_vector3d(180 * frand(), 180 * frand(), 180 * frand());
 				euler_parameters m_ep = EulerAngleToEulerParameters(rot);
 				matrix33d A = GlobalTransformationMatrix(m_ep);
 				for (unsigned int j = 0; j < neach; j++)
