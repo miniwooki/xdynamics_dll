@@ -365,6 +365,85 @@ xParticleObject* xParticleManager::CreateParticleFromList(
 // 	return xpo;
 // }
 
+void xParticleManager::SetClusterParticlesFromGenModel(std::string n, xMaterialType mt, vector3d loc, std::string path)
+{
+	std::fstream qf;
+	qf.open(path, std::ios::binary | std::ios::in);
+	unsigned int m_np = 0;
+	unsigned int m_ns = 0;
+	unsigned int npobjects = 0;
+	if (qf.is_open()) {
+		qf.read((char*)&m_np, sizeof(unsigned int));
+		qf.read((char*)&m_ns, sizeof(unsigned int));
+		qf.read((char*)&npobjects, sizeof(unsigned int));
+		vector4d* m_pos = new vector4d[m_np];
+		vector4d* m_ep = new vector4d[m_ns];
+		vector4d* m_cpos = new vector4d[m_ns];
+		//qf.read((char*)m_pos, sizeof(vector4d) * m_np);
+		//qf.read((char*)m_ep, sizeof(vector4d) * m_ns);
+		//qf.read((char*)m_cpos, sizeof(vector4d) * m_ns);
+		
+		
+		unsigned int nparticle = 0;
+		unsigned int ncluster = 0;
+		xMaterial xm = GetMaterialConstant(mt);
+		for (unsigned int i = 0; i < npobjects; i++) {
+			unsigned int ns = 0;
+			qf.read((char*)&ns, sizeof(int));
+			char* _name = new char[255];
+			memset(_name, 0, sizeof(char) * 255);
+			qf.read((char*)_name, sizeof(char) * ns);
+			xParticleObject* xpo = new xParticleObject(std::string(_name));
+			qf.read((char*)&ns, sizeof(int));
+			memset(_name, 0, sizeof(char) * 255);
+			qf.read((char*)_name, sizeof(char) * ns);
+			std::string shapeName = _name;
+			xClusterObject* xo = new xClusterObject(shapeName);
+			xo->setMaterialType(mt);
+			double min_rad = 0.0;
+			double max_rad = 0.0;
+			unsigned int neach = 0;
+			unsigned int cnp = 0;
+			qf.read((char*)&neach, sizeof(unsigned int));
+			qf.read((char*)&cnp, sizeof(unsigned int));
+			vector4d* relative_loc = new vector4d[neach];
+			qf.read((char*)relative_loc, sizeof(vector4d) * neach);
+			qf.read((char*)&min_rad, sizeof(double));
+			qf.read((char*)&max_rad, sizeof(double));
+			xo->setClusterSet(neach, min_rad, max_rad, relative_loc, 0);
+
+			xpo->setStartIndex(nparticle);
+			xpo->setClusterStartIndex(ncluster);
+			xpo->setMaterialType(mt);
+			xpo->setShapeForm(CLUSTER_SHAPE);
+			xpo->setDensity(xm.density);
+			xpo->setYoungs(xm.youngs);
+			xpo->setPoisson(xm.poisson);
+			xpo->setMinRadius(min_rad);
+			xpo->setMaxRadius(max_rad);
+			xpo->setEachCount(neach);
+			xpo->setParticleShapeName(shapeName);
+			setCriticalMaterial(xm.density, xm.youngs, xm.poisson);
+			vector4d* pos = xpo->AllocMemory(cnp * neach);
+			vector4d* cpos = xpo->AllocClusterMemory(cnp);
+			double* mass = xpo->Mass();
+			vector3d* inertia = xpo->Inertia();
+			euler_parameters* ep = (euler_parameters*)xpo->EulerParameters();
+			ncluster += cnp;
+			nparticle += cnp * neach;
+			xpo->setRelativeLocation(relative_loc);
+			qf.read((char*)pos, sizeof(vector4d) * cnp * neach);
+			qf.read((char*)cpos, sizeof(vector4d) * cnp);
+			qf.read((char*)ep, sizeof(vector4d) * cnp);
+			SetClusterMassAndInertia(xpo);
+			xpcos.insert(xpo->Name(), xpo);
+			xObjectManager::XOM()->addObject(xpo);
+			n_cluster_each += neach;
+			n_cluster_object++;
+		}
+	}
+}
+
 void xParticleManager::SetCurrentParticlesFromPartResult(std::string path)
 {
 	if (c_filepath.size() == 0 && path.empty())
@@ -943,6 +1022,42 @@ void xParticleManager::ExportParticleDataForView(std::string path)
 	//of.write((char*)m_mass, sizeof(double) * np);
 	//delete[] m_mass;
 	of.close();
+}
+
+void xParticleManager::ExportParticleDataForClusterModel(std::string path)
+{
+	std::fstream file;
+	file.open(path, std::ios_base::binary | std::ios_base::out);
+	file.write((char*)&np, sizeof(unsigned int));
+	file.write((char*)&ncluster, sizeof(unsigned int));
+	file.write((char*)&n_cluster_object, sizeof(unsigned int));
+	xmap<xstring, xParticleObject*>::iterator it = xpcos.begin();
+	for (; it != xpcos.end(); it.next()) {
+		xParticleObject* xpo = it.value();
+		if (xpo->Shape() == CLUSTER_SHAPE) {
+			xstring po_name = xpo->Name();
+			unsigned int ns = po_name.size();
+			file.write((char*)&ns, sizeof(unsigned int));
+			file.write((char*)po_name.text(), ns);
+			po_name = xpo->ParticleShapeName();
+			ns = po_name.size();
+			file.write((char*)&ns, sizeof(unsigned int));
+			file.write((char*)po_name.text(), ns);
+			unsigned int neach = xpo->EachCount();
+			unsigned int cnp = xpo->NumCluster();
+			vector4d* relative_loc = xpo->RelativeLocation();
+			double min_rad = xpo->MinRadius();
+			double max_rad = xpo->MaxRadius();
+			file.write((char*)&neach, sizeof(unsigned int));
+			file.write((char*)&cnp, sizeof(unsigned int));
+			file.write((char*)relative_loc, sizeof(vector4d) * neach);
+			file.write((char*)&min_rad, sizeof(double));
+			file.write((char*)&max_rad, sizeof(double));
+			file.write((char*)xpo->Position(), sizeof(vector4d) * cnp * neach);
+			file.write((char*)xpo->ClusterPosition(), sizeof(vector4d) * cnp);
+			file.write((char*)xpo->EulerParameters(), sizeof(vector4d) * cnp);
+		}
+	}
 }
 
 void xParticleManager::AllocParticleResultMemory(unsigned int npart, unsigned int np)

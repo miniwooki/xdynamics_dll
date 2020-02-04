@@ -29,6 +29,8 @@ protected:
 	bool checkTreeItemHasChild(QTreeWidgetItem* item);
 	void updateCollision();
 	void mouseReleaseEvent(QMouseEvent *event);
+	void MoveParticle(unsigned int id, double x, double y, double z);
+	
 
 private slots:
 	void checkCollision();

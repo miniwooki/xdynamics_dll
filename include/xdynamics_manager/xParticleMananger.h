@@ -27,6 +27,7 @@ public:
 	xmap<xstring, xParticleObject*>& XParticleObjects();
 	xParticleObject* XParticleObject(std::string ws);
 	void ExportParticleDataForView(std::string path);
+	void ExportParticleDataForClusterModel(std::string path);
 // 	void setRealTimeCreating(bool b);
 // 	bool OneByOneCreating();
 	unsigned int nClusterObject();
@@ -38,7 +39,7 @@ public:
 	double CriticalYoungs();
 	double CriticalRadius();
 
-
+	void SetClusterParticlesFromGenModel(std::string n, xMaterialType mt, vector3d loc, std::string path);
 	double* GetPositionResultPointer(unsigned int pt);
 	double* GetVelocityResultPointer(unsigned int pt);
 // 	unsigned int RealTimeCreating();

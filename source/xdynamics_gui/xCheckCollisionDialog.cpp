@@ -42,6 +42,15 @@ void xCheckCollisionDialog::selectedItemProcess()
 	isChangedSelection = true;
 }
 
+void xCheckCollisionDialog::MoveParticle(unsigned int id, double x, double y, double z)
+{
+	for(xmap<xstring, xParticleObject*>::iterator it = pmgr->XParticleObjects().begin(); it != pmgr->XParticleObjects().end(); it.next()){
+		if (it.value()->IsInThisFromIndex(id)) {
+			it.value()->MoveParticle(id, x, y, z);
+		}
+	}
+}
+
 void xCheckCollisionDialog::movePlusX()
 {
 	if (!checkTreeItemHasChild(CollisionParticle->currentItem())) {
@@ -57,8 +66,9 @@ void xCheckCollisionDialog::movePlusX()
 	}
 	double length = LE_MoveLength->text().toDouble();
 	for (int i = 0; i < info.neach; i++) {
-		xp->MoveParticle(info.sid + selectedCluster * info.neach, length, 0, 0);
+		xp->MoveParticle(info.sid + selectedCluster * info.neach + i, length, 0, 0);
 	}
+	MoveParticle(info.sid + selectedCluster * info.neach, length, 0, 0);
 	updateCollision();
 }
 
@@ -77,8 +87,9 @@ void xCheckCollisionDialog::movePlusY()
 	}
 	double length = LE_MoveLength->text().toDouble();
 	for (int i = 0; i < info.neach; i++) {
-		xp->MoveParticle(info.sid + selectedCluster * info.neach, 0, length, 0);
+		xp->MoveParticle(info.sid + selectedCluster * info.neach + i, 0, length, 0);		
 	}
+	MoveParticle(info.sid + selectedCluster * info.neach, 0, length, 0);
 	updateCollision();
 }
 
@@ -97,8 +108,9 @@ void xCheckCollisionDialog::movePlusZ()
 	}
 	double length = LE_MoveLength->text().toDouble();
 	for (int i = 0; i < info.neach; i++) {
-		xp->MoveParticle(info.sid + selectedCluster * info.neach, 0, 0, length);
+		xp->MoveParticle(info.sid + selectedCluster * info.neach + i, 0, 0, length);		
 	}
+	MoveParticle(info.sid + selectedCluster * info.neach, 0, 0, length);
 	updateCollision();
 }
 
@@ -117,8 +129,9 @@ void xCheckCollisionDialog::moveMinusX()
 	}
 	double length = LE_MoveLength->text().toDouble();
 	for (int i = 0; i < info.neach; i++) {
-		xp->MoveParticle(info.sid + selectedCluster * info.neach, -length, 0, 0);
+		xp->MoveParticle(info.sid + selectedCluster * info.neach + i, -length, 0, 0);		
 	}
+	MoveParticle(info.sid + selectedCluster * info.neach, -length, 0, 0);
 	updateCollision();
 }
 
@@ -137,8 +150,9 @@ void xCheckCollisionDialog::moveMinusY()
 	}
 	double length = LE_MoveLength->text().toDouble();
 	for (int i = 0; i < info.neach; i++) {
-		xp->MoveParticle(info.sid + selectedCluster * info.neach, 0, -length, 0);
+		xp->MoveParticle(info.sid + selectedCluster * info.neach + i, 0, -length, 0);		
 	}
+	MoveParticle(info.sid + selectedCluster * info.neach, 0, -length, 0);
 	updateCollision();
 }
 
@@ -157,8 +171,9 @@ void xCheckCollisionDialog::moveMinusZ()
 	}
 	double length = LE_MoveLength->text().toDouble();
 	for (int i = 0; i < info.neach; i++) {
-		xp->MoveParticle(info.sid + selectedCluster * info.neach, 0, 0, -length);
+		xp->MoveParticle(info.sid + selectedCluster * info.neach + i, 0, 0, -length);		
 	}
+	MoveParticle(info.sid + selectedCluster * info.neach, 0, 0, -length);
 	updateCollision();
 }
 
@@ -181,8 +196,9 @@ void xCheckCollisionDialog::movePlusNormal()
 	double uy = normal.at(1).toDouble();
 	double uz = normal.at(2).toDouble();
 	for (int i = 0; i < info.neach; i++) {
-		xp->MoveParticle(info.sid + selectedCluster * info.neach + i, length * ux, length * uy, length * uz);
+		xp->MoveParticle(info.sid + selectedCluster * info.neach + i, length * ux, length * uy, length * uz);		
 	}
+	MoveParticle(info.sid + selectedCluster * info.neach, length * ux, length * uy, length * uz);
 	updateCollision();
 }
 
@@ -204,9 +220,11 @@ void xCheckCollisionDialog::moveMinusNormal()
 	double ux = -normal.at(0).toDouble();
 	double uy = -normal.at(1).toDouble();
 	double uz = -normal.at(2).toDouble();
+	selectedCluster -= info.scid;
 	for (int i = 0; i < info.neach; i++) {
-		xp->MoveParticle(info.sid + selectedCluster * info.neach + i, length * ux, length * uy, length * uz);
+		xp->MoveParticle(info.sid + selectedCluster * info.neach + i, length * ux, length * uy, length * uz);		
 	}
+	MoveParticle(info.sid + selectedCluster * info.neach, length * ux, length * uy, length * uz);
 	updateCollision();
 }
 
@@ -308,10 +326,10 @@ void xCheckCollisionDialog::highlightSelectedCluster(int row, int column)
 	QColor previous_color;
 	xClusterInformation info;
 	foreach(info, cinfos) {
-		if (row >= info.sid && row * info.neach < info.sid + info.count)
+		if (row >= info.scid && row * info.neach < info.sid + info.count)
 			break;
 	}
-	unsigned int cid = info.sid + row * info.neach;
+	unsigned int cid = info.sid + (row - info.scid) * info.neach;
 	for (unsigned int i = cid; i < cid + info.neach; i++) {
 		xp->ChangeColor(i, QColor(255, 0, 0), previous_color);
 		changedColor[i] = previous_color;
@@ -504,11 +522,14 @@ void xCheckCollisionDialog::checkCollision()
 		}
 	}
 	double *pos = new double[np * 4];
-	double *ep = new double[np * 4];
+	double *ep = nullptr;// new double[ncp * 4];
 	//cpos = new double[ncp * 4];
 	double *cpos = nullptr;
-	if (ncp)
+	if (ncp) {
 		cpos = new double[ncp * 4];
+		ep = new double[ncp * 4];
+	}
+		
 	sid = 0;
 	foreach(xParticleObject* xpo, pobjects) {
 		xpo->CopyPosition(pos);

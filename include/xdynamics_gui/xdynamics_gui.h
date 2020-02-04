@@ -78,6 +78,7 @@ private slots:
 	void xGenerateClusterDistribution();
 	void xGenerateClusterParticles(QString, QString, int*, double*, bool);
 	void xCheckCollision();
+	void xExportClusterParticleModel();
 	//void xHighlightParticle(unsigned int, QColor, QColor&);
 	
 private:
@@ -86,6 +87,7 @@ private:
 	void setupObjectOperations();
 	void setupAnimationTool();
 	void setupBindingPointer();
+	void setupMenuOperations();
 	void setupShorcutOperations();
 	//void setupAnimationOperations();
 	void deleteFileByEXT(QString ext);

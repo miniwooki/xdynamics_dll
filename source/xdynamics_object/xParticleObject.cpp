@@ -1,5 +1,7 @@
 #include "..\..\include\xdynamics_object\xParticleObject.h"
 #include "..\..\include\xdynamics_object\xParticleObject.h"
+#include "..\..\include\xdynamics_object\xParticleObject.h"
+#include "..\..\include\xdynamics_object\xParticleObject.h"
 #include "xdynamics_object/xParticleObject.h"
 
 unsigned int xParticleObject::xpo_count = 0;
@@ -266,6 +268,24 @@ void xParticleObject::setParticleShapeName(xstring s)
 std::string xParticleObject::ParticleShapeName()
 {
 	return particleShapeName.toStdString();
+}
+
+bool xParticleObject::IsInThisFromIndex(unsigned int id)
+{
+	if (id >= sid && id < sid + np) {
+		return true;
+	}
+	return false;
+}
+
+void xParticleObject::MoveParticle(unsigned int id, double x, double y, double z)
+{
+	unsigned int cid = id - sid;
+	for (unsigned int i = cid; i < cid + each; i++) {
+		pos[i] += new_vector4d(x, y, z, pos[i].w);
+	}
+	cid = cid / each;
+	cpos[cid] += new_vector4d(x, y, z, cpos[cid].w);
 }
 
 unsigned int xParticleObject::create_sph_particles(double ps, unsigned int nlayers, vector3d* p, xMaterialType* t)

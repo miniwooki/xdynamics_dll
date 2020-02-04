@@ -44,6 +44,8 @@ public:
 	vector3d* Inertia() const;
 	void setParticleShapeName(xstring s);
 	std::string ParticleShapeName();
+	bool IsInThisFromIndex(unsigned int id);
+	void MoveParticle(unsigned int id, double x, double y, double z);
 	virtual unsigned int create_sph_particles(double ps, unsigned int nlayers, vector3d* p = NULL, xMaterialType* t = NULL);
 	//virtual QVector<xCorner> get_sph_boundary_corners();
 // 	static unsigned int calculateNumCubeParticles(double dx, double dy, double dz, double min_radius, double max_radius);

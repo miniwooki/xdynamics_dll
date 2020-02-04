@@ -55,6 +55,24 @@
      <height>21</height>
     </rect>
    </property>
+   <widget class="QMenu" name="MenuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <widget class="QMenu" name="File_Export">
+     <property name="title">
+      <string>Export</string>
+     </property>
+     <addaction name="File_Export_ClusterParticleModel"/>
+    </widget>
+    <addaction name="actionNew"/>
+    <addaction name="actionOpen"/>
+    <addaction name="actionSAve"/>
+    <addaction name="separator"/>
+    <addaction name="actionImport"/>
+    <addaction name="File_Export"/>
+   </widget>
+   <addaction name="MenuFile"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -65,6 +83,31 @@
    </attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionNew">
+   <property name="text">
+    <string>New</string>
+   </property>
+  </action>
+  <action name="actionOpen">
+   <property name="text">
+    <string>Open</string>
+   </property>
+  </action>
+  <action name="actionSAve">
+   <property name="text">
+    <string>Save</string>
+   </property>
+  </action>
+  <action name="actionImport">
+   <property name="text">
+    <string>Import</string>
+   </property>
+  </action>
+  <action name="File_Export_ClusterParticleModel">
+   <property name="text">
+    <string>Cluster particle model</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>

@@ -768,6 +768,11 @@ void xdynamics_gui::setupBindingPointer()
 	}
 }
 
+void xdynamics_gui::setupMenuOperations()
+{
+	connect(ui.File_Export_ClusterParticleModel, SIGNAL(triggered()), this, SLOT(xExportClusterParticleModel()));
+}
+
 void xdynamics_gui::setupShorcutOperations()
 {
 	QShortcut *a = new QShortcut(QKeySequence("Ctrl+Q"), this);
@@ -1189,6 +1194,15 @@ void xdynamics_gui::xCheckCollision()
 	c_checker->show();
 	c_checker->raise();
 	c_checker->activateWindow();
+}
+
+void xdynamics_gui::xExportClusterParticleModel()
+{
+	QString filepath = QFileDialog::getSaveFileName(this, tr("open"), path,
+		tr("Cluster model file (*.cmf)"));
+	if (!filepath.isEmpty()) {
+		pmgr->ExportParticleDataForClusterModel(filepath.toStdString());
+	}
 }
 
 //void xdynamics_gui::xHighlightParticle(unsigned int id, QColor color, QColor& pcolor)
