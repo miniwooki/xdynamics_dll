@@ -95,6 +95,7 @@ xdynamics_gui::xdynamics_gui(int _argc, char** _argv, QWidget *parent)
 	setupMainOperations();
 	setupObjectOperations();
 	setupShorcutOperations();
+	setupMenuOperations();
 	xnavi = new xModelNavigator(this);
 	addDockWidget(Qt::LeftDockWidgetArea, xnavi);
 	setAcceptDrops(true);

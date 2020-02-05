@@ -159,6 +159,9 @@ gen_cluster_dlg::gen_cluster_dlg(QWidget* parent)
 	connect(InputTable, &QTableWidget::cellActivated, this, &gen_cluster_dlg::changeCell);
 	rc[0] = -1;
 	rc[1] = -1;
+	graph->axisX()->setLabelFormat("%.6f");
+	graph->axisY()->setLabelFormat("%.6f");
+	graph->axisZ()->setLabelFormat("%.6f");
 }
 
 gen_cluster_dlg::~gen_cluster_dlg()

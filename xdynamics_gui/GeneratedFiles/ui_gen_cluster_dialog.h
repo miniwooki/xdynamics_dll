@@ -105,7 +105,7 @@ public:
         SB_Scale->setMinimumSize(QSize(100, 0));
         SB_Scale->setMaximumSize(QSize(100, 16777215));
         SB_Scale->setMinimum(1);
-        SB_Scale->setMaximum(100);
+        SB_Scale->setMaximum(10000);
 
         gridLayout->addWidget(SB_Scale, 0, 1, 1, 1);
 

@@ -1034,7 +1034,7 @@ void xParticleManager::ExportParticleDataForClusterModel(std::string path)
 	xmap<xstring, xParticleObject*>::iterator it = xpcos.begin();
 	for (; it != xpcos.end(); it.next()) {
 		xParticleObject* xpo = it.value();
-		if (xpo->Shape() == CLUSTER_SHAPE) {
+		if (xpo->ShapeForm() == CLUSTER_SHAPE) {
 			xstring po_name = xpo->Name();
 			unsigned int ns = po_name.size();
 			file.write((char*)&ns, sizeof(unsigned int));

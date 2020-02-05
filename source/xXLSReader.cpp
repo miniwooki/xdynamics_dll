@@ -558,19 +558,27 @@ void xXLSReader::ReadDEMParticle(xDiscreteElementMethodModel* xdem, xObjectManag
 			{
 				std::string obj;
 				obj = ReadStr(rc.x, rc.y++);
-				xObject* xo = xom->XObject(obj);
-
-				/*unsigned int num = ReadNum(rc.x, rc.y++);*/
-				vector3d loc = new_vector3d(0, 0, 0);
-				vector3i grid = new_vector3i(0, 0, 0);
-				xstring x = ReadStr(rc.x, rc.y++);
-				x.split(",", 3, &loc.x);
-				x = ReadStr(rc.x, rc.y++);
-				x.split(",", 3, &grid.x);
-				xstring israndom = ReadStr(rc.x, rc.y++);
-				/*xUtilityFunctions::xsplit(ReadStr(rc.x, rc.y++), ",", 3, &loc.x);
-				xUtilityFunctions::xsplit(ReadStr(rc.x, rc.y++), ",", 3, &grid.x);*/
-				xdem->XParticleManager()->CreateClusterParticle(name.c_str(), xo->Material(), loc, grid, dynamic_cast<xClusterObject*>(xo), israndom == "true" ? true : false);
+				if (obj == "cmf") {
+					material = static_cast<int>(ReadNum(rc.x, rc.y++));
+					vector3d loc = new_vector3d(0, 0, 0);
+					xstring x = ReadStr(rc.x, rc.y++);
+					x.split(",", 3, &loc.x);
+					xstring filepath = ReadStr(rc.x, rc.y++);
+					xdem->XParticleManager()->SetClusterParticlesFromGenModel(name, (xMaterialType)material, loc, filepath.toStdString());
+				}
+				else {
+					xObject* xo = xom->XObject(obj);
+					vector3d loc = new_vector3d(0, 0, 0);
+					vector3i grid = new_vector3i(0, 0, 0);
+					xstring x = ReadStr(rc.x, rc.y++);
+					x.split(",", 3, &loc.x);
+					x = ReadStr(rc.x, rc.y++);
+					x.split(",", 3, &grid.x);
+					xstring israndom = ReadStr(rc.x, rc.y++);
+					/*xUtilityFunctions::xsplit(ReadStr(rc.x, rc.y++), ",", 3, &loc.x);
+					xUtilityFunctions::xsplit(ReadStr(rc.x, rc.y++), ",", 3, &grid.x);*/
+					xdem->XParticleManager()->CreateClusterParticle(name.c_str(), xo->Material(), loc, grid, dynamic_cast<xClusterObject*>(xo), israndom == "true" ? true : false);
+				}
 			}
 			else if (form == NO_SHAPE_AND_MASS)
 			{
