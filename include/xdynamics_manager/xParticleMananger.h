@@ -65,6 +65,7 @@ public:
 	xParticleObject* CreatePlaneParticle(std::string n, xMaterialType mt, xPlaneParticleData& d);
 	
 	double GetMaxParticleRadius();
+	
 
 private:
 	void setCriticalMaterial(double d, double y, double p);

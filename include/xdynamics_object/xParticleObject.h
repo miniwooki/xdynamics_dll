@@ -2,10 +2,19 @@
 #define XPARTICLEOBJECT_H
 
 #include "xdynamics_object/xObject.h"
+#include "xmap.hpp"
+
+class xClusterObject;
 
 class XDYNAMICS_API xParticleObject : public xObject
 {
 public:
+
+	typedef struct
+	{
+		unsigned int sidx, num, each;
+	}xEachObjectData;
+
 	xParticleObject();
 	xParticleObject(std::string _name);
 	virtual ~xParticleObject();
@@ -16,7 +25,6 @@ public:
 	void setMinRadius(double _mr);
 	void setMaxRadius(double _mr);
 	void setShapeForm(xShapeType xst);
-	void setRelativeLocation(vector4d* rl);
 	void setMassIndex(unsigned _mid);
 	void resizeParticles(unsigned int new_np);
 	vector4d* AllocMemory(unsigned int _np);
@@ -39,7 +47,6 @@ public:
 	vector4d* Position() const;
 	vector4d* ClusterPosition() const;
 	vector4d* EulerParameters() const;
-	vector4d* RelativeLocation() const;
 	double* Mass() const;
 	vector3d* Inertia() const;
 	void setParticleShapeName(xstring s);
@@ -47,6 +54,7 @@ public:
 	bool IsInThisFromIndex(unsigned int id);
 	void MoveParticle(unsigned int id, double x, double y, double z);
 	virtual unsigned int create_sph_particles(double ps, unsigned int nlayers, vector3d* p = NULL, xMaterialType* t = NULL);
+	void appendEachObject(xstring n, xParticleObject::xEachObjectData& co);
 	//virtual QVector<xCorner> get_sph_boundary_corners();
 // 	static unsigned int calculateNumCubeParticles(double dx, double dy, double dz, double min_radius, double max_radius);
 // 	static unsigned int calculateNumPlaneParticles(double dx, unsigned int ny, double dy, double min_radius, double max_radius);
@@ -57,6 +65,9 @@ public:
 // 		double lx, double ly, double lz,
 // 		double spacing, double min_radius, double max_radius,
 // 		double youngs, double density, double poisson, double shear);
+	xmap<xstring, xParticleObject::xEachObjectData>& EachObjects();
+	void SetStartingPosition(unsigned int id, vector4d* p);
+	vector4d* StartingPosition(unsigned int id);
 
 private:
 	static unsigned int xpo_count;
@@ -76,7 +87,9 @@ private:
 	vector4d* ep;
 	double* mass;
 	vector3d* inertia;
-	vector4d *relative_loc;
+	//vector4d *relative_loc;
+	vector4d* spos[100];
+	xmap<xstring, xEachObjectData> cobjects;
 };
 
 #endif

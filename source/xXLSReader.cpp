@@ -691,6 +691,7 @@ void xXLSReader::ReadContact(xContactManager* xcm, vector2i rc)
 			std::string obj0 = ReadStr(rc.x, rc.y++);
 			std::string obj1 = ReadStr(rc.x, rc.y++);
 			xContactParameterData d = ReadContactData(name, rc.x, rc.y);
+		
 			xObject* obj0_ptr = xObjectManager::XOM()->XObject(obj0);
 			xObject* obj1_ptr = xObjectManager::XOM()->XObject(obj1);
 			if (obj0_ptr == NULL)
@@ -703,6 +704,7 @@ void xXLSReader::ReadContact(xContactManager* xcm, vector2i rc)
 				obj0_ptr,
 				obj1_ptr,
 				d);
+				
 			rc.x++;
 			rc.y = 0;
 		}

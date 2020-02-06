@@ -50,7 +50,8 @@ void xContactManager::CreateContactPair(
 			throw runtime_error("Contact force model of " + n + " is not matched. " + ForceModelString(xContact::ContactForceModel()) + "!=" + ForceModelString(method));
 		}		
 	}
-	xContactPairType pt = getContactPair(o1->Shape(), o2->Shape());
+	xContactPairType pt;
+	pt = getContactPair(o1->Shape(), o2->Shape());
 	xContact *_c = nullptr;
 	switch (pt)
 	{

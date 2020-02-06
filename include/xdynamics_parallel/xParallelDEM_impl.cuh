@@ -835,7 +835,7 @@ __global__ void cluster_plane_contact_kernel(
 	unsigned int neach = 0;
 	unsigned int seach = 0;
 	unsigned int sbegin = 0;
-//	printf("%d\n", cte.nClusterObject);
+	//printf("%d\n", cte.nClusterObject);
 	for (unsigned int i = 0; i < cte.nClusterObject; i++)
 	{
 		xClusterInformation xc = xci[i];

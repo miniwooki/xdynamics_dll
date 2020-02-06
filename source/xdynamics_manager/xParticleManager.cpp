@@ -373,35 +373,46 @@ void xParticleManager::SetClusterParticlesFromGenModel(std::string n, xMaterialT
 	unsigned int m_ns = 0;
 	unsigned int npobjects = 0;
 	if (qf.is_open()) {
+		std::string fileName = xUtilityFunctions::GetFileName(path.c_str());
 		qf.read((char*)&m_np, sizeof(unsigned int));
 		qf.read((char*)&m_ns, sizeof(unsigned int));
 		qf.read((char*)&npobjects, sizeof(unsigned int));
-		vector4d* m_pos = new vector4d[m_np];
-		vector4d* m_ep = new vector4d[m_ns];
-		vector4d* m_cpos = new vector4d[m_ns];
-		//qf.read((char*)m_pos, sizeof(vector4d) * m_np);
-		//qf.read((char*)m_ep, sizeof(vector4d) * m_ns);
-		//qf.read((char*)m_cpos, sizeof(vector4d) * m_ns);
-		
-		
-		unsigned int nparticle = 0;
-		unsigned int ncluster = 0;
+		xParticleObject* xpo = new xParticleObject(n);
 		xMaterial xm = GetMaterialConstant(mt);
-		for (unsigned int i = 0; i < npobjects; i++) {
+		xpo->setStartIndex(np);
+		xpo->setClusterStartIndex(ncluster);
+		xpo->setMaterialType(mt);
+		xpo->setShapeForm(CLUSTER_SHAPE);
+		xpo->setDensity(xm.density);
+		xpo->setYoungs(xm.youngs);
+		xpo->setPoisson(xm.poisson);
+		setCriticalMaterial(xm.density, xm.youngs, xm.poisson);
+
+		vector4d* pos = xpo->AllocMemory(m_np);
+		vector4d* cpos = xpo->AllocClusterMemory(m_ns);
+		/*double* mass = xpo->Mass();
+		vector3d* inertia = xpo->Inertia();*/
+		euler_parameters* ep = (euler_parameters*)xpo->EulerParameters();
+		//xpo->setEachCount(neach);
+
+		double min_rad = 0.0;
+		double max_rad = 0.0;
+		double min_x = FLT_MAX;
+		double min_y = FLT_MAX;
+		double min_z = FLT_MAX;
+		unsigned int tpts = 0;
+		for (unsigned int k = 0; k < npobjects; k++) {
 			unsigned int ns = 0;
 			qf.read((char*)&ns, sizeof(int));
 			char* _name = new char[255];
 			memset(_name, 0, sizeof(char) * 255);
 			qf.read((char*)_name, sizeof(char) * ns);
-			xParticleObject* xpo = new xParticleObject(std::string(_name));
 			qf.read((char*)&ns, sizeof(int));
 			memset(_name, 0, sizeof(char) * 255);
 			qf.read((char*)_name, sizeof(char) * ns);
 			std::string shapeName = _name;
-			xClusterObject* xo = new xClusterObject(shapeName);
+			xClusterObject* xo = xObjectManager::XOM()->CreateClusterShapeObject(shapeName, mt);// new xClusterObject(shapeName);
 			xo->setMaterialType(mt);
-			double min_rad = 0.0;
-			double max_rad = 0.0;
 			unsigned int neach = 0;
 			unsigned int cnp = 0;
 			qf.read((char*)&neach, sizeof(unsigned int));
@@ -411,37 +422,49 @@ void xParticleManager::SetClusterParticlesFromGenModel(std::string n, xMaterialT
 			qf.read((char*)&min_rad, sizeof(double));
 			qf.read((char*)&max_rad, sizeof(double));
 			xo->setClusterSet(neach, min_rad, max_rad, relative_loc, 0);
+			qf.read((char*)(pos + np), sizeof(vector4d) * cnp * neach);
+			qf.read((char*)(cpos + ncluster), sizeof(vector4d) * cnp);
+			qf.read((char*)(ep + ncluster), sizeof(vector4d) * cnp);
 
-			xpo->setStartIndex(nparticle);
-			xpo->setClusterStartIndex(ncluster);
-			xpo->setMaterialType(mt);
-			xpo->setShapeForm(CLUSTER_SHAPE);
-			xpo->setDensity(xm.density);
-			xpo->setYoungs(xm.youngs);
-			xpo->setPoisson(xm.poisson);
-			xpo->setMinRadius(min_rad);
-			xpo->setMaxRadius(max_rad);
-			xpo->setEachCount(neach);
-			xpo->setParticleShapeName(shapeName);
-			setCriticalMaterial(xm.density, xm.youngs, xm.poisson);
-			vector4d* pos = xpo->AllocMemory(cnp * neach);
-			vector4d* cpos = xpo->AllocClusterMemory(cnp);
-			double* mass = xpo->Mass();
-			vector3d* inertia = xpo->Inertia();
-			euler_parameters* ep = (euler_parameters*)xpo->EulerParameters();
-			ncluster += cnp;
-			nparticle += cnp * neach;
-			xpo->setRelativeLocation(relative_loc);
-			qf.read((char*)pos, sizeof(vector4d) * cnp * neach);
-			qf.read((char*)cpos, sizeof(vector4d) * cnp);
-			qf.read((char*)ep, sizeof(vector4d) * cnp);
-			SetClusterMassAndInertia(xpo);
-			xpcos.insert(xpo->Name(), xpo);
-			xObjectManager::XOM()->addObject(xpo);
 			n_cluster_each += neach;
+			delete[] _name;
+			delete[] relative_loc;
+			xParticleObject::xEachObjectData edata = { tpts, cnp, neach };
+			xpo->appendEachObject(shapeName, edata);
 			n_cluster_object++;
+			//xpo->appendClusterObject(xo);
 		}
+		for (unsigned int i = 0; i < m_np; i++) {
+			if (min_x > pos[i].x) min_x = pos[i].x;
+			if (min_y > pos[i].y) min_y = pos[i].y;
+			if (min_z > pos[i].z) min_z = pos[i].z;
+		}
+		vector3d dloc = new_vector3d(loc.x - min_x, loc.y - min_y, loc.z - min_z);
+		for (unsigned int i = 0; i < m_np; i++) {
+			pos[i].x += dloc.x;
+			pos[i].y += dloc.y;
+			pos[i].z += dloc.z;
+		}
+		for (unsigned int i = 0; i < m_ns; i++) {
+			cpos[i].x += dloc.x;
+			cpos[i].y += dloc.y;
+			cpos[i].z += dloc.z;
+		}
+	//	double* mass = xpo->Mass();
+		//vector3d* inertia = xpo->Inertia();
+		xpo->setParticleShapeName("cmf");
+		xpo->setMinRadius(min_rad);
+		xpo->setMaxRadius(max_rad);
+		SetClusterMassAndInertia(xpo);
+		xpcos.insert(xpo->Name(), xpo);
+		//n_cluster_object++;
+		np = m_np;
+		ncluster = m_ns;
+		xObjectManager::XOM()->addObject(xpo);
+		//np = nparticle;
+		//ncluster = ncluster;
 	}
+	qf.close();
 }
 
 void xParticleManager::SetCurrentParticlesFromPartResult(std::string path)
@@ -812,14 +835,15 @@ xParticleObject * xParticleManager::CreateClusterParticle(
 	double* mass = xpo->Mass();
 	vector3d* inertia = xpo->Inertia();
 	//vector3d* inertia = xpo->AllocInertiaMemory(_np);
-	
+	xParticleObject::xEachObjectData edata = { ncluster, _np, neach };
+	xpo->appendEachObject(xo->Name(), edata);
 	euler_parameters* ep = (euler_parameters*)xpo->EulerParameters();
 	//n_cluster_sphere += _np;
 	ncluster += _np;
 	np += _np * neach;
 	double norm = 0;
 	vector4d* rloc = xo->RelativeLocation();
-	xpo->setRelativeLocation(xo->RelativeLocation());
+//	xpo->setRelativeLocation(xo->RelativeLocation());
 	double c_rad = 0.0;
 	unsigned int cnt = 0;
 	double rad = max_rad;
@@ -866,18 +890,29 @@ xParticleObject * xParticleManager::CreateClusterParticle(
 void xParticleManager::CopyClusterInformation(xClusterInformation * xci, double* rcloc)
 {
 	unsigned int cnt = 0;
+	unsigned int nent = 0;
+	unsigned int nccnt = 0;
 	vector3d* rloc = (vector3d*)rcloc;
 	for (xmap<xstring, xParticleObject*>::iterator it = xpcos.begin(); it != xpcos.end(); it.next())// foreach(xParticleObject* xpo, xpcos)
 	{
 		xParticleObject* xpo = it.value();
 		if (xpo->ShapeForm() == CLUSTER_SHAPE)
 		{
-			xci[cnt].sid = xpo->StartClusterIndex();
-			xci[cnt].neach = xpo->EachCount();
-			xci[cnt].count = xpo->NumCluster();
-			memcpy(rloc + xci[cnt].sid, xpo->RelativeLocation(), sizeof(vector4d) * xci[cnt].neach);
-			cnt++;
+			for (xmap<xstring, xParticleObject::xEachObjectData>::iterator et = xpo->EachObjects().begin(); et != xpo->EachObjects().end(); et.next()) {
+				xci[cnt].sid = et.value().sidx;// o->StartClusterIndex();
+				xci[cnt].scid = nccnt;
+				xci[cnt].neach = et.value().each;// xpo->EachCount();
+				xci[cnt].count = et.value().num;// xpo->NumCluster();
+				vector4d* _rloc = dynamic_cast<xClusterObject*>(xObjectManager::XOM()->XObject(et.key().toStdString()))->RelativeLocation();
+				for (int i = 0; i < et.value().each; i++) {
+					rloc[nent + i] = new_vector3d(_rloc[i].x, _rloc[i].y, _rloc[i].z);
+				}
+				//memcpy(rloc + xci[cnt].sid, xpo->RelativeLocation(), sizeof(vector4d) * xci[cnt].neach);
+				cnt++;
+				nent += et.value().each;
+			}			
 		}
+		nccnt = cnt;
 	}
 }
 
@@ -919,10 +954,33 @@ bool xParticleManager::SetClusterMassAndInertia(xParticleObject* xpo)
 	double d = xpo->Density();
 	//vector4d* v = xpo->Position();
 	unsigned int sid = xpo->StartIndex();
+	vector4d* pos = xpo->Position();
 	vector4d* cpos = xpo->ClusterPosition();
-	vector4d* rloc = xpo->RelativeLocation();
-
-	for (unsigned int i = 0; i < xpo->NumCluster(); i++)
+	euler_parameters* ep = (euler_parameters*)xpo->EulerParameters();
+	//vector4d* rloc = xpo->RelativeLocation();
+	unsigned int cnt = 0;
+	for (xmap<xstring, xParticleObject::xEachObjectData>::iterator it = xpo->EachObjects().begin(); it != xpo->EachObjects().end(); it.next()) {
+		vector4d* m_pos = pos + it.value().sidx;
+		vector4d* m_cpos = cpos + it.value().sidx;
+		vector4d* rloc = dynamic_cast<xClusterObject*>(xObjectManager::XOM()->XObject(it.key().toStdString()))->RelativeLocation();
+		for (unsigned int i = 0; i < it.value().num; i++) {
+			double m = d * (4.0 / 3.0) * M_PI * pow(m_cpos[i].w, 3.0);
+			mass[i] = m * it.value().each;// xpo->EachCount();
+			double J = (2.0 / 5.0) * m * pow(m_cpos[i].w, 2.0);
+			vector3d J3 = new_vector3d(0, 0, 0);
+			//vector3d m_pos = new_vector3d(m_cpos[i].x, m_cpos[i].y, m_cpos[i].z);
+			for (unsigned int j = 0; j < it.value().each; j++)
+			{
+				vector4d dr = rloc[j];
+				J3.x += m * (dr.y * dr.y + dr.z * dr.z);
+				J3.y += m * (dr.x * dr.x + dr.z * dr.z);
+				J3.z += m * (dr.x * dr.x + dr.y * dr.y);
+			}
+			inertia[i] = J3;
+		}
+		c++;
+	}
+	/*for (unsigned int i = 0; i < xpo->NumCluster(); i++)
 	{
 		double m = d * (4.0 / 3.0) * M_PI * pow(cpos[i].w, 3.0);
 		mass[i] = m * xpo->EachCount();
@@ -931,14 +989,15 @@ bool xParticleManager::SetClusterMassAndInertia(xParticleObject* xpo)
 		vector3d m_pos = new_vector3d(cpos[i].x, cpos[i].y, cpos[i].z);
 		for (unsigned int j = 0; j < xpo->EachCount(); j++)
 		{
-			vector4d dr = rloc[j];
-			J3.x += m * (dr.y * dr.y + dr.z * dr.z);
-			J3.y += m * (dr.x * dr.x + dr.z * dr.z);
-			J3.z += m * (dr.x * dr.x + dr.y * dr.y);
+			vector3d dr = new_vector3d(pos[j].x - cpos[i].x, pos[j].y - cpos[i].y, pos[j].z - cpos[i].z);
+			vector3d dr_p = ToLocal(ep[i], dr);
+			J3.x += m * (dr_p.y * dr_p.y + dr_p.z * dr_p.z);
+			J3.y += m * (dr_p.x * dr_p.x + dr_p.z * dr_p.z);
+			J3.z += m * (dr_p.x * dr_p.x + dr_p.y * dr_p.y);
 		}
 		inertia[i] = J3;
 		c++;
-	}
+	}*/
 	xpo->setMassIndex(c);
 	//}
 	return false;
@@ -1045,7 +1104,7 @@ void xParticleManager::ExportParticleDataForClusterModel(std::string path)
 			file.write((char*)po_name.text(), ns);
 			unsigned int neach = xpo->EachCount();
 			unsigned int cnp = xpo->NumCluster();
-			vector4d* relative_loc = xpo->RelativeLocation();
+			vector4d* relative_loc = dynamic_cast<xClusterObject*>(xObjectManager::XOM()->XObject(xpo->ParticleShapeName()))->RelativeLocation();
 			double min_rad = xpo->MinRadius();
 			double max_rad = xpo->MaxRadius();
 			file.write((char*)&neach, sizeof(unsigned int));

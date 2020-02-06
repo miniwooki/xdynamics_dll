@@ -1,8 +1,5 @@
-#include "..\..\include\xdynamics_object\xParticleObject.h"
-#include "..\..\include\xdynamics_object\xParticleObject.h"
-#include "..\..\include\xdynamics_object\xParticleObject.h"
-#include "..\..\include\xdynamics_object\xParticleObject.h"
 #include "xdynamics_object/xParticleObject.h"
+#include "xdynamics_object/xClusterObject.h"
 
 unsigned int xParticleObject::xpo_count = 0;
 
@@ -14,7 +11,7 @@ xParticleObject::xParticleObject()
 	, min_radius(0)
 	, max_radius(0)
 	, pos(NULL)
-	, relative_loc(NULL)
+	//, relative_loc(NULL)
 	, each(1)
 	, mass(0)
 	, inertia(0)
@@ -30,7 +27,7 @@ xParticleObject::xParticleObject(std::string _name)
 	, min_radius(0)
 	, max_radius(0)
 	, pos(NULL)
-	, relative_loc(NULL)
+	//, relative_loc(NULL)
 	, each(1)
 	, mass(0)
 	, inertia(0)
@@ -245,11 +242,6 @@ vector4d * xParticleObject::EulerParameters() const
 	return ep;
 }
 
-vector4d * xParticleObject::RelativeLocation() const
-{
-	return relative_loc;
-}
-
 double* xParticleObject::Mass() const
 {
 	return mass;
@@ -293,6 +285,27 @@ unsigned int xParticleObject::create_sph_particles(double ps, unsigned int nlaye
 	return 0;
 }
 
+void xParticleObject::appendEachObject(xstring n, xParticleObject::xEachObjectData& co)
+{
+	//xstring n = co->Name();
+	cobjects.insert(n, co);
+}
+
+xmap<xstring, xParticleObject::xEachObjectData>& xParticleObject::EachObjects()
+{
+	return cobjects;
+}
+
+void xParticleObject::SetStartingPosition(unsigned int id, vector4d * p)
+{
+	spos[id] = p;
+}
+
+vector4d * xParticleObject::StartingPosition(unsigned int id)
+{
+	return spos[id];
+}
+
 void xParticleObject::setMinRadius(double _mr)
 {
 	min_radius = _mr;
@@ -306,11 +319,6 @@ void xParticleObject::setMaxRadius(double _mr)
 void xParticleObject::setShapeForm(xShapeType xst)
 {
 	form = xst;
-}
-
-void xParticleObject::setRelativeLocation(vector4d * rl)
-{
-	relative_loc = rl;
 }
 
 void xParticleObject::setMassIndex(unsigned _mid)

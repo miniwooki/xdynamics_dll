@@ -1199,7 +1199,7 @@ void xdynamics_gui::xCheckCollision()
 
 void xdynamics_gui::xExportClusterParticleModel()
 {
-	QString filepath = QFileDialog::getSaveFileName(this, tr("open"), path,
+	QString filepath = QFileDialog::getSaveFileName(this, tr("Save"), path,
 		tr("Cluster model file (*.cmf)"));
 	if (!filepath.isEmpty()) {
 		pmgr->ExportParticleDataForClusterModel(filepath.toStdString());
