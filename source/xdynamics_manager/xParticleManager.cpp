@@ -428,14 +428,15 @@ void xParticleManager::SetClusterParticlesFromGenModel(std::string n, xMaterialT
 			qf.read((char*)(cpos + sum_cnp), sizeof(vector4d) * cnp);
 			qf.read((char*)(ep + sum_cnp), sizeof(vector4d) * cnp);
 
+			
+			delete[] _name;
+			delete[] relative_loc;
+			xParticleObject::xEachObjectData edata = { sum_np, cnp, neach };
+			xpo->appendEachObject(shapeName, edata);
+			n_cluster_object++;
 			n_cluster_each += neach;
 			sum_np += cnp * neach;
 			sum_cnp += cnp;
-			delete[] _name;
-			delete[] relative_loc;
-			xParticleObject::xEachObjectData edata = { tpts, cnp, neach };
-			xpo->appendEachObject(shapeName, edata);
-			n_cluster_object++;
 			//xpo->appendClusterObject(xo);
 		}
 		for (unsigned int i = 0; i < m_np; i++) {
@@ -904,7 +905,7 @@ void xParticleManager::CopyClusterInformation(xClusterInformation * xci, double*
 		{
 			for (xmap<xstring, xParticleObject::xEachObjectData>::iterator et = xpo->EachObjects().begin(); et != xpo->EachObjects().end(); et.next()) {
 				xci[cnt].sid = et.value().sidx;// o->StartClusterIndex();
-				xci[cnt].scid = nccnt;
+				xci[cnt].scid = nent;// nccnt;
 				xci[cnt].neach = et.value().each;// xpo->EachCount();
 				xci[cnt].count = et.value().num;// xpo->NumCluster();
 				vector4d* _rloc = dynamic_cast<xClusterObject*>(xObjectManager::XOM()->XObject(et.key().toStdString()))->RelativeLocation();
@@ -914,6 +915,7 @@ void xParticleManager::CopyClusterInformation(xClusterInformation * xci, double*
 				//memcpy(rloc + xci[cnt].sid, xpo->RelativeLocation(), sizeof(vector4d) * xci[cnt].neach);
 				cnt++;
 				nent += et.value().each;
+				nccnt += et.value().num;
 			}			
 		}
 		nccnt = cnt;
