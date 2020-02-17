@@ -50,6 +50,11 @@ xObject::~xObject()
 
 }
 
+std::string xObject::info()
+{
+	return m_info.toStdString();
+}
+
 unsigned int xObject::create_sph_particles(double ps, unsigned int nlayers, vector3d* p /*= NULL*/, xMaterialType* t)
 {
 	return 0;
@@ -176,6 +181,11 @@ void xObject::setCompulsionMovingObject(bool b)
 void xObject::setMovingConstantMovingVelocity(vector3d v)
 {
 	const_vel = v;
+}
+
+void xObject::setInfo(std::string _info)
+{
+	m_info = _info;
 }
 
 xMaterialType xObject::Material() const

@@ -40,6 +40,15 @@ xClusterObject::~xClusterObject()
 	if (relative_loc) delete[] relative_loc; relative_loc = NULL;
 }
 
+void xClusterObject::clearData()
+{
+	is_each_cluster = false;
+	nelement = 0;
+	min_radius = 0;
+	max_radius = 0;
+	if (relative_loc) delete relative_loc; relative_loc = nullptr;
+}
+
 void xClusterObject::setClusterSet(unsigned int num, double min_rad, double max_rad, vector4d * d, bool isEachCluster)
 {
 	is_each_cluster = isEachCluster;

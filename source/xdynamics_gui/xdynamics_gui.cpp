@@ -917,25 +917,36 @@ void xdynamics_gui::xPassDistribution()
 
 void xdynamics_gui::xGenerateClusterDistribution()
 {
-	//if (!gen_cluster)
-	//	gen_cluster = new gen_cluster_dlg(this);
-	//gen_cluster->prepareShow();
 	gen_cluster_dlg dlg(this);
+	if (omgr->XClusterObjects().size()) {
+
+	}
 	int ret = dlg.exec();
 	if (ret) {
-		QMapIterator<QString, QPair<QString, xClusterObject*>> cluster(dlg.clusters);
+		QStringList names = dlg.clusters.keys();
+		foreach(QString name, names) {
+			xClusterObject* cobj = dlg.clusters.take(name);
+			if (omgr->InsertClusterShapeObject(cobj)) {
+				xnavi->addChild(xModelNavigator::SHAPE_ROOT, name, cobj);
+			}			
+		}
+		/*for (unsigned int i = 0; i < dlg.clusters.size(); i++) {
+			QString name = QString::fromStdString(dlg.clusters.cluster.value()->Name());
+		}
+		QMapIterator<QString, xClusterObject*> cluster(dlg.clusters);
 		while (cluster.hasNext()) {
 			cluster.next();
-			QString name = QString::fromStdString(cluster.value().second->Name());
-			xClusterObject* pobj = cluster.value().second;
+			QString name = QString::fromStdString(cluster.value()->Name());
+			xClusterObject* pobj = cluster.value();
 			xClusterObject* cobj = omgr->CreateClusterShapeObject(name.toStdString(), NO_MATERIAL);
+			cobj->setInfo(cluster.value());
 			cobj->setClusterSet(
 				pobj->NumElement(),
 				pobj->MinimumRadius(),
-				pobj->MaximumRadius(), 
+				pobj->MaximumRadius(),
 				pobj->RelativeLocation(), 0);
 			xnavi->addChild(xModelNavigator::SHAPE_ROOT, name, cobj);		
-		}
+		}*/
 	}
 }
 

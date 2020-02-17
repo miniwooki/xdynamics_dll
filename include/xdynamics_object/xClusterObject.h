@@ -11,6 +11,7 @@ public:
 	//xClusterObject(const xClusterObject& cobj);
 	virtual ~xClusterObject();
 
+	void clearData();
 	void setClusterSet(unsigned int num, double min_rad, double max_rad, vector4d* d, bool isEachCluster);
 	unsigned int NumElement();
 	double ElementMinimumRadius();

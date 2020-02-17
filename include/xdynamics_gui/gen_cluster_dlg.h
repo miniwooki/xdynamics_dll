@@ -44,7 +44,7 @@ public:
 	~gen_cluster_dlg();
 
 	void prepareShow();
-	QMap<QString, QPair<QString, xClusterObject*>> clusters;
+	QMap<QString, xClusterObject*> clusters;
 
 private slots:
 	void clickNew();
@@ -78,4 +78,5 @@ private:
 	QMap<QPair<int, int>, QTableWidgetItem*> tableItems;
 	QMap<QString, MapTableItems> tables;
 
+	xClusterObject* c_cluster;
 };

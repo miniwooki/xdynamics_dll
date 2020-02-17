@@ -14,7 +14,7 @@ public:
 	xObject(std::string _name, xShapeType _s = NO_SHAPE);
 	xObject(const xObject& o);
 	virtual ~xObject();
-
+	
 	virtual unsigned int create_sph_particles(double ps, unsigned int nlayers, vector3d* p = NULL, xMaterialType* t = NULL);
 	//virtual QVector<xCorner> get_sph_boundary_corners();
 
@@ -29,7 +29,9 @@ public:
 	void setConnectedGeometryName(std::string n);
 	void setCompulsionMovingObject(bool b);
 	void setMovingConstantMovingVelocity(vector3d v);
+	void setInfo(std::string _info);
 
+	std::string info();
 	double Density() const;// { return d; }
 	double Youngs() const;// { return y; }
 	double Poisson() const;// { return p; }
@@ -48,6 +50,7 @@ public:
 protected:
 	static int count;
 	xstring name;			// Object name
+	xstring m_info;
 	xstring connected_geometry_name;
 	xShapeType shape;
 	xMaterialType material;

@@ -174,6 +174,15 @@ xCylinderObject* xObjectManager::CreateCylinderShapeObject(std::string _name, in
 	return xco;
 }
 
+bool xObjectManager::InsertClusterShapeObject(xClusterObject *cobj)
+{
+	if (objects.find(cobj->Name()) == objects.end()) {
+		objects.insert(cobj->Name(), cobj);
+		return true;
+	}
+	return false;
+}
+
 void xObjectManager::CreateSPHBoundaryParticles(xParticleManager* xpm)
 {
 

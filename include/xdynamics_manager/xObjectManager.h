@@ -39,6 +39,8 @@ public:
 	xClusterObject* CreateClusterShapeObject(std::string _name, int _xmt);
 	xCylinderObject* CreateCylinderShapeObject(std::string _name, int _xmt);
 
+	bool InsertClusterShapeObject(xClusterObject*);
+
 	void CreateSPHBoundaryParticles(xParticleManager* xpm);
 	xmap<xstring, xObject*>& CompulsionMovingObjects();
 
