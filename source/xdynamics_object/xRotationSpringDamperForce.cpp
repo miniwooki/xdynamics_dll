@@ -11,14 +11,14 @@ xRotationSpringDamperForce::xRotationSpringDamperForce()
 	, f(0.0)
 	, l(0.0)
 	, dl(0.0)
-	, nsdci(0)
+	, nrdci(0)
 	, nConnection(0)
-	, xsdci(NULL)
+	, xrdci(NULL)
 	, connection_data(NULL)
 	, kc_value(NULL)
 	, free_angle(NULL)
-	, connection_body_info(NULL)
-	, connection_body_data(NULL)
+	, attached_body_info(NULL)
+	, attached_body_data(NULL)
 	, udrl(0)
 	, n_rev(0)
 	, theta(0)
@@ -35,14 +35,14 @@ xRotationSpringDamperForce::xRotationSpringDamperForce(std::string _name)
 	, f(0.0)
 	, l(0.0)
 	, dl(0.0)
-	, nsdci(0)
+	, nrdci(0)
 	, nConnection(0)
-	, xsdci(NULL)
+	, xrdci(NULL)
 	, connection_data(NULL)
 	, kc_value(NULL)
 	, free_angle(NULL)
-	, connection_body_info(NULL)
-	, connection_body_data(NULL)
+	, attached_body_info(NULL)
+	, attached_body_data(NULL)
 	, udrl(0)
 	, n_rev(0)
 	, theta(0)
@@ -52,10 +52,10 @@ xRotationSpringDamperForce::xRotationSpringDamperForce(std::string _name)
 
 xRotationSpringDamperForce::~xRotationSpringDamperForce()
 {
-	if (xsdci) delete[] xsdci; xsdci = NULL;
+	if (xrdci) delete[] xrdci; xrdci = NULL;
 	if (connection_data) delete[] connection_data; connection_data = NULL;
-	if (connection_body_info) delete[] connection_body_info; connection_body_info = NULL;
-	if (connection_body_data) delete[] connection_body_data; connection_body_data = NULL;
+	if (attached_body_info) delete[] attached_body_info; attached_body_info = NULL;
+	if (attached_body_data) delete[] attached_body_data; attached_body_data = NULL;
 	if (kc_value) delete[] kc_value; kc_value = NULL;
 	if (free_angle) delete[] free_angle; free_angle = NULL;
 }
@@ -83,23 +83,12 @@ void xRotationSpringDamperForce::SetupDataFromListData(xRSDAData&d, std::string 
 {
 	xForce::i_ptr = NULL;
 	xForce::j_ptr = NULL;
-	loc = new_vector3d(d.lx, d.ly, d.lz);
-	f_i = new_vector3d(d.fix, d.fiy, d.fiz);
-	g_i = new_vector3d(d.gix, d.giy, d.giz);
-	f_j = new_vector3d(d.fjx, d.fjy, d.fjz);
-	g_j = new_vector3d(d.gjx, d.gjy, d.gjz);
-	init_theta = acos(dot(f_i, f_j));
-	h_i = cross(f_i, g_i);// new_vector3d(d.uix, d.uiy, d.uiz);
-	h_j = cross(f_j, g_j);// new_vector3d(d.ujx, d.ujy, d.ujz);
-	k = d.k;
-	c = d.c;
-	init_theta = d.init_r;
 	std::fstream fs;
 	fs.open(data, std::ios::in);
 	unsigned int cnt = 0;
 	std::string ch;
-	std::list<xSpringDamperConnectionInformation> xsdcis;
-	std::list<xSpringDamperConnectionData> clist;
+	std::list<xRSDSConnectionInformation> xrdcis;
+	std::list<xRSDAConnectionData> clist;
 	std::list<xSpringDamperCoefficient> cvalue;
 	if (fs.is_open())
 	{
@@ -125,53 +114,54 @@ void xRotationSpringDamperForce::SetupDataFromListData(xRSDAData&d, std::string 
 				fs >> nlist;
 				for (unsigned int i = 0; i < nlist; i++)
 				{
-					xSpringDamperConnectionInformation xsi = { 0, cnt, 0 };
-					xSpringDamperConnectionData xsd = { 0, };
+					xRSDSConnectionInformation xsi = { 0, cnt, 0 };
+					xRSDAConnectionData xsd = { 0, };
 
-					fs >> xsi.id >> xsi.ntsda;
-					xsdcis.push_back(xsi);
+					fs >> xsi.id >> xsi.nrsda;
+					xrdcis.push_back(xsi);
 					unsigned int cid = 0;
 					unsigned int kc = 0;
-					for (unsigned int i = 0; i < xsi.ntsda; i++)
+					for (unsigned int i = 0; i < xsi.nrsda; i++)
 					{
 						fs >> cid >> kc;
 						xsd.jd = cid;
 						xsd.kc_id = kc;
 						clist.push_back(xsd);
 					}
-					cnt += xsi.ntsda;
+					cnt += xsi.nrsda;
 				}
 			}
 			else if (ch == "mass_particle_connection_list")
 			{
 				std::string ch;
 				size_t cnt = 0;
-				fs >> nBodyConnection;
-				connection_body_info = new xSpringDamperBodyConnectionInfo[nBodyConnection];
-				list<xSpringDamperBodyConnectionData> bc_list;
-				for (unsigned int i = 0; i < nBodyConnection; i++)
+				fs >> nBodyAttached;
+				attached_body_info = new xSpringDamperBodyConnectionInfo[nBodyAttached];
+				list<xRSDABodyAttachedData> bc_list;
+				for (unsigned int i = 0; i < nBodyAttached; i++)
 				{
 					fs >> ch >> ch;
-					connection_body_info[i].cbody = ch.c_str();
-					connection_body_info[i].sid = cnt;
-					fs >> ch >> connection_body_info[i].nconnection;
-					for (unsigned int j = 0; j < connection_body_info[i].nconnection; j++)
+					attached_body_info[i].cbody = ch.c_str();
+					attached_body_info[i].sid = cnt;
+					fs >> ch >> attached_body_info[i].nconnection;
+					for (unsigned int j = 0; j < attached_body_info[i].nconnection; j++)
 					{
-						xSpringDamperBodyConnectionData d = { 0, };
-						fs >> d.ci >> d.kc_id >> d.rx >> d.ry >> d.rz;
+						xRSDABodyAttachedData d = { 0, };
+						fs >> d.id >> d.jd >> d.rx >> d.ry >> d.rz
+							>> d.fix >> d.fiy >> d.fiz >> d.gix >> d.giy >> d.giz
+							>> d.fjx >> d.fjy >> d.fjz >> d.gjx >> d.gjy >> d.gjz;
 						bc_list.push_back(d);
 					}
 					cnt = bc_list.size();
 				}
 				cnt = 0;
-				nBodyConnectionData = bc_list.size();
-				if (nBodyConnectionData)
+				nBodyAttachedData = bc_list.size();
+				if (nBodyAttachedData)
 				{
-					connection_body_data = new xSpringDamperBodyConnectionData[nBodyConnectionData];
-					for (list<xSpringDamperBodyConnectionData>::iterator d = bc_list.begin(); d != bc_list.end(); d++)
-						//foreach(xSpringDamperBodyConnectionData d, bc_list)
+					attached_body_data = new xRSDABodyAttachedData[nBodyAttachedData];
+					for (list<xRSDABodyAttachedData>::iterator d = bc_list.begin(); d != bc_list.end(); d++)
 					{
-						connection_body_data[cnt++] = *d;
+						attached_body_data[cnt++] = *d;
 					}
 				}
 			}
@@ -188,54 +178,55 @@ void xRotationSpringDamperForce::SetupDataFromListData(xRSDAData&d, std::string 
 			kc_value[ct++] = *c;
 		}
 	}
-	if (!xsdci)
+	if (!xrdci)
 	{
-		xsdci = new xSpringDamperConnectionInformation[xsdcis.size()];
+		xrdci = new xRSDSConnectionInformation[xrdcis.size()];
 		unsigned int ct = 0;
-		for (list<xSpringDamperConnectionInformation>::iterator c = xsdcis.begin(); c != xsdcis.end(); c++)
+		for (list<xRSDSConnectionInformation>::iterator c = xrdcis.begin(); c != xrdcis.end(); c++)
 			//foreach(xSpringDamperConnectionInformation c, xsdcis)
 		{
-			xsdci[ct++] = *c;
+			xrdci[ct++] = *c;
 		}
 
 
 	}
 	if (!connection_data)
 	{
-		connection_data = new xSpringDamperConnectionData[cnt];
+		connection_data = new xRSDAConnectionData[cnt];
 		free_angle = new double[cnt];
 		unsigned int ct = 0;
-		for (list<xSpringDamperConnectionData>::iterator c = clist.begin(); c != clist.end(); c++)
+		for (list<xRSDAConnectionData>::iterator c = clist.begin(); c != clist.end(); c++)
 			//foreach(xSpringDamperConnectionData c, clist)
 			connection_data[ct++] = *c;
 	}
 	nkcvalue = cvalue.size();
-	nsdci = xsdcis.size();
+	nrdci = xrdcis.size();
 	nConnection = cnt;
 }
 
 void xRotationSpringDamperForce::ConvertGlobalToLocalOfBodyConnectionPosition(unsigned int i, xPointMass* pm)
 {
-	size_t sid = connection_body_info[i].sid;
+	/*size_t sid = attached_body_info[i].sid;
 	xSpringDamperBodyConnectionData *d = NULL;
-	for (unsigned int i = 0; i < connection_body_info[i].nconnection; i++)
+	for (unsigned int i = 0; i < attached_body_info[i].nconnection; i++)
 	{
-		d = &connection_body_data[sid + i];
+		d = &attached_body_data[sid + i];
 		vector3d loc = new_vector3d(d->rx, d->ry, d->rz);
 		vector3d new_loc = pm->toLocal(loc - pm->Position());
 		d->rx = new_loc.x;
 		d->ry = new_loc.y;
 		d->rz = new_loc.z;
-	}
+	}*/
 }
 
 size_t xRotationSpringDamperForce::NumSpringDamperConnection()
 {
-	return nsdci;
+	return nrdci;
 }
 
 size_t xRotationSpringDamperForce::NumSpringDamperConnectionList()
 {
+
 	return nConnection;
 }
 
@@ -246,20 +237,20 @@ size_t xRotationSpringDamperForce::NumSpringDamperConnectionValue()
 
 size_t xRotationSpringDamperForce::NumSpringDamperBodyConnection()
 {
-	return nBodyConnection;
+	return nBodyAttached;
 }
 
 size_t xRotationSpringDamperForce::NumSpringDamperBodyConnectionData()
 {
-	return nBodyConnectionData;
+	return nBodyAttachedData;
 }
 
-xSpringDamperConnectionInformation* xRotationSpringDamperForce::xSpringDamperConnection()
+xRSDSConnectionInformation* xRotationSpringDamperForce::xSpringDamperConnection()
 {
-	return xsdci;
+	return xrdci;
 }
 
-xSpringDamperConnectionData* xRotationSpringDamperForce::xSpringDamperConnectionList()
+xRSDAConnectionData* xRotationSpringDamperForce::xSpringDamperConnectionList()
 {
 	return connection_data;
 }
@@ -271,12 +262,12 @@ xSpringDamperCoefficient* xRotationSpringDamperForce::xSpringDamperCoefficientVa
 
 xSpringDamperBodyConnectionInfo* xRotationSpringDamperForce::xSpringDamperBodyConnectionInformation()
 {
-	return connection_body_info;
+	return attached_body_info;
 }
 
-xSpringDamperBodyConnectionData* xRotationSpringDamperForce::XSpringDamperBodyConnectionDataList()
+xRSDABodyAttachedData* xRotationSpringDamperForce::XSpringDamperBodyConnectionDataList()
 {
-	return connection_body_data;
+	return attached_body_data;
 }
 
 double* xRotationSpringDamperForce::FreeAngle()
@@ -284,9 +275,9 @@ double* xRotationSpringDamperForce::FreeAngle()
 	return free_angle;
 }
 
-void xRotationSpringDamperForce::initializeFreeLength(double* pos, double* ep)
+void xRotationSpringDamperForce::initializeAttachedPointForDEM(double* pos, double* ep)
 {
-	vector4d* p = (vector4d*)pos;
+	/*vector4d* p = (vector4d*)pos;
 	euler_parameters* e = (euler_parameters*)ep;
 	for (unsigned int i = 0; i < nsdci; i++)
 	{
@@ -318,7 +309,7 @@ void xRotationSpringDamperForce::initializeFreeLength(double* pos, double* ep)
 			bd->rx = rp.x; bd->ry = rp.y; bd->rz = rp.z;
 			bd->init_l = length(ri - rj);
 		}
-	}
+	}*/
 }
 
 void xRotationSpringDamperForce::xCalculateForce(const xVectorD& q, const xVectorD& qd)
@@ -375,115 +366,115 @@ void xRotationSpringDamperForce::xCalculateForce(const xVectorD& q, const xVecto
 void xRotationSpringDamperForce::xCalculateForceForDEM(
 	double* pos, double* vel, double* ep, double* ev, double* ms, double* force, double* moment)
 {
-	vector4d* p = (vector4d*)pos;
-	vector3d* v = (vector3d*)vel;
-	vector3d* f = (vector3d*)force;
-	vector3d* m = (vector3d*)moment;
-	euler_parameters* e = (euler_parameters*)ep;
-	euler_parameters* ed = (euler_parameters*)ev;
-	for (unsigned int i = 0; i < nsdci; i++)
-	{
-		unsigned int id = xsdci[i].id;
-		vector3d ri = new_vector3d(p[id].x, p[id].y, p[id].z);
-		vector3d vi = v[id];
-		vector3d rj = new_vector3d(0, 0, 0);
-		vector3d vj = new_vector3d(0, 0, 0);
-		for (unsigned int j = 0; j < xsdci[i].ntsda; j++)
-		{
-			unsigned int sid = xsdci[i].sid + j;
-			xSpringDamperConnectionData xsd = connection_data[sid];
-			xSpringDamperCoefficient kc = kc_value[xsd.kc_id];
-			rj = new_vector3d(p[xsd.jd].x, p[xsd.jd].y, p[xsd.jd].z);
-			vj = v[xsd.jd];
-			vector3d L = rj - ri;
-			l = length(L);
-			vector3d dL = vj - vi;
-			double dl = dot(L, dL) / l;
-			double fr = kc.k * (l - xsd.init_l) + kc.c * dl;
-			//std::cout << "tsda_dem - " << i << " : " << xsd.jd << " & " << l << " & " << dl << " => " << fr << std::endl;
-			vector3d Q = (fr / l) * L;
+	//vector4d* p = (vector4d*)pos;
+	//vector3d* v = (vector3d*)vel;
+	//vector3d* f = (vector3d*)force;
+	//vector3d* m = (vector3d*)moment;
+	//euler_parameters* e = (euler_parameters*)ep;
+	//euler_parameters* ed = (euler_parameters*)ev;
+	//for (unsigned int i = 0; i < nsdci; i++)
+	//{
+	//	unsigned int id = xsdci[i].id;
+	//	vector3d ri = new_vector3d(p[id].x, p[id].y, p[id].z);
+	//	vector3d vi = v[id];
+	//	vector3d rj = new_vector3d(0, 0, 0);
+	//	vector3d vj = new_vector3d(0, 0, 0);
+	//	for (unsigned int j = 0; j < xsdci[i].ntsda; j++)
+	//	{
+	//		unsigned int sid = xsdci[i].sid + j;
+	//		xSpringDamperConnectionData xsd = connection_data[sid];
+	//		xSpringDamperCoefficient kc = kc_value[xsd.kc_id];
+	//		rj = new_vector3d(p[xsd.jd].x, p[xsd.jd].y, p[xsd.jd].z);
+	//		vj = v[xsd.jd];
+	//		vector3d L = rj - ri;
+	//		l = length(L);
+	//		vector3d dL = vj - vi;
+	//		double dl = dot(L, dL) / l;
+	//		double fr = kc.k * (l - xsd.init_l) + kc.c * dl;
+	//		//std::cout << "tsda_dem - " << i << " : " << xsd.jd << " & " << l << " & " << dl << " => " << fr << std::endl;
+	//		vector3d Q = (fr / l) * L;
 
-			f[id] += Q;
-		}
-	};
-	for (unsigned int i = 0; i < nBodyConnection; i++)
-	{
-		xSpringDamperBodyConnectionInfo info = connection_body_info[i];
-		xParticleObject* xpo = dynamic_cast<xParticleObject*>(xDynamicsManager::This()->XObject()->XObject(std::string(info.cbody)));
-		unsigned int mid = xpo->MassIndex();
-		//xPointMass* pm = xDynamicsManager::This()->XMBDModel()->XMass(info.cbody.toStdString());
-		vector3d ri = new_vector3d(p[mid].x, p[mid].y, p[mid].z);// pm->Position();
-		vector3d rj = new_vector3d(0, 0, 0);
-		vector3d vi = v[mid];// pm->Velocity();
-		vector3d vj = new_vector3d(0, 0, 0);
-		euler_parameters ei = e[mid];// pm->EulerParameters();
-		euler_parameters edi = ed[mid];// pm->DEulerParameters();
-		matrix33d Ai = GlobalTransformationMatrix(ei);
-		size_t sid = connection_body_info[i].sid;
-		xSpringDamperBodyConnectionData d = { 0, };
+	//		f[id] += Q;
+	//	}
+	//};
+	//for (unsigned int i = 0; i < nBodyConnection; i++)
+	//{
+	//	xSpringDamperBodyConnectionInfo info = connection_body_info[i];
+	//	xParticleObject* xpo = dynamic_cast<xParticleObject*>(xDynamicsManager::This()->XObject()->XObject(std::string(info.cbody)));
+	//	unsigned int mid = xpo->MassIndex();
+	//	//xPointMass* pm = xDynamicsManager::This()->XMBDModel()->XMass(info.cbody.toStdString());
+	//	vector3d ri = new_vector3d(p[mid].x, p[mid].y, p[mid].z);// pm->Position();
+	//	vector3d rj = new_vector3d(0, 0, 0);
+	//	vector3d vi = v[mid];// pm->Velocity();
+	//	vector3d vj = new_vector3d(0, 0, 0);
+	//	euler_parameters ei = e[mid];// pm->EulerParameters();
+	//	euler_parameters edi = ed[mid];// pm->DEulerParameters();
+	//	matrix33d Ai = GlobalTransformationMatrix(ei);
+	//	size_t sid = connection_body_info[i].sid;
+	//	xSpringDamperBodyConnectionData d = { 0, };
 
-		for (unsigned int j = 0; j < connection_body_info[i].nconnection; j++)
-		{
-			d = connection_body_data[sid + j];
-			xSpringDamperCoefficient kc = kc_value[d.kc_id];
-			vector4d d_pos = p[d.ci];
-			rj = new_vector3d(d_pos.x, d_pos.y, d_pos.z);
-			vj = v[d.ci];
-			vector3d lp = new_vector3d(d.rx, d.ry, d.rz);
-			L = rj - ri - Ai * lp;
-			l = length(L);
-			vector3d dL = vj - vi - BMatrix(edi, lp) * ei;
-			dl = dot(L, dL) / l;
-			double fr = kc.k * (l - d.init_l) + kc.c * dl;
+	//	for (unsigned int j = 0; j < connection_body_info[i].nconnection; j++)
+	//	{
+	//		d = connection_body_data[sid + j];
+	//		xSpringDamperCoefficient kc = kc_value[d.kc_id];
+	//		vector4d d_pos = p[d.ci];
+	//		rj = new_vector3d(d_pos.x, d_pos.y, d_pos.z);
+	//		vj = v[d.ci];
+	//		vector3d lp = new_vector3d(d.rx, d.ry, d.rz);
+	//		L = rj - ri - Ai * lp;
+	//		l = length(L);
+	//		vector3d dL = vj - vi - BMatrix(edi, lp) * ei;
+	//		dl = dot(L, dL) / l;
+	//		double fr = kc.k * (l - d.init_l) + kc.c * dl;
 
-			vector3d Qi = (fr / l) * L;
-			vector3d Qj = -Qi;
-			vector4d QRi = (fr / l) * BMatrix(ei, lp) * L;
-			f[mid] += Qi;// pm->addAxialForce(Qi.x, Qi.y, Qi.z);
-			//pm->addEulerParameterMoment(QRi.x, QRi.y, QRi.z, QRi.w);
-			m[mid] += 0.5 * LMatrix(ei) * QRi;
-			f[d.ci] += Qj;
-		}
-	}
+	//		vector3d Qi = (fr / l) * L;
+	//		vector3d Qj = -Qi;
+	//		vector4d QRi = (fr / l) * BMatrix(ei, lp) * L;
+	//		f[mid] += Qi;// pm->addAxialForce(Qi.x, Qi.y, Qi.z);
+	//		//pm->addEulerParameterMoment(QRi.x, QRi.y, QRi.z, QRi.w);
+	//		m[mid] += 0.5 * LMatrix(ei) * QRi;
+	//		f[d.ci] += Qj;
+	//	}
+	//}
 }
 
 void xRotationSpringDamperForce::xCalculateForceFromDEM(
 	unsigned int ci, xPointMass* pm, const double* pos, const double* vel)
 {
-	xSpringDamperBodyConnectionInfo info = connection_body_info[i];
-	//xPointMass* pm = xDynamicsManager::This()->XMBDModel()->XMass(info.cbody.toStdString());
-	vector3d ri = pm->Position();
-	vector3d rj = new_vector3d(0, 0, 0);
-	vector3d vi = pm->Velocity();
-	vector3d vj = new_vector3d(0, 0, 0);
-	euler_parameters ei = pm->EulerParameters();
-	euler_parameters edi = pm->DEulerParameters();
-	matrix33d Ai = GlobalTransformationMatrix(ei);
-	size_t sid = connection_body_info[i].sid;
-	xSpringDamperBodyConnectionData d = { 0, };
-	vector4d* dem_pos = (vector4d*)pos;
-	vector3d* dem_vel = (vector3d*)vel;
-	for (unsigned int i = 0; i < connection_body_info[i].nconnection; i++)
-	{
-		d = connection_body_data[sid + i];
-		xSpringDamperCoefficient kc = kc_value[d.kc_id];
-		vector4d d_pos = dem_pos[d.ci];
-		rj = new_vector3d(d_pos.x, d_pos.y, d_pos.z);
-		vj = dem_vel[d.ci];
-		vector3d lp = new_vector3d(d.rx, d.ry, d.rz);
-		L = rj - ri - Ai * lp;
-		l = length(L);
-		vector3d dL = vj - vi - BMatrix(edi, lp) * ei;
-		dl = dot(L, dL) / l;
-		double fr = kc.k * (l - d.init_l) + kc.c * dl;
-		if (fr != 0)
-			fr = fr;
-		vector3d Qi = (fr / l) * L;
-		vector3d Qj = -Qi;
-		vector4d QRi = (fr / l) * BMatrix(ei, lp) * L;
-		pm->addAxialForce(Qi.x, Qi.y, Qi.z);
-		pm->addEulerParameterMoment(QRi.x, QRi.y, QRi.z, QRi.w);
-	}
+	//xSpringDamperBodyConnectionInfo info = connection_body_info[i];
+	////xPointMass* pm = xDynamicsManager::This()->XMBDModel()->XMass(info.cbody.toStdString());
+	//vector3d ri = pm->Position();
+	//vector3d rj = new_vector3d(0, 0, 0);
+	//vector3d vi = pm->Velocity();
+	//vector3d vj = new_vector3d(0, 0, 0);
+	//euler_parameters ei = pm->EulerParameters();
+	//euler_parameters edi = pm->DEulerParameters();
+	//matrix33d Ai = GlobalTransformationMatrix(ei);
+	//size_t sid = connection_body_info[i].sid;
+	//xSpringDamperBodyConnectionData d = { 0, };
+	//vector4d* dem_pos = (vector4d*)pos;
+	//vector3d* dem_vel = (vector3d*)vel;
+	//for (unsigned int i = 0; i < connection_body_info[i].nconnection; i++)
+	//{
+	//	d = connection_body_data[sid + i];
+	//	xSpringDamperCoefficient kc = kc_value[d.kc_id];
+	//	vector4d d_pos = dem_pos[d.ci];
+	//	rj = new_vector3d(d_pos.x, d_pos.y, d_pos.z);
+	//	vj = dem_vel[d.ci];
+	//	vector3d lp = new_vector3d(d.rx, d.ry, d.rz);
+	//	L = rj - ri - Ai * lp;
+	//	l = length(L);
+	//	vector3d dL = vj - vi - BMatrix(edi, lp) * ei;
+	//	dl = dot(L, dL) / l;
+	//	double fr = kc.k * (l - d.init_l) + kc.c * dl;
+	//	if (fr != 0)
+	//		fr = fr;
+	//	vector3d Qi = (fr / l) * L;
+	//	vector3d Qj = -Qi;
+	//	vector4d QRi = (fr / l) * BMatrix(ei, lp) * L;
+	//	pm->addAxialForce(Qi.x, Qi.y, Qi.z);
+	//	pm->addEulerParameterMoment(QRi.x, QRi.y, QRi.z, QRi.w);
+	//}
 }
 
 void xRotationSpringDamperForce::xDerivate(xMatrixD& lhs, const xVectorD& q, const xVectorD& qd, double mul)

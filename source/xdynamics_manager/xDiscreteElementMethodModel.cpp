@@ -32,21 +32,29 @@ xSpringDamperForce* xDiscreteElementMethodModel::XSpringDamperForce()
 	return tsda;
 }
 
-xSpringDamperForce* xDiscreteElementMethodModel::CreateForceElement(std::string _name, xForce::fType _type, std::string bn, std::string an)
+xRotationSpringDamperForce * xDiscreteElementMethodModel::XRotationalSpringDamperForce()
 {
+	return rsda;
+}
+
+xForce* xDiscreteElementMethodModel::CreateForceElement(std::string _name, xForce::fType _type, std::string bn, std::string an)
+{
+	xForce* xf = nullptr;
 //	xForce* xf = NULL;
 	switch (_type)
 	{
 	case xForce::TSDA_LIST_DATA:
-		tsda = new xSpringDamperForce(_name);
+		xf = new xSpringDamperForce(_name);
 		xLog::log("Create Translational Spring Damper Element From List Data : " + _name);
 		break;
+	case xForce::RSDA_LIST_DATA:
+		xf = new xRotationSpringDamperForce(_name);
+		xLog::log("Create Rotational Spring Damper Element From List Data : " + _name);
+		break;
 	}
-	if (tsda)
-	{
-		tsda->setBaseBodyName(bn);
-		tsda->setActionBodyName(an);
+	if (xf) {
+		xf->setBaseBodyName(bn);
+		xf->setActionBodyName(an);
 	}
-	//forces[name] = xf;
-	return tsda;
+	return xf;
 }

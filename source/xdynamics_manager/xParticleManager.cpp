@@ -401,6 +401,8 @@ void xParticleManager::SetClusterParticlesFromGenModel(std::string n, xMaterialT
 		double min_y = FLT_MAX;
 		double min_z = FLT_MAX;
 		unsigned int tpts = 0;
+		unsigned int sum_np = np;
+		unsigned int sum_cnp = ncluster;
 		for (unsigned int k = 0; k < npobjects; k++) {
 			unsigned int ns = 0;
 			qf.read((char*)&ns, sizeof(int));
@@ -422,11 +424,13 @@ void xParticleManager::SetClusterParticlesFromGenModel(std::string n, xMaterialT
 			qf.read((char*)&min_rad, sizeof(double));
 			qf.read((char*)&max_rad, sizeof(double));
 			xo->setClusterSet(neach, min_rad, max_rad, relative_loc, 0);
-			qf.read((char*)(pos + np), sizeof(vector4d) * cnp * neach);
-			qf.read((char*)(cpos + ncluster), sizeof(vector4d) * cnp);
-			qf.read((char*)(ep + ncluster), sizeof(vector4d) * cnp);
+			qf.read((char*)(pos + sum_np), sizeof(vector4d) * cnp * neach);
+			qf.read((char*)(cpos + sum_cnp), sizeof(vector4d) * cnp);
+			qf.read((char*)(ep + sum_cnp), sizeof(vector4d) * cnp);
 
 			n_cluster_each += neach;
+			sum_np += cnp * neach;
+			sum_cnp += cnp;
 			delete[] _name;
 			delete[] relative_loc;
 			xParticleObject::xEachObjectData edata = { tpts, cnp, neach };

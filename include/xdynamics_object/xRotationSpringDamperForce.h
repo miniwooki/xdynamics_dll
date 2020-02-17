@@ -20,13 +20,13 @@ public:
 	size_t NumSpringDamperBodyConnection();
 	size_t NumSpringDamperBodyConnectionData();
 
-	xSpringDamperConnectionInformation* xSpringDamperConnection();
-	xSpringDamperConnectionData* xSpringDamperConnectionList();
+	xRSDSConnectionInformation* xSpringDamperConnection();
+	xRSDAConnectionData* xSpringDamperConnectionList();
 	xSpringDamperCoefficient* xSpringDamperCoefficientValue();
 	xSpringDamperBodyConnectionInfo* xSpringDamperBodyConnectionInformation();
-	xSpringDamperBodyConnectionData* XSpringDamperBodyConnectionDataList();
+	xRSDABodyAttachedData* XSpringDamperBodyConnectionDataList();
 	double* FreeAngle();
-	void initializeFreeLength(double* p, double* ep);
+	void initializeAttachedPointForDEM(double* p, double* ep);
 
 	virtual void xCalculateForce(const xVectorD& q, const xVectorD& qd);
 	void xCalculateForceForDEM(double* pos, double* vel, double* ep, double* ev, double* ms, double* force, double* moment);
@@ -51,16 +51,16 @@ private:
 	double l;
 	double dl;
 
-	size_t nsdci;
+	size_t nrdci;
 	size_t nkcvalue;
 	size_t nConnection;
-	size_t nBodyConnection;
-	size_t nBodyConnectionData;
+	size_t nBodyAttached;
+	size_t nBodyAttachedData;
 	xSpringDamperCoefficient *kc_value;
-	xSpringDamperConnectionInformation* xsdci;
-	xSpringDamperConnectionData *connection_data;
-	xSpringDamperBodyConnectionInfo *connection_body_info;
-	xSpringDamperBodyConnectionData *connection_body_data;
+	xRSDSConnectionInformation* xrdci;
+	xRSDAConnectionData *connection_data;
+	xSpringDamperBodyConnectionInfo *attached_body_info;
+	xRSDABodyAttachedData *attached_body_data;
 	double *free_angle;
 
 	int udrl;

@@ -4,6 +4,7 @@
 #include "xdynamics_decl.h"
 #include "xModel.h"
 #include "xdynamics_object/xSpringDamperForce.h"
+#include "xdynamics_object/xRotationSpringDamperForce.h"
 #include "xdynamics_manager/xParticleMananger.h"
 
 class XDYNAMICS_API xDiscreteElementMethodModel
@@ -15,12 +16,14 @@ public:
 
 	xParticleManager* XParticleManager();
 	xSpringDamperForce* XSpringDamperForce();
-	xSpringDamperForce* CreateForceElement(std::string _name, xForce::fType _type, std::string bn, std::string an);
+	xRotationSpringDamperForce* XRotationalSpringDamperForce();
+	xForce* CreateForceElement(std::string _name, xForce::fType _type, std::string bn, std::string an);
 
 private:
 	xstring name;
 	xParticleManager *xpmgr;
 	xSpringDamperForce* tsda;
+	xRotationSpringDamperForce* rsda;
 };
 
 #endif

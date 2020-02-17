@@ -108,8 +108,8 @@ private:
 	QGraphicsRectItem *m_rectHovered;
 	QGraphicsLineItem *m_lineItemX;
 	QGraphicsLineItem *m_lineItemY;
-	QGraphicsSimpleTextItem *m_coordX;// = new QGraphicsSimpleTextItem(chart());
-	QGraphicsSimpleTextItem *m_coordY;// = new QGraphicsSimpleTextItem(chart());
+	QGraphicsSimpleTextItem *m_coordX;
+	QGraphicsSimpleTextItem *m_coordY;
 	QGraphicsSimpleTextItem *m_coordHoverX;
 	QGraphicsSimpleTextItem *m_coordHoverY;
 

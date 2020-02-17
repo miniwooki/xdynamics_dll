@@ -259,10 +259,26 @@ typedef struct{ double diameter, sx, sy, sz, dx, dy, dz, minr, maxr; }xCirclePar
 typedef struct{ unsigned int sid, count, neach, nstep; }xParticleCreateCondition;
 typedef struct { unsigned int sid, scid, count, neach; }xClusterInformation;
 typedef struct { unsigned int id, sid, ntsda; }xSpringDamperConnectionInformation;
+typedef struct { unsigned int id, sid, nrsda; }xRSDSConnectionInformation;
 typedef struct { unsigned int jd, kc_id; double init_l; }xSpringDamperConnectionData;
+typedef struct 
+{ 
+	unsigned int jd, kc_id, udrl, n_rev;
+	double theta, dtheta;
+}xRSDAConnectionData;
 typedef struct { double k, c; }xSpringDamperCoefficient;
 typedef struct { const char* cbody; size_t sid, nconnection; }xSpringDamperBodyConnectionInfo;
 typedef struct{ unsigned int ci, kc_id; double init_l, rx, ry, rz; }xSpringDamperBodyConnectionData;
+typedef struct 
+{ 
+	unsigned int id, jd; 
+	double rx, ry, rz;
+	double fix, fiy, fiz;
+	double gix, giy, giz;
+	double fjx, fjy, fjz;
+	double gjx, gjy, gjz;
+}
+xRSDABodyAttachedData;
 /*typedef struct{ double tstart, dpdt }xObjectMovingCondition;*/
 
 typedef struct 

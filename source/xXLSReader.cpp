@@ -476,13 +476,19 @@ void xXLSReader::ReadForce(xMultiBodyModel* xmbd, xDiscreteElementMethodModel* x
 		
 		if (type == xForce::TSDA_LIST_DATA)
 		{
-			xSpringDamperForce *xf = xdem->CreateForceElement(name, type, base, action);
+			xForce *xf = xdem->CreateForceElement(name, type, base, action);
 			xTSDAData xt = { 0, };// ReadTSDAData(name, rc.x, rc.y);
-			xt.k = ReadNum(rc.x, rc.y++);
-			xt.c = ReadNum(rc.x, rc.y++);
-			xt.init_l = ReadNum(rc.x, rc.y++);
+			//xt.k = ReadNum(rc.x, rc.y++);
+			//xt.c = ReadNum(rc.x, rc.y++);
+			//xt.init_l = ReadNum(rc.x, rc.y++);
 			std::string fpath = ReadStr(rc.x, rc.y);
-			xf->SetupDataFromListData(xt, fpath);
+			dynamic_cast<xSpringDamperForce*>(xf)->SetupDataFromListData(xt, fpath);
+		}
+		else if (type == xForce::RSDA_LIST_DATA) {
+			xForce* xf = xdem->CreateForceElement(name, type, base, action);
+			xRSDAData xt = { 0, };
+			std::string fpath = ReadStr(rc.x, rc.y);
+			dynamic_cast<xRotationSpringDamperForce*>(xf)->SetupDataFromListData(xt, fpath);
 		}
 		else
 		{
