@@ -157,11 +157,13 @@ __global__ void vv_update_position_cluster_kernel(
 	unsigned int neach = 0;
 	unsigned int seach = 0;
 	unsigned int sbegin = 0;
+	unsigned int scluster = 0;
 	for (unsigned int i = 0; i < cte.nClusterObject; i++)
 	{
 		xClusterInformation xc = xci[i];
-		if (id >= xc.sid && id < xc.sid + xc.count * xc.neach)
+		if (id >= xc.scid && id < xc.scid + xc.count)
 		{
+			scluster = xc.scid;
 			neach = xc.neach;
 			break;
 		}
@@ -179,7 +181,7 @@ __global__ void vv_update_position_cluster_kernel(
 	new_ep = normalize(new_ep);
 	ep[id] = new_ep;
 
-	unsigned int sid = sbegin + id * neach;
+	unsigned int sid = sbegin + (id - scluster) * neach;
 	for (unsigned int j = 0; j < neach; j++)
 	{
 		double3 m_pos = new_p + toGlobal(rloc[seach + j], new_ep);
@@ -240,11 +242,13 @@ __global__ void vv_update_cluster_velocity_kernel(
 	unsigned int neach = 0;
 	unsigned int seach = 0;
 	unsigned int sbegin = 0;
+	unsigned int scluster = 0;
 	for (unsigned int i = 0; i < cte.nClusterObject; i++)
 	{
 		xClusterInformation xc = xci[i];
-		if (id >= xc.sid && id < xc.sid + xc.count * xc.neach)
+		if (id >= xc.scid && id < xc.scid + xc.count)
 		{
+			scluster = xc.scid;
 			neach = xc.neach;
 			break;
 		}
@@ -261,7 +265,7 @@ __global__ void vv_update_cluster_velocity_kernel(
 	double3 in = iner[id];
 	double3 F = make_double3(0, 0, 0);
 	double3 T = make_double3(0, 0, 0);
-	unsigned int sid = sbegin + id * neach;
+	unsigned int sid = sbegin + (id - scluster) * neach;
 	for (unsigned int j = 0; j < neach; j++){
 		F += force[sid + j];
 		T += moment[sid + j];

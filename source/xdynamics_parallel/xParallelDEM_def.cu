@@ -499,7 +499,6 @@ void vv_update_cluster_position(
 	xClusterInformation *xci, unsigned int np)
 {
 	computeGridSize(np, CUDA_THREADS_PER_BLOCK, numBlocks, numThreads);
-
 	vv_update_position_cluster_kernel << < numBlocks, numThreads >> > (
 		(double4*)pos, 
 		(double4*)cpos,

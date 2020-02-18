@@ -905,7 +905,7 @@ void xParticleManager::CopyClusterInformation(xClusterInformation * xci, double*
 		{
 			for (xmap<xstring, xParticleObject::xEachObjectData>::iterator et = xpo->EachObjects().begin(); et != xpo->EachObjects().end(); et.next()) {
 				xci[cnt].sid = et.value().sidx;// o->StartClusterIndex();
-				xci[cnt].scid = nent;// nccnt;
+				xci[cnt].scid = nccnt;// nccnt;
 				xci[cnt].neach = et.value().each;// xpo->EachCount();
 				xci[cnt].count = et.value().num;// xpo->NumCluster();
 				vector4d* _rloc = dynamic_cast<xClusterObject*>(xObjectManager::XOM()->XObject(et.key().toStdString()))->RelativeLocation();
@@ -965,13 +965,14 @@ bool xParticleManager::SetClusterMassAndInertia(xParticleObject* xpo)
 	euler_parameters* ep = (euler_parameters*)xpo->EulerParameters();
 	//vector4d* rloc = xpo->RelativeLocation();
 	unsigned int cnt = 0;
+	unsigned int sum_cnp = 0;
 	for (xmap<xstring, xParticleObject::xEachObjectData>::iterator it = xpo->EachObjects().begin(); it != xpo->EachObjects().end(); it.next()) {
 		vector4d* m_pos = pos + it.value().sidx;
-		vector4d* m_cpos = cpos + it.value().sidx;
+		vector4d* m_cpos = cpos + sum_cnp;
 		vector4d* rloc = dynamic_cast<xClusterObject*>(xObjectManager::XOM()->XObject(it.key().toStdString()))->RelativeLocation();
 		for (unsigned int i = 0; i < it.value().num; i++) {
 			double m = d * (4.0 / 3.0) * M_PI * pow(m_cpos[i].w, 3.0);
-			mass[i] = m * it.value().each;// xpo->EachCount();
+			mass[sum_cnp + i] = m * it.value().each;// xpo->EachCount();
 			double J = (2.0 / 5.0) * m * pow(m_cpos[i].w, 2.0);
 			vector3d J3 = new_vector3d(0, 0, 0);
 			//vector3d m_pos = new_vector3d(m_cpos[i].x, m_cpos[i].y, m_cpos[i].z);
@@ -982,9 +983,10 @@ bool xParticleManager::SetClusterMassAndInertia(xParticleObject* xpo)
 				J3.y += m * (dr.x * dr.x + dr.z * dr.z);
 				J3.z += m * (dr.x * dr.x + dr.y * dr.y);
 			}
-			inertia[i] = J3;
+			inertia[sum_cnp + i] = J3;
 		}
 		c++;
+		sum_cnp += it.value().num;
 	}
 	/*for (unsigned int i = 0; i < xpo->NumCluster(); i++)
 	{
