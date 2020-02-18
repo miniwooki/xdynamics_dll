@@ -167,29 +167,27 @@ gen_cluster_dlg::gen_cluster_dlg(QWidget* parent)
 
 gen_cluster_dlg::~gen_cluster_dlg()
 {
-	if (tableItems.size()) qDeleteAll(tableItems);
+	//if (tableItems.size()) qDeleteAll(tableItems);
 	if (graph) delete graph; graph = nullptr;
 	if (modifier) delete modifier; modifier = nullptr;
-	//QMapIterator<QString, xClusterObject*> cluster(clusters);
-	//while (cluster.hasNext()) {
-	//	cluster.next();
-	//	delete cluster.value();
-	//}
 	clusters.clear();
-	QMapIterator<QString, MapTableItems> table(tables);
-	while (table.hasNext()) {
-		table.next();
-		qDeleteAll(table.value());
-	}
-	/*foreach(MapTableItems item, tables) {
-		qDeleteAll
-	}*/
 }
 
 void gen_cluster_dlg::prepareShow()
 {
 	InputTable->clear();
 	modifier->reset();
+}
+
+void gen_cluster_dlg::setClusterShapeObject(QMap<QString, xClusterObject*>& cobjs)
+{
+	clusters = cobjs;
+	QStringList name = clusters.keys();
+	foreach(QString n, name) {
+		QListWidgetItem* item = new QListWidgetItem(n);
+		ClusterList->addItem(item);
+	}
+	
 }
 
 void gen_cluster_dlg::deleteCurrentTableItems()
@@ -232,7 +230,7 @@ void gen_cluster_dlg::checkNeedAdd()
 
 void gen_cluster_dlg::clickUpdate()
 {
-	MapTableItems items = tables.take(current_list->text());
+	//MapTableItems items = tables.take(current_list->text());
 	QString name = current_list->text();
 	//qDeleteAll(items);
 	QListWidgetItem* item = ClusterList->takeItem(ClusterList->currentRow());
@@ -241,21 +239,19 @@ void gen_cluster_dlg::clickUpdate()
 		vector4d* local = new vector4d[InputTable->rowCount()];
 		double min_r = FLT_MAX;
 		double max_r = -FLT_MAX;
-		MapTableItems items;
+		//MapTableItems items;
 		for (unsigned int i = 0; i < InputTable->rowCount(); i++) {
 			double x = InputTable->item(i, 0)->text().toDouble();
 			double y = InputTable->item(i, 1)->text().toDouble();
 			double z = InputTable->item(i, 2)->text().toDouble();
 			double r = InputTable->item(i, 3)->text().toDouble();
 			local[i] = new_vector4d(x, y, z, r);
-			if (min_r > r)
-				min_r = r;
-			if (max_r < r)
-				max_r = r;
-			items[QPair<int, int>(i, 0)] = InputTable->takeItem(i, 0);
+			if (min_r > r) min_r = r;
+			if (max_r < r) max_r = r;
+			/*items[QPair<int, int>(i, 0)] = InputTable->takeItem(i, 0);
 			items[QPair<int, int>(i, 1)] = InputTable->takeItem(i, 1);
 			items[QPair<int, int>(i, 2)] = InputTable->takeItem(i, 2);
-			items[QPair<int, int>(i, 3)] = InputTable->takeItem(i, 3);
+			items[QPair<int, int>(i, 3)] = InputTable->takeItem(i, 3);*/
 		}
 		unsigned int num = SB_Numbers->value();
 		//c_cluster->setName
@@ -278,7 +274,7 @@ void gen_cluster_dlg::clickNew()
 	if (!isChangeCluster && isNewCluster)
 		return;
 	InputTable->setRowCount(0);
-	tableItems.clear();
+	//tableItems.clear();
 	Information->clear();
 	modifier->reset();
 	rc[0] = -1;
@@ -308,7 +304,7 @@ void gen_cluster_dlg::clickClusterItem(QListWidgetItem* item)
 	QString name = item->text();
 	if (clusters.find(name) == clusters.end())
 		return;
-	if (tables.find(name) == tables.end())
+	if (clusters.find(name) == clusters.end())
 		return;
 	isChangeCluster = false;
 	isNewCluster = false;
@@ -331,20 +327,22 @@ void gen_cluster_dlg::loadExistLocalPosition(QString name)
 	InputTable->clear();
 	if (isNewCluster)
 		deleteCurrentTableItems();
-	if (tables.find(name) == tables.end())
+	if (clusters.find(name) == clusters.end())
 		return;
 	rc[0] = -1;
 	rc[1] = -1;
 	QStringList labels = { "X", "Y", "Z", "R" };
 	InputTable->setHorizontalHeaderLabels(labels);
-	MapTableItems items = tables[name];
-	InputTable->setRowCount(items.size() / 4);
+//	MapTableItems items = tables[name];
+	xClusterObject* obj = clusters[name];
+	vector4d* loc = obj->RelativeLocation();
+	InputTable->setRowCount(obj->NumElement());
 	for (int i = 0; i < InputTable->rowCount(); i++) {
 		QTableWidgetItem* titems[4] = {
-			items[QPair<int, int>(i, 0)],
-			items[QPair<int, int>(i, 1)],
-			items[QPair<int, int>(i, 2)],
-			items[QPair<int, int>(i, 3)]
+			new QTableWidgetItem(QString("%1").arg(loc[i].x)),
+			new QTableWidgetItem(QString("%1").arg(loc[i].y)),
+			new QTableWidgetItem(QString("%1").arg(loc[i].z)),
+			new QTableWidgetItem(QString("%1").arg(loc[i].w))
 		};
 		setRowData(i, titems);
 	}
@@ -356,10 +354,10 @@ void gen_cluster_dlg::setRowData(int i, QTableWidgetItem** items)
 {
 	if (i >= InputTable->rowCount())
 		return;
-	tableItems[QPair<int, int>(i, 0)] = items[0];
+	/*tableItems[QPair<int, int>(i, 0)] = items[0];
 	tableItems[QPair<int, int>(i, 1)] = items[1];
 	tableItems[QPair<int, int>(i, 2)] = items[2];
-	tableItems[QPair<int, int>(i, 3)] = items[3];
+	tableItems[QPair<int, int>(i, 3)] = items[3];*/
 	InputTable->setItem(i, 0, items[0]);
 	InputTable->setItem(i, 1, items[1]);
 	InputTable->setItem(i, 2, items[2]);
@@ -382,14 +380,15 @@ void gen_cluster_dlg::increaseRows(int nrow)
 	int previous_rows = InputTable->rowCount();
 	isClickedCell = false;
 	if (previous_rows > nrow && previous_rows > 0) {
-		QTableWidgetItem* item = tableItems.take(QPair<int, int>(nrow, 0));
+		/*QTableWidgetItem* item = tableItems.take(QPair<int, int>(nrow, 0));
 		delete item;
 		item = tableItems.take(QPair<int, int>(nrow, 1));
 		delete item;
 		item = tableItems.take(QPair<int, int>(nrow, 2));
 		delete item;
 		item = tableItems.take(QPair<int, int>(nrow, 3));
-		delete item;
+		delete item;*/
+		InputTable->removeRow(nrow);
 		InputTable->setRowCount(nrow);
 		modifier->removeLastParticle();
 	}
@@ -401,10 +400,10 @@ void gen_cluster_dlg::increaseRows(int nrow)
 			QTableWidgetItem *y = new QTableWidgetItem("0");
 			QTableWidgetItem *z = new QTableWidgetItem("0");
 			QTableWidgetItem *r = new QTableWidgetItem("0.02");
-			tableItems[QPair<int, int>(nr, 0)] = x;
+			/*tableItems[QPair<int, int>(nr, 0)] = x;
 			tableItems[QPair<int, int>(nr, 1)] = y;
 			tableItems[QPair<int, int>(nr, 2)] = z;
-			tableItems[QPair<int, int>(nr, 3)] = r;
+			tableItems[QPair<int, int>(nr, 3)] = r;*/
 			InputTable->setItem(nr, 0, x);
 			InputTable->setItem(nr, 1, y);
 			InputTable->setItem(nr, 2, z);
@@ -444,21 +443,14 @@ void gen_cluster_dlg::clickAdd()
 	vector4d* local = new vector4d[InputTable->rowCount()];
 	double min_r = FLT_MAX;
 	double max_r = -FLT_MAX;
-	MapTableItems items;
 	for (unsigned int i = 0; i < InputTable->rowCount(); i++) {
 		double x = InputTable->item(i, 0)->text().toDouble();
 		double y = InputTable->item(i, 1)->text().toDouble();
 		double z = InputTable->item(i, 2)->text().toDouble();
 		double r = InputTable->item(i, 3)->text().toDouble();
 		local[i] = new_vector4d(x, y, z, r);
-		if (min_r > r)
-			min_r = r;
-		if (max_r < r)
-			max_r = r;
-		items[QPair<int, int>(i, 0)] = InputTable->takeItem(i, 0);
-		items[QPair<int, int>(i, 1)] = InputTable->takeItem(i, 1);
-		items[QPair<int, int>(i, 2)] = InputTable->takeItem(i, 2);
-		items[QPair<int, int>(i, 3)] = InputTable->takeItem(i, 3);
+		if (min_r > r) min_r = r;
+		if (max_r < r) max_r = r;
 	}
 	cObj->setClusterSet(InputTable->rowCount(), min_r, max_r, local, 0);
 	cObj->SetTotalClusters(num);
@@ -475,8 +467,7 @@ void gen_cluster_dlg::clickAdd()
 	QListWidgetItem* item = new QListWidgetItem(name);
 	ClusterList->addItem(item);
 	InputTable->setRowCount(0);
-	tables[name] = items;
-	tableItems.clear();
+	//tableItems.clear();
 	modifier->reset();
 	isNewCluster = false;
 	isClickedCell = false;

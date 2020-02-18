@@ -22,6 +22,8 @@
 #include "xdynamics_manager/xParticleMananger.h"
 #include "xdynamics_manager/xObjectManager.h"
 #include "xCheckCollisionDialog.h"
+
+#include <algorithm>
 //#include <QtWidgets/QListWidget>
 
 xdynamics_gui* xgui;
@@ -919,7 +921,13 @@ void xdynamics_gui::xGenerateClusterDistribution()
 {
 	gen_cluster_dlg dlg(this);
 	if (omgr->XClusterObjects().size()) {
-
+		QMap<QString, xClusterObject*> qobjs;
+		std::map<std::string, xClusterObject*> objs = omgr->XClusterObjects();
+		for (std::map<std::string, xClusterObject*>::iterator it = objs.begin(); it != objs.end(); it++) {
+			qobjs[QString::fromStdString(it->first)] = it->second;
+		}
+		dlg.setClusterShapeObject(qobjs);
+		//dlg.setClusterShapeObject(omgr->XClusterObjects());
 	}
 	int ret = dlg.exec();
 	if (ret) {
@@ -930,23 +938,6 @@ void xdynamics_gui::xGenerateClusterDistribution()
 				xnavi->addChild(xModelNavigator::SHAPE_ROOT, name, cobj);
 			}			
 		}
-		/*for (unsigned int i = 0; i < dlg.clusters.size(); i++) {
-			QString name = QString::fromStdString(dlg.clusters.cluster.value()->Name());
-		}
-		QMapIterator<QString, xClusterObject*> cluster(dlg.clusters);
-		while (cluster.hasNext()) {
-			cluster.next();
-			QString name = QString::fromStdString(cluster.value()->Name());
-			xClusterObject* pobj = cluster.value();
-			xClusterObject* cobj = omgr->CreateClusterShapeObject(name.toStdString(), NO_MATERIAL);
-			cobj->setInfo(cluster.value());
-			cobj->setClusterSet(
-				pobj->NumElement(),
-				pobj->MinimumRadius(),
-				pobj->MaximumRadius(),
-				pobj->RelativeLocation(), 0);
-			xnavi->addChild(xModelNavigator::SHAPE_ROOT, name, cobj);		
-		}*/
 	}
 }
 

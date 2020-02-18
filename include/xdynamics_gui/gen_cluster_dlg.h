@@ -37,13 +37,14 @@ private:
 
 class gen_cluster_dlg : public QDialog, private Ui::GenClusterDialog
 {
-	typedef QMap<QPair<int, int>, QTableWidgetItem*> MapTableItems;
+	//typedef QMap<QPair<int, int>, QTableWidgetItem*> MapTableItems;
 	Q_OBJECT
 public:
 	gen_cluster_dlg(QWidget* parent = nullptr);
 	~gen_cluster_dlg();
 
 	void prepareShow();
+	void setClusterShapeObject(QMap<QString, xClusterObject*>& cobjs);
 	QMap<QString, xClusterObject*> clusters;
 
 private slots:
@@ -75,8 +76,8 @@ private:
 	QListWidgetItem* current_list;
 	Q3DScatter* graph;
 	ScatterDataModifier* modifier;
-	QMap<QPair<int, int>, QTableWidgetItem*> tableItems;
-	QMap<QString, MapTableItems> tables;
+	//QMap<QPair<int, int>, QTableWidgetItem*> tableItems;
+	//QMap<QString, MapTableItems> tables;
 
 	xClusterObject* c_cluster;
 };
