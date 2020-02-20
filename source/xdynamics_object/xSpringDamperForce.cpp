@@ -107,7 +107,7 @@ void xSpringDamperForce::SetupDataFromListData(xTSDAData&d, std::string data)
 			{
 				unsigned int nlist = 0;
 				fs >> nlist;
-				for (unsigned int i = 0; i < nlist; i++)
+				for (unsigned int i = 0; i < nlist; i++) 
 				{
 					xSpringDamperConnectionInformation xsi = { 0, cnt, 0 };
 					xSpringDamperConnectionData xsd = { 0, };
@@ -122,6 +122,9 @@ void xSpringDamperForce::SetupDataFromListData(xTSDAData&d, std::string data)
 						xsd.jd = cid;
 						xsd.kc_id = kc;
 						clist.push_back(xsd);
+					}
+					if (xsi.ntsda == 0) {
+						clist.push_back({ 0, 0, 0 });
 					}
 					cnt += xsi.ntsda;
 				}

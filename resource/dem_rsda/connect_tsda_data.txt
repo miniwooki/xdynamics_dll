@@ -1,5 +1,7 @@
-kc_value 2
+kc_value 1
 0 5000 1
 
-connection_list 1
-0 1 1 2
+connection_list 3
+0 0 
+1 1 2 0
+2 1 1 0
