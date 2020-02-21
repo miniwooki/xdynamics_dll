@@ -494,6 +494,10 @@ void xParticleManager::SetCurrentParticlesFromPartResult(std::string path)
 			qf.close();
 			return;
 		}
+		double *m_mass = nullptr;
+		if (VERSION_NUMBER > 1) {
+			m_mass = new double[m_ns];
+		}
 		vector4d* m_pos = new vector4d[m_np];
 		vector3d* m_vel = new vector3d[m_ns];
 		vector3d* m_acc = new vector3d[m_ns];
@@ -503,6 +507,9 @@ void xParticleManager::SetCurrentParticlesFromPartResult(std::string path)
 		vector4d* m_cpos = NULL;
 		if (m_np != m_ns)
 			m_cpos = new vector4d[m_ns];
+		if (m_mass) {
+			qf.read((char*)m_mass, sizeof(double) * m_ns);
+		}
 		qf.read((char*)m_pos, sizeof(vector4d) * m_np);
 		qf.read((char*)m_vel, sizeof(vector3d) * m_ns);
 		qf.read((char*)m_acc, sizeof(vector3d) * m_ns);
@@ -517,6 +524,7 @@ void xParticleManager::SetCurrentParticlesFromPartResult(std::string path)
  			unsigned int sid = xpo->StartIndex();
 			unsigned int xnp = xpo->NumParticle();
 			unsigned int xns = xpo->NumCluster();
+		//	double* xpo_mass = xpo->Mass();
 			vector4d* xpo_pos = xpo->Position();
 			vector4d* xpo_ep = xpo->EulerParameters();
 			memcpy(xpo_pos, m_pos + sid, sizeof(vector4d) * xnp);
