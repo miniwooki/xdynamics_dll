@@ -4,6 +4,7 @@
 #include "xdynamics_decl.h"
 #include "xdynamics_simulation/xSimulation.h"
 #include "xdynamics_manager/xContactManager.h"
+#include "xdynamics_manager/xObjectManager.h"
 #include "xdynamics_algebra/xNeiborhoodCell.h"
 #include "xdynamics_manager/XDiscreteElementMethodModel.h"
 #include "xlist.hpp"
@@ -16,7 +17,7 @@ public:
 	//~xDiscreteElementMethoSimulation();
 	virtual ~xDiscreteElementMethodSimulation();
 
-	virtual int Initialize(xDiscreteElementMethodModel* _xdem, xContactManager* _cm, bool is_set_result_memory = false);
+	virtual int Initialize(xObjectManager* _xobj, xDiscreteElementMethodModel* _xdem, xContactManager* _cm, bool is_set_result_memory = false);
 	bool Initialized();
 	/*bool initialize_f(contactManager* _cm);*/
 	virtual int OneStepSimulation(double ct, unsigned int cstep) = 0;
@@ -28,7 +29,8 @@ public:
 	void updateObjectFromMBD();
 	double* Position();
 	double* Velocity();
-	void SpringDamperForce();
+	void TranslationSpringDamperForce();
+	void RotationSpringDamperForce();
 	unsigned int num_particles();
 	unsigned int num_clusters();
 	unsigned int setupByLastSimulationFile(std::string ldr);
@@ -54,6 +56,7 @@ protected:
 	xGridCell* dtor;
 	xParticleManager* xpm;
 	xContactManager* xcm;
+	xObjectManager* xom;
 	//unsigned int *cindex;
 	double *mass;
 	double *inertia;
@@ -90,6 +93,12 @@ protected:
 	xSpringDamperBodyConnectionInfo *dxsdc_body;
 	xSpringDamperBodyConnectionData *dxsdc_body_data;
 	device_tsda_connection_body_data *dxsd_cbd;
+
+	xSpringDamperCoefficient *drsda_coefficient;
+	xRSDAConnectionData *drsda_connection_data;
+	xRSDAConnectionInformation *drsda_connection_information;
+	xSpringDamperBodyConnectionInfo *drsda_attached_body_info;
+	xRSDABodyAttachedData *drsda_body_attatched_data;
 
 	xlist<xstring> partList;
 };

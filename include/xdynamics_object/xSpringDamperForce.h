@@ -28,6 +28,16 @@ public:
 	double* FreeLength();
 	void initializeFreeLength(double* p,double* ep);
 
+	static void xCalculateForce(
+		vector3d spi, vector3d spj,
+		double k, double c, double init_l,
+		vector3d p0, vector3d p1,
+		vector3d v0, vector3d v1,
+		euler_parameters e0, euler_parameters e1,
+		euler_parameters ev0, euler_parameters ev1,
+		vector3d& f0, vector3d& f1,
+		vector3d& m0, vector3d& m1
+	);
 	virtual void xCalculateForce(const xVectorD& q, const xVectorD& qd);
 	void xCalculateForceForDEM(double* pos, double* vel, double* ep, double* ev, double* ms, double* force, double* moment);
 	void xCalculateForceFromDEM(unsigned int ci, xPointMass* pm, const double* pos, const double* vel);

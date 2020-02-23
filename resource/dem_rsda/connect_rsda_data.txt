@@ -7,4 +7,4 @@ connection_list 1
 mass_particle_connection_list 1
 connection_mass_particle wheel
 connection_number 1
-0 1 0.001 0 0 1 0 0 0 1 0 1 0 0 0 1 0
+0 1 0 0.001 0 0 1 0 0 0 1 0 1 0 0 0 1 0

@@ -462,7 +462,7 @@ void xXLSReader::ReadJoint(xMultiBodyModel* xmbd, vector2i rc)
 	}
 }
 
-void xXLSReader::ReadForce(xMultiBodyModel* xmbd, xDiscreteElementMethodModel* xdem, vector2i rc)
+void xXLSReader::ReadForce(xMultiBodyModel* xmbd, xDiscreteElementMethodModel* xdem, xObjectManager* xobj, vector2i rc)
 {
 	vector2i init_rc = rc;
 	while (1)
@@ -471,6 +471,10 @@ void xXLSReader::ReadForce(xMultiBodyModel* xmbd, xDiscreteElementMethodModel* x
 		std::string name = ReadStr(rc.x, rc.y++);
 		xForce::fType type = (xForce::fType)static_cast<int>(ReadNum(rc.x, rc.y++));
 	
+		if (type == xForce::USER_DEFINED_SD) {
+			xGeneralSpringDamper* gsd = xobj->CreateGeneralSpringDamper(name, ReadStr(rc.x, rc.y++));
+			continue;
+		}
 		std::string base = ReadStr(rc.x, rc.y++);
 		std::string action = ReadStr(rc.x, rc.y++);
 		
@@ -489,7 +493,7 @@ void xXLSReader::ReadForce(xMultiBodyModel* xmbd, xDiscreteElementMethodModel* x
 			xRSDAData xt = { 0, };
 			std::string fpath = ReadStr(rc.x, rc.y);
 			dynamic_cast<xRotationSpringDamperForce*>(xf)->SetupDataFromListData(xt, fpath);
-		}
+		}		
 		else
 		{
 			xForce* xf = xmbd->CreateForceElement(name, type, base, action);

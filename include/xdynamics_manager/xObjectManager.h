@@ -10,6 +10,7 @@
 #include "xdynamics_object/xMeshObject.h"
 #include "xdynamics_object/xCylinderObject.h"
 #include "xdynamics_object/xClusterObject.h"
+#include "xdynamics_object/xGeneralSpringDamper.h"
 
 #include "xmap.hpp"
 #include <map>
@@ -28,7 +29,7 @@ public:
 	xmap<xstring, xObject*>& XObjects();
 	map<std::string, xObject*> XObjectsToSTD();
 	map<std::string, xClusterObject*> XClusterObjects();
-	
+	xGeneralSpringDamper* GeneralSpringDamper();
 	xPointMass* setMovingConstantMovingVelocity(std::string _name, double* v);
 	void UpdateMovingObjects(double ct);
 	void SaveResultCompulsionMovingObjects(double ct);
@@ -38,7 +39,7 @@ public:
 	xMeshObject* CreateMeshShapeObject(std::string _name, int _xmt);
 	xClusterObject* CreateClusterShapeObject(std::string _name, int _xmt);
 	xCylinderObject* CreateCylinderShapeObject(std::string _name, int _xmt);
-
+	xGeneralSpringDamper* CreateGeneralSpringDamper(std::string _name, std::string filepath);
 	bool InsertClusterShapeObject(xClusterObject*);
 
 	void CreateSPHBoundaryParticles(xParticleManager* xpm);
@@ -47,6 +48,7 @@ public:
 private:
 	xmap<xstring, xObject*> objects;
 	xmap<xstring, xObject*> compulsion_moving_objects;
+	xGeneralSpringDamper* general_sd;
 };
 
 #endif

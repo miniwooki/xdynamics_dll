@@ -308,6 +308,43 @@ void xSpringDamperForce::initializeFreeLength(double* pos, double* ep)
 	}
 }
 
+void xSpringDamperForce::xCalculateForce(
+	vector3d spi, vector3d spj,
+	double k, double c, double init_l,
+	vector3d ri, vector3d rj,
+	vector3d vi, vector3d vj, 
+	euler_parameters ei, euler_parameters ej,
+	euler_parameters edi, euler_parameters edj, 
+	vector3d & fi, vector3d & fj, 
+	vector3d & mi, vector3d &mj)
+{
+	matrix33d Ai = GlobalTransformationMatrix(ei);
+	matrix33d Aj = GlobalTransformationMatrix(ej);
+	vector3d L = rj + Aj * spj - ri - Ai * spi;
+	//L = action->getPosition() + action->toGlobal(spj) - base->getPosition() - base->toGlobal(spi);
+	double l = length(L);// .length();
+	vector3d dL = vj + BMatrix(edj, spj) * ej - vi - BMatrix(edi, spi) * ei;
+	//VEC3D dL = action->getVelocity() + B(action->getEV(), spj) * action->getEP() - base->getVelocity() - B(base->getEV(), spi) * base->getEP();
+	double dl = dot(L, dL) / l;
+	double f = k * (l - init_l) + c * dl;
+	fi = (f / l) * L;
+	fj = -fi;
+	//matrix34d eee = BMatrix(ej, spj);
+	vector4d QRi = (f / l) * BMatrix(ei, spi) * L;// transpose(B(base->getEP(), spi), L);
+	vector4d QRj = -(f / l) * BMatrix(ej, spj) * L;// transpose(B(action->getEP(), spj), L);
+	mi = 0.5 * LMatrix(ei) * QRi;
+	mj = 0.5 * LMatrix(ej) * QRj;
+
+		//int irc = (i - 1) * xModel::OneDOF();
+	//fi = Qi;// new_vector3d(Qi.x, Qi.y, Qi.z);
+	//i_ptr->addEulerParameterMoment(QRi.x, QRi.y, QRi.z, QRi.w);
+		//rhs.plus(irc, Qi, QRi);
+
+		//int jrc = (j - 1) * xModel::OneDOF();// action->ID() * 7;
+	//fj = Qj;//new_vector(Qj.x, Qj.y, Qj.z);
+	//j_ptr->addEulerParameterMoment(QRj.x, QRj.y, QRj.z, QRj.w);
+}
+
 void xSpringDamperForce::xCalculateForce(const xVectorD& q, const xVectorD& qd)
 {
 	vector3d Qi;
@@ -408,8 +445,6 @@ void xSpringDamperForce::xCalculateForceForDEM(
 		matrix33d Ai = GlobalTransformationMatrix(ei);
 		size_t sid = connection_body_info[i].sid;
 		xSpringDamperBodyConnectionData d = { 0, };
-		//vector4d* dem_pos = (vector4d*)pos;
-		//vector3d* dem_vel = (vector3d*)vel;
 		for (unsigned int j = 0; j < connection_body_info[i].nconnection; j++)
 		{
 			d = connection_body_data[sid + j];
@@ -423,17 +458,10 @@ void xSpringDamperForce::xCalculateForceForDEM(
 			vector3d dL = vj - vi - BMatrix(edi, lp) * ei;
 			dl = dot(L, dL) / l;
 			double fr = kc.k * (l - d.init_l) + kc.c * dl;
-			/*		if (abs(fr) <= 1e-10)
-						fr = 0.0;
-					else
-						fr = fr;*/
-			//if (fr != 0)
-			//	fr = fr;
 			vector3d Qi = (fr / l) * L;
 			vector3d Qj = -Qi;
 			vector4d QRi = (fr / l) * BMatrix(ei, lp) * L;
-			f[mid] += Qi;// pm->addAxialForce(Qi.x, Qi.y, Qi.z);
-			//pm->addEulerParameterMoment(QRi.x, QRi.y, QRi.z, QRi.w);
+			f[mid] += Qi;
 			m[mid] += 0.5 * LMatrix(ei) * QRi;
 			f[d.ci] += Qj;
 		}

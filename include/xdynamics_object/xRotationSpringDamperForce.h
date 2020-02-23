@@ -20,7 +20,7 @@ public:
 	size_t NumSpringDamperBodyConnection();
 	size_t NumSpringDamperBodyConnectionData();
 
-	xRSDSConnectionInformation* xSpringDamperConnection();
+	xRSDAConnectionInformation* xSpringDamperConnection();
 	xRSDAConnectionData* xSpringDamperConnectionList();
 	xSpringDamperCoefficient* xSpringDamperCoefficientValue();
 	xSpringDamperBodyConnectionInfo* xSpringDamperBodyConnectionInformation();
@@ -57,7 +57,7 @@ private:
 	size_t nBodyAttached;
 	size_t nBodyAttachedData;
 	xSpringDamperCoefficient *kc_value;
-	xRSDSConnectionInformation* xrdci;
+	xRSDAConnectionInformation* xrdci;
 	xRSDAConnectionData *connection_data;
 	xSpringDamperBodyConnectionInfo *attached_body_info;
 	xRSDABodyAttachedData *attached_body_data;

@@ -8,7 +8,7 @@
 class xForce
 {
 public:
-	enum fType{ NO_TYPE = -1, TSDA = 0, RSDA = 1, RAXIAL = 2, TSDA_LIST_DATA = 99, RSDA_LIST_DATA = 100 };
+	enum fType{ NO_TYPE = -1, TSDA = 0, RSDA = 1, RAXIAL = 2, USER_DEFINED_SD = 98, TSDA_LIST_DATA = 99, RSDA_LIST_DATA = 100 };
 	xForce();
 	xForce(std::string _name, fType _type);
 	virtual ~xForce();

@@ -33,33 +33,25 @@ xDiscreteElementMethodSimulation::~xDiscreteElementMethodSimulation()
 }
 
 int xDiscreteElementMethodSimulation::Initialize(
-	xDiscreteElementMethodModel* _xdem, xContactManager* _xcm, bool is_set_result_memory)
+	xObjectManager* _xobj, xDiscreteElementMethodModel* _xdem, 
+	xContactManager* _xcm, bool is_set_result_memory)
 {
 	xdem = _xdem;
+	xom = _xobj;
 	double maxRadius = 0;
 	double minRadius = FLT_MAX;
 	xpm = xdem->XParticleManager();
-	//np = xpm->NumParticleWithCluster();
 	np = xpm->NumParticle();
 	ns = xpm->NumCluster();
 	nco = xpm->nClusterObject();
 	nMassParticle = xpm->NumMassParticle();
 	if (ns == 0) ns = np;
-	//nSingleSphere = xpm->nSingleSphere();
-	//nClusterSphere = ns - xpm->nSingleSphere();
 	xcm = _xcm;
 	if (xcm)
 	{
 		xcm->defineContacts(np);
-		//nPolySphere = xcm->setupParticlesMeshObjectsContact();
-		//xcm->setupParticlesPlanesContact();
-		//xcm->setupParticlesCylindersContact();
 		xcm->allocPairList(np);
-		//if (nPolySphere)
-		//	maxRadius = xcm->ContactParticlesMeshObjects()->MaxRadiusOfPolySphere();
 		xcm->setNumClusterObject(nco);
-	/*	if (xdem->XParticleManager()->NumClusterSet())
-			xdem->XParticleManager()->SetClusterInformation();*/
 	}
 	
 
@@ -81,7 +73,6 @@ int xDiscreteElementMethodSimulation::Initialize(
 	memset(moment, 0, sizeof(double) * np * 3);
 	for (unsigned int i = 0; i < ns; i++)
 	{
-		//vel[0] = 0.2;
 		acc[i * 3 + 0] = 0.0;// mass[i] * xModel::gravity.x;
 		acc[i * 3 + 1] = xModel::gravity.y;
 		acc[i * 3 + 2] = 0.0;// mass[i] * xModel::gravity.z;
@@ -101,12 +92,6 @@ int xDiscreteElementMethodSimulation::Initialize(
 		maxRadius = xParticleMeshObjectContact::GetMaxSphereRadius();
 	double new_dt = CriticalTimeStep(minRadius);
 	dtor = new xNeiborhoodCell;
-	// 	switch (md->SortType())
-	// 	{
-	// 	case grid_base::NEIGHBORHOOD: dtor = new neighborhood_cell; break;
-	// 	}
-	//pos[0] = 0;
-	//pos[2] = 0;
 	if (dtor)
 	{
 		unsigned int num_mesh_sphere = xParticleMeshObjectContact::GetNumMeshSphere();
@@ -115,12 +100,13 @@ int xDiscreteElementMethodSimulation::Initialize(
 		dtor->setCellSize(maxRadius * 2.0);
 		dtor->initialize(np + num_mesh_sphere);
 	}
-	// 	switch (md->IntegrationType())
-	// 	{
-	// 	case dem_integrator::VELOCITY_VERLET: itor = new velocity_verlet; break;
-	// 	}
 	if (xdem->XSpringDamperForce())
 		xdem->XSpringDamperForce()->initializeFreeLength(pos, ep);
+	if (xom->GeneralSpringDamper())
+	{
+		xom->GeneralSpringDamper()->setPointData(
+			mass, pos, ep, vel, avel, force, moment);
+	}
 	if (xSimulation::Gpu())
 	{
 		checkXerror(cudaMemcpy(dpos, pos, sizeof(double) * np * 4, cudaMemcpyHostToDevice));
@@ -246,6 +232,11 @@ int xDiscreteElementMethodSimulation::Initialize(
 			dxsdc_data = xdem->XSpringDamperForce()->xSpringDamperConnectionList();
 			dxsdc_kc = xdem->XSpringDamperForce()->xSpringDamperCoefficientValue();
 		}
+		if (xdem->XRotationalSpringDamperForce()) {
+			drsda_connection_information = xdem->XRotationalSpringDamperForce()->xSpringDamperConnection();
+			drsda_connection_data = xdem->XRotationalSpringDamperForce()->xSpringDamperConnectionList();
+			drsda_coefficient = xdem->XRotationalSpringDamperForce()->xSpringDamperCoefficientValue();
+		}
 	}
 	if (isSaveMemory)
 		xdem->XParticleManager()->AllocParticleResultMemory(xSimulation::npart, np);
@@ -336,7 +327,7 @@ double* xDiscreteElementMethodSimulation::Velocity()
 	return dvel;
 }
 
-void xDiscreteElementMethodSimulation::SpringDamperForce()
+void xDiscreteElementMethodSimulation::TranslationSpringDamperForce()
 {
 	if (xSimulation::Gpu())
 	{
@@ -350,6 +341,18 @@ void xDiscreteElementMethodSimulation::SpringDamperForce()
 	else
 	{
 		xdem->XSpringDamperForce()->xCalculateForceForDEM(dpos, dvel, dep, davel, dmass, dforce, dmoment);
+	}
+}
+
+void xDiscreteElementMethodSimulation::RotationSpringDamperForce()
+{
+	if (xSimulation::Gpu())
+	{
+
+	}
+	else
+	{
+		xdem->XRotationalSpringDamperForce()->xCalculateForceForDEM(dpos, dvel, dep, davel, dmass, dforce, dmoment);
 	}
 }
 

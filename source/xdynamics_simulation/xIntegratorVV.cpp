@@ -53,7 +53,9 @@ int xIntegratorVV::OneStepSimulation(double ct, unsigned int cstep)
 			nco ? np : m_np);
 	}	
 	if (xdem->XSpringDamperForce())
-			SpringDamperForce();
+		TranslationSpringDamperForce();
+	if (xdem->XRotationalSpringDamperForce())
+		RotationSpringDamperForce();
 	this->updateVelocity(dvel, dacc, dep, davel, daacc, dforce, dmoment, dmass, diner, m_np);
 	return 0;
 }
@@ -89,7 +91,9 @@ void xIntegratorVV::updatePosition(
 			ep[i] = normalize(new_ep);
 			p[i] = new_vector4d(new_p.x, new_p.y, new_p.z, p[i].w);
 		}
+
 	}
+
 }
 
 void xIntegratorVV::updateVelocity(

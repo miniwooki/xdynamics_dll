@@ -5,6 +5,7 @@
 xObjectManager* _xom = NULL;
 
 xObjectManager::xObjectManager()
+	: general_sd(nullptr)
 {
 	_xom = this;
 }
@@ -64,6 +65,11 @@ map<std::string, xClusterObject*> xObjectManager::XClusterObjects()
 		it.next();
 	}
 	return ret;
+}
+
+xGeneralSpringDamper * xObjectManager::GeneralSpringDamper()
+{
+	return general_sd;
 }
 
 xPointMass * xObjectManager::setMovingConstantMovingVelocity(std::string _name, double* v)
@@ -172,6 +178,67 @@ xCylinderObject* xObjectManager::CreateCylinderShapeObject(std::string _name, in
 	//xco->setPoisson(xm.poisson);
 	objects.insert(name, xco);
 	return xco;
+}
+
+xGeneralSpringDamper * xObjectManager::CreateGeneralSpringDamper(std::string _name, std::string filepath)
+{
+	std::fstream fs;
+	fs.open(filepath, ios_base::in);
+	if (fs.is_open()) {
+		std::string ch;
+		while (!fs.eof()) {
+			//std::string name = xUtilityFunctions::GetFileName(filepath.c_str());
+			general_sd = new xGeneralSpringDamper(_name);
+
+			fs >> ch;
+			if (ch == "point2spring") {
+				unsigned int np2s = 0;
+				fs >> np2s;
+				for (unsigned int i = 0; i < np2s; i++) {
+					std::string p2s_name;
+					fs >> p2s_name;
+					xPoint2Spring *p2s = new xPoint2Spring(p2s_name);
+					objects.insert(p2s_name, p2s);
+					unsigned int i0, i1;
+					vector3d sp0, sp1;
+					double k, c, len;
+					fs >> i0 >> i1 >> sp0.x >> sp0.y >> sp0.z >> sp1.x >> sp1.y >> sp1.z
+						>> k >> c >> len;
+					p2s->SetSpringDamperData(i0, i1, sp0, sp1, k, c, len);
+					general_sd->appendPoint2Spring(p2s);
+				}
+			}
+			else if (ch == "attach_point") {
+				unsigned int nap = 0;
+				fs >> nap;
+				if (nap)
+					general_sd->allocAttachPoint(nap);
+				for (unsigned int i = 0; i < nap; i++) {
+					std::string ap_name;
+					fs >> ap_name;
+					xAttachPoint xap = { 0, };
+					xap.body = ap_name.c_str();
+					fs >> xap.id >> xap.rx >> xap.ry >> xap.rz;
+					general_sd->appendAttachPoint(i, xap);
+				}
+			}
+			else if (ch == "rotational_spring") {
+				unsigned int nrs = 0;
+				fs >> nrs;
+				if (nrs)
+					general_sd->allocRotationalSpring(nrs);
+				for (unsigned int i = 0; i < nrs; i++) {
+					std::string rs_name;
+					fs >> rs_name;
+					xRotationalSpringData rsd = { 0, };
+					rsd.body = rs_name.c_str();
+					fs >> rsd.id >> rsd.rx >> rsd.ry >> rsd.rz >> rsd.k >> rsd.c;
+					general_sd->appendRotationalSpring(i, rsd);
+				}				
+			}
+		}
+	}
+	return general_sd;
 }
 
 bool xObjectManager::InsertClusterShapeObject(xClusterObject *cobj)

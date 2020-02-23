@@ -87,7 +87,7 @@ void xRotationSpringDamperForce::SetupDataFromListData(xRSDAData&d, std::string 
 	fs.open(data, std::ios::in);
 	unsigned int cnt = 0;
 	std::string ch;
-	std::list<xRSDSConnectionInformation> xrdcis;
+	std::list<xRSDAConnectionInformation> xrdcis;
 	std::list<xRSDAConnectionData> clist;
 	std::list<xSpringDamperCoefficient> cvalue;
 	if (fs.is_open())
@@ -114,7 +114,7 @@ void xRotationSpringDamperForce::SetupDataFromListData(xRSDAData&d, std::string 
 				fs >> nlist;
 				for (unsigned int i = 0; i < nlist; i++)
 				{
-					xRSDSConnectionInformation xsi = { 0, cnt, 0 };
+					xRSDAConnectionInformation xsi = { 0, cnt, 0 };
 					xRSDAConnectionData xsd = { 0, };
 
 					fs >> xsi.id >> xsi.nrsda;
@@ -147,7 +147,7 @@ void xRotationSpringDamperForce::SetupDataFromListData(xRSDAData&d, std::string 
 					for (unsigned int j = 0; j < attached_body_info[i].nconnection; j++)
 					{
 						xRSDABodyAttachedData d = { 0, };
-						fs >> d.id >> d.jd >> d.rx >> d.ry >> d.rz
+						fs >> d.id >> d.jd >> d.kc_id >> d.rx >> d.ry >> d.rz
 							>> d.fix >> d.fiy >> d.fiz >> d.gix >> d.giy >> d.giz
 							>> d.fjx >> d.fjy >> d.fjz >> d.gjx >> d.gjy >> d.gjz;
 						bc_list.push_back(d);
@@ -180,9 +180,9 @@ void xRotationSpringDamperForce::SetupDataFromListData(xRSDAData&d, std::string 
 	}
 	if (!xrdci)
 	{
-		xrdci = new xRSDSConnectionInformation[xrdcis.size()];
+		xrdci = new xRSDAConnectionInformation[xrdcis.size()];
 		unsigned int ct = 0;
-		for (list<xRSDSConnectionInformation>::iterator c = xrdcis.begin(); c != xrdcis.end(); c++)
+		for (list<xRSDAConnectionInformation>::iterator c = xrdcis.begin(); c != xrdcis.end(); c++)
 			//foreach(xSpringDamperConnectionInformation c, xsdcis)
 		{
 			xrdci[ct++] = *c;
@@ -245,7 +245,7 @@ size_t xRotationSpringDamperForce::NumSpringDamperBodyConnectionData()
 	return nBodyAttachedData;
 }
 
-xRSDSConnectionInformation* xRotationSpringDamperForce::xSpringDamperConnection()
+xRSDAConnectionInformation* xRotationSpringDamperForce::xSpringDamperConnection()
 {
 	return xrdci;
 }
@@ -318,10 +318,6 @@ void xRotationSpringDamperForce::xCalculateForce(const xVectorD& q, const xVecto
 	vector4d QRj;
 	unsigned int si = i * xModel::OneDOF();
 	unsigned int sj = j * xModel::OneDOF();
-	vector3d ri = new_vector3d(q(si + 0), q(si + 1), q(si + 2));
-	vector3d rj = new_vector3d(q(sj + 0), q(sj + 1), q(sj + 2));
-	vector3d vi = new_vector3d(qd(si + 0), qd(si + 1), qd(si + 2));
-	vector3d vj = new_vector3d(qd(sj + 0), qd(sj + 1), qd(sj + 2));
 	euler_parameters ei = new_euler_parameters(q(si + 3), q(si + 4), q(si + 5), q(si + 6));
 	euler_parameters ej = new_euler_parameters(q(sj + 3), q(sj + 4), q(sj + 5), q(sj + 6));
 	euler_parameters edi = new_euler_parameters(qd(si + 3), qd(si + 4), qd(si + 5), qd(si + 6));
@@ -339,25 +335,18 @@ void xRotationSpringDamperForce::xCalculateForce(const xVectorD& q, const xVecto
 	double _theta = theta + 2 * n_rev * M_PI;
 	double dsin = sin(_theta);
 	double dcos = cos(_theta);
-	if (isSin) {
+	if (isSin) 
 		dtheta = dot(fj, BMatrix(ei, g_i) * edi) + dot(gi, BMatrix(ej, f_j) * edj) / dcos;
-	}
-	else {
+	else 
 		dtheta = dot(fj, BMatrix(ei, f_i) * edi) + dot(fi, BMatrix(ej, f_j) * edj) / dsin;
-	}
-	// xUtilityFunctions::DerivativeRelariveAngle(xSimulation::ctime, _udrl, d)	
-	//dtheta = dtheta / (isSin ? dcos : dsin);
 	n = k * _theta + c * dtheta;
 	QRi = 2.0 * n * (Gi * h_i);
 	QRj = -2.0 * n * (Gj * h_j);
-
-	if (i)
-	{
+	if (i){
 		i_ptr->addAxialForce(0, 0, 0);
 		i_ptr->addEulerParameterMoment(QRi.x, QRi.y, QRi.z, QRi.w);
 	}
-	if (j)
-	{
+	if (j){
 		j_ptr->addAxialForce(0, 0, 0);
 		j_ptr->addEulerParameterMoment(QRj.x, QRj.y, QRj.z, QRj.w);
 	}
@@ -366,35 +355,73 @@ void xRotationSpringDamperForce::xCalculateForce(const xVectorD& q, const xVecto
 void xRotationSpringDamperForce::xCalculateForceForDEM(
 	double* pos, double* vel, double* ep, double* ev, double* ms, double* force, double* moment)
 {
-	//vector4d* p = (vector4d*)pos;
-	//vector3d* v = (vector3d*)vel;
-	//vector3d* f = (vector3d*)force;
-	//vector3d* m = (vector3d*)moment;
-	//euler_parameters* e = (euler_parameters*)ep;
-	//euler_parameters* ed = (euler_parameters*)ev;
-	//for (unsigned int i = 0; i < nsdci; i++)
-	//{
-	//	unsigned int id = xsdci[i].id;
-	//	vector3d ri = new_vector3d(p[id].x, p[id].y, p[id].z);
-	//	vector3d vi = v[id];
-	//	vector3d rj = new_vector3d(0, 0, 0);
-	//	vector3d vj = new_vector3d(0, 0, 0);
-	//	for (unsigned int j = 0; j < xsdci[i].ntsda; j++)
-	//	{
-	//		unsigned int sid = xsdci[i].sid + j;
-	//		xSpringDamperConnectionData xsd = connection_data[sid];
-	//		xSpringDamperCoefficient kc = kc_value[xsd.kc_id];
-	//		rj = new_vector3d(p[xsd.jd].x, p[xsd.jd].y, p[xsd.jd].z);
-	//		vj = v[xsd.jd];
-	//		vector3d L = rj - ri;
-	//		l = length(L);
-	//		vector3d dL = vj - vi;
-	//		double dl = dot(L, dL) / l;
-	//		double fr = kc.k * (l - xsd.init_l) + kc.c * dl;
-	//		//std::cout << "tsda_dem - " << i << " : " << xsd.jd << " & " << l << " & " << dl << " => " << fr << std::endl;
-	//		vector3d Q = (fr / l) * L;
+	vector4d* p = (vector4d*)pos;
+	vector3d* v = (vector3d*)vel;
+	vector3d* f = (vector3d*)force;
+	vector3d* m = (vector3d*)moment;
+	euler_parameters* e = (euler_parameters*)ep;
+	euler_parameters* ed = (euler_parameters*)ev;
+	for (unsigned int i = 0; i < nBodyAttachedData; i++) {
+		xRSDABodyAttachedData *ab = &attached_body_data[i];
+		xSpringDamperCoefficient kc = kc_value[ab->kc_id];
+		euler_parameters ei = e[i];// new_euler_parameters(q(si + 3), q(si + 4), q(si + 5), q(si + 6));
+		euler_parameters ej = e[ab->jd];// new_euler_parameters(q(sj + 3), q(sj + 4), q(sj + 5), q(sj + 6));
+		euler_parameters edi = ed[i];// new_euler_parameters(qd(si + 3), qd(si + 4), qd(si + 5), qd(si + 6));
+		euler_parameters edj = ed[ab->jd];// new_euler_parameters(qd(sj + 3), qd(sj + 4), qd(sj + 5), qd(sj + 6));
+		matrix34d Gi = GMatrix(ei);
+		matrix34d Gj = GMatrix(ej);
+		matrix33d Ai = GlobalTransformationMatrix(ei);
+		matrix33d Aj = GlobalTransformationMatrix(ej);
+		vector3d _gi = new_vector3d(ab->gix, ab->giy, ab->giz);
+		vector3d _gj = new_vector3d(ab->gjx, ab->gjy, ab->gjz);
+		vector3d _fi = new_vector3d(ab->fix, ab->fiy, ab->fiz);// f_i;
+		vector3d _fj = new_vector3d(ab->fjx, ab->fjy, ab->fjz);// f_j;
+		vector3d gi = Ai * _gi;
+		vector3d fi = Aj * _fi;
+		vector3d fj = Aj * _fj;
+		vector3d _hi = cross(_fi, _gi);
+		vector3d _hj = cross(_fj, _gj);
+		bool isSin;
+		ab->theta = xUtilityFunctions::RelativeAngle(ab->udrl, ab->theta, ab->n_rev, gi, fi, fj, isSin);
+		double _theta = ab->theta + 2.0 * n_rev * M_PI;
+		double dsin = sin(_theta);
+		double dcos = cos(_theta);
+		if (isSin) {
+			dtheta = dot(fj, BMatrix(ei, _gi) * edi) + dot(gi, BMatrix(ej, _fj) * edj) / dcos;
+		}
+		else {
+			dtheta = dot(fj, BMatrix(ei, _fi) * edi) + dot(fi, BMatrix(ej, _fj) * edj) / dsin;
+		}
+		double n = k * _theta + c * dtheta;
+		vector4d QRi = 2.0 * n * Gi * _hi;
+		vector4d QRj = -2.0 * n * Gj * _hj;
+		m[ab->jd] = 0.5 * LMatrix(ei) * QRj;
 
-	//		f[id] += Q;
+	}
+	//for (unsigned int i = 0; i < nrdci; i++)
+	//{
+	//	unsigned int id = xrdci[i].id;
+	//	vector3d ri = new_vector3d(p[id].x, p[id].y, p[id].z);
+	////	vector3d vi = v[id];
+	//	vector3d rj = new_vector3d(0, 0, 0);
+	////	vector3d vj = new_vector3d(0, 0, 0);
+	//	for (unsigned int j = 0; j < xrdci[i].nrsda; j++)
+	//	{
+	//		unsigned int sid = xrdci[i].sid + j;
+	//		xRSDAConnectionData *xsd = &connection_data[sid];
+	//		xSpringDamperCoefficient kc = kc_value[xsd->kc_id];
+	//		xsd->theta = xUtilityFunctions::RelativeAngle(xsd->udrl, xsd->theta, xsd->n_rev, )
+	////		rj = new_vector3d(p[xsd.jd].x, p[xsd.jd].y, p[xsd.jd].z);
+	////		vj = v[xsd.jd];
+	////		vector3d L = rj - ri;
+	////		l = length(L);
+	////		vector3d dL = vj - vi;
+	////		double dl = dot(L, dL) / l;
+	////		double fr = kc.k * (l - xsd.init_l) + kc.c * dl;
+	////		//std::cout << "tsda_dem - " << i << " : " << xsd.jd << " & " << l << " & " << dl << " => " << fr << std::endl;
+	////		vector3d Q = (fr / l) * L;
+
+	////		f[id] += Q;
 	//	}
 	//};
 	//for (unsigned int i = 0; i < nBodyConnection; i++)
