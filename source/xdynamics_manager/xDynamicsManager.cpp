@@ -220,7 +220,7 @@ int xDynamicsManager::OpenModelXLS(const char* n)
 						xls.ReadMass(xmbd, bt->second);
 					}break;
 				case XLS_JOINT: xls.ReadJoint(xmbd, bt->second); break;
-				case XLS_FORCE: xls.ReadForce(xmbd, xdem, bt->second); break;
+				case XLS_FORCE: xls.ReadForce(xmbd, xdem, xom, bt->second); break;
 				case XLS_KERNEL:
 					if (!this->XSPHModel(model_name))
 					{

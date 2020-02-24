@@ -137,7 +137,7 @@ bool xDynamicsSimulator::xInitialize(
 		{
 			xLog::log("An uninitialized discrete element method model has been detected.");
 			//int ret = xdem->Initialize(xdm->XDEMModel(), xdm->XContact());
-			if (!checkXerror(xdem->Initialize(xdm->XDEMModel(), xdm->XContact(), !_sp)))
+			if (!checkXerror(xdem->Initialize(xdm->XObject(), xdm->XDEMModel(), xdm->XContact(), !_sp)))
 			{
 				char id_dem = 'd';
 				unsigned int nparticle = xdem->num_particles();
