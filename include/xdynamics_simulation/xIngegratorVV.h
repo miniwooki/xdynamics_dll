@@ -10,7 +10,7 @@ public:
 	xIntegratorVV();
 	virtual ~xIntegratorVV();
 
-	virtual int Initialize(xDiscreteElementMethodModel* _xdem, xContactManager* _cm, bool is_set_result_memory = false);
+	virtual int Initialize(xObjectManager* _xom, xDiscreteElementMethodModel* _xdem, xContactManager* _cm, bool is_set_result_memory = false);
 	virtual int OneStepSimulation(double ct, unsigned int cstep);
 
 private:

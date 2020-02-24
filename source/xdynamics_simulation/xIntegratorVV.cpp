@@ -13,9 +13,9 @@ xIntegratorVV::~xIntegratorVV()
 
 }
 
-int xIntegratorVV::Initialize(xDiscreteElementMethodModel* _xdem, xContactManager* _xcm, bool is_set_result_memory)
+int xIntegratorVV::Initialize(xObjectManager* _xom, xDiscreteElementMethodModel* _xdem, xContactManager* _xcm, bool is_set_result_memory)
 {
-	int ret = xDiscreteElementMethodSimulation::Initialize(_xdem, _xcm, is_set_result_memory);
+	int ret = xDiscreteElementMethodSimulation::Initialize(_xom, _xdem, _xcm, is_set_result_memory);
 	m_np = xDiscreteElementMethodSimulation::ns;
 	if (xDiscreteElementMethodSimulation::ns > xDiscreteElementMethodSimulation::np)
 		m_np = xDiscreteElementMethodSimulation::np;
