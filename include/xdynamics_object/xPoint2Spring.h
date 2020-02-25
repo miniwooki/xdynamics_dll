@@ -19,12 +19,12 @@ public:
 
 	void ConnectFirstPoint(
 		double mass,
-		vector3d* p, vector3d* v,
+		vector4d* p, vector3d* v,
 		euler_parameters* ep, euler_parameters* ev, 
 		vector3d* force, vector3d* moment);
 	void ConnectSecondPoint(
 		double mass,
-		vector3d* p, vector3d* v,
+		vector4d* p, vector3d* v,
 		euler_parameters* ep, euler_parameters* ev, 
 		vector3d* force, vector3d* moment);
 	void CalculateSpringForce();
@@ -38,7 +38,7 @@ public:
 	double k, c;
 	double init_l;
 	double mass0, mass1;
-	vector3d* p0, *p1;
+	vector4d* p0, *p1;
 	vector3d* v0, *v1;
 	euler_parameters* ep0, *ep1;
 	euler_parameters* ev0, *ev1;

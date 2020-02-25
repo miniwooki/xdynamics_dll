@@ -70,7 +70,6 @@ void xSpringDamperForce::SetupDataFromStructure(xPointMass* ip, xPointMass* jp, 
 
 void xSpringDamperForce::SetupDataFromListData(xTSDAData&d, std::string data)
 {
-
 	xForce::i_ptr = NULL;
 	xForce::j_ptr = NULL;
 	loc_i = new_vector3d(d.spix, d.spiy, d.spiz);
@@ -315,8 +314,8 @@ void xSpringDamperForce::xCalculateForce(
 	vector3d vi, vector3d vj, 
 	euler_parameters ei, euler_parameters ej,
 	euler_parameters edi, euler_parameters edj, 
-	vector3d & fi, vector3d & fj, 
-	vector3d & mi, vector3d &mj)
+	vector3d &fi, vector3d &fj, 
+	vector3d &mi, vector3d &mj)
 {
 	matrix33d Ai = GlobalTransformationMatrix(ei);
 	matrix33d Aj = GlobalTransformationMatrix(ej);

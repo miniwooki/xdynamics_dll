@@ -396,23 +396,32 @@ void xXLSReader::ReadMass(xMultiBodyModel* xmbd, vector2i rc)
 					{
 						xPointMass* _xpm = dynamic_cast<xPointMass*>(obj);
 						_xpm->setPosition(xpmd.px, xpmd.py, xpmd.pz);
-						
+						rc.x++;
+						continue;						
 					}
-					rc.x++;
-					continue;
+					/*else
+					{
+						obj = xmbd->XMass(ReadStr(rc.x, rc.y++));
+					}*/
 				}
-				xPointMass* xpm = NULL;
-			
+				xPointMass* xpm = NULL;			
 				xpm = xmbd->CreatePointMass(name);
 				xpm->SetDataFromStructure(xmbd->NumMass(), xpmd);
+				if (!xpmd.mass) {
+					xpm->setDummy(true);
+					if (!IsEmptyCell(rc.x, rc.y));
+						xpm->setDependencyBody(xmbd->XMass(ReadStr(rc.x, rc.y++)));
+				}
+					
  				if (obj)
- 				{
+				{				
  					obj->setDynamicsBody(true);
  					if (obj->Shape() == CYLINDER_SHAPE)
  					{
  						dynamic_cast<xCylinderObject*>(obj)->updateData();
  					}
  				}
+				//if(!IsEmptyCell(rc.x, rc.y))
 			}			
 			rc.x++;
 			rc.y = init_col;
@@ -471,7 +480,7 @@ void xXLSReader::ReadForce(xMultiBodyModel* xmbd, xDiscreteElementMethodModel* x
 		std::string name = ReadStr(rc.x, rc.y++);
 		xForce::fType type = (xForce::fType)static_cast<int>(ReadNum(rc.x, rc.y++));
 	
-		if (type == xForce::USER_DEFINED_SD) {
+		if (type == xForce::GENERAL_FORCE) {
 			xGeneralSpringDamper* gsd = xobj->CreateGeneralSpringDamper(name, ReadStr(rc.x, rc.y++));
 			continue;
 		}

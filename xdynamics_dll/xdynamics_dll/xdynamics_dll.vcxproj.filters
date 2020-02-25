@@ -294,6 +294,15 @@
     <ClCompile Include="..\..\source\xdynamics_object\xPoint2Spring.cpp">
       <Filter>소스 파일\xdynamics_object</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\include\xdynamics_object\xParticle.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xParticle.cpp">
+      <Filter>소스 파일\xdynamics_object</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xDummyMass.cpp">
+      <Filter>소스 파일\xdynamics_object</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\xdynamics_decl.h">
@@ -525,6 +534,12 @@
       <Filter>헤더 파일\xdynamics_object\force</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\xdynamics_object\xPoint2Spring.h">
+      <Filter>헤더 파일\xdynamics_object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_object\xParticle.h">
+      <Filter>헤더 파일\xdynamics_object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_object\xDummyMass.h">
       <Filter>헤더 파일\xdynamics_object</Filter>
     </ClInclude>
   </ItemGroup>

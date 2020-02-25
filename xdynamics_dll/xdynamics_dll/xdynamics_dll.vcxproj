@@ -173,6 +173,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\extern\ExcelFormat\BasicExcel.cpp" />
     <ClCompile Include="..\..\extern\ExcelFormat\ExcelFormat.cpp" />
+    <ClCompile Include="..\..\include\xdynamics_object\xParticle.cpp" />
     <ClCompile Include="..\..\source\xColorControl.cpp" />
     <ClCompile Include="..\..\source\xDynamicsError.cpp" />
     <ClCompile Include="..\..\source\xdynamics_algebra\xAlgebraMath.cpp" />
@@ -198,6 +199,7 @@
     <ClCompile Include="..\..\source\xdynamics_object\xCubicSplineKernel.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xCylinderObject.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xDrivingConstraint.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xDummyMass.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xFixConstraint.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xForce.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xGeneralSpringDamper.cpp" />
@@ -206,6 +208,7 @@
     <ClCompile Include="..\..\source\xdynamics_object\xLineObject.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xMeshObject.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xObject.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xParticle.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xParticleCubeContact.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xParticleCylinderContact.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xParticleMeshObjectContact.cpp" />
@@ -287,6 +290,7 @@
     <ClInclude Include="..\..\include\xdynamics_object\xCubicSplineKernel.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xCylinderObject.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xDrivingConstraint.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xDummyMass.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xFixConstraint.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xForce.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xGeneralSpringDamper.h" />
@@ -295,6 +299,7 @@
     <ClInclude Include="..\..\include\xdynamics_object\xLineObject.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xMeshObject.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xObject.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xParticle.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xParticleCubeContact.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xParticleCylinderContact.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xParticleMeshObjectContact.h" />

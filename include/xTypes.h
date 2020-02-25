@@ -143,6 +143,7 @@ enum xContactPairType
 enum xShapeType
 {
 	NO_SHAPE = 0,
+	PARTICLE = 1,
 	CUBE_SHAPE = 2,
 	PLANE_SHAPE = 3,
 	LINE_SHAPE = 5,
@@ -153,6 +154,7 @@ enum xShapeType
 	CIRCLE_SHAPE = 23,
 	CYLINDER_SHAPE = 27,
 	CLUSTER_SHAPE = 28,
+	DUMMY_SHAPE = 29,
 	NO_SHAPE_AND_MASS = 98,
 	NO_SHAPE_AND_LIST = 99,
 	FROM_SHAPE = 999,
@@ -288,8 +290,10 @@ typedef struct {
 
 typedef struct {
 	const char* body;
+	const char* p2s;
 	unsigned int id;
 	double rx, ry, rz;
+
 	double k, c;
 }xRotationalSpringData;
 /*typedef struct{ double tstart, dpdt }xObjectMovingCondition;*/

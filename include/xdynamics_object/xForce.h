@@ -8,7 +8,7 @@
 class xForce
 {
 public:
-	enum fType{ NO_TYPE = -1, TSDA = 0, RSDA = 1, RAXIAL = 2, USER_DEFINED_SD = 98, TSDA_LIST_DATA = 99, RSDA_LIST_DATA = 100 };
+	enum fType{ NO_TYPE = -1, TSDA = 0, RSDA = 1, RAXIAL = 2, GENERAL_FORCE = 98, TSDA_LIST_DATA = 99, RSDA_LIST_DATA = 100 };
 	xForce();
 	xForce(std::string _name, fType _type);
 	virtual ~xForce();
@@ -24,6 +24,7 @@ public:
 	fType Type();
 	std::string BaseBodyName();
 	std::string ActionBodyName();
+	xObject* GeneralObject();
 
 	virtual void xCalculateForce(const xVectorD& q, const xVectorD& qd) = 0;
 	//virtual vector3d xCalculateForceForDEM(vector3d& ip, vector3d& jp, vector3d& iv, vector3d& jv) = 0;
@@ -37,6 +38,7 @@ protected:
 	int i, j;
 	xPointMass *i_ptr;
 	xPointMass *j_ptr;
+	xObject *g_ptr;
 	vector3d spi, spj;
 };
 

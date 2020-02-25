@@ -62,3 +62,8 @@ std::string xForce::ActionBodyName()
 {
 	return action.toStdString();
 }
+
+xObject * xForce::GeneralObject()
+{
+	return g_ptr;
+}

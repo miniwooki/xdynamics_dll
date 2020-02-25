@@ -43,6 +43,7 @@ public:
 	xMaterialType Material() const;
 
 	std::string Name() const;
+	char* xCharName();
 	std::string ConnectedGeometryName() const;
 	int ObjectID() const;
 	bool isDynamicsBody() const;

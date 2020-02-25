@@ -53,7 +53,7 @@ void xPoint2Spring::SetSpringDamperData(
 }
 
 void xPoint2Spring::ConnectFirstPoint(
-	double mass, vector3d* p, vector3d* v,
+	double mass, vector4d* p, vector3d* v,
 	euler_parameters* ep, euler_parameters* ev,
 	vector3d* force, vector3d* moment)
 {
@@ -67,7 +67,7 @@ void xPoint2Spring::ConnectFirstPoint(
 }
 
 void xPoint2Spring::ConnectSecondPoint(
-	double mass, vector3d* p, vector3d* v,
+	double mass, vector4d* p, vector3d* v,
 	euler_parameters* ep, euler_parameters* ev,
 	vector3d* force, vector3d* moment)
 {
@@ -84,8 +84,10 @@ void xPoint2Spring::CalculateSpringForce()
 {
 	vector3d fi, fj;
 	vector3d mi, mj;
+	vector3d pi = new_vector3d(p0->x, p0->y, p0->z);
+	vector3d pj = new_vector3d(p1->x, p1->y, p1->z);
 	xSpringDamperForce::xCalculateForce(
-		spi, spj, k, c, init_l, *p0, *p1,
+		spi, spj, k, c, init_l, pi, pj,
 		*v0, *v1, *ep0, *ep1, *ev0, *ev1,
 		fi, fj, mi, mj);
 	f0->x = fi.x; f0->y = fi.y; f0->z = fi.z;

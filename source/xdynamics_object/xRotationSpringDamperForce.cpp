@@ -79,6 +79,27 @@ void xRotationSpringDamperForce::SetupDataFromStructure(xPointMass* ip, xPointMa
 	xForce::spj = j_ptr->toLocal(loc - j_ptr->Position());
 }
 
+void xRotationSpringDamperForce::SetupDataFromBodyAndPoint2Spring(xPointMass * ip, xPoint2Spring * ps, xRSDAData & d)
+{
+	xForce::i_ptr = ip;
+	xForce::j_ptr = nullptr;
+	xForce::g_ptr = ps;
+	loc = new_vector3d(d.lx, d.ly, d.lz);
+	f_i = new_vector3d(d.fix, d.fiy, d.fiz);
+	g_i = new_vector3d(d.gix, d.giy, d.giz);
+	f_j = new_vector3d(d.fjx, d.fjy, d.fjz);
+	g_j = new_vector3d(d.gjx, d.gjy, d.gjz);
+	init_theta = acos(dot(f_i, f_j));
+	h_i = cross(f_i, g_i);// new_vector3d(d.uix, d.uiy, d.uiz);
+	h_j = cross(f_j, g_j);// new_vector3d(d.ujx, d.ujy, d.ujz);
+	k = d.k;
+	c = d.c;
+	init_theta = d.init_r;
+	vector3d p2s_first_position = new_vector3d(ps->p0->x, ps->p0->y, ps->p0->z);
+	xForce::spi = i_ptr->toLocal(loc - i_ptr->Position());
+	xForce::spj = j_ptr->toLocal(loc - p2s_first_position);
+}
+
 void xRotationSpringDamperForce::SetupDataFromListData(xRSDAData&d, std::string data)
 {
 	xForce::i_ptr = NULL;
@@ -350,6 +371,47 @@ void xRotationSpringDamperForce::xCalculateForce(const xVectorD& q, const xVecto
 		j_ptr->addAxialForce(0, 0, 0);
 		j_ptr->addEulerParameterMoment(QRj.x, QRj.y, QRj.z, QRj.w);
 	}
+}
+
+void xRotationSpringDamperForce::xCalculateForceBodyAndP2S(vector3d & mi, vector3d & mj)
+{
+	vector4d QRi;
+	vector4d QRj;
+	xPoint2Spring* ps = dynamic_cast<xPoint2Spring*>(g_ptr);
+	unsigned int si = i * xModel::OneDOF();
+	unsigned int sj = j * xModel::OneDOF();
+	euler_parameters ei = i_ptr->EulerParameters();// new_euler_parameters(q(si + 3), q(si + 4), q(si + 5), q(si + 6));
+	euler_parameters ej = *ps->ep0;// new_euler_parameters(q(sj + 3), q(sj + 4), q(sj + 5), q(sj + 6));
+	euler_parameters edi = i_ptr->DEulerParameters();
+	euler_parameters edj = *ps->ev0;
+	//euler_parameters edi = new_euler_parameters(qd(si + 3), qd(si + 4), qd(si + 5), qd(si + 6));
+	//euler_parameters edj = new_euler_parameters(qd(sj + 3), qd(sj + 4), qd(sj + 5), qd(sj + 6));
+	matrix34d Gi = GMatrix(ei);
+	matrix34d Gj = GMatrix(ej);
+	matrix33d Ai = GlobalTransformationMatrix(ei);
+	matrix33d Aj = GlobalTransformationMatrix(ej);
+	vector3d gi = Ai * g_i;
+	vector3d fi = Ai * f_i;
+	vector3d fj = Aj * f_j;
+	int _udrl = udrl;
+	bool isSin;
+	theta = xUtilityFunctions::RelativeAngle(udrl, theta, n_rev, gi, fi, fj, isSin);
+	double _theta = theta + 2 * n_rev * M_PI;
+	double dsin = sin(_theta);
+	double dcos = cos(_theta);
+	if (isSin)
+		dtheta = dot(fj, BMatrix(ei, g_i) * edi) + dot(gi, BMatrix(ej, f_j) * edj) / dcos;
+	else
+		dtheta = dot(fj, BMatrix(ei, f_i) * edi) + dot(fi, BMatrix(ej, f_j) * edj) / dsin;
+	n = k * _theta + c * dtheta;
+	QRi = 2.0 * n * (Gi * h_i);
+	QRj = -2.0 * n * (Gj * h_j);
+	//i_ptr->addAxialForce(0, 0, 0);
+	//i_ptr->addEulerParameterMoment(QRi.x, QRi.y, QRi.z, QRi.w);
+	mi = 0.5 * LMatrix(ei) * QRi;
+	mj = 0.5 * LMatrix(ej) * QRj;
+
+	//mj->addEulerParameterMoment(QRj.x, QRj.y, QRj.z, QRj.w);
 }
 
 void xRotationSpringDamperForce::xCalculateForceForDEM(

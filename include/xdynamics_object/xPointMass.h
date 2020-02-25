@@ -39,6 +39,7 @@ public:
 	~xPointMass();
 
 	// Declaration set functions
+	//void setDummy(bool b);
 	void setXpmIndex(int idx);
 	void setMass(double _mass);
 	void setPosition(double x, double y, double z);
@@ -59,6 +60,7 @@ public:
 	void setHydroMoment(double x, double y, double z);
 	void setEulerParameterMoment(double m0, double m1, double m2, double m3);
 	void setStopCondition(xSimulationStopType sst, xComparisonType ct, double value);
+	//
 
 	void addContactForce(double x, double y, double z);
 	void addContactMoment(double x, double y, double z);
@@ -69,6 +71,7 @@ public:
 	void addEulerParameterMoment(double m0, double m1, double m2, double m3);
 
 	// Declaration get functions
+	//bool IsDummy() const;
 	int xpmIndex() const;
 	double Mass() const;
 	matrix33d Inertia() const;
@@ -152,9 +155,11 @@ protected:
 	//QVector<pointmass_result> pmrs;
 
 	xSimulationStopCondition stop_condition;
+	//xPointMass* dependency_mass;
 
 private:
 	double* initial_data;
+	//bool isdummy;
 	//bool checkForceStopCondition(xComparisonType ct, double v);
 };
 

@@ -2,6 +2,7 @@
 #define XROTATIONSPRINGDAMPERFORCE_H
 
 #include "xdynamics_object/xForce.h"
+#include "xdynamics_object/xPoint2Spring.h"
 
 class xRotationSpringDamperForce : public xForce
 {
@@ -12,6 +13,7 @@ public:
 
 	void SetupDataFromStructure(xPointMass* ip, xPointMass* jp, xRSDAData& d);
 	void SetupDataFromListData(xRSDAData&d, std::string data);
+	void SetupDataFromBodyAndPoint2Spring(xPointMass* ip, xPoint2Spring* ps, xRSDAData& d);
 	void ConvertGlobalToLocalOfBodyConnectionPosition(unsigned int i, xPointMass* pm);
 
 	size_t NumSpringDamperConnection();
@@ -28,9 +30,10 @@ public:
 	double* FreeAngle();
 	void initializeAttachedPointForDEM(double* p, double* ep);
 
-	virtual void xCalculateForce(const xVectorD& q, const xVectorD& qd);
+	void xCalculateForceBodyAndP2S(vector3d& mi, vector3d& mj);
 	void xCalculateForceForDEM(double* pos, double* vel, double* ep, double* ev, double* ms, double* force, double* moment);
 	void xCalculateForceFromDEM(unsigned int ci, xPointMass* pm, const double* pos, const double* vel);
+	virtual void xCalculateForce(const xVectorD& q, const xVectorD& qd);
 	virtual void xDerivate(xMatrixD& lhs, const xVectorD& q, const xVectorD& qd, double mul);
 	virtual void xDerivateVelocity(xMatrixD& lhs, const xVectorD& q, const xVectorD& qd, double mul);
 

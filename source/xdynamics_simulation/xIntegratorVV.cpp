@@ -54,8 +54,11 @@ int xIntegratorVV::OneStepSimulation(double ct, unsigned int cstep)
 	}	
 	if (xdem->XSpringDamperForce())
 		TranslationSpringDamperForce();
-	if (xdem->XRotationalSpringDamperForce())
-		RotationSpringDamperForce();
+	if (xom->GeneralSpringDamper()) {
+		xom->GeneralSpringDamper()->calculateForce();
+	}
+	/*if (xdem->XRotationalSpringDamperForce())
+		RotationSpringDamperForce();*/
 	this->updateVelocity(dvel, dacc, dep, davel, daacc, dforce, dmoment, dmass, diner, m_np);
 	return 0;
 }

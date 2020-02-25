@@ -110,7 +110,6 @@ int xDiscreteElementMethodSimulation::Initialize(
 	if (xSimulation::Gpu())
 	{
 		checkXerror(cudaMemcpy(dpos, pos, sizeof(double) * np * 4, cudaMemcpyHostToDevice));
-
 		checkXerror(cudaMemcpy(dep, ep, sizeof(double) * ns * 4, cudaMemcpyHostToDevice));
 		checkXerror(cudaMemcpy(dvel, vel, sizeof(double) * ns * 3, cudaMemcpyHostToDevice));
 		checkXerror(cudaMemcpy(dacc, acc, sizeof(double) * ns * 3, cudaMemcpyHostToDevice));

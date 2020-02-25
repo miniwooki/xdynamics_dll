@@ -1,0 +1,5 @@
+mass_particle_translational_spring 1
+ts0 wheel p0 0.001 0 0 5000 1
+
+rotational_spring 1
+rs0 wheel dummy 0.001 0 0 1 0 0 0 1 0 1 0 0 0 1 0 100 1

@@ -1,7 +1,3 @@
-// xdynamics_object.cpp : DLL 응용 프로그램을 위해 내보낸 함수를 정의합니다.
-//
-
-//#include "stdafx.h"
 #include "xdynamics_object/xPointMass.h"
 #include "xdynamics_manager/xModel.h"
 #include <sstream>
@@ -10,10 +6,10 @@
 xPointMass::xPointMass(xShapeType _s)
 	: xObject(_s)
 	, nr_part(0)
-	//, pmrs(NULL)
+	, isdummy(false)
 	, initial_data(NULL)
+	, dependency_mass(nullptr)
 {
-	//memset(&id, 0, sizeof(*this));
 	memset(&nr_part, 0, 564);
 	ep.e0 = 1.0;
 	setupTransformationMatrix();
@@ -23,15 +19,12 @@ xPointMass::xPointMass(xShapeType _s)
 xPointMass::xPointMass(std::string _name, xShapeType _s)
 	: xObject(_name, _s)
 	, nr_part(0)
-	//, pmrs(NULL)
+	, isdummy(false)
 	, initial_data(NULL)
 	, mass(0)
+	, dependency_mass(nullptr)
 {
-	//name = _name;
-	//unsigned int sc = sizeof(name);
-	//unsigned int s = sizeof(*this);
 	memset(&nr_part, 0, 564);
-	//wsprintfW(name, TEXT("%s"), _name);
 	ep.e0 = 1.0;
 	setupTransformationMatrix();
 	stop_condition = { 0, };
@@ -39,8 +32,8 @@ xPointMass::xPointMass(std::string _name, xShapeType _s)
 
 xPointMass::xPointMass(const xPointMass& xpm)
 	: xObject(*this)
-	//, pmrs(NULL)
 	, initial_data(NULL)
+	, isdummy(xpm.IsDummy())
 	, mass(xpm.Mass())
 	, syme_inertia(xpm.SymetricInertia())
 	, diag_inertia(xpm.DiaginalInertia())
@@ -62,13 +55,16 @@ xPointMass::xPointMass(const xPointMass& xpm)
 	, A(xpm.TransformationMatrix())
 {
 	id = xpm.xpmIndex();
-	//wsprintfW(name, TEXT("%s"), xpm.Name());
 }
 
 xPointMass::~xPointMass()
 {
-	//if (pmrs) delete[] pmrs; pmrs = NULL;
 	if (initial_data) delete[] initial_data; initial_data = NULL;
+}
+
+void xPointMass::setDummy(bool b)
+{
+	isdummy = b;
 }
 
 void xPointMass::setXpmIndex(int idx)
@@ -155,6 +151,11 @@ void xPointMass::setStopCondition(xSimulationStopType sst, xComparisonType ct, d
 	stop_condition = { true, sst, ct, value };
 }
 
+void xPointMass::setDependencyBody(xPointMass * body)
+{
+	dependency_mass = body;
+}
+
 void xPointMass::addContactForce(double x, double y, double z)
 {
 	cf += new_vector3d(x, y, z);
@@ -188,6 +189,11 @@ void xPointMass::addAxialMoment(double x, double y, double z)
 void xPointMass::addEulerParameterMoment(double m0, double m1, double m2, double m3)
 {
 	em += new_vector4d(m0, m1, m2, m3);
+}
+
+bool xPointMass::IsDummy() const
+{
+	return isdummy;
 }
 
 int xPointMass::xpmIndex() const

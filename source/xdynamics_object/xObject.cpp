@@ -80,6 +80,11 @@ std::string xObject::Name() const
 	return name.toStdString();
 }
 
+char* xObject::xCharName()
+{
+	return name.text();
+}
+
 std::string xObject::ConnectedGeometryName() const
 {
 	return connected_geometry_name.toStdString();

@@ -5,4 +5,4 @@ attach_point 1
 wheel 0 0.001 0 0
 
 rotational_spring 1
-wheel 0 0.001 0 0 100 1
+rs0 wheel ps0 0.001 0 0 1 0 0 0 1 0 1 0 0 0 1 0 100 1
