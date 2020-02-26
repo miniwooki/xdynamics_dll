@@ -173,7 +173,6 @@
   <ItemGroup>
     <ClCompile Include="..\..\extern\ExcelFormat\BasicExcel.cpp" />
     <ClCompile Include="..\..\extern\ExcelFormat\ExcelFormat.cpp" />
-    <ClCompile Include="..\..\include\xdynamics_object\xParticle.cpp" />
     <ClCompile Include="..\..\source\xColorControl.cpp" />
     <ClCompile Include="..\..\source\xDynamicsError.cpp" />
     <ClCompile Include="..\..\source\xdynamics_algebra\xAlgebraMath.cpp" />

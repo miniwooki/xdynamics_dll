@@ -30,7 +30,7 @@ public:
 	double* FreeAngle();
 	void initializeAttachedPointForDEM(double* p, double* ep);
 
-	void xCalculateForceBodyAndP2S(vector3d& mi, vector3d& mj);
+	void xCalculateForceBodyAndPoint(vector3d& mi, vector3d& mj);
 	void xCalculateForceForDEM(double* pos, double* vel, double* ep, double* ev, double* ms, double* force, double* moment);
 	void xCalculateForceFromDEM(unsigned int ci, xPointMass* pm, const double* pos, const double* vel);
 	virtual void xCalculateForce(const xVectorD& q, const xVectorD& qd);

@@ -24,7 +24,7 @@ xGeneralSpringDamper::xGeneralSpringDamper(std::string _name)
 xGeneralSpringDamper::~xGeneralSpringDamper()
 {
 	if (aps) delete[] aps; aps = nullptr;
-	rsda.delete_all;
+	rsda.delete_all();
 }
 
 void xGeneralSpringDamper::allocAttachPoint(unsigned int n)
@@ -66,50 +66,55 @@ void xGeneralSpringDamper::calculateForce()
 		vector3d mi = new_vector3d(0, 0, 0);
 		vector3d mj = new_vector3d(0, 0, 0);
 		//vector3d rj = new_vector3d(ps->p0->x, ps->p0->y, ps->p0->z);
-		rs->xCalculateForceBodyAndP2S(mi, mj);
+		rs->xCalculateForceBodyAndPoint(mi, mj);
 		xPoint2Spring* ps = dynamic_cast<xPoint2Spring*>(rs->GeneralObject());
 		ps->m0->x += mj.x;
 		ps->m0->y += mj.y;
 		ps->m0->z += mj.z;
 	}
-}
+	xmap<xstring, xSpringDamperForce*>::iterator tit = tsda.begin();
+	while (tit.has_next()) {
+		xSpringDamperForce* ts = tit.value();
 
-xPoint2Spring * xGeneralSpringDamper::Point2Spring(std::string n)
-{
-	return p2s.find(n).value();
-}
-
-void xGeneralSpringDamper::setPointData(
-	double * mass, double * pos,
-	double * ep, double * vel, double * avel,
-	double * force, double * moment)
-{
-	xmap<xstring, xPoint2Spring*>::iterator it = p2s.begin();
-	vector4d* p = (vector4d*)pos;
-	vector3d* v = (vector3d*)vel;
-	euler_parameters* e = (euler_parameters*)ep;
-	euler_parameters* ed = (euler_parameters*)avel;
-	vector3d* f = (vector3d*)force;
-	vector3d* m = (vector3d*)moment;
-	for (it; it != p2s.end(); it.next()) {
-		xPoint2Spring* ps = it.value();
-		unsigned int id0 = ps->FirstIndex();
-		unsigned int id1 = ps->SecondIndex();
-		double mass0 = mass[id0];
-		double mass1 = mass[id1];
-		vector4d* p0 = p + id0;
-		vector4d* p1 = p + id1;
-		vector3d* v0 = v + id0;
-		vector3d* v1 = v + id1;
-		euler_parameters *e0 = e + id0;
-		euler_parameters *e1 = e + id1;
-		euler_parameters *ed0 = ed + id0;
-		euler_parameters *ed1 = ed + id1;
-		vector3d* f0 = f + id0;
-		vector3d* f1 = f + id1;
-		vector3d* m0 = m + id0;
-		vector3d* m1 = m + id1;
-		ps->ConnectFirstPoint(mass0, p0, v0, e0, ed0, f0, m0);
-		ps->ConnectSecondPoint(mass1, p1, v1, e1, ed1, f1, m1);
 	}
 }
+
+//xPoint2Spring * xGeneralSpringDamper::Point2Spring(std::string n)
+//{
+//	return p2s.find(n).value();
+//}
+
+//void xGeneralSpringDamper::setPointData(
+//	double * mass, double * pos,
+//	double * ep, double * vel, double * avel,
+//	double * force, double * moment)
+//{
+//	xmap<xstring, xPoint2Spring*>::iterator it = p2s.begin();
+//	vector4d* p = (vector4d*)pos;
+//	vector3d* v = (vector3d*)vel;
+//	euler_parameters* e = (euler_parameters*)ep;
+//	euler_parameters* ed = (euler_parameters*)avel;
+//	vector3d* f = (vector3d*)force;
+//	vector3d* m = (vector3d*)moment;
+//	for (it; it != p2s.end(); it.next()) {
+//		xPoint2Spring* ps = it.value();
+//		unsigned int id0 = ps->FirstIndex();
+//		unsigned int id1 = ps->SecondIndex();
+//		double mass0 = mass[id0];
+//		double mass1 = mass[id1];
+//		vector4d* p0 = p + id0;
+//		vector4d* p1 = p + id1;
+//		vector3d* v0 = v + id0;
+//		vector3d* v1 = v + id1;
+//		euler_parameters *e0 = e + id0;
+//		euler_parameters *e1 = e + id1;
+//		euler_parameters *ed0 = ed + id0;
+//		euler_parameters *ed1 = ed + id1;
+//		vector3d* f0 = f + id0;
+//		vector3d* f1 = f + id1;
+//		vector3d* m0 = m + id0;
+//		vector3d* m1 = m + id1;
+//		ps->ConnectFirstPoint(mass0, p0, v0, e0, ed0, f0, m0);
+//		ps->ConnectSecondPoint(mass1, p1, v1, e1, ed1, f1, m1);
+//	}
+//}

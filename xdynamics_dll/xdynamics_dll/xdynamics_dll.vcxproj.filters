@@ -294,9 +294,6 @@
     <ClCompile Include="..\..\source\xdynamics_object\xPoint2Spring.cpp">
       <Filter>소스 파일\xdynamics_object</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\include\xdynamics_object\xParticle.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\xdynamics_object\xParticle.cpp">
       <Filter>소스 파일\xdynamics_object</Filter>
     </ClCompile>

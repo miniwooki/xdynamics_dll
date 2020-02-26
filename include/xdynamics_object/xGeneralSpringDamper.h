@@ -20,8 +20,8 @@ public:
 	void appendAttachPoint(unsigned int id, xAttachPoint& _xap);
 	void appendRotationalSpring(xRotationSpringDamperForce* _xrd);
 	void calculateForce();
-	xPoint2Spring* Point2Spring(std::string n);
-	void setPointData(double* mass, double* pos, double* ep, double* vel, double* avel, double *force, double* moment);
+//	xPoint2Spring* Point2Spring(std::string n);
+	//void setPointData(double* mass, double* pos, double* ep, double* vel, double* avel, double *force, double* moment);
 
 private:
 	xstring name;

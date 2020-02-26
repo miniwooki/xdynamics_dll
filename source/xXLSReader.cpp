@@ -7,6 +7,7 @@
 #include "xdynamics_manager/xContactManager.h"
 #include "xdynamics_simulation/xSimulation.h"
 #include "ExcelFormat.h"
+#include "xdynamics_object/xDummyMass.h"
 
 #include <sstream>
 
@@ -404,13 +405,15 @@ void xXLSReader::ReadMass(xMultiBodyModel* xmbd, vector2i rc)
 						obj = xmbd->XMass(ReadStr(rc.x, rc.y++));
 					}*/
 				}
-				xPointMass* xpm = NULL;			
-				xpm = xmbd->CreatePointMass(name);
-				xpm->SetDataFromStructure(xmbd->NumMass(), xpmd);
+				//xPointMass* xpm = NULL;			
+				//xpm = xmbd->CreatePointMass(name);
+				//xpm->SetDataFromStructure(xmbd->NumMass(), xpmd);
 				if (!xpmd.mass) {
-					xpm->setDummy(true);
+					xDummyMass* xdummy = xmbd->CreateDummyMass(name);
+					xdummy->SetDataFromStructure(xmbd->NumMass(), xpmd);
+					//xpm->setDummy(true);
 					if (!IsEmptyCell(rc.x, rc.y));
-						xpm->setDependencyBody(xmbd->XMass(ReadStr(rc.x, rc.y++)));
+						xdummy->setDependencyBody(xmbd->XMass(ReadStr(rc.x, rc.y++)));
 				}
 					
  				if (obj)

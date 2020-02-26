@@ -128,6 +128,26 @@ xPointMass* xMultiBodyModel::CreatePointMass(std::string _name)
 	return xpm;
 }
 
+xDummyMass * xMultiBodyModel::CreateDummyMass(std::string _name)
+{
+	xstring name = _name;
+	xDummyMass* xpm = NULL;
+	if (xObjectManager::XOM()->XObject(_name))
+	{
+		xpm = (dynamic_cast<xDummyMass*>(xObjectManager::XOM()->XObject(_name)));
+		masses.insert(name, xpm);// = xpm;
+// 		if (xpm->Shape() == MESH_SHAPE)
+// 			dynamic_cast<xMeshObject*>(xObjectManager::XOM()->XObject(_name))->translation()
+		return xpm;
+	}
+	xpm = new xDummyMass(_name);
+	masses.insert(name, xpm);
+	xObjectManager::XOM()->addObject(xpm);
+	xLog::log("Create dummy mass : " + _name);
+	//std::cout << "Create point mass - " << _name.c_str() << ", Num. mass - " << masses.size() << std::endl;
+	return xpm;
+}
+
 void xMultiBodyModel::CreatePointMassesFromFile(std::string _name)
 {
 	std::fstream sfs;

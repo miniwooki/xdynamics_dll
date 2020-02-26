@@ -373,7 +373,7 @@ void xRotationSpringDamperForce::xCalculateForce(const xVectorD& q, const xVecto
 	}
 }
 
-void xRotationSpringDamperForce::xCalculateForceBodyAndP2S(vector3d & mi, vector3d & mj)
+void xRotationSpringDamperForce::xCalculateForceBodyAndPoint(vector3d & mi, vector3d & mj)
 {
 	vector4d QRi;
 	vector4d QRj;
