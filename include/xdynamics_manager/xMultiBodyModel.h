@@ -35,7 +35,7 @@ public:
 	xKinematicConstraint* XJoint(std::string& ws);
 	xForce* XForce(std::string& ws);
 	xDrivingConstraint* xDriving(std::string& ws);
-
+	void AppendPointMass(xPointMass* xpm);
 	xPointMass* CreatePointMass(std::string _name);
 	xDummyMass* CreateDummyMass(std::string _name);
 	void CreatePointMassesFromFile(std::string _name);

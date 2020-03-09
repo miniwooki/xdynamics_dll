@@ -528,14 +528,14 @@ void xResultManager::set_num_constraints_equations(unsigned int nc)
 
 void xResultManager::set_distribution_result(std::list<unsigned int> dl)
 {
-	if (dist_id.size())
+	/*if (dist_id.size())
 	{
 		dist_id.remove_all();
 	}
 	for (std::list<unsigned int>::iterator it = dl.begin(); it != dl.end(); it++)
 	{
 		dist_id.push_back(*it);
-	}
+	}*/
 }
 
 void xResultManager::set_terminated_num_parts(unsigned int _npt)

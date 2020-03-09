@@ -70,7 +70,7 @@ map<std::string, xClusterObject*> xObjectManager::XClusterObjects()
 	return ret;
 }
 
-xGeneralSpringDamper * xObjectManager::GeneralSpringDamper()
+xMassSpringTireModel * xObjectManager::GeneralSpringDamper()
 {
 	return general_sd;
 }
@@ -183,13 +183,13 @@ xCylinderObject* xObjectManager::CreateCylinderShapeObject(std::string _name, in
 	return xco;
 }
 
-xGeneralSpringDamper * xObjectManager::CreateGeneralSpringDamper(std::string _name, std::string filepath)
+xMassSpringTireModel * xObjectManager::CreateGeneralSpringDamper(std::string _name, std::string filepath)
 {
 	std::fstream fs;
 	fs.open(filepath, ios_base::in);
 	if (fs.is_open()) {
 		std::string ch;
-		general_sd = new xGeneralSpringDamper(_name);
+		general_sd = new xMassSpringTireModel(_name);
 		while (!fs.eof()) {
 			fs >> ch;
 			if (ch == "mass_particle_translational_sping")

@@ -1,0 +1,1 @@
+*createbutton(5, "Lighting", 10, 5, 5, YELLOW, "Launch the lighting.tcl script", "EvalTcl", "lighting.tcl")

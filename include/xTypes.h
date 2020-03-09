@@ -155,6 +155,7 @@ enum xShapeType
 	CYLINDER_SHAPE = 27,
 	CLUSTER_SHAPE = 28,
 	DUMMY_SHAPE = 29,
+	MASS_SPRING_MODEL = 30,
 	NO_SHAPE_AND_MASS = 98,
 	NO_SHAPE_AND_LIST = 99,
 	FROM_SHAPE = 999,
@@ -380,6 +381,12 @@ typedef struct
 	xComparisonType comparison;
 	double value;
 }xSimulationStopCondition;
+
+typedef struct
+{
+	int neach;
+	double* pos;
+}xClusterEachPos;
 
 //
 //typedef struct

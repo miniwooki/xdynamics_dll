@@ -19,6 +19,7 @@
 #include <QTabWidget>
 #include <QDialogButtonBox>
 #include <QDebug>
+#include "..\..\include\xdynamics_gui\xvParticle.h"
 //#include "vcube.h"
 
 xvParticle::xvParticle()
@@ -511,6 +512,17 @@ float xvParticle::getMaxValue(xColorControl::ColorMapType cmt)
 	case xColorControl::COLORMAP_VELOCITY_MAG: v = max_velocity_mag; break;
 	}*/
 	return v;
+}
+
+void xvParticle::updatePosition(std::vector<vector4d>& new_pos)
+{
+	for (unsigned int i = 0; i < new_pos.size(); i++) {
+		vector4d p = new_pos[i];
+		pos[i * 4 + 0] = p.x;
+		pos[i * 4 + 1] = p.y;
+		pos[i * 4 + 2] = p.z;
+		pos[i * 4 + 3] = p.w;
+	}
 }
 
 bool xvParticle::_define()

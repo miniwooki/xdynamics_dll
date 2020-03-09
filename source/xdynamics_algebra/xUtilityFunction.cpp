@@ -1,28 +1,10 @@
-//#include "stdafx.h"
 #include "xdynamics_algebra/xUtilityFunctions.h"
 #include "xdynamics_algebra/xAlgebraMath.h"
-/*#include "boost/filesystem.hpp"*/
 #include <ctime>
 #include <sstream>
+#include <random>
 #include <filesystem>
-
-//using namespace boost::filesystem;
-
-//std::string xUtilityFunctions::xstring(int v)
-//{
-//	stringstream(s)
-//	return QString("%1").arg(v).toStdString();
-//}
-//
-//std::string xUtilityFunctions::xstring(unsigned int v)
-//{
-//	return QString("%1").arg(v).toStdString();
-//}
-//
-//std::string xUtilityFunctions::xstring(double v)
-//{
-//	return QString("%1").arg(v).toStdString();
-//}
+//#include <set>
 
 void xUtilityFunctions::CreateDirectory(const char* _path)
 {
@@ -574,30 +556,18 @@ double xUtilityFunctions::RelativeAngle(int udrl, double theta, int& n_rev, vect
 	return stheta;// xUtilityFunctions::AngleCorrection(prad, stheta);
 }
 
-//double xUtilityFunctions::DerivativeRelativeAngle(
-//	int udrl, double theta, unsigned int& n_rev, 
-//	vector3d& gi, vector3d& fi, vector3d& fj, 
-//	vector3d& dgi, vector3d& dfi, vector3d& dfj)
-//{
-//	double df = dot(fj, dfi) + dot(fi, dfj);
-//	double dg = dot(fj, dgi) + dot(gi, dfj);// dot(gi, fj);
-//	double a = -asin(df);
-//	double b = acos(dg);
-//	double a_deg = a * 180 / M_PI;
-//	double b_deg = b * 180 / M_PI;
-//	double stheta = 0.0;
-//	double p_theta = theta;
-//	if ((df <= 0.2 && df > -0.8) && dg > 0) { udrl = UP_RIGHT;  stheta = acos(df); }
-//	else if ((df < -0.8 && df >= -1.1 && dg > 0) || (df > -1.1 && df <= -0.2 && dg < 0)) { udrl = UP_LEFT; stheta = M_PI - asin(dg); }
-//	else if ((df > -0.2 && df <= 0.8) && dg < 0) { udrl = DOWN_LEFT; stheta = 2.0 * M_PI - acos(df); }
-//	else if ((df > 0.8 && df < 1.1 && dg < 0) || (df <= 1.1 && df > 0.2 && dg > 0)) { udrl = DOWN_RIGHT; stheta = 2.0 * M_PI + asin(dg); }
-//	if (p_theta >= 2.0 * M_PI && stheta < 2.0 * M_PI)
-//		n_rev--;
-//	if (p_theta > M_PI && p_theta < 2.0 * M_PI && stheta >= 2.0 * M_PI)
-//		n_rev++;
-//
-//	if (stheta >= 2.0 * M_PI)
-//		stheta -= 2.0 * M_PI;
-//	//std::cout << "stheta : " << stheta << std::endl;
-//	return stheta;// xUtilityFunctions::AngleCorrection(prad, stheta);
-//}
+std::vector<__int64> xUtilityFunctions::RandomDistribution(__int64 s, __int64 e, bool useSeed)
+{
+	auto current = std::chrono::system_clock::now();
+	auto duration = current.time_since_epoch();
+	auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+	std::mt19937_64 genMT(millis);
+	std::uniform_int_distribution<__int64> uniformDist(s, e);
+	__int64 sz = e - s;
+	std::vector<__int64> out;
+	while (sz > out.size()) {
+		out.push_back(uniformDist(genMT));
+	}
+
+	return out;
+}

@@ -54,36 +54,6 @@ public:
 		if (!sz) head->left = tail;
 		sz++;
 	}
-	//void push_back(Key k, T v)
-	//{
-	//	xMapNode *n = new xMapNode(k, v);
-	//	if (!sz)
-	//	{
-	//		head = n;
-	//		head->right = NULL;
-	//		tail = NULL;
-	//		head->left = tail;
-	//		sz++;
-	//	}
-	//	else if (sz == 1)
-	//	{
-	//		n->right = head;
-	//		tail = n;
-	//		tail->left = NULL;
-	//		head->left = tail;
-	//		sz++;
-	//	}
-	//	else
-	//	{
-	//		//xMapNode* tail_rnode = tail.right;
-
-	//		tail->left = n;
-	//		n->right = tail;
-	//		tail = n;
-	//		tail->left = NULL;
-	//		sz++;
-	//	}
-	//}
 
 	T operator[] (Key k)
 	{
@@ -168,16 +138,6 @@ public:
 			if(nl)
 				if (nr)
 					nr->left = nl;
-			
-			
-// 			if (n != head)
-// 				n->right->left = n->left;
-// 			else
-// 				head = n->left;
-// 			if (n != tail)
-// 				n->left->right = n->right;
-// 			else
-// 				tail = n->right;
 			sz--;
 			T o = n->value;
 			delete n;

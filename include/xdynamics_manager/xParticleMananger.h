@@ -38,6 +38,7 @@ public:
 	double CriticalPoisson();
 	double CriticalYoungs();
 	double CriticalRadius();
+	std::vector<vector4d> RandomRepositioningClusters();
 
 	void SetClusterParticlesFromGenModel(std::string n, xMaterialType mt, vector3d loc, std::string path);
 	double* GetPositionResultPointer(unsigned int pt);
@@ -69,19 +70,11 @@ public:
 
 private:
 	void setCriticalMaterial(double d, double y, double p);
-	//void create_sph_particles_with_plane_shape(double dx, double dy, double lx, double ly, double lz, double ps);
-// 	bool is_realtime_creating;
-// 	bool one_by_one;
 	unsigned int n_cluster_object;
 	unsigned int n_cluster_each;
-	//unsigned int n_single_sphere;
-	//unsigned int n_cluster_sphere; // the number of cluster set element
 	unsigned int np;
 	unsigned int ncluster;
 	unsigned int n_mass_particle;
-	//unsigned int num_xpo;
-	//unsigned int per_np;
-	//double per_time;
 	xmap<xstring, xParticleObject*> xpcos;
 	xmap<xstring, xParticleCreateCondition> xpccs;
 
@@ -92,11 +85,6 @@ private:
 	double minimum_poisson_ratio;
 	double minimum_radius;
 	double maximum_radius;
-	//bool *isCluster;
-	//unsigned int *cluster_index;
-	//unsigned int *cluster_count;
-//unsigned int *cluster_begin;
-	//vector3d* rcluster;
 	xMaterialType *r_type;
 	xstring c_filepath;
 };

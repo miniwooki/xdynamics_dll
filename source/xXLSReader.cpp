@@ -391,30 +391,45 @@ void xXLSReader::ReadMass(xMultiBodyModel* xmbd, vector2i rc)
 			{
 				xObject *obj = xObjectManager::XOM()->XObject(name);
 				xPointMassData xpmd = ReadPointMassData(name, rc.x, rc.y);
-				if (!IsEmptyCell(rc.x, rc.y))
+				//if (!IsEmptyCell(rc.x, rc.y))
+				//{
+				//	if (obj)
+				//	{
+				//		xPointMass* _xpm = dynamic_cast<xPointMass*>(obj);
+				//		_xpm->setPosition(xpmd.px, xpmd.py, xpmd.pz);
+				//		rc.x++;
+				//		continue;						
+				//	}
+				//	/*else
+				//	{
+				//		obj = xmbd->XMass(ReadStr(rc.x, rc.y++));
+				//	}*/
+				//}
+				xPointMass* xpm = NULL;
+				if (obj)
 				{
-					if (obj)
-					{
-						xPointMass* _xpm = dynamic_cast<xPointMass*>(obj);
-						_xpm->setPosition(xpmd.px, xpmd.py, xpmd.pz);
-						rc.x++;
-						continue;						
-					}
-					/*else
-					{
-						obj = xmbd->XMass(ReadStr(rc.x, rc.y++));
-					}*/
+					xpm = dynamic_cast<xPointMass*>(obj);
+					xpm->SetDataFromStructure(xmbd->NumMass(), xpmd);
+					xmbd->AppendPointMass(xpm);
+					//_xpm->setPosition(xpmd.px, xpmd.py, xpmd.pz);
+					//rc.x++;
+					//continue;
 				}
-				//xPointMass* xpm = NULL;			
+				else
+				{
+					xpm = xmbd->CreatePointMass(name);
+					xpm->SetDataFromStructure(xmbd->NumMass(), xpmd);
+				}
+							
 				//xpm = xmbd->CreatePointMass(name);
 				//xpm->SetDataFromStructure(xmbd->NumMass(), xpmd);
-				if (!xpmd.mass) {
-					xDummyMass* xdummy = xmbd->CreateDummyMass(name);
-					xdummy->SetDataFromStructure(xmbd->NumMass(), xpmd);
-					//xpm->setDummy(true);
-					if (!IsEmptyCell(rc.x, rc.y));
-						xdummy->setDependencyBody(xmbd->XMass(ReadStr(rc.x, rc.y++)));
-				}
+				//if (!xpmd.mass) {
+				//	xDummyMass* xdummy = xmbd->CreateDummyMass(name);
+				//	xdummy->SetDataFromStructure(xmbd->NumMass(), xpmd);
+				//	//xpm->setDummy(true);
+				//	if (!IsEmptyCell(rc.x, rc.y));
+				//		xdummy->setDependencyBody(xmbd->XMass(ReadStr(rc.x, rc.y++)));
+				//}
 					
  				if (obj)
 				{				
@@ -484,7 +499,7 @@ void xXLSReader::ReadForce(xMultiBodyModel* xmbd, xDiscreteElementMethodModel* x
 		xForce::fType type = (xForce::fType)static_cast<int>(ReadNum(rc.x, rc.y++));
 	
 		if (type == xForce::GENERAL_FORCE) {
-			xGeneralSpringDamper* gsd = xobj->CreateGeneralSpringDamper(name, ReadStr(rc.x, rc.y++));
+			xMassSpringTireModel* gsd = xobj->CreateGeneralSpringDamper(name, ReadStr(rc.x, rc.y++));
 			continue;
 		}
 		std::string base = ReadStr(rc.x, rc.y++);

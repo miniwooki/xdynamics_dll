@@ -34,7 +34,9 @@ class xdynamics_gui : public QMainWindow
 
 public:
 	enum { NEW = 0, OPEN, SAVE };
-	enum { CUBE = 3, CYLINDER, CHART, UPLOAD_RESULT, PASSING_DISTRIBUTION, CONVERT_MESH_TO_SPHERE, GENERATE_CLUSTER_DISTRIBUTION, CHECK_COLLISION };
+	enum { CUBE = 3, CYLINDER, CHART, UPLOAD_RESULT, 
+		PASSING_DISTRIBUTION, CONVERT_MESH_TO_SPHERE, GENERATE_CLUSTER_DISTRIBUTION, 
+		CHECK_COLLISION, REPOSITIONING_CLUSTERS };
 	
 	xdynamics_gui(int _argc, char** _argv, QWidget *parent = Q_NULLPTR);
 	~xdynamics_gui();
@@ -79,6 +81,7 @@ private slots:
 	void xGenerateClusterParticles(QString, QString, int*, double*, bool);
 	void xCheckCollision();
 	void xExportClusterParticleModel();
+	void xRepositioningClusters();
 	//void xHighlightParticle(unsigned int, QColor, QColor&);
 	
 private:

@@ -10,39 +10,28 @@ class XDYNAMICS_API xlist
 	struct xListNode
 	{
 		T value;
-		xListNode* left;
-		xListNode* right;
-		xListNode(T v, xListNode* n) : value(v), left(n) {}
+		xListNode* parent;
+		xListNode* child;
+		xListNode(T v, xListNode* n) : value(v), parent(n), child(nullptr) {}
 	};
 	xListNode* head;
 	xListNode* tail;
 	unsigned int sz;
 public:
-	xlist() : head(0), sz(0) {}
+	xlist() : head(0), tail(0), sz(0) {}
 	~xlist()
 	{
-		remove_all();
+		xListNode* n = head;
+		while (n != nullptr) {
+			xListNode *tn = n;
+			n = n->child;
+			delete tn;
+			tn = nullptr;
+			sz--;
+		}
 	}
 
 	unsigned int size() { return sz; }
-
-	void remove_all()
-	{
-		xListNode *n = tail;
-		while (n != head)
-		{
-			xListNode *tn = n;
-			n = n->right;
-			delete tn;
-			tn = NULL;
-		}
-		if (head)
-		{
-			delete head;
-			head = NULL;
-		}
-		sz = 0;
-	}
 
 	void delete_all()
 	{
@@ -55,11 +44,10 @@ public:
 
 	void push_front(T v)
 	{
-		xListNode *n = new xListNode(v, head);
+		xListNode *n = new xListNode(v, nullptr);
 		if (head)
-			head->right = n;
+			head->parent = n;
 		head = n;
-		head->right = NULL;
 		if (!sz) tail = head;
 		sz++;
 	}
@@ -68,16 +56,16 @@ public:
 	{
 		if (!head)
 		{
-			tail = NULL;
-			head = new xListNode(v, tail);			
+			tail = nullptr;
+			head = new xListNode(v, nullptr);
 			tail = head;
 			sz++;
 		}
 		else
 		{
-			xListNode *n = new xListNode(v, NULL);
-			if (tail)
-				n->right = tail;
+			xListNode *n = new xListNode(v, tail);
+			/*if (tail)
+				n->right = tail;*/
 			tail = n;
 			sz++;
 		}
@@ -96,7 +84,7 @@ public:
 		}
 		void next()
 		{
-			current = current->left;
+			current = current->child;
 		}
 		T value()
 		{
@@ -120,6 +108,7 @@ public:
 	}
 	iterator begin() { return iterator(head); }
 	iterator end() { return iterator(0); }
+
 };
 
 #endif

@@ -61,6 +61,7 @@ public:
 	float* VelocityBuffers();
 	float getMinValue(xColorControl::ColorMapType cmt);
 	float getMaxValue(xColorControl::ColorMapType cmt);
+	void updatePosition(std::vector<vector4d>& new_pos);
 
 private:
 	bool _define();

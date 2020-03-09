@@ -104,8 +104,8 @@ int xDiscreteElementMethodSimulation::Initialize(
 		xdem->XSpringDamperForce()->initializeFreeLength(pos, ep);
 	if (xom->GeneralSpringDamper())
 	{
-		xom->GeneralSpringDamper()->setPointData(
-			mass, pos, ep, vel, avel, force, moment);
+		//xom->GeneralSpringDamper()->setPointData(
+			//mass, pos, ep, vel, avel, force, moment);
 	}
 	if (xSimulation::Gpu())
 	{

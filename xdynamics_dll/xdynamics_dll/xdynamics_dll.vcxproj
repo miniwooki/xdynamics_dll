@@ -201,7 +201,8 @@
     <ClCompile Include="..\..\source\xdynamics_object\xDummyMass.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xFixConstraint.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xForce.cpp" />
-    <ClCompile Include="..\..\source\xdynamics_object\xGeneralSpringDamper.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xMassSpringModel.cpp" />
+    <ClCompile Include="..\..\source\xdynamics_object\xMassSpringTireModel.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xKernelFunction.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xKinematicConstraint.cpp" />
     <ClCompile Include="..\..\source\xdynamics_object\xLineObject.cpp" />
@@ -292,7 +293,8 @@
     <ClInclude Include="..\..\include\xdynamics_object\xDummyMass.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xFixConstraint.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xForce.h" />
-    <ClInclude Include="..\..\include\xdynamics_object\xGeneralSpringDamper.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xMassSpringModel.h" />
+    <ClInclude Include="..\..\include\xdynamics_object\xMassSpringTireModel.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xKernelFunction.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xKinematicConstraint.h" />
     <ClInclude Include="..\..\include\xdynamics_object\xLineObject.h" />

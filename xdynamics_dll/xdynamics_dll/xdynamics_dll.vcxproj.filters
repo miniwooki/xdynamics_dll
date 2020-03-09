@@ -288,9 +288,6 @@
     <ClCompile Include="..\..\source\xdynamics_object\xRotationSpringDamperForce.cpp">
       <Filter>소스 파일\xdynamics_object\force</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\xdynamics_object\xGeneralSpringDamper.cpp">
-      <Filter>소스 파일\xdynamics_object\force</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\xdynamics_object\xPoint2Spring.cpp">
       <Filter>소스 파일\xdynamics_object</Filter>
     </ClCompile>
@@ -298,6 +295,12 @@
       <Filter>소스 파일\xdynamics_object</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\xdynamics_object\xDummyMass.cpp">
+      <Filter>소스 파일\xdynamics_object</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xMassSpringTireModel.cpp">
+      <Filter>소스 파일\xdynamics_object\force</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\xdynamics_object\xMassSpringModel.cpp">
       <Filter>소스 파일\xdynamics_object</Filter>
     </ClCompile>
   </ItemGroup>
@@ -527,9 +530,6 @@
     <ClInclude Include="..\..\include\xdynamics_object\xFixConstraint.h">
       <Filter>헤더 파일\xdynamics_object\joint</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\xdynamics_object\xGeneralSpringDamper.h">
-      <Filter>헤더 파일\xdynamics_object\force</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\xdynamics_object\xPoint2Spring.h">
       <Filter>헤더 파일\xdynamics_object</Filter>
     </ClInclude>
@@ -537,6 +537,12 @@
       <Filter>헤더 파일\xdynamics_object</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\xdynamics_object\xDummyMass.h">
+      <Filter>헤더 파일\xdynamics_object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_object\xMassSpringTireModel.h">
+      <Filter>헤더 파일\xdynamics_object\force</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\xdynamics_object\xMassSpringModel.h">
       <Filter>헤더 파일\xdynamics_object</Filter>
     </ClInclude>
   </ItemGroup>

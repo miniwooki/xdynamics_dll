@@ -24,6 +24,7 @@
 #include "xCheckCollisionDialog.h"
 
 #include <algorithm>
+#include "..\..\include\xdynamics_gui\xdynamics_gui.h"
 //#include <QtWidgets/QListWidget>
 
 xdynamics_gui* xgui;
@@ -699,6 +700,11 @@ void xdynamics_gui::setupObjectOperations()
 	connect(a, SIGNAL(triggered()), this, SLOT(xCheckCollision()));
 	myObjectActions.insert(CHECK_COLLISION, a);
 
+	a = new QAction(QIcon(":/Resources/icon/repositioning.png"), tr("&Repositon clusters"), this);
+	a->setStatusTip(tr("Random reposition of clusters"));
+	connect(a, SIGNAL(triggered()), this, SLOT(xRepositioningClusters()));
+	myObjectActions.insert(REPOSITIONING_CLUSTERS, a);
+
 // 	a = new QAction(QIcon(":/Resources/icon/save.png"), tr("&Save"), this);
 // 	a->setStatusTip(tr("Save project"));
 // 	connect(a, SIGNAL(triggered()), this, SLOT(xSave()));
@@ -1208,6 +1214,12 @@ void xdynamics_gui::xExportClusterParticleModel()
 	}
 }
 
+void xdynamics_gui::xRepositioningClusters()
+{
+	xParticleManager* xpm = xdm->XDEMModel()->XParticleManager();
+	std::vector<vector4d> new_pos = xpm->RandomRepositioningClusters();
+	xgl->vParticles()->updatePosition(new_pos);
+}
 //void xdynamics_gui::xHighlightParticle(unsigned int id, QColor color, QColor& pcolor)
 //{
 //	xgl->vParticles()->ChangeColor(id, color, pcolor);

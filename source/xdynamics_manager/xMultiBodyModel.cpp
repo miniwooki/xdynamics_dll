@@ -108,6 +108,12 @@ xDrivingConstraint* xMultiBodyModel::xDriving(std::string& _ws)
 	return it.value();
 }
 
+void xMultiBodyModel::AppendPointMass(xPointMass* xpm)
+{
+	xstring name = xpm->Name();
+	masses.insert(name, xpm);
+}
+
 xPointMass* xMultiBodyModel::CreatePointMass(std::string _name)
 {
 	xstring name = _name;

@@ -6,9 +6,9 @@
 xPointMass::xPointMass(xShapeType _s)
 	: xObject(_s)
 	, nr_part(0)
-	, isdummy(false)
+	//, isdummy(false)
 	, initial_data(NULL)
-	, dependency_mass(nullptr)
+	//, dependency_mass(nullptr)
 {
 	memset(&nr_part, 0, 564);
 	ep.e0 = 1.0;
@@ -19,10 +19,10 @@ xPointMass::xPointMass(xShapeType _s)
 xPointMass::xPointMass(std::string _name, xShapeType _s)
 	: xObject(_name, _s)
 	, nr_part(0)
-	, isdummy(false)
+	//, isdummy(false)
 	, initial_data(NULL)
 	, mass(0)
-	, dependency_mass(nullptr)
+	//, dependency_mass(nullptr)
 {
 	memset(&nr_part, 0, 564);
 	ep.e0 = 1.0;
@@ -33,7 +33,7 @@ xPointMass::xPointMass(std::string _name, xShapeType _s)
 xPointMass::xPointMass(const xPointMass& xpm)
 	: xObject(*this)
 	, initial_data(NULL)
-	, isdummy(xpm.IsDummy())
+	//, isdummy(xpm.IsDummy())
 	, mass(xpm.Mass())
 	, syme_inertia(xpm.SymetricInertia())
 	, diag_inertia(xpm.DiaginalInertia())
@@ -62,10 +62,10 @@ xPointMass::~xPointMass()
 	if (initial_data) delete[] initial_data; initial_data = NULL;
 }
 
-void xPointMass::setDummy(bool b)
-{
-	isdummy = b;
-}
+//void xPointMass::setDummy(bool b)
+//{
+//	isdummy = b;
+//}
 
 void xPointMass::setXpmIndex(int idx)
 {
@@ -151,10 +151,10 @@ void xPointMass::setStopCondition(xSimulationStopType sst, xComparisonType ct, d
 	stop_condition = { true, sst, ct, value };
 }
 
-void xPointMass::setDependencyBody(xPointMass * body)
-{
-	dependency_mass = body;
-}
+//void xPointMass::setDependencyBody(xPointMass * body)
+//{
+//	dependency_mass = body;
+//}
 
 void xPointMass::addContactForce(double x, double y, double z)
 {
@@ -191,10 +191,10 @@ void xPointMass::addEulerParameterMoment(double m0, double m1, double m2, double
 	em += new_vector4d(m0, m1, m2, m3);
 }
 
-bool xPointMass::IsDummy() const
-{
-	return isdummy;
-}
+//bool xPointMass::IsDummy() const
+//{
+//	return isdummy;
+//}
 
 int xPointMass::xpmIndex() const
 {

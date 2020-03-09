@@ -1,9 +1,7 @@
 #include "xdynamics_manager/xParticleMananger.h"
-//#include "xdynamics_object/xParticleObject.h"
 #include "xdynamics_manager/xObjectManager.h"
 #include <algorithm>
 #include <random>
-//#include <QtCore/QRandomGenerator>
 
 xParticleManager::xParticleManager()
 	: np(0)
@@ -72,6 +70,91 @@ double xParticleManager::CriticalYoungs()
 double xParticleManager::CriticalRadius()
 {
 	return minimum_radius;
+}
+
+std::vector<vector4d> xParticleManager::RandomRepositioningClusters()
+{
+	if (!ncluster)
+		return std::vector<vector4d>();
+	std::vector<__int64> new_idx = xUtilityFunctions::RandomDistribution(0, ncluster-1, true);
+	std::vector<vector4d> new_pos(np);// = new vector4d[np];
+	std::vector<vector4d> new_cpos;// (ncluster);
+	//std::vector<xClusterEachPos> epos(ncluster);
+	vector4d sloc = new_vector4d(-1.04, -0.09, -0.125, 0.0);
+	vector4d gab = new_vector4d(0.0, 0.0, 0.0, 0.0);
+	__int64 cnt = 0;
+	double max_y = -FLT_MAX;
+	double max_r = -FLT_MAX;
+	for (xmap<xstring, xParticleObject*>::iterator it = xpcos.begin(); it != xpcos.end(); it.next())
+	{
+		xParticleObject* pobj = it.value();
+		xmap<xstring, xParticleObject::xEachObjectData>::iterator eit;// = pobj->EachObjects().begin();
+
+		for (eit = pobj->EachObjects().begin(); eit != pobj->EachObjects().end(); eit.next()) {
+			xstring name = eit.key();
+			
+			
+			xParticleObject::xEachObjectData ed = eit.value();
+			xClusterObject* cobj = dynamic_cast<xClusterObject*>(xObjectManager::XOM()->XObject(name.toStdString()));
+			unsigned int _ss = ed.sidx / ed.each;
+			unsigned int _ns = ed.num / ed.each;
+			vector4d* rloc = cobj->RelativeLocation();			
+			for (unsigned int i = _ss; i < _ss + _ns; i++) {
+				__int64 idx = new_idx[i];
+				vector4d old_cpos = pobj->ClusterPosition()[i];// &pobj->CluPosition()[idx * ed.each];
+				vector4d ep = pobj->EulerParameters()[idx];
+				vector4d new_cp = sloc + gab;				
+				//vector3d dist = new_vector3d(new_p.x - old_cpos.x, new_p.y - old_cpos.y, new_p.z - old_cpos.z);//
+				new_cpos.push_back(new_cp);
+				double maxr = 0, minr = 0;
+				double maxx = -FLT_MAX, maxy = -FLT_MAX, maxz = -FLT_MAX;
+				double minx = FLT_MAX, miny = FLT_MAX, minz = FLT_MAX;
+				for (unsigned int j = 0; j < ed.each; j++) {
+					vector3d _new_p = new_vector3d(new_cp.x, new_cp.y, new_cp.z) + GlobalTransformationMatrix(new_euler_parameters(ep)) * new_vector3d(rloc[j].x, rloc[j].y, rloc[j].z);
+					vector4d new_p = new_vector4d(_new_p.x, _new_p.y, _new_p.z, rloc[j].w);
+					new_pos.at(cnt++) = new_p;
+					if (maxr < rloc[j].w) maxr = rloc[j].w;
+					if (minr > rloc[j].w) minr = rloc[j].w;
+					if (maxx < new_p.x) maxx = new_p.x + new_p.w;
+					if (maxy < new_p.y) maxy = new_p.y + new_p.w;
+					if (maxz < new_p.z) maxz = new_p.z + new_p.w;
+					if (minx > new_p.x) minx = new_p.x + new_p.w;
+					if (miny > new_p.y) miny = new_p.y + new_p.w;
+					if (minz > new_p.z) minz = new_p.z + new_p.w;
+				}
+				double dist = length(new_vector3d(maxx, maxy, maxz) - new_vector3d(minx, miny, minz)) + minr + maxr;
+				if (maxr > max_r) max_r = dist;
+				if (max_y < maxy) max_y = maxy;
+				if (gab.x + old_cpos.w > 0.7) {
+					if (gab.z + old_cpos.w > 0.260) {
+						gab.z = 0.0;
+						gab.y = max_y + max_r;
+						max_r = 0.0;
+					}
+					else {
+						gab.z += dist;
+					}
+					gab.x = 0.0;
+				}
+				else {
+					gab.x += dist;
+				}
+				//gab.x = gab.x > 0.7 ? 0.0 : gab.x + old_cpos.w;
+				//gab.z = gab.z > 0.260 ? 0.0 : gab.z + old_cpos.w;
+			}			
+		}		
+	}
+	/*cnt = 0;
+	
+	for (auto i : new_idx) {
+		xClusterEachPos _epos = epos[i];
+		vector4d *_pos = (vector4d*)_epos.pos;
+
+		for (int j = 0; j < _epos.neach; j++) {
+			new_pos[cnt++] = _pos[j];
+		}
+	}*/
+	return new_pos;
 }
 
 //unsigned int xParticleManager::NumClusterSet()
@@ -542,6 +625,7 @@ void xParticleManager::SetCurrentParticlesFromPartResult(std::string path)
 		//	qf.read((char*)m_pos, sizeof()
 		//	xpccs.erase(xpo->Name());
 		}
+		if (m_mass) delete[] m_mass;
 		delete[] m_pos;
 		delete[] m_vel;
 		delete[] m_acc;
@@ -917,7 +1001,7 @@ void xParticleManager::CopyClusterInformation(xClusterInformation * xci, double*
 				xci[cnt].neach = et.value().each;// xpo->EachCount();
 				xci[cnt].count = et.value().num;// xpo->NumCluster();
 				vector4d* _rloc = dynamic_cast<xClusterObject*>(xObjectManager::XOM()->XObject(et.key().toStdString()))->RelativeLocation();
-				for (int i = 0; i < et.value().each; i++) {
+				for (unsigned int i = 0; i < et.value().each; i++) {
 					rloc[nent + i] = new_vector3d(_rloc[i].x, _rloc[i].y, _rloc[i].z);
 				}
 				//memcpy(rloc + xci[cnt].sid, xpo->RelativeLocation(), sizeof(vector4d) * xci[cnt].neach);
@@ -1111,11 +1195,11 @@ void xParticleManager::ExportParticleDataForClusterModel(std::string path)
 		xParticleObject* xpo = it.value();
 		if (xpo->ShapeForm() == CLUSTER_SHAPE) {
 			xstring po_name = xpo->Name();
-			unsigned int ns = po_name.size();
+			unsigned int ns = (unsigned int)po_name.size();
 			file.write((char*)&ns, sizeof(unsigned int));
 			file.write((char*)po_name.text(), ns);
 			po_name = xpo->ParticleShapeName();
-			ns = po_name.size();
+			ns = (unsigned int)po_name.size();
 			file.write((char*)&ns, sizeof(unsigned int));
 			file.write((char*)po_name.text(), ns);
 			unsigned int neach = xpo->EachCount();
