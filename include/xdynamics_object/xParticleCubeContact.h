@@ -4,6 +4,7 @@
 #include "xdynamics_object/xConatct.h"
 
 class xParticleObject;
+class xParticlePlaneContact;
 class xCubeObject;
 
 class XDYNAMICS_API xParticleCubeContact : public xContact
@@ -36,19 +37,21 @@ public:
 		unsigned int np);
 
 	virtual void collision_cpu(
-		xContactPairList* pairs, unsigned int pid, unsigned int cid, double r,
-		vector4d* pos, euler_parameters* ep, vector3d* vel,
-		euler_parameters* ev, double* mass, double& rres, vector3d& tmax,
-		vector3d& force, vector3d& moment, unsigned int nco,
-		xClusterInformation* xci, vector4d *cpos);
-
+		vector4d * pos, euler_parameters * ep, vector3d * vel,
+		euler_parameters * ev, double* mass, double & rres, vector3d & tmax,
+		vector3d & force, vector3d & moment, unsigned int nco,
+		xClusterInformation * xci, vector4d * cpos);
+	static void savePartData(unsigned int np);
 	virtual void cudaMemoryAlloc(unsigned int np);
+	virtual void update();
+	virtual void define(unsigned int idx, unsigned int np);
 
 private:
-
+	double *dbi;
 	xParticleObject* p;
 	xCubeObject* cu;
 	device_plane_info *dpi;
+	xParticlePlaneContact* cpplanes[6];
 };
 
 #endif

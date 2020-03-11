@@ -2,6 +2,7 @@
 #include "xdynamics_object/xParticlePlaneContact.h"
 #include "xdynamics_object/xCubeObject.h"
 #include "xdynamics_object/xParticleObject.h"
+#include <sstream>
 
 xParticleCubeContact::xParticleCubeContact()
 	: xContact()
@@ -18,6 +19,7 @@ xParticleCubeContact::xParticleCubeContact(std::string _name, xObject* o1, xObje
 	, p(NULL)
 	, dpi(NULL)
 {
+	for(int i = 0; i < 6; i++) cpplanes[i] = nullptr;
 	if (o1->Shape() == CUBE_SHAPE)
 	{
 		cu = dynamic_cast<xCubeObject*>(o1);
@@ -28,12 +30,15 @@ xParticleCubeContact::xParticleCubeContact(std::string _name, xObject* o1, xObje
 		cu = dynamic_cast<xCubeObject*>(o2);
 		p = dynamic_cast<xParticleObject*>(o1);
 	}
-	//cu = o1->Shape() == CUBE_SHAPE ? dynamic_cast<xCubeObject*>(o1) : dynamic_cast<xParticleObject*>(o1);
+	mpp = { o1->Youngs(), o2->Youngs(), o1->Poisson(), o2->Poisson(), o1->Shear(), o2->Shear() };
 }
 
 xParticleCubeContact::~xParticleCubeContact()
 {
 	if (dpi) checkCudaErrors(cudaFree(dpi)); dpi = NULL;
+	for (int i = 0; i < 6; i++) {
+		if (cpplanes[i]) delete cpplanes[i]; cpplanes[i] = nullptr;
+	}
 }
 
 xCubeObject* xParticleCubeContact::CubeObject()
@@ -52,25 +57,29 @@ void xParticleCubeContact::collision_gpu(
 	unsigned int *cell_end,
 	unsigned int np)
 {
-	/*xParticlePlaneContact cpps(*this);
-	xPlaneObject* planes = cu->Planes();
-	for (unsigned int j = 0; j < 6; j++)
-	{
-		vector3d m_f, m_m;
-		cpps.singleCollision(planes + j, m, r, pos, vel, omega, m_f, m_m);
-		F += m_f;
-		M += m_m;
-	}*/
+	for (int i = 0; i < 6; i++) {
+		if (cpplanes[i]) {
+			cpplanes[i]->collision_gpu(
+				pos, cpos, xci, ep, vel, ev,
+				mass, inertia, force, moment, tmax, rres, sorted_id,
+				cell_start, cell_end, np);
+		}
+	}
 }
 
 void xParticleCubeContact::collision_cpu(
-	xContactPairList * pairs, unsigned int pid, unsigned int cid, double r,
-	vector4d * pos, euler_parameters * ep, 
-	vector3d * vel,	euler_parameters * ev, double* mass,
-	 double & rres, vector3d & tmax, 
-	vector3d & force, vector3d & moment, unsigned int nco, 
+	vector4d * pos, euler_parameters * ep, vector3d * vel,
+	euler_parameters * ev, double* mass, double & rres, vector3d & tmax,
+	vector3d & force, vector3d & moment, unsigned int nco,
 	xClusterInformation * xci, vector4d * cpos)
 {
+}
+
+void xParticleCubeContact::savePartData(unsigned int np)
+{
+	//for (int i = 0; i < 6; i++) {
+	//	cpplanes[i]->savePartData(np);
+	//}
 }
 
 void xParticleCubeContact::cuda_collision(
@@ -106,4 +115,48 @@ void xParticleCubeContact::cudaMemoryAlloc(unsigned int np)
 	checkCudaErrors(cudaMalloc((void**)&dpi, sizeof(device_plane_info) * 6));
 	checkCudaErrors(cudaMemcpy(dpi, _dpi, sizeof(device_plane_info) * 6, cudaMemcpyHostToDevice));
 	delete[] _dpi;*/
+}
+
+void xParticleCubeContact::update()
+{
+	cu->updateCube();
+	for (int i = 0; i < 6; i++) {
+		cpplanes[i]->update();
+	}
+	//if (xSimulation::Gpu())
+	//{
+	//	euler_parameters ep = cu->EulerParameters();
+	//	euler_parameters ed = cu->DEulerParameters();
+	//	double bi[15] =
+	//	{
+	//		cu->Mass(),
+	//		cu->Position().x, cu->Position().y, cu->Position().z,
+	//		cu->Velocity().x, cu->Velocity().y, cu->Velocity().z,
+	//		ep.e0, ep.e1, ep.e2, ep.e3,
+	//		ed.e0, ed.e1, ed.e2, ed.e3
+	//	};
+	//	checkXerror(cudaMemcpy(dbi, bi, DEVICE_BODY_MEM_SIZE, cudaMemcpyHostToDevice));
+	//	//cu_update_meshObjectData(dvList, dsphere, dlocal, dti, dbi, po->NumTriangle());
+	//}
+}
+
+void xParticleCubeContact::define(unsigned int idx, unsigned int np)
+{
+	xContactParameterData cpd = {
+		xContact::restitution,
+		xContact::stiffnessRatio,
+		xContact::s_friction,
+		xContact::friction,
+		xContact::cohesion,
+		xContact::rolling_factor
+	};
+	for (int i = 0; i < 6; i++) {
+		std::stringstream ss;
+		ss << name << i;
+		//xstring _n = ss.str();
+		xPlaneObject* plane = cu->Planes() + i;
+		cpplanes[i] = new xParticlePlaneContact(ss.str(), p, plane);
+		cpplanes[i]->setContactParameters(cpd);
+		cpplanes[i]->define(idx, np);
+	}	
 }

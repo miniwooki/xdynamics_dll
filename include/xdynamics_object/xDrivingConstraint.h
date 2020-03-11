@@ -18,6 +18,7 @@ public:
 	unsigned int RevolutionCount();
 	unsigned int DerivativeRevolutionCount();
 	double RotationAngle();
+	double EndTime();
 	void setRevolutionCount(unsigned int _n_rev);
 	void setDerivativeRevolutionCount(unsigned int _dn_rev);
 	void setRotationAngle(double _theta);
@@ -25,16 +26,11 @@ public:
 	std::string Name();
 	int get_driving_type();
 	void setStartTime(double st);
+	void setEndTime(double et);
 	void setConstantVelocity(double cv);
+	void setFixAfterDrivingEnd(bool b);
 	void ImportResults(std::string f);
 	void ExportResults(std::fstream& of);
-	//unsigned int startRow() { return srow; }
-	//	unsigned int startColumn() { return scol; }
-	//bool use(int i) { return use_p[i]; }
-	//int maxNNZ() { return maxnnz; }
-	//pointMass* ActionBody(){ return m; }
-	//void updateInitialCondition();
-	//double constraintEquation(double ct);
 	void ConstraintGamma(xVectorD& rhs, xVectorD& q, xVectorD& qd, unsigned int sr, double ct, double mul);
 	void ConstraintEquation(xVectorD& rhs, xVectorD& q, xVectorD& qd, unsigned int sr, double ct, double mul);
 	void ConstraintDerivative(xVectorD& rhs, xVectorD& q, xVectorD& qd, unsigned int sr, double ct, double mul);
@@ -50,18 +46,16 @@ private:
 	int d_udrl;
 	xstring name;
 	int type;
+	bool is_fix_after_end;
+	double last_ce;
 	double plus_time;
 	double start_time;
+	double end_time;
 	//int maxnnz;
 	double init_v;
 	double cons_v;
 //	QVector<xKinematicConstraint::kinematicConstraint_result> kcrs;
 	double theta;
-	//unsigned int srow;
-	//unsigned int scol;
-	//QString name;
-
-	//unsigned int n;
 	int n_rev;
 	int dn_rev;
 	unsigned int srow;

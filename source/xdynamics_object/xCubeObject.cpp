@@ -31,6 +31,17 @@ xCubeObject::~xCubeObject()
 	if (planes) delete[] planes; planes = NULL;
 }
 
+void xCubeObject::updateCube()
+{
+	for (int i = 0; i < 6; i++) {
+		planes[i].setEulerParameters(xPointMass::ep.e0, xPointMass::ep.e1, xPointMass::ep.e2, xPointMass::ep.e3);
+		planes[i].setDEulerParameters(xPointMass::ev.e0, xPointMass::ev.e1, xPointMass::ev.e2, xPointMass::ev.e3);
+		vector3d pgp = xPointMass::pos + toGlobal(local_plane_position[i]);
+		planes[i].setPosition(pgp.x, pgp.y, pgp.z);
+		planes[i].setVelocity(xPointMass::vel.x, xPointMass::vel.y, xPointMass::vel.z);
+	}
+}
+
 bool xCubeObject::define(vector3d& min, vector3d& max)
 {
 	if (!planes)
@@ -55,6 +66,13 @@ bool xCubeObject::define(vector3d& min, vector3d& max)
 	planes[3].setMaterialType(this->Material());
 	planes[4].setMaterialType(this->Material());
 	planes[5].setMaterialType(this->Material());
+
+	local_plane_position[0] = toLocal(planes[0].Position() - xPointMass::pos);
+	local_plane_position[1] = toLocal(planes[1].Position() - xPointMass::pos);
+	local_plane_position[2] = toLocal(planes[2].Position() - xPointMass::pos);
+	local_plane_position[3] = toLocal(planes[3].Position() - xPointMass::pos);
+	local_plane_position[4] = toLocal(planes[4].Position() - xPointMass::pos);
+	local_plane_position[5] = toLocal(planes[5].Position() - xPointMass::pos);
 	return true;
 }
 

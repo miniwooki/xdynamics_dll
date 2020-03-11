@@ -112,6 +112,7 @@ private:
 	xmap<xstring, xParticlePlaneContact*> cpplanes;
 	xmap<xstring, xParticleMeshObjectContact*> cpmeshes;
 	xmap<xstring, xParticleCylinderContact*> cpcylinders;
+	xmap<xstring, xParticleCubeContact*> cpcubes;
 	xContactPairList* xcpl;
 };
 

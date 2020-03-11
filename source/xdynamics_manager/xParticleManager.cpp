@@ -79,12 +79,14 @@ std::vector<vector4d> xParticleManager::RandomRepositioningClusters()
 	std::vector<__int64> new_idx = xUtilityFunctions::RandomDistribution(0, ncluster-1, true);
 	std::vector<vector4d> new_pos(np);// = new vector4d[np];
 	std::vector<vector4d> new_cpos;// (ncluster);
-	//std::vector<xClusterEachPos> epos(ncluster);
+	std::vector<xClusterEachPos> epos(ncluster);
 	vector4d sloc = new_vector4d(-1.04, -0.09, -0.125, 0.0);
 	vector4d gab = new_vector4d(0.0, 0.0, 0.0, 0.0);
 	__int64 cnt = 0;
 	double max_y = -FLT_MAX;
 	double max_r = -FLT_MAX;
+	double max_d = -FLT_MAX;
+
 	for (xmap<xstring, xParticleObject*>::iterator it = xpcos.begin(); it != xpcos.end(); it.next())
 	{
 		xParticleObject* pobj = it.value();
@@ -101,12 +103,13 @@ std::vector<vector4d> xParticleManager::RandomRepositioningClusters()
 			vector4d* rloc = cobj->RelativeLocation();			
 			for (unsigned int i = _ss; i < _ss + _ns; i++) {
 				__int64 idx = new_idx[i];
-				vector4d old_cpos = pobj->ClusterPosition()[i];// &pobj->CluPosition()[idx * ed.each];
+				
+				vector4d old_cpos = pobj->ClusterPosition()[idx];// &pobj->CluPosition()[idx * ed.each];
 				vector4d ep = pobj->EulerParameters()[idx];
 				vector4d new_cp = sloc + gab;				
 				//vector3d dist = new_vector3d(new_p.x - old_cpos.x, new_p.y - old_cpos.y, new_p.z - old_cpos.z);//
 				new_cpos.push_back(new_cp);
-				double maxr = 0, minr = 0;
+				double maxr = -FLT_MAX, minr = FLT_MAX;
 				double maxx = -FLT_MAX, maxy = -FLT_MAX, maxz = -FLT_MAX;
 				double minx = FLT_MAX, miny = FLT_MAX, minz = FLT_MAX;
 				for (unsigned int j = 0; j < ed.each; j++) {
@@ -123,8 +126,9 @@ std::vector<vector4d> xParticleManager::RandomRepositioningClusters()
 					if (minz > new_p.z) minz = new_p.z + new_p.w;
 				}
 				double dist = length(new_vector3d(maxx, maxy, maxz) - new_vector3d(minx, miny, minz)) + minr + maxr;
-				if (maxr > max_r) max_r = dist;
+				if (maxr > max_r) max_r = maxr;
 				if (max_y < maxy) max_y = maxy;
+				if (max_d < dist) max_d = dist;
 				if (gab.x + old_cpos.w > 0.7) {
 					if (gab.z + old_cpos.w > 0.260) {
 						gab.z = 0.0;
@@ -132,7 +136,8 @@ std::vector<vector4d> xParticleManager::RandomRepositioningClusters()
 						max_r = 0.0;
 					}
 					else {
-						gab.z += dist;
+						gab.z += max_d;
+						max_d = 0.0;
 					}
 					gab.x = 0.0;
 				}

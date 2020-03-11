@@ -66,7 +66,7 @@ bool xPlaneObject::define(bool isMovingObject, vector3d& _xw, vector3d& _pa, vec
 	u1 = pa / l1;
 	u2 = pb / l2;
 	uw = cross(u1, u2);
-	w3 = xw + w2 + l2 * u2;
+	w3 = xw + pa + pb;
 	xPointMass::pos = 0.5 * (xw + w3);
 	local_point[0] = toLocal(xw - xPointMass::pos);
 	local_point[1] = toLocal(w2 - xPointMass::pos);

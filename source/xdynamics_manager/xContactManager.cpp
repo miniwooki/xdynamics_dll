@@ -66,14 +66,15 @@ void xContactManager::CreateContactPair(
 			xParticleObject* particles = dynamic_cast<xParticleObject*>(o1->Shape() == PARTICLES ? o1 : o2);
 			for (unsigned int i = 0; i < 6; i++)
 			{
-				std::stringstream ss;
+				/*std::stringstream ss;
 				ss << n << i;
-				xstring _n = ss.str();
-				xPlaneObject* plane = cube->Planes() + i;
-				xParticlePlaneContact *c = new xParticlePlaneContact(ss.str(), particles, plane);
+				xstring _n = ss.str();*/
+				xParticleCubeContact* c = new xParticleCubeContact(n, particles, cube);
+				//xPlaneObject* plane = cube->Planes() + i;
+				//xParticlePlaneContact *c = new xParticlePlaneContact(ss.str(), particles, plane);
 				c->setContactParameters(d);
-				cpplanes.insert(_n, c);
-				cots.insert(_n, c);
+				cpcubes.insert(n, c);
+				cots.insert(n, c);
 			}
 			break;
 		}			
@@ -129,6 +130,8 @@ void xContactManager::defineContacts(unsigned int np)
 		case PARTICLE_PARTICLE:
 			dynamic_cast<xParticleParticleContact*>(it.value())->define(0, np);
 			break;
+		case PARTICLE_CUBE:
+			dynamic_cast<xParticleCubeContact*>(it.value())->define(cpcubes.size(), np);
 		}
 	}
 }
@@ -302,7 +305,11 @@ void xContactManager::SaveStepResult(unsigned int pt, unsigned int np)
 		if (cpmeshes.size())
 		{
 			xParticleMeshObjectContact::savePartData(np);
-		}			
+		}		
+		if (cpcubes.size() || !cpplanes.size())
+		{
+			xParticlePlaneContact::savePartData(np);
+		}
 	}
 }
 

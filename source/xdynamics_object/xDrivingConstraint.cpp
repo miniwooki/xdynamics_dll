@@ -7,6 +7,8 @@ xDrivingConstraint::xDrivingConstraint()
 	: type(ROTATION_DRIVING)
 	, plus_time(0.0)
 	, start_time(0.0)
+	, end_time(FLT_MAX)
+	, is_fix_after_end(false)
 	, init_v(0.0)
 	, cons_v(0.0)
 	, theta(0.0)
@@ -16,6 +18,7 @@ xDrivingConstraint::xDrivingConstraint()
 	, srow(0)
 	, udrl(0)
 	, d_udrl(0)
+	, last_ce(0)
 {
 
 }
@@ -24,6 +27,8 @@ xDrivingConstraint::xDrivingConstraint(std::string _name, xKinematicConstraint* 
 	: type(ROTATION_DRIVING)
 	, plus_time(0.0)
 	, start_time(0.0)
+	, end_time(FLT_MAX)
+	, is_fix_after_end(false)
 	, init_v(0.0)
 	, cons_v(0.0)
 	, theta(0.0)
@@ -33,6 +38,7 @@ xDrivingConstraint::xDrivingConstraint(std::string _name, xKinematicConstraint* 
 	, srow(0)
 	, udrl(0)
 	, d_udrl(0)
+	, last_ce(0)
 {
 	if (kconst->Type() == xKinematicConstraint::REVOLUTE)
 		type = ROTATION_DRIVING;
@@ -60,6 +66,11 @@ unsigned int xDrivingConstraint::DerivativeRevolutionCount()
 double xDrivingConstraint::RotationAngle()
 {
 	return theta;
+}
+
+double xDrivingConstraint::EndTime()
+{
+	return end_time;
 }
 
 void xDrivingConstraint::setRevolutionCount(unsigned int _n_rev)
@@ -116,9 +127,19 @@ void xDrivingConstraint::setStartTime(double st)
 	start_time = st;
 }
 
+void xDrivingConstraint::setEndTime(double et)
+{
+	end_time = et;
+}
+
 void xDrivingConstraint::setConstantVelocity(double cv)
 {
 	cons_v = cv;
+}
+
+void xDrivingConstraint::setFixAfterDrivingEnd(bool b)
+{
+	is_fix_after_end = b;
 }
 
 void xDrivingConstraint::ImportResults(std::string f)
@@ -211,8 +232,12 @@ void xDrivingConstraint::ConstraintEquation(xVectorD& rhs, xVectorD& q, xVectorD
 	{
 		vector3d dist = (rj + Aj * kconst->Spj()) - (ri + Ai * kconst->Spi());// kconst->CurrentDistance();
 		vector3d hi = Ai * kconst->Hi();// kconst->iMass()->toGlobal(kconst->h_i());
-		if (start_time > ct + plus_time)
-			v = dot(hi, dist) - (init_v + 0.0 * ct);
+		double pct = ct + plus_time;
+		if (start_time > pct || end_time < pct)
+			if (is_fix_after_end)
+				v = dot(hi, dist) - (init_v + end_time * ct);
+			else
+				v = dot(hi, dist) - (init_v + 0.0 * ct);
 		else
 			v = dot(hi, dist) - (init_v + cons_v * (ct - start_time));
 		rhs(sr) = mul * v;
@@ -225,10 +250,15 @@ void xDrivingConstraint::ConstraintEquation(xVectorD& rhs, xVectorD& q, xVectorD
 		//	n_rev++;
 	//	accum_theta -= n_rev * 2.0 * M_PI;
 			
-		if (start_time > ct)
-			v = theta - (init_v + 0.0 * ct);
+		if (start_time > ct || end_time < ct) {
+			if (is_fix_after_end)
+				v = last_ce;// theta - (init_v + end_time * ct);
+			else
+				v = theta - (init_v + 0.0 * ct);
+		}
 		else
 			v = theta - accum_theta;
+		last_ce = v;
 		rhs(sr) = mul * v;
 	}
 }

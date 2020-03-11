@@ -477,13 +477,17 @@ void xXLSReader::ReadJoint(xMultiBodyModel* xmbd, vector2i rc)
 					name = ReadStr(drc[0], drc[1]++);
 					xdc = xmbd->CreateDrivingConstraint(name, xkc);
 					double stime = ReadNum(drc[0], drc[1]++);
-					double cvel = ReadNum(drc[0]++, drc[1]++);
+					double cvel = ReadNum(drc[0], drc[1]++);
 					xdc->setStartTime(stime);
 					xdc->setConstantVelocity(cvel);
+					if (!IsEmptyCell(drc[0], drc[1]))
+					{
+						double etime = ReadNum(drc[0], drc[1]++);
+						xdc->setEndTime(etime);
+					}
 				}
 			}
 		}
-		
 		rc.x++;
 		rc.y = 0;
 	}

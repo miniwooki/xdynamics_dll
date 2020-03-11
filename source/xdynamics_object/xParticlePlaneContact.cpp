@@ -95,6 +95,7 @@ void xParticlePlaneContact::local_initialize()
 
 void xParticlePlaneContact::update()
 {
+	pe->setupTransformationMatrix();
 	hpi.id = id;
 	hpi.xw = pe->Position() + pe->toGlobal(pe->LocalPoint(0));
 	hpi.w2 = pe->Position() + pe->toGlobal(pe->LocalPoint(1));

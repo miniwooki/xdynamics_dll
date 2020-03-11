@@ -17,7 +17,7 @@ public:
 
 	xPlaneObject* Planes() const { return planes; }
 	//device_plane_info* deviceCubeInfo() { return dpi; }
-
+	void updateCube();
 	bool define(vector3d& min, vector3d& max);
 	vector3d origin();// { return ori; }
 	vector3d origin() const;// { return ori; }
@@ -40,6 +40,7 @@ private:
 	vector3d min_p;
 	vector3d max_p;
 	vector3d size;
+	vector3d local_plane_position[6];
 };
 
 #endif

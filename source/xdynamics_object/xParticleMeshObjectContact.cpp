@@ -185,11 +185,6 @@ void xParticleMeshObjectContact::update()
 	}
 }
 
-// void xParticleMeshObjectContact::initialize()
-// {
-// 	xParticleMeshObjectContact::local_initialize();
-// }
-
 double * xParticleMeshObjectContact::MeshSphere()
 {
 	return xSimulation::Gpu() ? dsphere : (double*)hsphere;

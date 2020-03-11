@@ -374,6 +374,7 @@ void xMultiBodySimulation::ConstructConstraintEquation(xVectorD& v, int sr, doub
 	}
 	for (xmap<xstring, xDrivingConstraint*>::iterator it = xmbd->Drivings().begin(); it != xmbd->Drivings().end(); it.next())
 	{
+		//if (xSimulation::ctime < it.value()->EndTime())
 		it.value()->ConstraintEquation(v, q, qd, sr, xSimulation::ctime, mul);
 		sr++;
 	}
