@@ -705,6 +705,11 @@ void xdynamics_gui::setupObjectOperations()
 	connect(a, SIGNAL(triggered()), this, SLOT(xRepositioningClusters()));
 	myObjectActions.insert(REPOSITIONING_CLUSTERS, a);
 
+	a = new QAction(QIcon(":/Resources/icon/colorforsize.png"), tr("&Color for particle size"), this);
+	a->setStatusTip(tr("Color for particle size"));
+	connect(a, SIGNAL(triggered()), this, SLOT(xColorForParticleSize()));
+	myObjectActions.insert(COLOR_FOR_PARTICLE_SIZE, a);
+
 // 	a = new QAction(QIcon(":/Resources/icon/save.png"), tr("&Save"), this);
 // 	a->setStatusTip(tr("Save project"));
 // 	connect(a, SIGNAL(triggered()), this, SLOT(xSave()));
@@ -1219,6 +1224,14 @@ void xdynamics_gui::xRepositioningClusters()
 	xParticleManager* xpm = xdm->XDEMModel()->XParticleManager();
 	std::vector<vector4d> new_pos = xpm->RandomRepositioningClusters();
 	xgl->vParticles()->updatePosition(new_pos);
+}
+
+void xdynamics_gui::xColorForParticleSize()
+{
+	if (xgl->vParticles())
+	{
+		xgl->vParticles()->setColorFromParticleSize();
+	}
 }
 //void xdynamics_gui::xHighlightParticle(unsigned int id, QColor color, QColor& pcolor)
 //{

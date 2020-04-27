@@ -13,7 +13,6 @@ public:
 	void SetupDataFromStructure(xPointMass* ip, xPointMass* jp, xRotationalAxialForceData& d);
 
 	virtual void xCalculateForce(const xVectorD& q, const xVectorD& qd);
-	//virtual vector3d xCalculateForceForDEM(vector3d& ip, vector3d& jp, vector3d& iv, vector3d& jv);
 	virtual void xDerivate(xMatrixD& lhs, const xVectorD& q, const xVectorD& qd, double mul);
 	virtual void xDerivateVelocity(xMatrixD& lhs, const xVectorD& q, const xVectorD& qd, double mul);
 

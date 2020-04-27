@@ -18,7 +18,6 @@ xDrivingConstraint::xDrivingConstraint()
 	, srow(0)
 	, udrl(0)
 	, d_udrl(0)
-	, last_ce(0)
 {
 
 }
@@ -38,7 +37,6 @@ xDrivingConstraint::xDrivingConstraint(std::string _name, xKinematicConstraint* 
 	, srow(0)
 	, udrl(0)
 	, d_udrl(0)
-	, last_ce(0)
 {
 	if (kconst->Type() == xKinematicConstraint::REVOLUTE)
 		type = ROTATION_DRIVING;
@@ -251,14 +249,11 @@ void xDrivingConstraint::ConstraintEquation(xVectorD& rhs, xVectorD& q, xVectorD
 	//	accum_theta -= n_rev * 2.0 * M_PI;
 			
 		if (start_time > ct || end_time < ct) {
-			if (is_fix_after_end)
-				v = last_ce;// theta - (init_v + end_time * ct);
-			else
-				v = theta - (init_v + 0.0 * ct);
+			v = theta - (init_v + 0.0 * ct);
 		}
 		else
 			v = theta - accum_theta;
-		last_ce = v;
+		//last_ce = v;
 		rhs(sr) = mul * v;
 	}
 }

@@ -31,8 +31,10 @@ public:
 	static void setUserLimitInputType(bool isu);
 	static float minimumLimit();
 	static float maximumLimit();
+	static void colorFromData(double vmin, double vmax, double v, double* color);
 
 private:
+	static double ratio(double a, double b);
 	//static double* tmp_color;
 	static bool is_user_limit_input;
 	//size_t npart;

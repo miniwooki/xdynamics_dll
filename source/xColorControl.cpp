@@ -1,4 +1,6 @@
 #include "xColorControl.h"
+#include <algorithm>
+#include "..\include\xColorControl.h"
 //#include "vcontroller.h"
 
 //using namespace ucolors;
@@ -50,6 +52,97 @@ float xColorControl::minimumLimit()
 float xColorControl::maximumLimit()
 {
 	return max_v;;
+}
+
+void xColorControl::colorFromData(double min_value, double max_value, double v, double* color)
+{
+	///double min_value = c_prop->MinZ();
+	///double max_value = c_prop->MaxZ();
+	double dv = max_value - min_value;// c_prop->MaxZ() - c_prop->MinZ();
+	double dc = dv / 9.0;
+	double r, g, b;
+
+
+
+	if (v < -1 && v > -2) {
+		v = v;
+	}
+	if (v <= min_value) {
+		r = 0.0;
+		g = 0.0;
+		b = 1.0;
+	}
+	else if (v >= min_value + dc && v < min_value + 1.0 * dc) {
+		r = 0;	g = 0;
+		b = 0.4 + 0.4 * ratio(v, min_value + 1.0 * dc);
+	}
+	else if (v >= min_value + 1.0 * dc && v < min_value + 2.0 * dc) {
+		r = 0;	g = 0;
+		b = 0.8 + ratio(v, min_value + 2.0 * dc);
+		if (b > 1.0) {
+			b = 1.0;
+			g = 0.5 * (ratio(v, (min_value + 2.0 * dc)) - 0.2);
+		}
+	}
+	else if (v >= min_value + 2.0 * dc && v < min_value + 3.0 * dc) {
+		r = 0;
+		g = 0.4 + 0.6 * ratio(v, min_value + 3.0 * dc);
+		b = 1.0;
+	}
+	else if (v >= min_value + 3.0 * dc && v < min_value + 4.0 * dc) {
+		r = 0;
+		g = 1.0;
+		b = 1.0 - 0.6 * ratio(v, min_value + 4.0 * dc);
+	}
+	else if (v >= min_value + 4.0 * dc && v < min_value + 5.0 * dc) {
+		r = 0;
+		g = 1.0;
+		b = 0.4 - ratio(v, min_value + 5.0 * dc);
+		if (b < 0.0) {
+			b = 0.0;
+			r = 1.333333 * (ratio(v, min_value + 5.0 * dc) - 0.4);
+		}
+	}
+	else if (v >= min_value + 5.0 * dc && v < min_value + 6.0 * dc) {
+		r = 0.8 + ratio(v, min_value + 6.0 * dc);
+		b = 0.0;
+		g = 1.0;
+		if (r > 1.0) {
+			r = 1.0;
+			g = 1.0 - 0.25 * (ratio(v, min_value + 6.0 * dc) - 0.2);
+		}
+	}
+	else if (v >= min_value + 6.0 * dc && v < min_value + 7.0 * dc) {
+		r = 1.0;
+		b = 0.0;
+		g = 0.8 - 0.4 * ratio(v, min_value + 7.0 * dc);
+	}
+	else if (v >= min_value + 7.0 * dc && v < min_value + 8.0 * dc) {
+		r = 1.0;
+		b = 0.0;
+		g = 0.4 - 0.4 * ratio(v, min_value + 8.0 * dc);
+	}
+	else if (v >= min_value + 8.0 * dc && v < max_value) {
+		r = 1.0 - 0.6 * ratio(v, max_value);
+		b = 0.0;
+		g = 0.0;
+	}
+	else if (v >= max_value) {
+		r = 1.0;
+		g = 0.0;
+		b = 0.0;
+	}
+	color[0] = r;
+	color[1] = g;
+	color[2] = b;
+	//return qRgb(int(r * 255), int(g * 255), int(b * 255));
+}
+
+double xColorControl::ratio(double a, double b)
+{
+	double top = std::min(abs(a), abs(b));
+	double bottom = std::max(abs(a), abs(b));
+	return top / bottom;
 }
 
 void xColorControl::setTarget(ColorMapType _cmt)

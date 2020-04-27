@@ -22,5 +22,6 @@
         <file>Resources/mesh/largesphere.obj</file>
         <file>Resources/icon/collision_check.png</file>
         <file>Resources/icon/repositioning.png</file>
+        <file>Resources/icon/colorforsize.png</file>
     </qresource>
 </RCC>

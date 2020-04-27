@@ -62,6 +62,7 @@ public:
 	float getMinValue(xColorControl::ColorMapType cmt);
 	float getMaxValue(xColorControl::ColorMapType cmt);
 	void updatePosition(std::vector<vector4d>& new_pos);
+	void setColorFromParticleSize();
 
 private:
 	bool _define();
@@ -82,6 +83,9 @@ private:
 	float *color;
 	double *r_pos;
 	bool isSetColor;
+
+	double min_radius;
+	double max_radius;
 	
 	float pscale;
 	QMap<QString, particleGroupData> pgds;

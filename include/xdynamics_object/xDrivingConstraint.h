@@ -47,7 +47,6 @@ private:
 	xstring name;
 	int type;
 	bool is_fix_after_end;
-	double last_ce;
 	double plus_time;
 	double start_time;
 	double end_time;

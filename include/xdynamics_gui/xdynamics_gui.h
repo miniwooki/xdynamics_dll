@@ -36,7 +36,7 @@ public:
 	enum { NEW = 0, OPEN, SAVE };
 	enum { CUBE = 3, CYLINDER, CHART, UPLOAD_RESULT, 
 		PASSING_DISTRIBUTION, CONVERT_MESH_TO_SPHERE, GENERATE_CLUSTER_DISTRIBUTION, 
-		CHECK_COLLISION, REPOSITIONING_CLUSTERS };
+		CHECK_COLLISION, REPOSITIONING_CLUSTERS, COLOR_FOR_PARTICLE_SIZE };
 	
 	xdynamics_gui(int _argc, char** _argv, QWidget *parent = Q_NULLPTR);
 	~xdynamics_gui();
@@ -82,6 +82,7 @@ private slots:
 	void xCheckCollision();
 	void xExportClusterParticleModel();
 	void xRepositioningClusters();
+	void xColorForParticleSize();
 	//void xHighlightParticle(unsigned int, QColor, QColor&);
 	
 private:

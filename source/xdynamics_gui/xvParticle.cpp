@@ -31,6 +31,8 @@ xvParticle::xvParticle()
 	, r_pos(NULL)
 	, pscale(0)
 	, isDefine(false)
+	, min_radius(FLT_MAX)
+	, max_radius(-FLT_MAX)
 {
 	m_posVBO = 0;
 	m_colorVBO = 0;
@@ -204,7 +206,11 @@ bool xvParticle::defineFromParticleObject(xParticleObject* pobj)
 		pos[(np + i) * 4 + 0] = (float)d_pos[i].x;
 		pos[(np + i) * 4 + 1] = (float)d_pos[i].y;
 		pos[(np + i) * 4 + 2] = (float)d_pos[i].z;
-		pos[(np + i) * 4 + 3] = (float)d_pos[i].w;
+		double rad = pos[(np + i) * 4 + 3] = (float)d_pos[i].w;
+		if (rad < min_radius)
+			min_radius = rad;
+		if (rad > max_radius)
+			max_radius = rad;
 	}
 	if (color) {
 		delete[]color;
@@ -256,7 +262,11 @@ bool xvParticle::defineFromViewFile(QString path)
 			pos[(np + i) * 4 + 0] = (float)d_pos[i * 4 + 0];
 			pos[(np + i) * 4 + 1] = (float)d_pos[i * 4 + 1];
 			pos[(np + i) * 4 + 2] = (float)d_pos[i * 4 + 2];
-			pos[(np + i) * 4 + 3] = (float)d_pos[i * 4 + 3];
+			double rad = pos[(np + i) * 4 + 3] = (float)d_pos[i * 4 + 3];
+			if (rad < min_radius)
+				min_radius = rad;
+			if (rad > max_radius)
+				max_radius = rad;
 		}
 		qf.read((char*)d_mass, sizeof(double) * (pgds[name].cnp ? pgds[name].cnp : pgds[name].np));
 		np += pgds[name].np;
@@ -285,7 +295,11 @@ bool xvParticle::defineFromListFile(QString path)
 		pos[(np + i) * 4 + 0] = (float)d_pos[0];
 		pos[(np + i) * 4 + 1] = (float)d_pos[1];
 		pos[(np + i) * 4 + 2] = (float)d_pos[2];
-		pos[(np + i) * 4 + 3] = (float)d_pos[3];
+		double rad = pos[(np + i) * 4 + 3] = (float)d_pos[3];
+		if (rad < min_radius)
+			min_radius = rad;
+		if (rad > max_radius)
+			max_radius = rad;
 	}
 	np += _np;
 	
@@ -522,6 +536,20 @@ void xvParticle::updatePosition(std::vector<vector4d>& new_pos)
 		pos[i * 4 + 1] = p.y;
 		pos[i * 4 + 2] = p.z;
 		pos[i * 4 + 3] = p.w;
+	}
+}
+
+void xvParticle::setColorFromParticleSize()
+{
+	if (min_radius == max_radius)
+		return;
+	for (unsigned int i = 0; i < np; i++) {
+		double c[3] = { 0, };
+		xColorControl::colorFromData(min_radius, max_radius, pos[i * 4 + 3], c);
+		color[i * 4 + 0] = (float)c[0];
+		color[i * 4 + 1] = (float)c[1];
+		color[i * 4 + 2] = (float)c[2];
+		color[i * 4 + 3] = 1.0f;
 	}
 }
 

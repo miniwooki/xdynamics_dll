@@ -78,7 +78,7 @@ xGLWidget::xGLWidget(int argc, char** argv, QWidget *parent)
 
 xGLWidget::~xGLWidget()
 {
-	makeCurrent();
+	//makeCurrent();
 	glDeleteLists(coordinate, 1);
 	glObjectClear();
 	//if (xcc) delete xcc; xcc = NULL;

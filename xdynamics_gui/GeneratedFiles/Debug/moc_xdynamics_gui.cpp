@@ -1,18 +1,19 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'xdynamics_gui.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.12.6)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.14.1)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
+#include <memory>
 #include "../../../include/xdynamics_gui/xdynamics_gui.h"
 #include <QtCore/qbytearray.h>
 #include <QtCore/qmetatype.h>
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'xdynamics_gui.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.12.6. It"
+#error "This file was generated using the moc from 5.14.1. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -21,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_xdynamics_gui_t {
-    QByteArrayData data[42];
-    char stringdata0[724];
+    QByteArrayData data[43];
+    char stringdata0[746];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -72,7 +73,8 @@ QT_MOC_LITERAL(37, 644, 4), // "int*"
 QT_MOC_LITERAL(38, 649, 7), // "double*"
 QT_MOC_LITERAL(39, 657, 15), // "xCheckCollision"
 QT_MOC_LITERAL(40, 673, 27), // "xExportClusterParticleModel"
-QT_MOC_LITERAL(41, 701, 22) // "xRepositioningClusters"
+QT_MOC_LITERAL(41, 701, 22), // "xRepositioningClusters"
+QT_MOC_LITERAL(42, 724, 21) // "xColorForParticleSize"
 
     },
     "xdynamics_gui\0xNew\0\0xSave\0xOpen\0"
@@ -94,7 +96,7 @@ QT_MOC_LITERAL(41, 701, 22) // "xRepositioningClusters"
     "xGenerateClusterDistribution\0"
     "xGenerateClusterParticles\0int*\0double*\0"
     "xCheckCollision\0xExportClusterParticleModel\0"
-    "xRepositioningClusters"
+    "xRepositioningClusters\0xColorForParticleSize"
 };
 #undef QT_MOC_LITERAL
 
@@ -104,7 +106,7 @@ static const uint qt_meta_data_xdynamics_gui[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-      31,   14, // methods
+      32,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -112,37 +114,38 @@ static const uint qt_meta_data_xdynamics_gui[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,  169,    2, 0x08 /* Private */,
-       3,    0,  170,    2, 0x08 /* Private */,
-       4,    0,  171,    2, 0x08 /* Private */,
-       5,    0,  172,    2, 0x08 /* Private */,
-       6,    0,  173,    2, 0x08 /* Private */,
-       7,    0,  174,    2, 0x08 /* Private */,
-       8,    1,  175,    2, 0x08 /* Private */,
-      10,    1,  178,    2, 0x08 /* Private */,
-      12,    1,  181,    2, 0x08 /* Private */,
-      14,    1,  184,    2, 0x08 /* Private */,
-      16,    3,  187,    2, 0x08 /* Private */,
-      17,    0,  194,    2, 0x08 /* Private */,
-      18,    2,  195,    2, 0x08 /* Private */,
-      19,    0,  200,    2, 0x08 /* Private */,
-      20,    1,  201,    2, 0x08 /* Private */,
-      21,    0,  204,    2, 0x08 /* Private */,
-      22,    0,  205,    2, 0x08 /* Private */,
-      23,    0,  206,    2, 0x08 /* Private */,
-      24,    0,  207,    2, 0x08 /* Private */,
-      25,    0,  208,    2, 0x08 /* Private */,
-      26,    2,  209,    2, 0x08 /* Private */,
-      30,    1,  214,    2, 0x08 /* Private */,
-      31,    0,  217,    2, 0x08 /* Private */,
-      32,    1,  218,    2, 0x08 /* Private */,
-      33,    0,  221,    2, 0x08 /* Private */,
-      34,    0,  222,    2, 0x08 /* Private */,
-      35,    0,  223,    2, 0x08 /* Private */,
-      36,    5,  224,    2, 0x08 /* Private */,
-      39,    0,  235,    2, 0x08 /* Private */,
-      40,    0,  236,    2, 0x08 /* Private */,
-      41,    0,  237,    2, 0x08 /* Private */,
+       1,    0,  174,    2, 0x08 /* Private */,
+       3,    0,  175,    2, 0x08 /* Private */,
+       4,    0,  176,    2, 0x08 /* Private */,
+       5,    0,  177,    2, 0x08 /* Private */,
+       6,    0,  178,    2, 0x08 /* Private */,
+       7,    0,  179,    2, 0x08 /* Private */,
+       8,    1,  180,    2, 0x08 /* Private */,
+      10,    1,  183,    2, 0x08 /* Private */,
+      12,    1,  186,    2, 0x08 /* Private */,
+      14,    1,  189,    2, 0x08 /* Private */,
+      16,    3,  192,    2, 0x08 /* Private */,
+      17,    0,  199,    2, 0x08 /* Private */,
+      18,    2,  200,    2, 0x08 /* Private */,
+      19,    0,  205,    2, 0x08 /* Private */,
+      20,    1,  206,    2, 0x08 /* Private */,
+      21,    0,  209,    2, 0x08 /* Private */,
+      22,    0,  210,    2, 0x08 /* Private */,
+      23,    0,  211,    2, 0x08 /* Private */,
+      24,    0,  212,    2, 0x08 /* Private */,
+      25,    0,  213,    2, 0x08 /* Private */,
+      26,    2,  214,    2, 0x08 /* Private */,
+      30,    1,  219,    2, 0x08 /* Private */,
+      31,    0,  222,    2, 0x08 /* Private */,
+      32,    1,  223,    2, 0x08 /* Private */,
+      33,    0,  226,    2, 0x08 /* Private */,
+      34,    0,  227,    2, 0x08 /* Private */,
+      35,    0,  228,    2, 0x08 /* Private */,
+      36,    5,  229,    2, 0x08 /* Private */,
+      39,    0,  240,    2, 0x08 /* Private */,
+      40,    0,  241,    2, 0x08 /* Private */,
+      41,    0,  242,    2, 0x08 /* Private */,
+      42,    0,  243,    2, 0x08 /* Private */,
 
  // slots: parameters
     QMetaType::Void,
@@ -173,6 +176,7 @@ static const uint qt_meta_data_xdynamics_gui[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void, QMetaType::QString, QMetaType::QString, 0x80000000 | 37, 0x80000000 | 38, QMetaType::Bool,    2,    2,    2,    2,    2,
+    QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
@@ -217,13 +221,14 @@ void xdynamics_gui::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _i
         case 28: _t->xCheckCollision(); break;
         case 29: _t->xExportClusterParticleModel(); break;
         case 30: _t->xRepositioningClusters(); break;
+        case 31: _t->xColorForParticleSize(); break;
         default: ;
         }
     }
 }
 
 QT_INIT_METAOBJECT const QMetaObject xdynamics_gui::staticMetaObject = { {
-    &QMainWindow::staticMetaObject,
+    QMetaObject::SuperData::link<QMainWindow::staticMetaObject>(),
     qt_meta_stringdata_xdynamics_gui.data,
     qt_meta_data_xdynamics_gui,
     qt_static_metacall,
@@ -251,13 +256,13 @@ int xdynamics_gui::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 31)
+        if (_id < 32)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 31;
+        _id -= 32;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 31)
+        if (_id < 32)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 31;
+        _id -= 32;
     }
     return _id;
 }
